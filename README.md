@@ -1,8 +1,10 @@
 # FeedbackFlow
 
+Una plataforma de retroalimentación y evaluación para empleados dentro de una empresa que usa inteligencia artificial para reducir sesgos, sugerir planes de mejora y ayudar al empleado a resolver dudas diarias.
+
 [📌 Diseño de Figma](https://www.figma.com/file/klnYbVO4bRceWdcZrKkmZq/MockUp?type=design&node-id=0%3A1&mode=design&t=ZbcneFEULlyu53gy-1)
 
-Una plataforma de retroalimentación y evaluación para empleados dentro de una empresa que usa inteligencia artificial para reducir sesgos, sugerir planes de mejora y ayudar al empleado a resolver dudas diarias.
+![Mockup](mockup.png)
 
 ## Problema 
 Muchas empresas no cuentan con un sistema para dar retroalimentación entre los empleados, o si lo tienen, está de una manera muy sesgada, esto hace que muchas veces no se reconozca el esfuerzo de ciertos empleados que van muy bien, y no se le de un plan de mejora a aquellos que no van tan bien.
