@@ -2,7 +2,7 @@ import Image from "next/image";
 
 const Login = () => {
   return (
-    <main className="from-primary flex h-dvh w-full items-center justify-center bg-gradient-to-r to-[#8671d3]">
+    <main className="flex h-dvh w-full items-center justify-center bg-gradient-to-r from-primary to-[#8671d3]">
       <section className="h-[80%] w-[459px] rounded-[20px] bg-white shadow-md">
         <p className="mx-8 mt-10 text-center text-4xl font-medium leading-tight text-black">
           Welcome to Feedback Flow
@@ -33,13 +33,13 @@ const Login = () => {
             placeholder="********"
           />
           {/* Find a darker color for hover */}
-          <button className="bg-primary mx-auto my-4 h-12 w-28 rounded-3xl text-white shadow-2xl hover:bg-violet-900">
+          <button className="mx-auto my-4 h-12 w-28 rounded-3xl bg-primary text-white shadow-2xl hover:bg-violet-900">
             Login
           </button>
         </form>
         <div className="mx-auto flex justify-center">
           <p className="text-black">Don&apos;t have an account? </p>
-          <p className="text-primary ms-1 hover:text-violet-900">Register</p>
+          <p className="ms-1 text-primary hover:text-violet-900">Register</p>
         </div>
       </section>
     </main>
