@@ -2,9 +2,11 @@ name: lint
 
 on:
   push:
-    branches: [main]
+    branches:
+      - "**" # matches every branch
   pull_request:
-    branches: [main]
+    branches:
+      - "**" # matches every branch
 
 jobs:
   build:
