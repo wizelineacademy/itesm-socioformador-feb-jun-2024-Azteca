@@ -2,27 +2,27 @@ import Image from "next/image";
 
 const Login = () => {
   return (
-    <main className="w-full h-dvh bg-gradient-to-r from-primary to-[#8671d3] flex items-center justify-center">
-      <section className="bg-white w-[459px] h-[80%] rounded-[20px] shadow-md">
-        <p className=" text-center text-black text-4xl leading-tight font-medium mt-10 mx-8">
+    <main className="from-primary flex h-dvh w-full items-center justify-center bg-gradient-to-r to-[#8671d3]">
+      <section className="h-[80%] w-[459px] rounded-[20px] bg-white shadow-md">
+        <p className=" mx-8 mt-10 text-center text-4xl font-medium leading-tight text-black">
           Welcome to Feedback Flow
         </p>
         <Image
-          className="my-6 mx-auto px-3 border border-black rounded-lg hover:bg-gray-300"
+          className="mx-auto my-6 rounded-lg border border-black px-3 hover:bg-gray-300"
           src="/slack.svg"
           alt="slack-logo"
           width={65}
           height={20}
         />
-        <div className="flex items-center justify-center mx-12">
+        <div className="mx-12 flex items-center justify-center">
           <div className="flex-grow border-t border-black"></div>
-          <span className="mx-4 text-black text-sm">OR</span>
+          <span className="mx-4 text-sm text-black">OR</span>
           <div className="flex-grow border-t border-black"></div>
         </div>
-        <form className="flex flex-col items-center justify-center mt-6">
-          <label className="text-black text-sm">Email</label>
+        <form className="mt-6 flex flex-col items-center justify-center">
+          <label className="text-sm text-black">Email</label>
           <input
-            className="w-[80%] h-10 border bg-white text-black border-black rounded-lg px-2 my-2"
+            className="my-2 h-10 w-[80%] rounded-lg border border-black bg-white px-2 text-black"
             type="email"
           />
         </form>

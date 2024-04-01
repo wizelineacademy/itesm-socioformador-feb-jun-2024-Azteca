@@ -5,9 +5,9 @@ import "./globals.css";
 // const inter = Inter({ subsets: ["latin"] });
 
 const poppins = Poppins({
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-  subsets: ['latin'],
-  display: 'swap',
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
