@@ -4,7 +4,7 @@ const Login = () => {
   return (
     <main className="from-primary flex h-dvh w-full items-center justify-center bg-gradient-to-r to-[#8671d3]">
       <section className="h-[80%] w-[459px] rounded-[20px] bg-white shadow-md">
-        <p className=" mx-8 mt-10 text-center text-4xl font-medium leading-tight text-black">
+        <p className="mx-8 mt-10 text-center text-4xl font-medium leading-tight text-black">
           Welcome to Feedback Flow
         </p>
         <Image
