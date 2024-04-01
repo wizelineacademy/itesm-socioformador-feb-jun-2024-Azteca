@@ -15,9 +15,9 @@ const Login = () => {
           height={20}
         />
         <div className="mx-12 flex items-center justify-center">
-          <div className="flex-grow border-t border-black"></div>
+          <div className="flex-grow border-t border-black" />
           <span className="mx-4 text-sm text-black">OR</span>
-          <div className="flex-grow border-t border-black"></div>
+          <div className="flex-grow border-t border-black" />
         </div>
         <form className="mt-6 flex flex-col items-center justify-center">
           <label className="text-sm text-black">Email</label>
