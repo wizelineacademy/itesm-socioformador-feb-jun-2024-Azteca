@@ -19,13 +19,28 @@ const Login = () => {
           <span className="mx-4 text-sm text-black">OR</span>
           <div className="flex-grow border-t border-black" />
         </div>
-        <form className="mt-6 flex flex-col items-center justify-center">
-          <label className="text-sm text-black">Email</label>
+        <form className="mx-12 mt-6 flex flex-col justify-center">
+          <label className="self-start text-black">Email</label>
           <input
-            className="my-2 h-10 w-[80%] rounded-lg border border-black bg-white px-2 text-black"
+            className="mt-2 h-12 w-full rounded-2xl border border-black bg-white px-2 text-black"
             type="email"
+            placeholder="mail@gmail.com"
           />
+          <label className="mt-5 self-start text-black">Password</label>
+          <input
+            className="mt-2 h-12 w-full rounded-2xl border border-black bg-white px-2 text-black"
+            type="password"
+            placeholder="********"
+          />
+          {/* Find a darker color for hover */}
+          <button className="bg-primary mx-auto my-4 h-12 w-28 rounded-3xl text-white shadow-2xl hover:bg-violet-900">
+            Login
+          </button>
         </form>
+        <div className="mx-auto flex justify-center">
+          <p className="text-black">Don&apos;t have an account? </p>
+          <p className="text-primary ms-1 hover:text-violet-900">Register</p>
+        </div>
       </section>
     </main>
   );
