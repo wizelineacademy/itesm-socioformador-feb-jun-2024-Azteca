@@ -2,13 +2,13 @@ import Image from "next/image";
 
 const Login = () => {
   return (
-    <main className="flex h-dvh w-full items-center justify-center bg-gradient-to-r from-primary to-[#8671d3]">
+    <main className="flex h-dvh w-full items-center justify-center bg-gradient-to-r from-primary to-primary-light">
       <section className="h-[80%] w-[459px] rounded-[20px] bg-white shadow-md">
         <p className="mx-8 mt-10 text-center text-4xl font-medium leading-tight text-black">
           Welcome to Feedback Flow
         </p>
         <Image
-          className="mx-auto my-6 rounded-lg border border-black px-3 hover:bg-gray-300"
+          className="mx-auto my-8 h-12 w-20 rounded-lg border border-black px-3 hover:bg-gray-300"
           src="/slack.svg"
           alt="slack-logo"
           width={65}
@@ -19,27 +19,27 @@ const Login = () => {
           <span className="mx-4 text-sm text-black">OR</span>
           <div className="flex-grow border-t border-black" />
         </div>
-        <form className="mx-12 mt-6 flex flex-col justify-center">
-          <label className="self-start text-black">Email</label>
+        <form className="mx-12 mt-8 flex flex-col justify-center">
+          <label className="self-start text-xl text-black">Email</label>
           <input
-            className="mt-2 h-12 w-full rounded-2xl border border-black bg-white px-2 text-black"
+            className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-white px-2 text-black"
             type="email"
             placeholder="mail@gmail.com"
           />
-          <label className="mt-5 self-start text-black">Password</label>
+          <label className="mt-5 self-start text-xl text-black">Password</label>
           <input
-            className="mt-2 h-12 w-full rounded-2xl border border-black bg-white px-2 text-black"
+            className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-white px-2 text-black"
             type="password"
             placeholder="********"
           />
           {/* Find a darker color for hover */}
-          <button className="mx-auto my-4 h-12 w-28 rounded-3xl bg-primary text-white shadow-2xl hover:bg-violet-900">
+          <button className="mx-auto my-8 h-12 w-28 rounded-3xl bg-primary text-white shadow-2xl hover:bg-primary-dark">
             Login
           </button>
         </form>
-        <div className="mx-auto flex justify-center">
+        <div className="mx-auto flex justify-center text-sm font-medium">
           <p className="text-black">Don&apos;t have an account? </p>
-          <p className="ms-1 text-primary hover:text-violet-900">Register</p>
+          <p className="ms-1 text-primary hover:text-primary-dark">Register</p>
         </div>
       </section>
     </main>
