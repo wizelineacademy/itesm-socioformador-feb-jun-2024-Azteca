@@ -1,9 +1,18 @@
+"use client";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { FormEvent } from "react";
 
 const Login = () => {
+  const router = useRouter();
+  const handleLogin = (e: FormEvent) => {
+    e.preventDefault();
+    router.push("/");
+  };
+
   return (
     <main className="flex h-dvh w-full items-center justify-center bg-gradient-to-r from-primary to-primary-light">
-      <section className="h-[80%] w-[459px] rounded-[20px] bg-white shadow-md">
+      <section className="h-[80%] w-[459px] rounded-[20px] bg-white drop-shadow-md">
         <p className="mx-8 mt-10 text-center text-4xl font-medium leading-tight text-black">
           Welcome to Feedback Flow
         </p>
@@ -19,7 +28,10 @@ const Login = () => {
           <span className="mx-4 text-sm text-black">OR</span>
           <div className="flex-grow border-t border-black" />
         </div>
-        <form className="mx-12 mt-8 flex flex-col justify-center">
+        <form
+          className="mx-12 mt-8 flex flex-col justify-center"
+          onSubmit={(e) => handleLogin(e)}
+        >
           <label className="self-start text-xl text-black">Email</label>
           <input
             className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-white px-2 text-black"
@@ -33,13 +45,21 @@ const Login = () => {
             placeholder="********"
           />
           {/* Find a darker color for hover */}
-          <button className="mx-auto my-8 h-12 w-28 rounded-3xl bg-primary text-white shadow-2xl hover:bg-primary-dark">
+          <button
+            className="mx-auto my-8 h-12 w-28 rounded-3xl bg-primary text-white shadow-2xl hover:bg-primary-dark"
+            type="submit"
+          >
             Login
           </button>
         </form>
         <div className="mx-auto flex justify-center text-sm font-medium">
           <p className="text-black">Don&apos;t have an account? </p>
-          <p className="ms-1 text-primary hover:text-primary-dark">Register</p>
+          <a
+            href="/register"
+            className="ms-1 text-primary hover:text-primary-dark"
+          >
+            Register
+          </a>
         </div>
       </section>
     </main>
