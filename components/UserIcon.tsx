@@ -9,7 +9,7 @@ const UserIcon = ({ path, currentPath }: UserIconInterface) => {
   return (
     <Link
       href="/profile"
-      className={`${isActive ? "bg-primary" : "bg-white"} group rounded-full p-2 drop-shadow-lg hover:bg-primary`}
+      className={`${isActive ? "bg-primary" : "bg-white transition-all delay-0 hover:scale-[1.175]"} group rounded-full p-2 drop-shadow-lg`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -17,7 +17,7 @@ const UserIcon = ({ path, currentPath }: UserIconInterface) => {
         viewBox="0 0 24 24"
         strokeWidth={1.5}
         stroke="currentColor"
-        className={`${isActive ? "text-white" : "text-primary"} h-6 w-6 group-hover:text-white`}
+        className={`${isActive ? "text-white" : "text-primary"} h-6 w-6 `}
       >
         <path
           strokeLinecap="round"

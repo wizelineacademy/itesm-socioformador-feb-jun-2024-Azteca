@@ -1,8 +1,10 @@
+import NavigationBar from "@/components/NavigationBar";
+
 const Dashboard = () => {
   return (
-    <div>
-      <h1>Dashboard</h1>
-    </div>
+    <main>
+      <NavigationBar />
+    </main>
   );
 };
 
