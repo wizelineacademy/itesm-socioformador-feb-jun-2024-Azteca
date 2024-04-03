@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <main className="h-dvh w-dvw bg-white">
+    <main className="h-full w-full bg-bone">
       <a href="/login"> Login </a>
     </main>
   );
