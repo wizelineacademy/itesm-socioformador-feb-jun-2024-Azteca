@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "format": "npx prettier --check .",
+    "prettier-check": "npx prettier --check .",
+    "prettier-format": "npx prettier --write .",
     "lint": "next lint"
   },
   "dependencies": {
