@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import dynamic from "next/dynamic";
+import { ClerkProvider } from "@clerk/nextjs";
 
 // const inter = Inter({ subsets: ["latin"] });
 
@@ -26,11 +27,10 @@ export default function RootLayout({
   // if the current route is login or register, we don't want to show the nav bar
 
   return (
-    <html lang="en">
-      <body className={poppins.className}>
-        <Navbar />
-        {children}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className={poppins.className}>{children}</body>
+      </html>
+    </ClerkProvider>
   );
 }
