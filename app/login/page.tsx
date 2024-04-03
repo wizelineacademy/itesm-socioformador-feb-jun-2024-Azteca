@@ -12,8 +12,8 @@ const Login = () => {
 
   return (
     <main className="flex h-dvh w-full items-center justify-center bg-gradient-to-r from-primary to-primary-light">
-      <section className="h-[80%] w-[459px] rounded-[20px] bg-white drop-shadow-md">
-        <p className="mx-8 mt-10 text-center text-4xl font-medium leading-tight text-black">
+      <section className="h-5/6 w-[30%] rounded-[20px] bg-bone drop-shadow-md">
+        <p className="mx-8 mt-10 text-center text-4xl font-medium leading-normal text-black">
           Welcome to Feedback Flow
         </p>
         <Image
@@ -34,19 +34,19 @@ const Login = () => {
         >
           <label className="self-start text-xl text-black">Email</label>
           <input
-            className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-white px-2 text-black"
+            className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-bone px-2 text-black"
             type="email"
             placeholder="mail@gmail.com"
           />
           <label className="mt-5 self-start text-xl text-black">Password</label>
           <input
-            className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-white px-2 text-black"
+            className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-bone px-2 text-black"
             type="password"
             placeholder="********"
           />
           {/* Find a darker color for hover */}
           <button
-            className="mx-auto my-8 h-12 w-28 rounded-3xl bg-primary text-white shadow-2xl hover:bg-primary-dark"
+            className="mx-auto my-8 h-12 w-28 rounded-3xl bg-primary text-bone shadow-2xl hover:bg-primary-dark"
             type="submit"
           >
             Login
