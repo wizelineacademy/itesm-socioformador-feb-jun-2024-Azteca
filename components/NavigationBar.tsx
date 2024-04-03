@@ -8,12 +8,8 @@ import Notifications from "./Notifications";
 
 const NavigationBar = () => {
   const pathname = usePathname();
-
-  // si estamos en el login o register no mostramos la navbar
-  if (pathname === "/login" || pathname === "/register") return null;
-
   return (
-    <nav className="flex items-center justify-between bg-bone p-4 ">
+    <nav className="mx-8 mt-10 flex items-center justify-between bg-bone">
       <h1 className="text-3xl font-bold text-primary">FEEDBACK FLOW</h1>
       <div className="flex flex-row gap-5 p-1">
         <PIPIcon path="/pip" currentPath={pathname} />

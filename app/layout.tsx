@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
-import NavigationBar from "@/components/NavigationBar";
 
 // const inter = Inter({ subsets: ["latin"] });
 
@@ -26,7 +25,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={poppins.className + " h-dvh w-dvw bg-bone"}>
-        <NavigationBar />
         {children}
       </body>
     </html>

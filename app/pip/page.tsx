@@ -1,8 +1,10 @@
+import NavigationBar from "@/components/NavigationBar";
+
 const PIP = () => {
   return (
-    <div>
-      <h1>PIP</h1>
-    </div>
+    <main>
+      <NavigationBar />
+    </main>
   );
 };
 
