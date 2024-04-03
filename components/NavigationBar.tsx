@@ -13,7 +13,7 @@ const NavigationBar = () => {
   const router = useRouter();
 
   return (
-    <nav className="bg-bone mx-8 mt-10 flex items-center justify-between">
+    <nav className="mx-8 mt-10 flex items-center justify-between bg-bone">
       <h1 className="text-3xl font-bold text-primary">FEEDBACK FLOW</h1>
       <div className="flex flex-row gap-5 p-1">
         <button onClick={() => signOut(() => router.push("/sign-in"))}>
