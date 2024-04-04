@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^4.29.10",
+    "@headlessui/react": "^1.7.18",
     "next": "14.1.4",
     "react": "^18",
     "react-dom": "^18"
