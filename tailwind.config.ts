@@ -16,6 +16,7 @@ const config: Config = {
         },
         secondary: "#4598FB",
         bone: "#F8F5F5",
+        grayText: "#4A5660",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
