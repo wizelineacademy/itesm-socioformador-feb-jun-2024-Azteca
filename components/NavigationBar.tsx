@@ -22,7 +22,7 @@ const NavigationBar = () => {
         <PIPIcon path="/pip" currentPath={pathname} />
         <DashboardIcon path="/dashboard" currentPath={pathname} />
         <UserIcon path="/profile" currentPath={pathname} />
-        <SearchBar placeholder="Search Co-workers ..." />
+        <SearchBar placeholder="Search Co-workers ..." expanded={true} />
         <Notifications />
       </div>
     </nav>
