@@ -6,6 +6,53 @@ Una plataforma de retroalimentación y evaluación para empleados dentro de una 
 
 ![Mockup](mockup.png)
 
+# 📚 Usage
+
+To spawn the postgres container and get into it
+
+```bash
+docker pull postgres
+docker run --name feedbackflow-postgres -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 postgres
+docker exec -it feedbackflow-postgres psql -U postgres
+```
+
+Create the database before running
+
+```sql
+CREATE DATABASE feedbackflow_db;
+\l
+```
+
+Push the schema directly to the database
+
+```bash
+npx drizzle-kit push:pg
+```
+
+Show the created tables
+
+```
+\c feedbackflow_db
+\dt
+```
+
+Make sure you have the right `.env.local` file in your project
+
+```env
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<YOUR KEY>
+CLERK_SECRET_KEY=<YOUR KEY>
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
+```
+
+To run the app
+
+```bash
+npm run dev
+```
+
 ## Problema
 
 Muchas empresas no cuentan con un sistema para dar retroalimentación entre los empleados, o si lo tienen, está de una manera muy sesgada, esto hace que muchas veces no se reconozca el esfuerzo de ciertos empleados que van muy bien, y no se le de un plan de mejora a aquellos que no van tan bien.
