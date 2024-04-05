@@ -107,3 +107,67 @@ export const rulerSurveyAnswers = pgTable(
     };
   },
 );
+
+export const sprintSurvey = pgTable("sprint_survey", {
+  id: integer("sprint_survey_id").primaryKey(),
+  projectId: integer("project_id").references(() => project.id),
+  createdAt: date("created_at"),
+});
+
+export const sprintSurveyAnswerProject = pgTable(
+  "sprint_survey_answer_project",
+  {
+    sprintSurveyId: integer("sprint_survey_id").references(
+      () => sprintSurvey.id,
+    ),
+    userId: integer("user_id").references(() => user.id),
+    questionName: varchar("question_name", { length: 8 }),
+    answer: integer("answer"),
+  },
+  // composite primary key on (userId, sprintSurveyId)
+  (table) => {
+    return {
+      pk: primaryKey({ columns: [table.userId, table.sprintSurveyId] }),
+    };
+  },
+);
+
+export const sprintSurveyAnswerCoworkers = pgTable(
+  "sprint_survey_answer_coworkers",
+  {
+    sprintSurveyId: integer("sprint_survey_id").references(
+      () => sprintSurvey.id,
+    ),
+    userId: integer("user_id").references(() => user.id),
+    coworkerId: integer("coworker_id"),
+    questionName: varchar("question_name", { length: 8 }),
+    answer: integer("answer"),
+  },
+  // composite primary key on (userId, sprintSurveyId)
+  (table) => {
+    return {
+      pk: primaryKey({ columns: [table.userId, table.sprintSurveyId] }),
+    };
+  },
+);
+
+export const finalSurvey = pgTable("final_survey", {
+  id: integer("final_survey_id").primaryKey(),
+  created_at: date("created_at"),
+  projectId: integer("project_id").references(() => project.id),
+});
+
+export const finalSurveyAnswer = pgTable(
+  "final_survey_answer",
+  {
+    userId: integer("user_id").references(() => user.id),
+    finalSurveyId: integer("final_survey_id").references(() => finalSurvey.id),
+    questionName: varchar("question_name", { length: 8 }),
+    answer: integer("answer"),
+  },
+  (table) => {
+    return {
+      pk: primaryKey({ columns: [table.userId, table.finalSurveyId] }),
+    };
+  },
+);
