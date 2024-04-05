@@ -1,5 +1,6 @@
 import NavigationBar from "@/components/NavigationBar";
 import UserProfileButton from "@/components/UserProfileButton";
+import Carousel from "@/components/Carousel";
 import Image from "next/image";
 import JobSVG from "@/public/Job-Profile-Image.svg";
 
@@ -36,18 +37,20 @@ const Profile = () => {
       <section className="mx-auto flex w-[95%] justify-between space-x-10">
         <div className="w-7/12">
           {/* Co-workers */}
-          <div>
+          <div className="mb-10">
             <div className="mx-auto flex justify-between">
               <h3 className="text-2xl font-medium">Co-workers</h3>
-              <p className="text-grayText self-center text-sm">Show More</p>
+              <p className="self-center text-sm text-grayText">Show More</p>
             </div>
-            <div></div>
+            <div className="mt-2">
+              <Carousel />
+            </div>
           </div>
           {/* Projects */}
           <div>
             <div className="mx-auto flex justify-between">
               <h3 className="text-2xl font-medium">Projects</h3>
-              <p className="text-grayText self-center text-sm">Show More</p>
+              <p className="self-center text-sm text-grayText">Show More</p>
             </div>
           </div>
         </div>
@@ -56,12 +59,12 @@ const Profile = () => {
           {/* Strenghts */}
           <div className="mx-auto flex justify-between">
             <h3 className="text-2xl font-medium">Strenghs</h3>
-            <p className="text-grayText self-center text-sm">Show More</p>
+            <p className="self-center text-sm text-grayText">Show More</p>
           </div>
           {/* Oportunity Areas */}
           <div className="mx-auto flex justify-between">
             <h3 className="text-2xl font-medium">Oportunity Areas</h3>
-            <p className="text-grayText self-center text-sm">Show More</p>
+            <p className="self-center text-sm text-grayText">Show More</p>
           </div>
         </div>
       </section>
