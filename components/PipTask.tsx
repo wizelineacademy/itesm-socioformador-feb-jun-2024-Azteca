@@ -5,13 +5,15 @@ interface InterfacePipTask {
   title: string;
   description: string;
   isDone: boolean;
+  handleCheck: () => void;
 }
 
-const PipTask = ({ title, description, isDone }: InterfacePipTask) => {
-  const [done, setIsDone] = useState<boolean>(isDone);
-  const handleDone = () => {
-    setIsDone(!done);
-  };
+const PipTask = ({
+  title,
+  description,
+  isDone,
+  handleCheck,
+}: InterfacePipTask) => {
   return (
     <div className="box-border h-48 w-52 shrink-0 rounded-xl bg-white px-2 py-9 shadow-lg">
       <header className="flex items-center">
@@ -23,7 +25,9 @@ const PipTask = ({ title, description, isDone }: InterfacePipTask) => {
           >
             <input
               type="checkbox"
+              onChange={handleCheck}
               className="h-6 w-6 cursor-pointer appearance-none rounded-full border border-primary border-primary/80 bg-primary-light/20 outline-primary transition-all checked:bg-primary checked:before:bg-primary hover:scale-105"
+              checked={isDone}
               id="checkbox-pip-input"
             />
           </label>
