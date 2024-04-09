@@ -1,10 +1,12 @@
+"use client";
 import NavigationBar from "@/components/NavigationBar";
 import PipResource from "@/components/PipResource";
 import PipTask from "@/components/PipTask";
 import ProgressBar from "@/components/Progressbar";
+import { useState } from "react";
 
 const PIP = () => {
-  const tasks = [
+  const [tasks, setTasks] = useState([
     {
       id: 1,
       title: "Ir con el psicólogo",
@@ -65,7 +67,7 @@ const PIP = () => {
       description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
       isDone: false,
     },
-  ];
+  ]);
 
   const resources = [
     {
@@ -96,6 +98,12 @@ const PIP = () => {
     (tasks.filter((task) => task.isDone).length / tasks.length) * 100,
   );
 
+  const handleCheckTask = (index: number) => {
+    const newTasks = [...tasks];
+    newTasks[index].isDone = !newTasks[index].isDone;
+    setTasks(newTasks);
+  };
+
   return (
     <main className="overflow-y-hidden">
       <NavigationBar />
@@ -113,6 +121,7 @@ const PIP = () => {
               title={task.title}
               description={task.description}
               isDone={task.isDone}
+              handleCheck={() => handleCheckTask(index)}
               key={index}
             />
           ))}
