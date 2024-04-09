@@ -2,7 +2,8 @@ import NavigationBar from "@/components/NavigationBar";
 import UserProfileButton from "@/components/UserProfileButton";
 import CoWorkersCarousel from "@/components/CoWorkersCarousel";
 import ProjectsCarousel from "@/components/ProjectsCarousel";
-import ProjectCard from "@/components/ProjectCard";
+import Tooltip from "@/components/Tooltip";
+import Badge from "@/components/Badge";
 import Image from "next/image";
 import JobSVG from "@/public/Job-Profile-Image.svg";
 
@@ -11,6 +12,22 @@ const Profile = () => {
   const userEmail = "adrian_rmzc@gmail.com";
   const userRole = "Software Engineer";
   const userDepartment = "IT Department";
+
+  const Strengths = [
+    "Detail Attention",
+    "Good Communication",
+    "Punctuallity",
+    "Creative",
+    "Discipline",
+    "Proactive",
+  ];
+  const oportunityAreas = [
+    "Lack of Communication",
+    "Ineffective Time Management",
+    "Bad Work Team",
+    "Procrastination",
+  ];
+
   return (
     <main className=" h-dvh w-dvw overflow-hidden">
       <NavigationBar />
@@ -42,7 +59,9 @@ const Profile = () => {
           <div className="mb-6">
             <div className="mx-auto flex justify-between">
               <h3 className="text-2xl font-medium">Co-workers</h3>
-              <p className="self-center text-sm text-grayText">Show More</p>
+              <p className="cursor-pointer self-center text-sm text-grayText">
+                Show More
+              </p>
             </div>
             <div className="mt-2">
               <CoWorkersCarousel />
@@ -66,13 +85,31 @@ const Profile = () => {
         <div className="w-5/12">
           {/* Strenghts */}
           <div className="mx-auto flex justify-between">
-            <h3 className="text-2xl font-medium">Strenghs</h3>
-            <p className="self-center text-sm text-grayText">Show More</p>
+            <h3 className="text-2xl font-medium">Strengths</h3>
+            <p className="cursor-pointer self-center text-sm text-grayText">
+              Show More
+            </p>
+          </div>
+          <div className="mb-10 mt-5 flex flex-wrap gap-5">
+            {Strengths.map((strength, index) => (
+              <Tooltip message="Lorem ipsum dolor sit amet" key={index}>
+                <Badge text={strength} />
+              </Tooltip>
+            ))}
           </div>
           {/* Oportunity Areas */}
           <div className="mx-auto flex justify-between">
             <h3 className="text-2xl font-medium">Oportunity Areas</h3>
-            <p className="self-center text-sm text-grayText">Show More</p>
+            <p className="cursor-pointer self-center text-sm text-grayText">
+              Show More
+            </p>
+          </div>
+          <div className="mb-10 mt-5 flex flex-wrap gap-5">
+            {oportunityAreas.map((area, index) => (
+              <Tooltip message="Lorem ipsum dolor sit amet" key={index}>
+                <Badge text={area} />
+              </Tooltip>
+            ))}
           </div>
         </div>
       </section>
