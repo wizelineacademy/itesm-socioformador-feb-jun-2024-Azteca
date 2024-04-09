@@ -10,7 +10,17 @@
     display: flex;
 }
 
-.embla__slide {
+.embla__slide__coworker {
     flex: 0 0 20%;
     min-width: 0;
+}
+
+.embla__slide__project {
+    flex: 0 0 35%;
+    min-width: 0;
+    padding: 0 20px;
+    /* padding: 0 16px 0 0; */
+    /* min-width: 200px; */
+    /* max-width: 220px; */
+    /* padding: 0 14px; */
 }
