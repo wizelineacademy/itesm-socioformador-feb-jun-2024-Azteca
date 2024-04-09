@@ -23,7 +23,7 @@ const UserProfileButton = ({
   const isActive = false;
   return (
     <button
-      className={`${className} ${isActive ? "bg-primary" : "bg-white"} group rounded-full p-2 drop-shadow-lg hover:bg-primary`}
+      className={`${className} ${isActive ? "bg-primary" : "bg-white"} group rounded-full p-2 drop-shadow-lg`}
     >
       {photoUrl ? (
         <Image

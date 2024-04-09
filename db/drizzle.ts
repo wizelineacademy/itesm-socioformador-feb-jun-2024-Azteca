@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
-import { Client } from "pg";
+import { Pool } from "pg";
 
-const client = new Client({
+const pool = new Pool({
   host: "127.0.0.1",
   port: 5432,
   user: "postgres",
@@ -9,6 +9,6 @@ const client = new Client({
   database: "feedbackflow_db",
 });
 
-const db = drizzle(client);
+const db = drizzle(pool);
 
 export default db;
