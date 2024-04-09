@@ -36,6 +36,28 @@ Show the created tables
 \dt
 ```
 
+To enable webhooks and make login work you have to use a proxy.
+
+Log into [ngrok](https://ngrok.com/docs/) with the team google account.
+
+Setup it in your [local machine](https://dashboard.ngrok.com/get-started/setup/macos)
+
+Once you got it, run it to proxy calls in port 3000
+
+```bash
+ngrok http http://localhost:3000
+```
+
+You should get an url like `Forwarding https://<random uuid>.ngrok-free.app -> http://localhost:3000`
+
+Go to clerk dashboard (with the team google account) and click on `webhooks`
+
+Click on `Add endpoint` and paste the url you've got by appending `/api/webhooks`: `https://<random uuid>.ngrok-free.app/api/webhooks`
+
+On description put your name, ex `Pedro-Testing`
+
+Discover your `Signing Secret` on the dashboard and paste it into your `WEBHOOK_SECRET=<YOUR KEY>` in the `.env.local` file
+
 Make sure you have the right `.env.local` file in your project
 
 ```env
@@ -45,6 +67,7 @@ NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
+WEBHOOK_SECRET=<YOUR KEY>
 ```
 
 To run the app
