@@ -34,7 +34,7 @@ export default function ProjectCard() {
           </button>
         </div>
       </div>
-      <button className="flex h-9 w-9 items-center justify-center rounded-full bg-primary">
+      <button className="ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-primary hover:bg-primary-dark">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

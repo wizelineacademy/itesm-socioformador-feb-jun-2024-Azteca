@@ -29,10 +29,9 @@ const Profile = () => {
   ];
 
   return (
-    <main className=" h-dvh w-dvw overflow-hidden">
-      <NavigationBar />
+    <main>
       {/* Banner */}
-      <section className="mx-auto mb-24 mt-6 flex h-52 w-[95%] rounded-xl bg-primary">
+      <section className="w-100 mx-auto mb-24 mt-6 flex h-52 rounded-xl bg-primary">
         <UserProfileButton
           size="lg"
           className="absolute left-20 top-60 h-fit"
@@ -53,7 +52,7 @@ const Profile = () => {
       </section>
 
       {/* Data */}
-      <section className="mx-auto flex w-[95%] justify-between space-x-10">
+      <section className="w-100 mx-auto flex justify-between space-x-10">
         <div className="w-7/12">
           {/* Co-workers */}
           <div className="mb-6">

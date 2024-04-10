@@ -1,11 +1,7 @@
 import NavigationBar from "@/components/NavigationBar";
 
 const Dashboard = () => {
-  return (
-    <main>
-      <NavigationBar />
-    </main>
-  );
+  return <main></main>;
 };
 
 export default Dashboard;

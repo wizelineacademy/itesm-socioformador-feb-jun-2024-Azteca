@@ -105,15 +105,14 @@ const PIP = () => {
   };
 
   return (
-    <main className="overflow-y-hidden">
-      <NavigationBar />
-      <section id="pip-progressbar" className="mt-4 px-7">
+    <main>
+      <section id="pip-progressbar" className="mt-4">
         <p className=" mb-2 text-3xl font-semibold">
           Performance Improvement Plan
         </p>
         <ProgressBar width={progressPercentage} height={6} />
       </section>
-      <section id="pip-tasks" className="mt-9 w-full px-7">
+      <section id="pip-tasks" className="mt-9 w-full">
         <p className="text-3xl font-medium">Tasks</p>
         <div className="flew-wrap mb-10 mt-2 flex w-full flex-row gap-12 overflow-x-auto pb-3">
           {tasks.map((task, index) => (
@@ -127,7 +126,7 @@ const PIP = () => {
           ))}
         </div>
       </section>
-      <section id="pip-resources" className="mt-9 w-full px-7">
+      <section id="pip-resources" className="mt-9 w-full">
         <p className="text-3xl font-medium">Resources</p>
         <div className="flew-wrap mb-10 mt-2 flex w-full flex-row gap-12 overflow-x-auto pb-3">
           {resources.map((task, index) => (
