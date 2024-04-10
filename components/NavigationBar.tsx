@@ -1,6 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
-import PIPIcon from "./PIPIcon";
+import PIPIcon from "./icons/PIPIcon";
 import DashboardIcon from "./DashboardIcon";
 import UserIcon from "./UserIcon";
 import SearchBar from "./SearchBar";

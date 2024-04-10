@@ -1,9 +1,10 @@
 import Image from "next/image";
+import Link from "next/link";
 
 interface UserProfileButtonProps {
   name?: string;
   photoUrl?: string;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   className?: string;
 }
 
@@ -14,6 +15,7 @@ const UserProfileButton = ({
   className,
 }: UserProfileButtonProps) => {
   const sizes = {
+    xs: "h-4 w-4",
     sm: "h-10 w-10",
     md: "h-20 w-20",
     lg: "h-32 w-32",
@@ -21,7 +23,7 @@ const UserProfileButton = ({
   const isActive = false;
   return (
     <button
-      className={`${className} ${isActive ? "bg-primary" : "bg-white"} group rounded-full p-2 drop-shadow-lg hover:bg-primary`}
+      className={`${className} ${isActive ? "bg-primary" : "bg-white"} group rounded-full p-2 drop-shadow-lg`}
     >
       {photoUrl ? (
         <Image
