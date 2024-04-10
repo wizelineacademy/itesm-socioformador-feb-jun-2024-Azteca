@@ -1,7 +1,13 @@
+"use client";
+
 import React from "react";
+import { usePathname } from "next/navigation";
 import UserProfileButton from "@/components/UserProfileButton";
+import ChevronRightIcon from "./icons/ChevronRightIcon";
 
 export default function ProjectCard() {
+  const pathname = usePathname();
+
   return (
     <div className="flex items-center gap-20 rounded-lg bg-white p-4">
       <div>
@@ -34,22 +40,7 @@ export default function ProjectCard() {
           </button>
         </div>
       </div>
-      <button className="flex h-9 w-9 items-center justify-center rounded-full bg-primary">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2.5}
-          stroke="white"
-          className="h-6 w-6"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="m8.25 4.5 7.5 7.5-7.5 7.5"
-          />
-        </svg>
-      </button>
+      <ChevronRightIcon path="/projects/1" currentPath={pathname} />
     </div>
   );
 }

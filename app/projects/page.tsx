@@ -13,13 +13,12 @@ const Projects = () => {
             Create
           </button>
         </div>
-        <div className="mx-auto flex max-w-[60%] flex-wrap items-center justify-center gap-4">
+        <div className="mx-auto flex max-w-[60%] flex-wrap items-center justify-center gap-6">
           <ProjectExtendedCard />
           <ProjectExtendedCard />
           <ProjectExtendedCard />
           <ProjectExtendedCard />
-          {/* <ProjectExtendedCard /> */}
-          {/* <ProjectExtendedCard /> */}
+          <ProjectExtendedCard />
         </div>
       </section>
     </main>
