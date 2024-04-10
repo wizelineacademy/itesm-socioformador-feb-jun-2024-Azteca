@@ -1,5 +1,5 @@
 const Home = () => {
-  return <p>vete a /profile noseajoto</p>;
+  return <></>;
 };
 
 export default Home;

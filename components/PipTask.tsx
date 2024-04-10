@@ -1,6 +1,3 @@
-"use client";
-import { useState } from "react";
-
 interface InterfacePipTask {
   title: string;
   description: string;
@@ -19,16 +16,12 @@ const PipTask = ({
       <header className="flex items-center">
         <p className="text-md text-wrap font-semibold">{title}</p>
         <div className="ml-auto inline-flex items-center">
-          <label
-            className="relative flex cursor-pointer items-center"
-            htmlFor="checkbox-pip-input"
-          >
+          <label className="relative flex cursor-pointer items-center">
             <input
               type="checkbox"
               onChange={handleCheck}
-              className="h-6 w-6 cursor-pointer appearance-none rounded-full border border-primary border-primary/80 bg-primary-light/20 outline-primary transition-all checked:bg-primary checked:before:bg-primary hover:scale-105"
+              className="h-6 w-6 transform cursor-pointer appearance-none rounded-full border border-primary border-primary/80 bg-primary-light/20 outline-primary transition-all duration-200 ease-in-out checked:bg-primary hover:scale-110"
               checked={isDone}
-              id="checkbox-pip-input"
             />
           </label>
         </div>

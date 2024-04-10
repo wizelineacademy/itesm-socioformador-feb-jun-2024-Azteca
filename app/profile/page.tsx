@@ -6,6 +6,7 @@ import Tooltip from "@/components/Tooltip";
 import Badge from "@/components/Badge";
 import Image from "next/image";
 import JobSVG from "@/public/Job-Profile-Image.svg";
+import BitmojiAdrian from "@/public/Bitmoji Adrian.png";
 
 const Profile = () => {
   const userName = "Adrián Alejandro Ramírez Cruz";
@@ -29,14 +30,14 @@ const Profile = () => {
   ];
 
   return (
-    <main className=" h-dvh w-dvw overflow-hidden">
-      <NavigationBar />
+    <main>
       {/* Banner */}
-      <section className="mx-auto mb-24 mt-6 flex h-52 w-[95%] rounded-xl bg-primary">
+      <section className="w-100 mx-auto mb-24 mt-6 flex h-52 rounded-xl bg-primary">
         <UserProfileButton
           size="lg"
           className="absolute left-20 top-60 h-fit"
-          photoUrl="https://static.wikia.nocookie.net/heroe/images/0/08/Lucario_SSBU.png/revision/latest?cb=20200104023610&path-prefix=es"
+          photoUrl={BitmojiAdrian}
+          /*           photoUrl="https://static.wikia.nocookie.net/heroe/images/0/08/Lucario_SSBU.png/revision/latest?cb=20200104023610&path-prefix=es" */
         />
         <div className="flex w-5/6 flex-row items-center justify-between">
           <div className="ps-56 leading-tight text-white">
@@ -53,7 +54,7 @@ const Profile = () => {
       </section>
 
       {/* Data */}
-      <section className="mx-auto flex w-[95%] justify-between space-x-10">
+      <section className="w-100 mx-auto flex justify-between space-x-10">
         <div className="w-7/12">
           {/* Co-workers */}
           <div className="mb-6">

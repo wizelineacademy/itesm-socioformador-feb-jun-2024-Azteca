@@ -3,7 +3,6 @@
 import React from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import ProjectCard from "@/components/ProjectCard";
-import Autoplay from "embla-carousel-autoplay";
 
 export default function EmblaCarousel() {
   const [emblaRef] = useEmblaCarousel({ loop: true }, []);

@@ -74,7 +74,7 @@ const Notifications = () => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute right-0 mt-2 box-content h-72 w-96 origin-top-right divide-y divide-gray-100 rounded-md bg-white px-4 shadow-lg ring-1 ring-black/5 focus:outline-none">
+        <Menu.Items className=" absolute right-0 z-50 mt-2 box-content h-72 w-96 origin-top-right rounded-md bg-white px-4 shadow-lg ring-1 ring-black/5 focus:outline-none">
           <Menu.Item>
             {({ close }) => (
               <div className="mt-3 flex flex-row items-center justify-between">

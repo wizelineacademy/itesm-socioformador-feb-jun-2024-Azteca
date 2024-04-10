@@ -40,7 +40,7 @@ const UserProfileButton = ({
           viewBox="0 0 24 24"
           strokeWidth={1}
           stroke="currentColor"
-          className={`${isActive ? "text-white" : "text-primary"} ${sizes[size]} group-hover:text-white`}
+          className={`${isActive ? "text-white" : "text-primary"} ${sizes[size]}`}
         >
           <path
             strokeLinecap="round"

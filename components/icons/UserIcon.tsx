@@ -3,7 +3,7 @@ import { Menu, Transition } from "@headlessui/react";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useClerk } from "@clerk/nextjs";
+import { useClerk, useUser } from "@clerk/nextjs";
 
 interface UserIconInterface {
   path: string;
@@ -13,6 +13,7 @@ const UserIcon = ({ path, currentPath }: UserIconInterface) => {
   const onSite = currentPath === path;
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const { signOut } = useClerk();
+  const { isSignedIn, user } = useUser();
   const router = useRouter();
   const handleSignOut = () => {
     signOut(() => router.push("/sign-in"));
@@ -62,7 +63,7 @@ const UserIcon = ({ path, currentPath }: UserIconInterface) => {
           <div className="px-1 py-1 ">
             <Menu.Item>
               <p className="mx-auto items-center px-2 py-2 text-sm">
-                Hola José Carlos!
+                Hola Pedro!
               </p>
             </Menu.Item>
           </div>
