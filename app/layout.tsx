@@ -20,6 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   // if the current route is login or register, we don't want to show the nav bar
+
   return (
     <ClerkProvider>
       <html lang="en">
