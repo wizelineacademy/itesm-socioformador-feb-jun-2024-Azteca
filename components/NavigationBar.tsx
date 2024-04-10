@@ -9,13 +9,13 @@ import ProjectNavbarIcon from "./ProjectNavbarIcon";
 
 const NavigationBar = () => {
   const pathname = usePathname();
-  const validRoutes = ["/pip", "/dashboard", "/profile", "/projects"];
+  const validRoutes = ["/pip", "/dashboard", "/profile", "/projects", "/"];
 
   if (!validRoutes.includes(pathname)) {
     return null;
   }
 
-  const isManager = false;
+  const isManager = true;
 
   return (
     <nav className="flex items-center justify-between bg-bone">
