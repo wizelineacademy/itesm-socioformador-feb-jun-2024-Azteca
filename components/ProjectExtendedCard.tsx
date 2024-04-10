@@ -12,8 +12,8 @@ const ProjectExtendedCard = () => {
     <div className="flex items-center gap-20 rounded-lg bg-white p-5">
       <div>
         <h3 className="pb-2 text-lg font-medium">Project 1</h3>
-        <p className="text-graySubtitle pb-4 text-sm">Sep 2023 - Dec 2023</p>
-        <p className="text-grayText w-[30ch] pb-4 text-xs">
+        <p className="pb-4 text-sm text-graySubtitle">Sep 2023 - Dec 2023</p>
+        <p className="w-[30ch] pb-4 text-xs text-grayText">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non
           risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec,
           ultricies sed, dolor...
