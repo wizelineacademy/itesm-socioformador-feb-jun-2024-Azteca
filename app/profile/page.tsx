@@ -1,4 +1,3 @@
-import NavigationBar from "@/components/NavigationBar";
 import UserProfileButton from "@/components/UserProfileButton";
 import CoWorkersCarousel from "@/components/CoWorkersCarousel";
 import ProjectsCarousel from "@/components/ProjectsCarousel";

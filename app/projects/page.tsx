@@ -1,11 +1,9 @@
 import React from "react";
-import NavigationBar from "@/components/NavigationBar";
 import ProjectExtendedCard from "@/components/ProjectExtendedCard";
 
 const Projects = () => {
   return (
     <main className=" h-dvh w-dvw overflow-hidden">
-      <NavigationBar />
       <section className="mt-12 flex flex-col">
         <div className="mb-8 flex justify-center gap-5">
           <h3 className="text-4xl font-medium">My Projects</h3>
