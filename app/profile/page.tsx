@@ -59,7 +59,7 @@ const Profile = () => {
           <div className="mb-6">
             <div className="mx-auto flex justify-between">
               <h3 className="text-2xl font-medium">Co-workers</h3>
-              <p className="cursor-pointer self-center text-sm text-grayText">
+              <p className="text-graySubtitle cursor-pointer self-center text-sm">
                 Show More
               </p>
             </div>
@@ -71,7 +71,7 @@ const Profile = () => {
           <div>
             <div className="mx-auto flex justify-between">
               <h3 className="text-2xl font-medium">Projects</h3>
-              <p className="cursor-pointer self-center text-sm text-grayText">
+              <p className="text-graySubtitle cursor-pointer self-center text-sm">
                 Show More
               </p>
             </div>
@@ -86,7 +86,7 @@ const Profile = () => {
           {/* Strenghts */}
           <div className="mx-auto flex justify-between">
             <h3 className="text-2xl font-medium">Strengths</h3>
-            <p className="cursor-pointer self-center text-sm text-grayText">
+            <p className="text-graySubtitle cursor-pointer self-center text-sm">
               Show More
             </p>
           </div>
@@ -100,7 +100,7 @@ const Profile = () => {
           {/* Oportunity Areas */}
           <div className="mx-auto flex justify-between">
             <h3 className="text-2xl font-medium">Oportunity Areas</h3>
-            <p className="cursor-pointer self-center text-sm text-grayText">
+            <p className="text-graySubtitle cursor-pointer self-center text-sm">
               Show More
             </p>
           </div>
