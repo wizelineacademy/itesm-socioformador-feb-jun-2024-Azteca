@@ -22,8 +22,8 @@ const ProjectExtendedCard = ({
     <div className="flex items-center gap-20 rounded-lg bg-white p-5">
       <div>
         <h3 className="pb-2 text-lg font-medium">{title}</h3>
-        <p className="text-graySubtitle pb-4 text-sm">{date}</p>
-        <p className="text-grayText w-[30ch] pb-4 text-xs">{description}</p>
+        <p className="pb-4 text-sm text-graySubtitle">{date}</p>
+        <p className="w-[30ch] pb-4 text-xs text-grayText">{description}</p>
         <div className="flex justify-between">
           <div className="ml-[6px]">
             <UserProfileButton size="xs" className="mx-[-6px]" />
