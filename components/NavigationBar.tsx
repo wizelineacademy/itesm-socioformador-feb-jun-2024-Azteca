@@ -1,11 +1,11 @@
 "use client";
 import { usePathname } from "next/navigation";
-import PIPIcon from "./icons/PIPIcon";
-import DashboardIcon from "./DashboardIcon";
-import UserIcon from "./UserIcon";
+import PIPIcon from "./PIPIconNavbar";
 import SearchBar from "./SearchBar";
 import Notifications from "./Notifications";
 import ProjectNavbarIcon from "./ProjectNavbarIcon";
+import UserIconNavbar from "./UserIconNavbar";
+import DashboardIconNavbar from "./DashboardIconNavbar";
 
 const NavigationBar = () => {
   const pathname = usePathname();
@@ -22,13 +22,13 @@ const NavigationBar = () => {
       <h1 className="text-3xl font-bold text-primary">FEEDBACK FLOW</h1>
       <div className="flex flex-row gap-5 p-1">
         <PIPIcon path="/pip" currentPath={pathname} />
-        <DashboardIcon path="/dashboard" currentPath={pathname} />
+        <DashboardIconNavbar path="/dashboard" currentPath={pathname} />
         {isManager && (
           <ProjectNavbarIcon path="/projects" currentPath={pathname} />
         )}
         <SearchBar placeholder="Search Co-workers ..." expanded={false} />
         <Notifications />
-        <UserIcon path="/profile" currentPath={pathname} />
+        <UserIconNavbar path="/profile" currentPath={pathname} />
       </div>
     </nav>
   );
