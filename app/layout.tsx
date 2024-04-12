@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import { usePathname } from "next/navigation";
 import NavigationBar from "@/components/NavigationBar";
 
 const poppins = Poppins({
@@ -21,8 +20,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // if the current route is login or register, we don't want to show the nav bar
-
   return (
     <ClerkProvider>
       <html lang="en">
