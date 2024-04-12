@@ -9,7 +9,14 @@ import DashboardIconNavbar from "./DashboardIconNavbar";
 
 const NavigationBar = () => {
   const pathname = usePathname();
-  const validRoutes = ["/pip", "/dashboard", "/profile", "/projects", "/"];
+  const validRoutes = [
+    "/pip",
+    "/dashboard",
+    "/profile",
+    "/projects",
+    "/",
+    "/projects/create",
+  ];
 
   if (!validRoutes.includes(pathname)) {
     return null;

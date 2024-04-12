@@ -7,17 +7,12 @@ interface ProjectExtendedCardProps {
 }
 
 import React from "react";
-import { usePathname } from "next/navigation";
+import Link from "next/link";
 import UserProfileButton from "@/components/UserProfileButton";
 import ChevronRightIcon from "./icons/ChevronRightIcon";
 import PlusIcon from "./icons/PlusIcon";
 
-const ProjectExtendedCard = ({
-  title,
-  date,
-  description,
-}: ProjectExtendedCardProps) => {
-  const pathname = usePathname();
+const ProjectExtendedCard = () => {
   return (
     <div className="flex items-center gap-20 rounded-lg bg-white p-5">
       <div>
@@ -29,9 +24,21 @@ const ProjectExtendedCard = ({
             <UserProfileButton size="xs" className="mx-[-6px]" />
             <UserProfileButton size="xs" className="mx-[-6px]" />
             <UserProfileButton size="xs" className="mx-[-6px]" />
-            <PlusIcon size="h-4 w-4" color="primary" />
+            <button
+              disabled
+              className={
+                "group mx-[-6px] rounded-full bg-white p-2 text-primary drop-shadow-lg"
+              }
+            >
+              <PlusIcon size="h-4 w-4" color="primary" />
+            </button>
           </div>
-          <ChevronRightIcon path="/projects/1" currentPath={pathname} />
+          <Link
+            href="/projects/1"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-primary"
+          >
+            <ChevronRightIcon size="h-6 w-6" color="white" />
+          </Link>
         </div>
       </div>
     </div>
