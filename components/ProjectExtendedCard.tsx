@@ -12,7 +12,11 @@ import UserProfileButton from "@/components/UserProfileButton";
 import ChevronRightIcon from "./icons/ChevronRightIcon";
 import PlusIcon from "./icons/PlusIcon";
 
-const ProjectExtendedCard = () => {
+const ProjectExtendedCard = ({
+  title,
+  date,
+  description,
+}: ProjectExtendedCardProps) => {
   return (
     <div className="flex items-center gap-20 rounded-lg bg-white p-5">
       <div>
