@@ -35,7 +35,7 @@ const Admin = () => {
 
   return (
     <div className="flex h-full w-full flex-col items-center">
-      <p className="text-4xl font-medium">Dashboard Super Admin</p>
+      <p className="text-4xl font-medium">Dashboard Super Super Admin</p>
       <table className="mt-5 table-auto">
         <thead className="w-full bg-primary/80 text-white">
           <tr className="">
