@@ -13,25 +13,25 @@ const Projects = () => {
     },
     {
       title: "Project 2",
-      date: "Sep 2023 - Dec 2023",
+      date: "Apr 2023 - Jun 2023",
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nonrisus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor...",
     },
     {
       title: "Project 3",
-      date: "Sep 2023 - Dec 2023",
+      date: "Oct 2023 - Jan 2024",
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nonrisus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor...",
     },
     {
       title: "Project 4",
-      date: "Sep 2023 - Dec 2023",
+      date: "Feb 2024 - Apr 2024",
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nonrisus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor...",
     },
     {
       title: "Project 5",
-      date: "Sep 2023 - Dec 2023",
+      date: "In progress",
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nonrisus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor...",
     },
@@ -54,7 +54,7 @@ const Projects = () => {
             <ProjectExtendedCard
               key={index}
               title={project.title}
-              date={project.title}
+              date={project.date}
               description={project.description}
             />
           ))}
