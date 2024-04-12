@@ -3,6 +3,7 @@
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment, useEffect, useState } from "react";
 import CloseIcon from "./icons/CloseIcon";
+import NotificationIcon from "./icons/NotificationIcon";
 
 const Notifications = () => {
   const [isActive, setIsActive] = useState(false);
@@ -41,29 +42,19 @@ const Notifications = () => {
 
   return (
     <Menu as="div" className="relative inline-block text-left">
-      <Menu.Button
-        className={`${isActive ? "bg-primary" : "bg-white"} group rounded-full p-2 drop-shadow-lg hover:bg-primary`}
-      >
-        <div onClick={() => setIsActive(!isActive)}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.8}
-            stroke="currentColor"
-            className={`${isActive ? "text-white" : "text-primary"} h-6 w-6 group-hover:text-white`}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-            />
-          </svg>
+      <div onClick={() => setIsActive(!isActive)}>
+        <Menu.Button
+          className={`${isActive ? "bg-primary" : "bg-white transition-all delay-0 hover:scale-[1.175]"} group rounded-full p-2 drop-shadow-lg`}
+        >
+          <NotificationIcon
+            size="h-6 w-6"
+            color={isActive ? "text-white" : "text-primary"}
+          />
           {notifications.length > 0 && (
             <span className=" absolute -right-px -top-px flex h-3 w-3 items-center justify-center rounded-full bg-red-700 " />
           )}
-        </div>
-      </Menu.Button>
+        </Menu.Button>
+      </div>
 
       <Transition
         as={Fragment}
