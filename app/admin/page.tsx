@@ -1,37 +1,25 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getRoles, getUsers, updateRole } from "../services/admin-page";
 
 const Admin = () => {
-  const [users, setUsers] = useState([
-    {
-      name: "Pedro Alonso",
-      email: "pedroben123@gmail.com",
-      role: "SuperAdmin",
-    },
-    { name: "Jose Sanchez", email: "josewwe@gmail.com", role: "Admin" },
-    {
-      name: "Adrian Ramirez",
-      email: "adrianperfumes@icloud.com",
-      role: "User",
-    },
-    {
-      name: "Eduardo de Valle",
-      email: "lalolavieja@hotmail.com",
-      role: "Admin",
-    },
-  ]);
+  const [users, setUsers] = useState<Awaited<ReturnType<typeof getUsers>>>();
+  const [roles, setRoles] = useState<Awaited<ReturnType<typeof getRoles>>>();
 
-  const updateRole = (index: number, role: string) => {
-    const newUsers = [...users];
-    newUsers[index].role = role;
-    setUsers(newUsers);
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      const fetchedUsers = await getUsers();
+      setUsers(fetchedUsers);
+      const fetchedRoles = await getRoles();
+      setRoles(fetchedRoles);
+    };
 
-  const roles = [
-    { name: "SuperAdmin", value: "SuperAdmin" },
-    { name: "Admin", value: "Admin" },
-    { name: "User", value: "User" },
-  ];
+    fetchData();
+  }, []);
+
+  if (!users || !roles) {
+    return <div>loading...</div>;
+  }
 
   return (
     <div className="flex h-full w-full flex-col items-center">
@@ -45,22 +33,20 @@ const Admin = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user, index) => (
-            <tr key={index}>
+          {users.map((user) => (
+            <tr key={user.id}>
               <td className="border px-4 py-2">{user.name}</td>
               <td className="border px-4 py-2">{user.email}</td>
               <td className="border px-4 py-2">
                 <select
                   className="rounded bg-primary/50 px-3 py-1 text-white hover:bg-primary focus:bg-primary"
-                  value={user.role}
-                  onChange={(e) => updateRole(index, e.target.value)}
+                  defaultValue={user.role}
+                  onChange={(e) => {
+                    updateRole(user.id, e.target.value);
+                  }}
                 >
                   {roles.map((role, index) => (
-                    <option
-                      key={index}
-                      value={role.value}
-                      className={` bg-indigo-300`}
-                    >
+                    <option key={index} className="bg-indigo-300">
                       {role.name}
                     </option>
                   ))}

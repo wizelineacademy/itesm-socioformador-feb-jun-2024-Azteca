@@ -9,18 +9,18 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-export const userRoleEnum = pgEnum("role", ["EMPLOYEE", "MANAGER"]);
+export const userRoleEnum = pgEnum("role", ["EMPLOYEE", "MANAGER", "ADMIN"]);
 
 export const user = pgTable(
   "_user", //had to rename it because the word 'user' is reserved in postgres
   {
     id: char("id", { length: 32 }).primaryKey(),
-    name: varchar("name", { length: 64 }),
-    email: varchar("email", { length: 64 }).unique(),
+    name: varchar("name", { length: 64 }).notNull(),
+    email: varchar("email", { length: 64 }).notNull().unique(),
     jobTitle: varchar("job_title", { length: 64 }),
     department: varchar("department", { length: 64 }),
     photoUrl: varchar("photo_url", { length: 1024 }),
-    role: userRoleEnum("role"),
+    role: userRoleEnum("role").notNull(),
   },
 );
 
