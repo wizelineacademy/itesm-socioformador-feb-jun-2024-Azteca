@@ -1,23 +1,23 @@
 "use client";
-import { useEffect, useState } from "react";
 import { getRoles, getUsers, updateRole } from "../services/admin-page";
+import { useQuery, useMutation } from "@tanstack/react-query";
 
 const Admin = () => {
-  const [users, setUsers] = useState<Awaited<ReturnType<typeof getUsers>>>();
-  const [roles, setRoles] = useState<Awaited<ReturnType<typeof getRoles>>>();
+  const usersQuery = useQuery({
+    queryKey: ["users"],
+    queryFn: () => getUsers(),
+  });
+  const rolesQuery = useQuery({
+    queryKey: ["roles"],
+    queryFn: () => getRoles(),
+  });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const fetchedUsers = await getUsers();
-      setUsers(fetchedUsers);
-      const fetchedRoles = await getRoles();
-      setRoles(fetchedRoles);
-    };
+  // Mutations
+  const { mutate } = useMutation({
+    mutationFn: updateRole,
+  });
 
-    fetchData();
-  }, []);
-
-  if (!users || !roles) {
+  if (!usersQuery.data || !rolesQuery.data) {
     return <div>loading...</div>;
   }
 
@@ -33,7 +33,7 @@ const Admin = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+          {usersQuery.data.map((user) => (
             <tr key={user.id}>
               <td className="border px-4 py-2">{user.name}</td>
               <td className="border px-4 py-2">{user.email}</td>
@@ -42,10 +42,10 @@ const Admin = () => {
                   className="rounded bg-primary/50 px-3 py-1 text-white hover:bg-primary focus:bg-primary"
                   defaultValue={user.role}
                   onChange={(e) => {
-                    updateRole(user.id, e.target.value);
+                    mutate({ id: user.id, newRole: e.target.value });
                   }}
                 >
-                  {roles.map((role, index) => (
+                  {rolesQuery.data.map((role, index) => (
                     <option key={index} className="bg-indigo-300">
                       {role.name}
                     </option>
