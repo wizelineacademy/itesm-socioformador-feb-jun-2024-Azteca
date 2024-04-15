@@ -1,10 +1,13 @@
 "use client";
 
 import React from "react";
+import { useState } from "react";
+import { DateInput } from "@mantine/dates";
 import AddMemberButton from "@/components/AddMemberButton";
 import UserProfileButton from "@/components/UserProfileButton";
 
 const CreateProject = () => {
+  const [value, setValue] = useState<Date | null>(null);
   return (
     <div className="mx-28 my-6">
       <h3 className="text-4xl font-medium">Project Creation</h3>
@@ -41,6 +44,23 @@ const CreateProject = () => {
                   className="mt-2 w-fit rounded-xl p-2 drop-shadow-lg"
                 />
               </div>
+              <DateInput
+                value={value}
+                onChange={setValue}
+                // label="Date input"
+                // size="lg"
+                // radius="lg"
+                placeholder="Date input"
+                className="drop-shadow-lg"
+                styles={{
+                  input: {
+                    backgroundColor: "white",
+                    borderRadius: "12px",
+                    border: "none",
+                    padding: "8px",
+                  },
+                }}
+              />
             </div>
 
             {/* Sprint Survey Periodicity */}

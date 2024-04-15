@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
+import "@mantine/charts/styles.css";
+import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import NavigationBar from "@/components/NavigationBar";
 
 const poppins = Poppins({
@@ -30,7 +34,7 @@ export default function RootLayout({
           }
         >
           <NavigationBar />
-          {children}
+          <MantineProvider>{children}</MantineProvider>
         </body>
       </html>
     </ClerkProvider>
