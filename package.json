@@ -6,8 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "prettier-check": "npx prettier --check .",
-    "prettier-format": "npx prettier --write .",
+    "db:push": "drizzle-kit push:pg",
+    "db:studio": "drizzle-kit studio",
+    "prettier:write": "prettier --write --ignore-unknown .",
+    "prettier:check": "prettier --check --ignore-unknown .",
     "lint": "next lint"
   },
   "dependencies": {
