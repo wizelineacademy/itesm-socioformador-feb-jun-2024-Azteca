@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
+import "@mantine/charts/styles.css";
+import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import NavigationBar from "@/components/NavigationBar";
 import ReactQueryProvider from "@/utils/ReactQueryProvider";
 
@@ -30,8 +34,12 @@ export default function RootLayout({
             " h-dvh w-dvw overflow-hidden bg-bone px-7 pb-4 pt-10"
           }
         >
-          <NavigationBar />
-          <ReactQueryProvider>{children}</ReactQueryProvider>
+          <ReactQueryProvider>
+            <MantineProvider>
+              <NavigationBar />
+              {children}
+            </MantineProvider>
+          </ReactQueryProvider>
         </body>
       </html>
     </ClerkProvider>
