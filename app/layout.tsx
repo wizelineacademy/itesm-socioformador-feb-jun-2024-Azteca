@@ -33,8 +33,10 @@ export default function RootLayout({
             " h-dvh w-dvw overflow-hidden bg-bone px-7 pb-4 pt-10"
           }
         >
-          <NavigationBar />
-          <MantineProvider>{children}</MantineProvider>
+          <MantineProvider>
+            <NavigationBar />
+            {children}
+          </MantineProvider>
         </body>
       </html>
     </ClerkProvider>
