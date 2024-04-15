@@ -13,7 +13,7 @@ import BitmojiAdrian from "@/public/Bitmoji Adrian.png";
 import { useUser } from "@clerk/clerk-react";
 
 // Services imports
-import { getInfoById, getTraits } from "@/services/user";
+import { getInfoById, getTraits, getCoWorkers } from "@/services/user";
 import { useEffect, useState } from "react";
 import { SignedIn } from "@clerk/nextjs";
 
@@ -28,6 +28,8 @@ const Profile = () => {
       setUserName(userInfo.name);
     }
     const userTraits = await getTraits();
+    const coworkers = await getCoWorkers();
+    console.log(coworkers);
   }
 
   if (isLoaded) {
