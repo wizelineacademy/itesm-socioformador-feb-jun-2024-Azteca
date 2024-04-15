@@ -11,8 +11,15 @@ import { useState } from "react";
 
 const NavigationBar = () => {
   const pathname = usePathname();
-  const validRoutes = ["/pip", "/dashboard", "/profile", "/projects", "/"];
   const [showModal, setShowModal] = useState(false);
+  const validRoutes = [
+    "/pip",
+    "/dashboard",
+    "/profile",
+    "/projects",
+    "/",
+    "/projects/create",
+  ];
 
   if (!validRoutes.includes(pathname)) {
     return null;
