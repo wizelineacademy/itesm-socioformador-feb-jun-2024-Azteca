@@ -1,3 +1,4 @@
+"use client";
 import NavigationBar from "@/components/NavigationBar";
 import UserProfileButton from "@/components/UserProfileButton";
 import CoWorkersCarousel from "@/components/CoWorkersCarousel";
@@ -8,8 +9,31 @@ import Image from "next/image";
 import JobSVG from "@/public/Job-Profile-Image.svg";
 import BitmojiAdrian from "@/public/Bitmoji Adrian.png";
 
+// Clerk imports
+import { useUser } from "@clerk/clerk-react";
+
+// Services imports
+import { getInfoById, getTraits } from "@/services/user";
+import { useEffect, useState } from "react";
+import { SignedIn } from "@clerk/nextjs";
+
 const Profile = () => {
-  const userName = "Adrián Alejandro Ramírez Cruz";
+  const { isSignedIn, user, isLoaded } = useUser();
+
+  const [userName, setUserName] = useState<string | null>("");
+
+  async function setUserInfo() {
+    const userInfo = await getInfoById();
+    if (userInfo) {
+      setUserName(userInfo.name);
+    }
+    const userTraits = await getTraits();
+  }
+
+  if (isLoaded) {
+    setUserInfo();
+  }
+
   const userEmail = "adrian_rmzc@gmail.com";
   const userRole = "Software Engineer";
   const userDepartment = "IT Department";
@@ -36,8 +60,8 @@ const Profile = () => {
         <UserProfileButton
           size="lg"
           className="absolute left-20 top-60 h-fit"
-          photoUrl={BitmojiAdrian}
-          /*           photoUrl="https://static.wikia.nocookie.net/heroe/images/0/08/Lucario_SSBU.png/revision/latest?cb=20200104023610&path-prefix=es" */
+          // photoUrl={BitmojiAdrian}
+          photoUrl="https://static.wikia.nocookie.net/heroe/images/0/08/Lucario_SSBU.png/revision/latest?cb=20200104023610&path-prefix=es"
         />
         <div className="flex w-5/6 flex-row items-center justify-between">
           <div className="ps-56 leading-tight text-white">
