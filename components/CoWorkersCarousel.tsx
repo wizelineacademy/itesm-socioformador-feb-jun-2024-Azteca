@@ -9,6 +9,7 @@ export default function EmblaCarousel() {
   const [emblaRef] = useEmblaCarousel({ loop: true }, [
     Autoplay({ delay: 2000 }),
   ]);
+  const users = [{}, {}, {}, {}, {}, {}, {}, {}];
 
   const users = [{}, {}, {}, {}, {}, {}, {}, {}];
 
