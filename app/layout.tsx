@@ -7,6 +7,7 @@ import "@mantine/dates/styles.css";
 import "@mantine/charts/styles.css";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import NavigationBar from "@/components/NavigationBar";
+import ReactQueryProvider from "@/utils/ReactQueryProvider";
 
 const poppins = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -33,10 +34,12 @@ export default function RootLayout({
             " h-dvh w-dvw overflow-hidden bg-bone px-7 pb-4 pt-10"
           }
         >
-          <MantineProvider>
-            <NavigationBar />
-            {children}
-          </MantineProvider>
+          <ReactQueryProvider>
+            <MantineProvider>
+              <NavigationBar />
+              {children}
+            </MantineProvider>
+          </ReactQueryProvider>
         </body>
       </html>
     </ClerkProvider>
