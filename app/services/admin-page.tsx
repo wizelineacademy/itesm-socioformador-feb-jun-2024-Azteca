@@ -16,7 +16,12 @@ export const getRoles = async () => {
   }));
 };
 
-export const updateRole = async (id: string, newRole: any) => {
+export const updateRole = async ({
+  id,
+  newRole,
+}: {
+  id: string;
+  newRole: any;
+}) => {
   await db.update(user).set({ role: newRole }).where(eq(user.id, id)).execute();
-  revalidatePath("/admin");
 };
