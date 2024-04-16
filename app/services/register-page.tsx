@@ -14,14 +14,12 @@ export const registerUser = async (
       throw new Error("Empty email or empty password");
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    await db
-      .insert(user)
-      .values({
-        name: name,
-        email: email,
-        password: hashedPassword,
-        role: "EMPLOYEE",
-      });
+    await db.insert(user).values({
+      name: name,
+      email: email,
+      password: hashedPassword,
+      role: "EMPLOYEE",
+    });
   } catch (error) {
     console.error("Could not register user", error);
     throw new Error("Could not register user");
