@@ -1,5 +1,3 @@
-
-"use client";
 import NavigationBar from "@/components/NavigationBar";
 import UserProfileButton from "@/components/UserProfileButton";
 import CoWorkersCarousel from "@/components/CoWorkersCarousel";
@@ -10,33 +8,15 @@ import Image from "next/image";
 import JobSVG from "@/public/Job-Profile-Image.svg";
 import BitmojiAdrian from "@/public/Bitmoji Adrian.png";
 
-// Clerk imports
-import { useUser } from "@clerk/clerk-react";
-
 // Services imports
 import { getInfoById, getTraits, getCoWorkers } from "@/services/user";
 import { useEffect, useState } from "react";
-import { SignedIn } from "@clerk/nextjs";
+import { auth } from "@/auth";
 
-const Profile = () => {
-  const { isSignedIn, user, isLoaded } = useUser();
+const Profile = async () => {
+  // const session = await auth();
 
-  const [userName, setUserName] = useState<string | null>("");
-
-  async function setUserInfo() {
-    const userInfo = await getInfoById();
-    if (userInfo) {
-      setUserName(userInfo.name);
-    }
-    const userTraits = await getTraits();
-    const coworkers = await getCoWorkers();
-    console.log(coworkers);
-  }
-
-  if (isLoaded) {
-    setUserInfo();
-  }
-
+  const userName = "Adrian Ramirez";
   const userEmail = "adrian_rmzc@gmail.com";
   const userRole = "Software Engineer";
   const userDepartment = "IT Department";

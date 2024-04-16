@@ -107,9 +107,7 @@ const PIP = () => {
   return (
     <main>
       <section id="pip-progressbar" className="mt-4">
-        <p className=" mb-2 text-3xl font-semibold">
-          Performance Improvement Plan
-        </p>
+        <p className=" mb-2 text-3xl font-semibold">Personal Career Plan</p>
         <ProgressBar width={progressPercentage} height={6} />
       </section>
       <section id="pip-tasks" className="mt-9 w-full">
