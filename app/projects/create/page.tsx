@@ -2,12 +2,18 @@
 
 import React from "react";
 import { useState } from "react";
-import { DateInput } from "@mantine/dates";
+import { DatePickerInput } from "@mantine/dates";
 import AddMemberButton from "@/components/AddMemberButton";
 import UserProfileButton from "@/components/UserProfileButton";
+import CalendarIcon from "@/components/icons/CalendarIcon";
 
 const CreateProject = () => {
-  const [value, setValue] = useState<Date | null>(null);
+  const [surveyPeriodicity, setSurveyPeriodicity] = useState("");
+  const [rangeDates, setRangeDates] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
+
   return (
     <div className="mx-28 my-6">
       <h3 className="text-4xl font-medium">Project Creation</h3>
@@ -32,32 +38,22 @@ const CreateProject = () => {
               <label htmlFor="duration" className="text-2xl font-medium">
                 Duration
               </label>
-              <div className="flex gap-8">
-                <input
-                  type="date"
-                  id="start"
-                  className="mt-2 w-fit rounded-xl p-2 drop-shadow-lg"
-                />
-                <input
-                  type="date"
-                  id="end"
-                  className="mt-2 w-fit rounded-xl p-2 drop-shadow-lg"
-                />
-              </div>
-              <DateInput
-                value={value}
-                onChange={setValue}
-                // label="Date input"
-                // size="lg"
-                // radius="lg"
-                placeholder="Date input"
-                className="drop-shadow-lg"
+              <DatePickerInput
+                leftSection={<CalendarIcon size="h-6 w-6" color="grayText" />}
+                type="range"
+                aria-label="Duration"
+                placeholder="Pick dates range"
+                value={rangeDates}
+                onChange={setRangeDates}
+                minDate={new Date()}
+                className="mt-2 gap-2 drop-shadow-lg"
                 styles={{
                   input: {
                     backgroundColor: "white",
                     borderRadius: "12px",
                     border: "none",
-                    padding: "8px",
+                    color: "9E9E9E",
+                    font: "inherit",
                   },
                 }}
               />
