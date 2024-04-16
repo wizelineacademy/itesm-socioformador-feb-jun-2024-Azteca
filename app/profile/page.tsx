@@ -1,4 +1,3 @@
-
 "use client";
 import NavigationBar from "@/components/NavigationBar";
 import UserProfileButton from "@/components/UserProfileButton";
@@ -63,8 +62,8 @@ const Profile = () => {
         <UserProfileButton
           size="lg"
           className="absolute left-20 top-60 h-fit"
-          // photoUrl={BitmojiAdrian}
-          photoUrl="https://static.wikia.nocookie.net/heroe/images/0/08/Lucario_SSBU.png/revision/latest?cb=20200104023610&path-prefix=es"
+          photoUrl={BitmojiAdrian}
+          // photoUrl="https://static.wikia.nocookie.net/heroe/images/0/08/Lucario_SSBU.png/revision/latest?cb=20200104023610&path-prefix=es"
         />
         <div className="flex w-5/6 flex-row items-center justify-between">
           <div className="ps-56 leading-tight text-white">
