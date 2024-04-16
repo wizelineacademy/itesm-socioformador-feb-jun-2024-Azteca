@@ -31,6 +31,7 @@ const Notifications = ({ setShowModal }: NotificationProps) => {
   ]);
 
   const handleClickNotification = (index: number): void => {
+    setShowModal();
     const newNotifications = [...notifications];
     newNotifications.splice(index, 1);
     setNotifications(newNotifications);
@@ -76,21 +77,23 @@ const Notifications = ({ setShowModal }: NotificationProps) => {
           {notifications.length > 0 &&
             notifications.map((notification, index) => {
               return (
-                <div
-                  key={notification.id}
-                  onClick={setShowModal}
-                  className="w-full cursor-pointer py-1"
-                >
-                  <Menu.Item>
-                    {({ active }) => (
+                <Menu.Item key={index}>
+                  {({ close }) => (
+                    <div
+                      onClick={() => {
+                        close();
+                        handleClickNotification(index);
+                      }}
+                      className="w-full cursor-pointer py-1"
+                    >
                       <NotificationCard
                         notification={notification}
                         onClick={() => {}}
                         index={index}
                       />
-                    )}
-                  </Menu.Item>
-                </div>
+                    </div>
+                  )}
+                </Menu.Item>
               );
             })}
           {notifications.length === 0 && (
