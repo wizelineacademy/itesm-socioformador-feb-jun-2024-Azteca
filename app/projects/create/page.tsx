@@ -68,8 +68,9 @@ const CreateProject = () => {
                 name=""
                 id="periodicity"
                 className="mt-2 rounded-xl p-2 drop-shadow-lg"
+                defaultValue="--- Select Periodicity ---"
               >
-                <option value="" selected disabled hidden>
+                <option disabled hidden>
                   --- Select Periodicity ---
                 </option>
                 <option value="everyWeek">Every Week</option>
