@@ -13,7 +13,7 @@ const NavigationBar = () => {
   const pathname = usePathname();
   const [showModal, setShowModal] = useState(false);
   const validRoutes = [
-    "/pip",
+    "/pcp",
     "/dashboard",
     "/profile",
     "/projects",
@@ -35,7 +35,7 @@ const NavigationBar = () => {
       <nav className="flex items-center justify-between bg-bone">
         <h1 className="text-3xl font-bold text-primary">FEEDBACK FLOW</h1>
         <div className="flex flex-row gap-5 p-1">
-          <PIPIcon path="/pip" currentPath={pathname} />
+          <PIPIcon path="/pcp" currentPath={pathname} />
           <DashboardIconNavbar path="/dashboard" currentPath={pathname} />
           {isManager && (
             <ProjectNavbarIcon path="/projects" currentPath={pathname} />

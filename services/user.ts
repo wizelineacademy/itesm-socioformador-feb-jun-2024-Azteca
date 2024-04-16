@@ -3,13 +3,12 @@
 import * as schema from "@/db/schema";
 import db from "@/db/drizzle";
 import { eq } from "drizzle-orm";
-import { auth } from "@clerk/nextjs";
 import { join } from "path";
 import { alias } from "drizzle-orm/pg-core";
 import { use } from "react";
 
 export async function getInfoById() {
-  const { userId } = auth();
+  const userId = "TODO: implement nextauth";
   if (!userId) {
     throw new Error("You most be signed in");
   }
@@ -21,7 +20,7 @@ export async function getInfoById() {
 }
 
 export async function getTraits() {
-  const { userId } = auth();
+  const userId = "TODO: implement nextauth";
   if (!userId) {
     throw new Error("You most be signed in");
   }
@@ -35,7 +34,7 @@ export async function getTraits() {
 }
 
 export async function getCoWorkers() {
-  const { userId } = auth();
+  const userId = "TODO: implement nextauth";
   if (!userId) {
     throw new Error("You most be signed in");
   }
