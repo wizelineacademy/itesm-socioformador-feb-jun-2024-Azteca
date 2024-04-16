@@ -1,6 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { Slider } from "@mantine/core";
 import { Fragment } from "react";
+import Slider from "../Slider";
 
 interface ProjectSurveyProps {
   showModal: boolean;
@@ -8,6 +8,8 @@ interface ProjectSurveyProps {
 }
 const ProjectSurvey = ({ showModal, onClose }: ProjectSurveyProps) => {
   const handleClose = () => {};
+  const marks = ["Disagree", "Medium", "Agree"];
+  const label = "How likely are you to recommend this project to a friend?";
   return (
     <Transition appear show={showModal} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -34,59 +36,44 @@ const ProjectSurvey = ({ showModal, onClose }: ProjectSurveyProps) => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-5xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="flex w-full max-w-5xl transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <Dialog.Title
                   as="h3"
                   className="text-2xl font-semibold text-black"
                 >
                   Project Survey
                 </Dialog.Title>
-                <div className="w-1/2">
-                  <label className="mb-2 mt-4 block text-sm font-light text-black">
-                    Do you feel that your efforts were recognized?
-                  </label>
-                  <input
-                    type="range"
-                    step={50}
-                    min={0}
-                    max={100}
-                    className="h-1.5 w-full appearance-none rounded-full bg-primary
-                    [&::-webkit-slider-thumb]:h-5
-                    [&::-webkit-slider-thumb]:w-5
-                    [&::-webkit-slider-thumb]:appearance-none
-                    [&::-webkit-slider-thumb]:rounded-full
-                    [&::-webkit-slider-thumb]:bg-white
-                    [&::-webkit-slider-thumb]:shadow-[0_0_0_1px]
-                    [&::-webkit-slider-thumb]:shadow-gray-300
-                    [&::-webkit-slider-thumb]:transition-all
-                    [&::-webkit-slider-thumb]:duration-150
-                    [&::-webkit-slider-thumb]:ease-in-out
-                    [&::-webkit-slider-thumb]:hover:bg-bone
-                    [&::-webkit-slider-thumb]:active:bg-gray-200
-                    "
+                <section>
+                  <div className="mt-3 flex flex-row flex-wrap justify-around">
+                    <Slider
+                      label="Do you feel that your efforts were recognized?"
+                      className=" pe-10"
+                    />
+                    <Slider
+                      label="Did you feel supported in your personal growth?"
+                      className=" ps-10"
+                    />
+                    <Slider
+                      label="Were your ideas and creativity heard in decision-making?"
+                      className="mt-8 pe-10"
+                    />
+                    <Slider
+                      label="Were the challenges addressed with opportuninites for growth?"
+                      className="mt-8 ps-10"
+                    />
+                  </div>
+                  <Slider
+                    label="Was there an atmosphere of respect and trust?"
+                    className="mx-auto mt-8 flex-1 px-5"
                   />
-                  <div className="mt-1 flex flex-row items-center justify-between">
-                    <div className="h-4 w-[1.5px] bg-grayText" />
-                    <div className="h-4 w-[1.5px] bg-grayText" />
-                    <div className="h-4 w-[1.5px] bg-grayText" />
-                  </div>
-
-                  <div className="flex flex-row items-center justify-between text-center">
-                    <p className="text-sm text-graySubtitle">Disagree</p>
-                    <p className="me-5 text-sm text-graySubtitle">Medium</p>
-                    <p className="text-sm text-graySubtitle">Agree</p>
-                  </div>
-                </div>
-
-                <div className="mt-4">
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                    onClick={onClose}
-                  >
-                    Got it, thanks!
-                  </button>
-                </div>
+                </section>
+                <button
+                  type="button"
+                  className=" mx-auto mt-12 rounded-full bg-primary px-7 py-2 text-base font-medium text-white"
+                  onClick={onClose}
+                >
+                  Submit
+                </button>
               </Dialog.Panel>
             </Transition.Child>
           </div>
