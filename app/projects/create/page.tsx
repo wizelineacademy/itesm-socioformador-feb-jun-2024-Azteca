@@ -2,10 +2,10 @@
 
 import React from "react";
 import { useState } from "react";
-import { NativeSelect } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import AddMemberButton from "@/components/AddMemberButton";
 import UserProfileButton from "@/components/UserProfileButton";
+import CalendarIcon from "@/components/icons/CalendarIcon";
 
 const CreateProject = () => {
   const [surveyPeriodicity, setSurveyPeriodicity] = useState("");
@@ -39,20 +39,19 @@ const CreateProject = () => {
                 Duration
               </label>
               <DatePickerInput
+                leftSection={<CalendarIcon size="h-6 w-6" color="grayText" />}
                 type="range"
                 aria-label="Duration"
                 placeholder="Pick dates range"
-                variant="unstyled"
                 value={rangeDates}
                 onChange={setRangeDates}
                 minDate={new Date()}
-                className="mt-2 drop-shadow-lg"
+                className="mt-2 gap-2 drop-shadow-lg"
                 styles={{
                   input: {
                     backgroundColor: "white",
                     borderRadius: "12px",
                     border: "none",
-                    padding: "8px",
                     color: "9E9E9E",
                     font: "inherit",
                   },
