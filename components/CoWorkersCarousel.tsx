@@ -11,8 +11,6 @@ export default function EmblaCarousel() {
   ]);
   const users = [{}, {}, {}, {}, {}, {}, {}, {}];
 
-  const users = [{}, {}, {}, {}, {}, {}, {}, {}];
-
   return (
     <div className="embla" ref={emblaRef}>
       <ul className="embla__container px-1 py-3">
