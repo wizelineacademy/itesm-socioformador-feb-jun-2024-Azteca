@@ -4,7 +4,7 @@ import { registerUser } from "../services/register-page";
 const Login = () => {
   const registerAction = async (formData: FormData) => {
     "use server";
-    const name = formData.get("email")?.toString();
+    const name = formData.get("name")?.toString();
     const email = formData.get("email")?.toString();
     const password = formData.get("password")?.toString();
     registerUser(name, email, password);

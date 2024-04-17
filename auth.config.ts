@@ -31,5 +31,18 @@ export const authConfig = {
         return false; // Redirect unauthenticated users to login page
       }
     },
+    async jwt({ token, user: jwtUser, account, profile, trigger }) {
+      // Persist the OAuth access_token and or the user id to the token right after signin
+      if (trigger === "signIn") {
+        token.id = jwtUser.id;
+      }
+
+      return token;
+    },
+    async session({ session, token, user }) {
+      // Send properties to the client, like an access_token from a provider.
+      session.user.id = token.id as string;
+      return session;
+    },
   },
 } satisfies NextAuthConfig;

@@ -6,12 +6,13 @@ import { eq } from "drizzle-orm";
 import { join } from "path";
 import { alias } from "drizzle-orm/pg-core";
 import { use } from "react";
+import { auth } from "@/auth";
 
 export async function getInfoById() {
-  const userId = "TODO: implement nextauth";
-  if (!userId) {
-    throw new Error("You most be signed in");
-  }
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) throw new Error("You must be signed in");
+
   const res = await db
     .select()
     .from(schema.user)

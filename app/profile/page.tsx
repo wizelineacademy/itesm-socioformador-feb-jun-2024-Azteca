@@ -11,15 +11,9 @@ import BitmojiAdrian from "@/public/Bitmoji Adrian.png";
 // Services imports
 import { getInfoById, getTraits, getCoWorkers } from "@/services/user";
 import { useEffect, useState } from "react";
-import { auth } from "@/auth";
 
 const Profile = async () => {
-  // const session = await auth();
-
-  const userName = "Adrian Ramirez";
-  const userEmail = "adrian_rmzc@gmail.com";
-  const userRole = "Software Engineer";
-  const userDepartment = "IT Department";
+  const user = await getInfoById();
 
   const Strengths = [
     "Detail Attention",
@@ -48,13 +42,13 @@ const Profile = async () => {
         />
         <div className="flex w-5/6 flex-row items-center justify-between">
           <div className="ps-56 leading-tight text-white">
-            <h2 className=" text-3xl font-semibold">{userName}</h2>
+            <h2 className=" text-3xl font-semibold">{user.name}</h2>
             <div className="flex flex-row items-center gap-2 text-xl">
-              <p className="font-medium">{userRole}</p>
+              <p className="font-medium">{user.role}</p>
               <p className="font-normal">-</p>
-              <p className="font-normal">{userDepartment}</p>
+              <p className="font-normal">{user.department}</p>
             </div>
-            <p className="font-light">{userEmail}</p>
+            <p className="font-light">{user.email}</p>
           </div>
           <Image src={JobSVG} alt="image" className="hidden md:block" />
         </div>
