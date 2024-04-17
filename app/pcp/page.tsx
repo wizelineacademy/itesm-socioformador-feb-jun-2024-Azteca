@@ -3,12 +3,13 @@ import NavigationBar from "@/components/NavigationBar";
 import PipResource from "@/components/PipResource";
 import PipTask from "@/components/PipTask";
 import ProgressBar from "@/components/Progressbar";
-import { getUserTasks } from "@/services/tasks-and-resources";
+import { getUserTasks, getUserResources } from "@/services/tasks-and-resources";
 import { useState, useEffect } from "react";
 
 const PIP = () => {
   
   const [tasks, setTasks] = useState([]);
+  const [resources, setResources] = useState([]);
 
   useEffect(() => {
     // Define an async function within the useEffect
@@ -26,30 +27,21 @@ const PIP = () => {
     fetchTasks();
   }, []);
 
-  const resources = [
-    {
-      id: 1,
-      title: "Hábitos Atómicos",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor...",
-      type: "video",
-      link: "https://www.youtube.com",
-    },
-    {
-      id: 2,
-      title: "Resource 2",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      type: "article",
-      link: "https://www.youtube.com",
-    },
-    {
-      id: 3,
-      title: "Resource 3",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      type: "book",
-      link: "https://www.youtube.com",
-    },
-  ];
+  useEffect(() => {
+    // Define an async function within the useEffect
+    async function fetchResources() {
+      try {
+        const data = await getUserResources();
+        console.log(data);
+        setResources(data); // Assuming getUserTasks() fetches your data correctly
+      } catch (error) {
+        console.error('Failed to fetch tasks:', error);
+      }
+    }
+
+    // Call the async function
+    fetchResources();
+  }, []);
 
   const progressPercentage = Math.round(
     (tasks.filter((task) => task.isDone).length / tasks.length) * 100,
