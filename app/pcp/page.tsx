@@ -3,71 +3,28 @@ import NavigationBar from "@/components/NavigationBar";
 import PipResource from "@/components/PipResource";
 import PipTask from "@/components/PipTask";
 import ProgressBar from "@/components/Progressbar";
-import { useState } from "react";
+import { getUserTasks } from "@/services/tasks-and-resources";
+import { useState, useEffect } from "react";
 
 const PIP = () => {
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Ir con el psicólogo",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: false,
-    },
-    {
-      id: 2,
-      title: "Task 2",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: true,
-    },
-    {
-      id: 3,
-      title: "Task 3",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: true,
-    },
-    {
-      id: 4,
-      title: "Task 4",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: false,
-    },
-    {
-      id: 3,
-      title: "Task 3",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: true,
-    },
-    {
-      id: 4,
-      title: "Ir con el psicólogo",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: false,
-    },
-    {
-      id: 3,
-      title: "Task 3",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: true,
-    },
-    {
-      id: 4,
-      title: "Task 4",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: false,
-    },
-    {
-      id: 3,
-      title: "Ir con el psicólogo",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: true,
-    },
-    {
-      id: 4,
-      title: "Task 4",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: false,
-    },
-  ]);
+  
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    // Define an async function within the useEffect
+    async function fetchTasks() {
+      try {
+        const data = await getUserTasks();
+        console.log(data);
+        setTasks(data); // Assuming getUserTasks() fetches your data correctly
+      } catch (error) {
+        console.error('Failed to fetch tasks:', error);
+      }
+    }
+
+    // Call the async function
+    fetchTasks();
+  }, []);
 
   const resources = [
     {
