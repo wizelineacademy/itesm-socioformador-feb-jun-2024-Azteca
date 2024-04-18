@@ -27,6 +27,7 @@ const NavigationBar = () => {
     "/projects",
     "/",
     "/projects/create",
+    "/projects/1",
     "/admin",
   ];
 
