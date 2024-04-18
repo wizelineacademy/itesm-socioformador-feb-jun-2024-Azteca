@@ -2,7 +2,8 @@
 
 import React from "react";
 import { RadarChart, AreaChart } from "@mantine/charts";
-import { Gauge } from "@mui/x-charts/Gauge";
+import GaugeFullChart from "../../../components/GaugeFullChart";
+import GaugeHalfChart from "../../../components/GaugeHalfChart";
 
 // const Project = ({ params: { project_id } }) => {
 const Project = () => {
@@ -55,6 +56,13 @@ const Project = () => {
       growthOportunities: 78,
     },
   ];
+
+  const percentage = 43;
+  // const strokeDashoffset = 440 - (440 * percentage) / 100;
+
+  const strokeDasharray = Math.PI * 70; // Circunferencia para el radio del círculo SVG
+  const strokeDashoffset =
+    strokeDasharray - (strokeDasharray * percentage) / 100;
 
   return (
     <div className="flex flex-wrap">
@@ -124,17 +132,8 @@ const Project = () => {
           ></div>
         </div>
       </div>
-      <div>
-        <Gauge
-          value={75}
-          startAngle={0}
-          endAngle={360}
-          innerRadius="80%"
-          outerRadius="100%"
-          width={200}
-          height={200}
-        />
-      </div>
+      <GaugeFullChart percentage={43} />
+      <GaugeHalfChart percentage={43} />
     </div>
   );
 };
