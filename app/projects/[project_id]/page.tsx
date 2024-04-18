@@ -2,8 +2,7 @@
 
 import React from "react";
 import { RadarChart, AreaChart } from "@mantine/charts";
-import GaugeFullChart from "../../../components/GaugeFullChart";
-import GaugeHalfChart from "../../../components/GaugeHalfChart";
+import GaugeChart from "../../../components/GaugeChart";
 
 // const Project = ({ params: { project_id } }) => {
 const Project = () => {
@@ -132,8 +131,8 @@ const Project = () => {
           ></div>
         </div>
       </div>
-      <GaugeFullChart percentage={43} />
-      <GaugeHalfChart percentage={43} />
+      <GaugeChart percentage={78} type="half" />
+      <GaugeChart percentage={78} type="full" />
     </div>
   );
 };
