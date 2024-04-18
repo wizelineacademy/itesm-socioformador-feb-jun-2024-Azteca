@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import "@mantine/charts/styles.css";
@@ -26,22 +25,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body
-          className={
-            poppins.className +
-            " h-dvh w-dvw overflow-hidden bg-bone px-7 pb-4 pt-10"
-          }
-        >
-          <ReactQueryProvider>
-            <MantineProvider>
-              <NavigationBar />
-              {children}
-            </MantineProvider>
-          </ReactQueryProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en">
+      <body
+        className={
+          poppins.className +
+          " h-dvh w-dvw overflow-hidden bg-bone px-7 pb-4 pt-10"
+        }
+      >
+        <ReactQueryProvider>
+          <MantineProvider>
+            <NavigationBar />
+            {children}
+          </MantineProvider>
+        </ReactQueryProvider>
+      </body>
+    </html>
   );
 }

@@ -8,18 +8,27 @@ import UserIconNavbar from "./UserIconNavbar";
 import DashboardIconNavbar from "./DashboardIconNavbar";
 import ProjectSurvey from "./modals/ProjectSurvey";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getUserRole } from "@/services/navigation-bar-page";
+import Link from "next/link";
 
 const NavigationBar = () => {
+  const userRoleQuery = useQuery({
+    queryKey: ["user-role"],
+    queryFn: () => getUserRole(),
+  });
+
   const pathname = usePathname();
   const [showModal, setShowModal] = useState(false);
   const validRoutes = [
-    "/pip",
+    "/pcp",
     "/dashboard",
     "/profile",
     "/projects",
     "/",
     "/projects/create",
     "/projects/1",
+    "/admin",
   ];
 
   if (!validRoutes.includes(pathname)) {
@@ -36,7 +45,15 @@ const NavigationBar = () => {
       <nav className="flex items-center justify-between bg-bone">
         <h1 className="text-3xl font-bold text-primary">FEEDBACK FLOW</h1>
         <div className="flex flex-row gap-5 p-1">
-          <PIPIcon path="/pip" currentPath={pathname} />
+          {userRoleQuery.data && userRoleQuery.data == "ADMIN" && (
+            <Link
+              href="/admin"
+              className="rounded-xl bg-primary px-4 py-2 text-white"
+            >
+              Admin Dashboard
+            </Link>
+          )}
+          <PIPIcon path="/pcp" currentPath={pathname} />
           <DashboardIconNavbar path="/dashboard" currentPath={pathname} />
           {isManager && (
             <ProjectNavbarIcon path="/projects" currentPath={pathname} />

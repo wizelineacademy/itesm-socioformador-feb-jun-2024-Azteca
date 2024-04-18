@@ -1,52 +1,47 @@
 "use server";
 
-import * as schema from "@/db/schema";
+import { projectMember, trait, user, userTrait } from "@/db/schema";
 import db from "@/db/drizzle";
 import { eq } from "drizzle-orm";
-import { auth } from "@clerk/nextjs";
-import { join } from "path";
 import { alias } from "drizzle-orm/pg-core";
-import { use } from "react";
+import { auth } from "@/auth";
 
 export async function getInfoById() {
-  const { userId } = auth();
-  if (!userId) {
-    throw new Error("You most be signed in");
-  }
-  const res = await db
-    .select()
-    .from(schema.user)
-    .where(eq(schema.user.id, userId));
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) throw new Error("You must be signed in");
+
+  const res = await db.select().from(user).where(eq(user.id, userId));
   return res[0];
 }
 
 export async function getTraits() {
-  const { userId } = auth();
+  const userId = "TODO: implement nextauth";
   if (!userId) {
     throw new Error("You most be signed in");
   }
   const res = await db
     .select()
-    .from(schema.userTrait)
-    .leftJoin(schema.user, eq(schema.userTrait.userId, schema.user.id))
-    .leftJoin(schema.trait, eq(schema.userTrait.traitId, schema.trait.id))
-    .where(eq(schema.user.id, userId));
+    .from(userTrait)
+    .leftJoin(user, eq(userTrait.userId, user.id))
+    .leftJoin(trait, eq(userTrait.traitId, trait.id))
+    .where(eq(user.id, userId));
   return res[0];
 }
 
 export async function getCoWorkers() {
-  const { userId } = auth();
+  const userId = "TODO: implement nextauth";
   if (!userId) {
     throw new Error("You most be signed in");
   }
-  const pm = alias(schema.projectMember, "pm");
-  const pm2 = alias(schema.projectMember, "pm2");
+  const pm = alias(projectMember, "pm");
+  const pm2 = alias(projectMember, "pm2");
   const res = await db
     .selectDistinct()
     .from(pm)
     .leftJoin(pm, eq(pm.projectId, pm2.projectId))
-    .leftJoin(schema.user, eq(schema.user.id, pm2.userId))
-    .where(eq(schema.user.id, userId));
+    .leftJoin(user, eq(user.id, pm2.userId))
+    .where(eq(user.id, userId));
   return res[0];
 }
 

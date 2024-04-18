@@ -3,8 +3,8 @@ import { Menu, Transition } from "@headlessui/react";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useClerk, useUser } from "@clerk/nextjs";
 import UserIcon from "./icons/UserIcon";
+import { signOut } from "next-auth/react";
 
 interface UserIconInterface {
   path: string;
@@ -13,11 +13,9 @@ interface UserIconInterface {
 const UserIconNavbar = ({ path, currentPath }: UserIconInterface) => {
   const onSite = currentPath === path;
   const [isClicked, setIsClicked] = useState<boolean>(false);
-  const { signOut } = useClerk();
-  const { isSignedIn, user } = useUser();
   const router = useRouter();
-  const handleSignOut = () => {
-    signOut(() => router.push("/sign-in"));
+  const handleSignOut = async () => {
+    await signOut();
   };
 
   useEffect(() => {

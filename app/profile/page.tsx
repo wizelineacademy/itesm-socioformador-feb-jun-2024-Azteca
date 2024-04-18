@@ -1,4 +1,3 @@
-"use client";
 import NavigationBar from "@/components/NavigationBar";
 import UserProfileButton from "@/components/UserProfileButton";
 import CoWorkersCarousel from "@/components/CoWorkersCarousel";
@@ -9,36 +8,12 @@ import Image from "next/image";
 import JobSVG from "@/public/Job-Profile-Image.svg";
 import BitmojiAdrian from "@/public/Bitmoji Adrian.png";
 
-// Clerk imports
-import { useUser } from "@clerk/clerk-react";
-
 // Services imports
 import { getInfoById, getTraits, getCoWorkers } from "@/services/user";
 import { useEffect, useState } from "react";
-import { SignedIn } from "@clerk/nextjs";
 
-const Profile = () => {
-  const { isSignedIn, user, isLoaded } = useUser();
-
-  const [userName, setUserName] = useState<string | null>("");
-
-  async function setUserInfo() {
-    const userInfo = await getInfoById();
-    if (userInfo) {
-      setUserName(userInfo.name);
-    }
-    const userTraits = await getTraits();
-    const coworkers = await getCoWorkers();
-    console.log(coworkers);
-  }
-
-  if (isLoaded) {
-    setUserInfo();
-  }
-
-  const userEmail = "adrian_rmzc@gmail.com";
-  const userRole = "Software Engineer";
-  const userDepartment = "IT Department";
+const Profile = async () => {
+  const user = await getInfoById();
 
   const Strengths = [
     "Detail Attention",
@@ -67,13 +42,13 @@ const Profile = () => {
         />
         <div className="flex w-5/6 flex-row items-center justify-between">
           <div className="ps-56 leading-tight text-white">
-            <h2 className=" text-3xl font-semibold">{userName}</h2>
+            <h2 className=" text-3xl font-semibold">{user.name}</h2>
             <div className="flex flex-row items-center gap-2 text-xl">
-              <p className="font-medium">{userRole}</p>
+              <p className="font-medium">{user.role}</p>
               <p className="font-normal">-</p>
-              <p className="font-normal">{userDepartment}</p>
+              <p className="font-normal">{user.department}</p>
             </div>
-            <p className="font-light">{userEmail}</p>
+            <p className="font-light">{user.email}</p>
           </div>
           <Image src={JobSVG} alt="image" className="hidden md:block" />
         </div>
