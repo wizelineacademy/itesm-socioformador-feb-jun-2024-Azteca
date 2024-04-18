@@ -1,3 +1,4 @@
+import Link from "next/link";
 import ArticleIcon from "./icons/ArticleIcon";
 import BookIcon from "./icons/BookIcon";
 import VideoIcon from "./icons/VideoIcon";
@@ -51,7 +52,7 @@ const PipResource = ({
         {description}
       </p>
       <button className="mx-auto w-fit rounded-full bg-primary px-7 py-1 text-xs font-medium text-white">
-        <a href={link}>{renderButtonLabel()}</a>
+        <Link href={link}>{renderButtonLabel()}</Link>
       </button>
     </div>
   );

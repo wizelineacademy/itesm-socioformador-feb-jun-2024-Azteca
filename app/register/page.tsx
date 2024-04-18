@@ -1,5 +1,7 @@
 import { signIn } from "@/auth";
-import { registerUser } from "../services/register-page";
+import { registerUser } from "@/services/register-page";
+import { AuthError } from "next-auth";
+import Link from "next/link";
 
 const Login = () => {
   const registerAction = async (formData: FormData) => {
@@ -7,7 +9,20 @@ const Login = () => {
     const name = formData.get("name")?.toString();
     const email = formData.get("email")?.toString();
     const password = formData.get("password")?.toString();
-    registerUser(name, email, password);
+    await registerUser(name, email, password);
+    try {
+      await signIn("credentials", formData);
+    } catch (error) {
+      if (error instanceof AuthError) {
+        switch (error.type) {
+          case "CredentialsSignin":
+            return "Invalid credentials.";
+          default:
+            return "Something went wrong.";
+        }
+      }
+      throw error;
+    }
   };
 
   return (
@@ -51,12 +66,12 @@ const Login = () => {
         </form>
         <div className="mx-auto flex justify-center text-sm font-medium">
           <p className="text-black">Already have an account? </p>
-          <a
+          <Link
             href="/login"
             className="ms-1 text-primary hover:text-primary-dark"
           >
             Login
-          </a>
+          </Link>
         </div>
       </section>
     </main>
