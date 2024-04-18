@@ -1,5 +1,6 @@
 import { signIn } from "@/auth";
 import { registerUser } from "@/services/register-page";
+import { AuthError } from "next-auth";
 import Link from "next/link";
 
 const Login = () => {
@@ -8,7 +9,20 @@ const Login = () => {
     const name = formData.get("name")?.toString();
     const email = formData.get("email")?.toString();
     const password = formData.get("password")?.toString();
-    registerUser(name, email, password);
+    await registerUser(name, email, password);
+    try {
+      await signIn("credentials", formData);
+    } catch (error) {
+      if (error instanceof AuthError) {
+        switch (error.type) {
+          case "CredentialsSignin":
+            return "Invalid credentials.";
+          default:
+            return "Something went wrong.";
+        }
+      }
+      throw error;
+    }
   };
 
   return (
