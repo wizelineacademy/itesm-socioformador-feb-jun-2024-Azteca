@@ -1,5 +1,6 @@
 import { signIn } from "@/auth";
-import { registerUser } from "../services/register-page";
+import { registerUser } from "@/services/register-page";
+import Link from "next/link";
 
 const Login = () => {
   const registerAction = async (formData: FormData) => {
@@ -51,12 +52,12 @@ const Login = () => {
         </form>
         <div className="mx-auto flex justify-center text-sm font-medium">
           <p className="text-black">Already have an account? </p>
-          <a
+          <Link
             href="/login"
             className="ms-1 text-primary hover:text-primary-dark"
           >
             Login
-          </a>
+          </Link>
         </div>
       </section>
     </main>
