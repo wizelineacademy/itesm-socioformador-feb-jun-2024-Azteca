@@ -19,6 +19,7 @@ const NavigationBar = () => {
     "/projects",
     "/",
     "/projects/create",
+    "/projects/1",
   ];
 
   if (!validRoutes.includes(pathname)) {

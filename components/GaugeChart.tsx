@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+
+let gradientIdCounter = 0; // Contador estático fuera del componente
 
 interface GradientColor {
   start: string;
@@ -7,11 +9,16 @@ interface GradientColor {
 
 interface GaugeChartProps {
   percentage: number;
-  type: "half" | "full";
+  type: string;
+  // type: "half" | "full";
   gradient: GradientColor;
 }
 
 const GaugeChart = ({ percentage, type, gradient }: GaugeChartProps) => {
+  const [gradientId, setGradientId] = useState(
+    `gradient${gradientIdCounter++}`,
+  );
+
   const radius = 85;
   const strokeWidth = 20;
   const viewBoxHalf = "0 0 200 100";
@@ -31,7 +38,7 @@ const GaugeChart = ({ percentage, type, gradient }: GaugeChartProps) => {
       >
         <defs>
           <linearGradient
-            id="gradient1"
+            id={gradientId}
             gradientTransform={type === "full" ? "rotate(90)" : ""}
           >
             <stop offset="0%" stop-color={gradient.start} />
@@ -65,7 +72,7 @@ const GaugeChart = ({ percentage, type, gradient }: GaugeChartProps) => {
               : "M 15 100 A 85 85 0 0 1 185 100"
           }
           fill="none"
-          stroke="url(#gradient1)"
+          stroke={`url(#${gradientId})`}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={strokeDasharray}
@@ -75,7 +82,7 @@ const GaugeChart = ({ percentage, type, gradient }: GaugeChartProps) => {
           x="100" // Centered in X axis
           y={type === "full" ? "110" : "90"} // Adjust y position depending on type
           text-anchor="middle" // Align text in the center horizontally
-          fill="url(#gradient1)" // Apply gradient
+          fill={`url(#${gradientId})`} // Apply gradient using dynamic ID
           font-size="32"
           font-weight="bold"
           font-family="inherit"
