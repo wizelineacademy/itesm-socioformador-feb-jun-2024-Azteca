@@ -6,7 +6,6 @@ import Tooltip from "@/components/Tooltip";
 import Badge from "@/components/Badge";
 import Image from "next/image";
 import JobSVG from "@/public/Job-Profile-Image.svg";
-import BitmojiAdrian from "@/public/Bitmoji Adrian.png";
 
 // Services imports
 import { getInfoById, getTraits, getCoWorkers } from "@/services/user";
@@ -37,7 +36,7 @@ const Profile = async () => {
         <UserProfileButton
           size="lg"
           className="absolute left-20 top-60 h-fit"
-          photoUrl={BitmojiAdrian}
+         // photoUrl={BitmojiAdrian}
           // photoUrl="https://static.wikia.nocookie.net/heroe/images/0/08/Lucario_SSBU.png/revision/latest?cb=20200104023610&path-prefix=es"
         />
         <div className="flex w-5/6 flex-row items-center justify-between">
