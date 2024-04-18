@@ -57,11 +57,6 @@ const Project = () => {
   ];
 
   const percentage = 43;
-  // const strokeDashoffset = 440 - (440 * percentage) / 100;
-
-  const strokeDasharray = Math.PI * 70; // Circunferencia para el radio del círculo SVG
-  const strokeDashoffset =
-    strokeDasharray - (strokeDasharray * percentage) / 100;
 
   return (
     <div className="flex flex-wrap">
@@ -131,8 +126,16 @@ const Project = () => {
           ></div>
         </div>
       </div>
-      <GaugeChart percentage={78} type="half" />
-      <GaugeChart percentage={78} type="full" />
+      <GaugeChart
+        percentage={75}
+        type="half"
+        gradient={{ start: "#988511", end: "#FEDE1C" }}
+      />
+      <GaugeChart
+        percentage={62}
+        type="full"
+        gradient={{ start: "#ef4444", end: "#f59e0b" }}
+      />
     </div>
   );
 };

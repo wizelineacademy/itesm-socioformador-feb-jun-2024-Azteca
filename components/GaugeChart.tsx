@@ -1,88 +1,88 @@
 import React from "react";
 
+interface GradientColor {
+  start: string;
+  end: string;
+}
+
 interface GaugeChartProps {
   percentage: number;
   type: "half" | "full";
+  gradient: GradientColor;
 }
 
-const GaugeChart = ({ percentage, type }: GaugeChartProps) => {
-  const strokeDasharray = Math.PI * 70; // Circunferencia para el radio del círculo SVG
+const GaugeChart = ({ percentage, type, gradient }: GaugeChartProps) => {
+  const radius = 85;
+  const strokeWidth = 20;
+  const viewBoxHalf = "0 0 200 100";
+  const viewBoxFull = "0 0 200 200";
+  const circumference = Math.PI * (radius * 2);
+  const halfCircumference = Math.PI * radius;
+  const strokeDasharray = type === "full" ? circumference : halfCircumference;
   const strokeDashoffset =
     strokeDasharray - (strokeDasharray * percentage) / 100;
 
   return (
-    <div>
-      {type === "half" ? (
-        <div className="relative h-32 w-64">
-          <svg width="200" height="100" viewBox="0 0 200 100">
-            <path
-              d="M 15 100 A 85 85 0 0 1 185 100"
-              fill="none"
-              stroke="#d1d5db"
-              strokeWidth="20"
-              strokeLinecap="round"
-            />
-            <path
-              d="M 15 100 A 85 85 0 0 1 185 100"
-              fill="none"
-              stroke="#facc15"
-              strokeWidth="20"
-              strokeLinecap="round"
-              strokeDasharray={strokeDasharray}
-              strokeDashoffset={strokeDashoffset}
-              style={{
-                transition: "stroke-dashoffset 0.6s ease 0s",
-                transformOrigin: "center bottom",
-              }}
-            />
-          </svg>
-          <div
-            className="absolute flex w-full items-center justify-center"
-            style={{
-              top: "50%",
-              transform: "translateY(-20%) translateX(-10%)",
-            }}
+    <div className="relative">
+      <svg
+        width="200"
+        height={type === "full" ? "200" : "100"}
+        viewBox={type === "full" ? viewBoxFull : viewBoxHalf}
+      >
+        <defs>
+          <linearGradient
+            id="gradient1"
+            gradientTransform={type === "full" ? "rotate(90)" : ""}
           >
-            <span className="text-3xl font-semibold text-[#facc15]">
-              {percentage}%
-            </span>
-          </div>
-        </div>
-      ) : (
-        <div className="flex h-64 w-64 items-center justify-center">
-          <svg
-            className="-rotate-90 transform"
-            width="200"
-            height="200"
-            viewBox="0 0 200 200"
-          >
-            <circle
-              cx="100"
-              cy="100"
-              r="70"
-              stroke="#d1d5db"
-              strokeWidth="20"
-              fill="none"
-              strokeLinecap="round"
-            />
-            <circle
-              cx="100"
-              cy="100"
-              r="70"
-              stroke="#facc15"
-              strokeWidth="20"
-              fill="none"
-              strokeDasharray="440"
-              strokeDashoffset={strokeDashoffset}
-              strokeLinecap="round"
-              style={{ transition: "stroke-dashoffset 0.6s ease 0s" }}
-            />
-          </svg>
-          <div className="absolute text-3xl font-semibold text-[#facc15]">
-            {percentage}%
-          </div>
-        </div>
-      )}
+            <stop offset="0%" stop-color={gradient.start} />
+            <stop offset="100%" stop-color={gradient.end} />
+          </linearGradient>
+        </defs>
+        {type === "half" && (
+          <path
+            d="M 15 100 A 85 85 0 0 1 185 100"
+            fill="none"
+            stroke="#d1d5db"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+          />
+        )}
+        {type === "full" && (
+          <circle
+            cx="100"
+            cy="100"
+            r={radius}
+            fill="none"
+            stroke="#d1d5db"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+          />
+        )}
+        <path
+          d={
+            type === "full"
+              ? "M 100,15 A 85,85 0 1 1 100,185 A 85,85 0 1 1 100,15"
+              : "M 15 100 A 85 85 0 0 1 185 100"
+          }
+          fill="none"
+          stroke="url(#gradient1)"
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          strokeDasharray={strokeDasharray}
+          strokeDashoffset={strokeDashoffset}
+        />
+        <text
+          x="100" // Centered in X axis
+          y={type === "full" ? "110" : "90"} // Adjust y position depending on type
+          text-anchor="middle" // Align text in the center horizontally
+          fill="url(#gradient1)" // Apply gradient
+          font-size="32"
+          font-weight="bold"
+          font-family="inherit"
+        >
+          {percentage}%
+        </text>
+      </svg>
     </div>
   );
 };
