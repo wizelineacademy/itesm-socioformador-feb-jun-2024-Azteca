@@ -61,6 +61,49 @@ const Project = () => {
   return (
     <div className="flex flex-wrap">
       <p className="text-3xl font-medium">Project 1</p>
+      {/* Gauge Charts */}
+      <div className="flex">
+        <div className="flex h-fit w-fit flex-col rounded-xl bg-white px-10 py-5 drop-shadow-lg">
+          <GaugeChart
+            percentage={75}
+            type="half"
+            gradient={{ start: "#988511", end: "#FEDE1C" }}
+          />
+          <p className="mx-auto mt-2 max-w-48 text-center text-xl font-medium text-graySubtitle">
+            Resources Satisfaction
+          </p>
+        </div>
+        <div className="flex h-fit w-fit flex-col rounded-xl bg-white px-10 py-5 drop-shadow-lg">
+          <GaugeChart
+            percentage={75}
+            type="half"
+            gradient={{ start: "#295A95", end: "#4598FB" }}
+          />
+          <p className="mx-auto mt-2 max-w-48 text-center text-xl font-medium text-graySubtitle">
+            Listening Feeling
+          </p>
+        </div>
+        <div className="flex h-fit w-fit flex-col rounded-xl bg-white px-10 py-5 drop-shadow-lg">
+          <GaugeChart
+            percentage={75}
+            type="half"
+            gradient={{ start: "#881931", end: "#EE2B55" }}
+          />
+          <p className="mx-auto mt-2 max-w-48 text-center text-xl font-medium text-graySubtitle">
+            Recognition Feeling
+          </p>
+        </div>
+        <div className="flex h-fit w-fit flex-col rounded-xl bg-white px-10 py-5 drop-shadow-lg">
+          <GaugeChart
+            percentage={75}
+            type="half"
+            gradient={{ start: "#35216F", end: "#6640D5" }}
+          />
+          <p className="mx-auto mt-2 max-w-48 text-center text-xl font-medium text-graySubtitle">
+            Respect and Trust Environment
+          </p>
+        </div>
+      </div>
       {/* Radar Chart */}
       <div className="flex h-fit w-fit flex-col items-center rounded-xl bg-white p-5 drop-shadow-lg">
         <h4 className="text-xl font-medium">Overall Statistics</h4>
@@ -127,19 +170,6 @@ const Project = () => {
             className="h-6 rounded-full bg-gradient-to-r from-green-400 via-yellow-400 to-orange-500"
             style={{ width: `70%` }}
           ></div>
-        </div>
-      </div>
-      {/* Gauge Charts */}
-      <div>
-        <div className="flex h-fit w-fit flex-col rounded-xl bg-white px-10 py-5 drop-shadow-lg">
-          <GaugeChart
-            percentage={75}
-            type="half"
-            gradient={{ start: "#988511", end: "#FEDE1C" }}
-          />
-          <p className="mx-auto mt-2 max-w-48 text-center text-xl font-medium text-graySubtitle">
-            Resources Satisfaction
-          </p>
         </div>
       </div>
     </div>
