@@ -61,6 +61,7 @@ const Project = () => {
   return (
     <div className="flex flex-wrap">
       <p className="text-3xl font-medium">Project 1</p>
+      {/* Radar Chart */}
       <div className="flex h-fit w-fit flex-col items-center rounded-xl bg-white p-5 drop-shadow-lg">
         <h4 className="text-xl font-medium">Overall Statistics</h4>
         <RadarChart
@@ -79,6 +80,7 @@ const Project = () => {
           }}
         />
       </div>
+      {/* Area Chart */}
       <div className="flex h-fit w-fit flex-col items-center rounded-xl bg-white px-5 py-7 drop-shadow-lg">
         <AreaChart
           h={220}
@@ -108,6 +110,7 @@ const Project = () => {
           fillOpacity={0.25}
         />
       </div>
+      {/* Progress Bar */}
       <div className="flex h-fit w-fit flex-col rounded-xl bg-white p-5 drop-shadow-lg">
         <div className="flex justify-between">
           <div>
@@ -126,16 +129,19 @@ const Project = () => {
           ></div>
         </div>
       </div>
-      <GaugeChart
-        percentage={75}
-        type="half"
-        gradient={{ start: "#988511", end: "#FEDE1C" }}
-      />
-      <GaugeChart
-        percentage={62}
-        type="full"
-        gradient={{ start: "#ef4444", end: "#f59e0b" }}
-      />
+      {/* Gauge Charts */}
+      <div>
+        <div className="flex h-fit w-fit flex-col rounded-xl bg-white px-10 py-5 drop-shadow-lg">
+          <GaugeChart
+            percentage={75}
+            type="half"
+            gradient={{ start: "#988511", end: "#FEDE1C" }}
+          />
+          <p className="mx-auto mt-2 max-w-48 text-center text-xl font-medium text-graySubtitle">
+            Resources Satisfaction
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
