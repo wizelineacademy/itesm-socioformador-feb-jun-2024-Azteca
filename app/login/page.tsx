@@ -1,5 +1,6 @@
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
+import Link from "next/link";
 
 const Login = () => {
   const loginAction = async (formData: FormData) => {
@@ -53,12 +54,12 @@ const Login = () => {
         </form>
         <div className="mx-auto flex justify-center text-sm font-medium">
           <p className="text-black">Don&apos;t have an account? </p>
-          <a
+          <Link
             href="/register"
             className="ms-1 text-primary hover:text-primary-dark"
           >
             Register
-          </a>
+          </Link>
         </div>
       </section>
     </main>
