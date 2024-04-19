@@ -8,14 +8,12 @@ import Image from "next/image";
 import JobSVG from "@/public/Job-Profile-Image.svg";
 
 // Services imports
-import { getInfoById, getTraits, getCoWorkers } from "@/services/user";
+import { getInfoById, getTraits } from "@/services/user";
 import { useEffect, useState } from "react";
 
 const Profile = async () => {
   const user = await getInfoById();
   const traits = await getTraits();
-  const coworkers = await getCoWorkers();
-  console.log(coworkers);
 
   const Strengths = traits.strengths;
   const oportunityAreas = traits.areasOfOportunity;
@@ -69,7 +67,6 @@ const Profile = async () => {
             </div>
             <div className="mt-2 flex gap-4">
               <ProjectsCarousel />
-              {/* <ProjectCard /> */}
             </div>
           </div>
         </div>

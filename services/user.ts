@@ -2,7 +2,7 @@
 
 import * as schema from "@/db/schema";
 import db from "@/db/drizzle";
-import { eq } from "drizzle-orm";
+import { eq, not, and, or } from "drizzle-orm";
 import { join } from "path";
 import { alias } from "drizzle-orm/pg-core";
 import { use } from "react";
@@ -41,8 +41,8 @@ export async function getTraits() {
       kind: schema.trait.kind,
     })
     .from(schema.trait)
-    .fullJoin(schema.userTrait, eq(schema.userTrait.traitId, schema.trait.id))
-    .fullJoin(schema.user, eq(schema.userTrait.userId, schema.user.id))
+    .innerJoin(schema.userTrait, eq(schema.userTrait.traitId, schema.trait.id))
+    .innerJoin(schema.user, eq(schema.userTrait.userId, schema.user.id))
     .where(eq(schema.user.id, userId));
 
   let strengths_arr = [];
@@ -80,26 +80,48 @@ export async function getCoWorkers() {
       photoUrl: schema.user.photoUrl,
     })
     .from(pm)
-    .fullJoin(pm2, eq(pm.projectId, pm2.projectId))
-    .fullJoin(schema.user, eq(schema.user.id, pm2.userId))
+    .innerJoin(pm2, eq(pm.projectId, pm2.projectId))
+    .innerJoin(schema.user, eq(schema.user.id, pm2.userId))
     .where(eq(pm.userId, userId));
 
   const coworkers = res.filter((user) => user.id !== userId);
   return coworkers;
 }
 
+export async function getProjectsProfile(userId: string | null | undefined) {
+  if (!userId || userId === undefined) {
+    const session = await auth();
+    userId = session?.user?.id;
+    if (!userId) {
+      throw new Error("You most be signed in");
+    }
+  }
+
+  const res = await db
+    .selectDistinctOn([schema.project.id], {
+      id: schema.project.id,
+      name: schema.project.name,
+      description: schema.project.description,
+      startDate: schema.project.startDate,
+      endDate: schema.project.endDate,
+    })
+    .from(schema.projectMember)
+    .innerJoin(
+      schema.project,
+      eq(schema.projectMember.projectId, schema.project.id),
+    )
+    .where(
+      or(
+        eq(schema.projectMember.userId, userId!),
+        eq(schema.project.managerId, userId!),
+      ),
+    );
+  return res;
+}
+
 /*-- GET ALL TRAITS
-
--- GET ALL COWORKERS
-SELECT DISTINCT u.*
+SELECT p.*
 FROM project_member pm
-JOIN project_member pm2 ON pm.project_id = pm2.project_id
-JOIN _user u ON u.id = pm2.user_id
-WHERE pm.user_id != '1a0cf7e3b02d48f8b5d89c4f5fb37c21';
-
--- GET USER PROJECTS
-SELECT DISTINCT project.* 
-FROM project_member 
-JOIN project ON project.id = project_member.project_id
-JOIN _user ON _user.id = project_member.user_id
-WHERE user_id = '1a0cf7e3b02d48f8b5d89c4f5fb37c21' OR project.manager_id = '1a0cf7e3b02d48f8b5d89c4f5fb37c21'; */
+JOIN project p ON pm.project_id = p.id
+WHERE pm.user_id = '5c0bbaeb-d54a-4fc3-a404-afaac7c7a47f';
+ */
