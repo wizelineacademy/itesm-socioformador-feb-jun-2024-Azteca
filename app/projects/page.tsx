@@ -1,41 +1,17 @@
 import React from "react";
 import Link from "next/link";
 import ProjectExtendedCard from "@/components/ProjectExtendedCard";
-import { title } from "process";
+import { getProjects } from "@/services/project";
 
-const Projects = () => {
-  const existingProjects = [
-    {
-      title: "Project 1",
-      date: "Sep 2023 - Dec 2023",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nonrisus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor...",
-    },
-    {
-      title: "Project 2",
-      date: "Apr 2023 - Jun 2023",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nonrisus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor...",
-    },
-    {
-      title: "Project 3",
-      date: "Oct 2023 - Jan 2024",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nonrisus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor...",
-    },
-    {
-      title: "Project 4",
-      date: "Feb 2024 - Apr 2024",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nonrisus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor...",
-    },
-    {
-      title: "Project 5",
-      date: "In progress",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nonrisus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor...",
-    },
-  ];
+const formatDate = (date: string) => {
+  return new Date(date).toLocaleString("default", {
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const Projects = async () => {
+  const projects = await getProjects();
 
   return (
     <main className=" h-dvh w-dvw overflow-hidden">
@@ -50,11 +26,11 @@ const Projects = () => {
           </Link>
         </div>
         <div className="mx-auto flex max-w-[60%] flex-wrap items-center justify-center gap-6">
-          {existingProjects.map((project, index) => (
+          {projects.map((project, index) => (
             <ProjectExtendedCard
               key={index}
-              title={project.title}
-              date={project.date}
+              title={project.name}
+              date={`${formatDate(project.startDate)} - ${formatDate(project.endDate)}`}
               description={project.description}
             />
           ))}
