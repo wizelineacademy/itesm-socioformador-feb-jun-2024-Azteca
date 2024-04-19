@@ -6,6 +6,8 @@ import bcrypt from "bcrypt";
 
 export const registerUser = async (
   name: string | undefined,
+  jobTitle: string | undefined,
+  department: string | undefined,
   email: string | undefined,
   password: string | undefined,
 ) => {
@@ -16,6 +18,8 @@ export const registerUser = async (
     const hashedPassword = await bcrypt.hash(password, 10);
     await db.insert(user).values({
       name: name,
+      jobTitle: jobTitle,
+      department: department,
       email: email,
       password: hashedPassword,
       role: "EMPLOYEE",

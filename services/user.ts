@@ -1,54 +1,127 @@
 "use server";
 
-import { projectMember, trait, user, userTrait } from "@/db/schema";
+import * as schema from "@/db/schema";
 import db from "@/db/drizzle";
-import { eq } from "drizzle-orm";
+import { eq, not, and, or } from "drizzle-orm";
+import { join } from "path";
 import { alias } from "drizzle-orm/pg-core";
+import { use } from "react";
 import { auth } from "@/auth";
 
 export async function getInfoById() {
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) throw new Error("You must be signed in");
-
-  const res = await db.select().from(user).where(eq(user.id, userId));
+  const res = await db
+    .select({
+      id: schema.user.id,
+      name: schema.user.name,
+      email: schema.user.email,
+      jobTitle: schema.user.jobTitle,
+      department: schema.user.department,
+      photoUrl: schema.user.photoUrl,
+      role: schema.user.role,
+    })
+    .from(schema.user)
+    .where(eq(schema.user.id, userId));
   return res[0];
 }
 
 export async function getTraits() {
-  const userId = "TODO: implement nextauth";
+  const session = await auth();
+  const userId = session?.user?.id;
   if (!userId) {
     throw new Error("You most be signed in");
   }
   const res = await db
-    .select()
-    .from(userTrait)
-    .leftJoin(user, eq(userTrait.userId, user.id))
-    .leftJoin(trait, eq(userTrait.traitId, trait.id))
-    .where(eq(user.id, userId));
-  return res[0];
+    .select({
+      id: schema.trait.id,
+      name: schema.trait.name,
+      description: schema.trait.description,
+      kind: schema.trait.kind,
+    })
+    .from(schema.trait)
+    .innerJoin(schema.userTrait, eq(schema.userTrait.traitId, schema.trait.id))
+    .innerJoin(schema.user, eq(schema.userTrait.userId, schema.user.id))
+    .where(eq(schema.user.id, userId));
+
+  let strengths_arr = [];
+  let areasOfOportunity_arr = [];
+
+  for (let c = 0; c < res.length; c++) {
+    if (res[c].kind == "AREA_OF_OPPORTUNITY") {
+      areasOfOportunity_arr.push(res[c]);
+    } else if (res[c].kind == "STRENGTH") {
+      strengths_arr.push(res[c]);
+    }
+  }
+  let traits = {
+    strengths: strengths_arr,
+    areasOfOportunity: areasOfOportunity_arr,
+  };
+  return traits;
 }
 
 export async function getCoWorkers() {
-  const userId = "TODO: implement nextauth";
+  const session = await auth();
+  const userId = session?.user?.id;
   if (!userId) {
     throw new Error("You most be signed in");
   }
-  const pm = alias(projectMember, "pm");
-  const pm2 = alias(projectMember, "pm2");
+  const pm = alias(schema.projectMember, "pm");
+  const pm2 = alias(schema.projectMember, "pm2");
   const res = await db
-    .selectDistinct()
+    .selectDistinct({
+      id: schema.user.id,
+      name: schema.user.name,
+      email: schema.user.email,
+      jobTitle: schema.user.jobTitle,
+      department: schema.user.department,
+      photoUrl: schema.user.photoUrl,
+    })
     .from(pm)
-    .leftJoin(pm, eq(pm.projectId, pm2.projectId))
-    .leftJoin(user, eq(user.id, pm2.userId))
-    .where(eq(user.id, userId));
-  return res[0];
+    .innerJoin(pm2, eq(pm.projectId, pm2.projectId))
+    .innerJoin(schema.user, eq(schema.user.id, pm2.userId))
+    .where(eq(pm.userId, userId));
+
+  const coworkers = res.filter((user) => user.id !== userId);
+  return coworkers;
 }
 
-// feedbackflow_db=# SELECT DISTINCT u.*
-// FROM project_member pm
-// JOIN project_member pm2 ON pm.project_id = pm2.project_id
-// JOIN _user u ON u.id = pm2.user_id
-// WHERE pm.user_id = 'user_2ey70SzI6BPQtP9V7oDXnLwOAnA';
-// feedbackflow_db=#
-// feedbackflow_db=#
+export async function getProjectsProfile(userId: string | null | undefined) {
+  if (!userId || userId === undefined) {
+    const session = await auth();
+    userId = session?.user?.id;
+    if (!userId) {
+      throw new Error("You most be signed in");
+    }
+  }
+
+  const res = await db
+    .selectDistinctOn([schema.project.id], {
+      id: schema.project.id,
+      name: schema.project.name,
+      description: schema.project.description,
+      startDate: schema.project.startDate,
+      endDate: schema.project.endDate,
+    })
+    .from(schema.projectMember)
+    .innerJoin(
+      schema.project,
+      eq(schema.projectMember.projectId, schema.project.id),
+    )
+    .where(
+      or(
+        eq(schema.projectMember.userId, userId!),
+        eq(schema.project.managerId, userId!),
+      ),
+    );
+  return res;
+}
+
+/*-- GET ALL TRAITS
+SELECT p.*
+FROM project_member pm
+JOIN project p ON pm.project_id = p.id
+WHERE pm.user_id = '5c0bbaeb-d54a-4fc3-a404-afaac7c7a47f';
+ */
