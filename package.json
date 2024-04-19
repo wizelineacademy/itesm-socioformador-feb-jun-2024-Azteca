@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
     "build": "next build",
-    "start": "next start",
     "db:push": "drizzle-kit push:pg",
     "db:studio": "drizzle-kit studio",
-    "prettier:write": "prettier --write --ignore-unknown .",
+    "dev": "next dev",
+    "lint": "next lint",
     "prettier:check": "prettier --check --ignore-unknown .",
-    "lint": "next lint"
+    "prettier:write": "prettier --write --ignore-unknown .",
+    "start": "next start"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
@@ -34,6 +34,8 @@
     "react": "^18",
     "react-dom": "^18",
     "recharts": "^2.12.5",
+    "sharp": "^0.33.3",
+    "sst": "ion",
     "svix": "^1.21.0",
     "zod": "^3.22.4"
   },
