@@ -1,10 +1,17 @@
 "use server";
 
-import { projectMember, trait, user, userTrait } from "@/db/schema";
+import {
+  projectMember,
+  trait,
+  user,
+  userTrait,
+  userRoleEnum,
+} from "@/db/schema";
 import db from "@/db/drizzle";
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { auth } from "@/auth";
+import bcrypt from "bcrypt";
 
 export async function getInfoById() {
   const session = await auth();
@@ -14,6 +21,60 @@ export async function getInfoById() {
   const res = await db.select().from(user).where(eq(user.id, userId));
   return res[0];
 }
+
+// TODO: this function is duplicated in the middleware
+export const getUserRole = async () => {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) throw new Error("You must be signed in");
+
+  const res = await db.select().from(user).where(eq(user.id, userId));
+  const { role } = res[0];
+  return role;
+};
+
+export const registerUser = async (
+  name: string | undefined,
+  email: string | undefined,
+  password: string | undefined,
+) => {
+  try {
+    if (!name || !email || !password) {
+      throw new Error("Empty email or empty password");
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await db.insert(user).values({
+      name: name,
+      email: email,
+      password: hashedPassword,
+      role: "EMPLOYEE",
+    });
+  } catch (error) {
+    console.error("Could not register user", error);
+    throw new Error("Could not register user");
+  }
+};
+
+export const getUsers = async () => {
+  return await db.select().from(user).orderBy(asc(user.name));
+};
+
+export const getRoles = async () => {
+  return userRoleEnum.enumValues.map((enumValue) => ({
+    name: enumValue,
+    value: enumValue,
+  }));
+};
+
+export const updateRole = async ({
+  id,
+  newRole,
+}: {
+  id: string;
+  newRole: any;
+}) => {
+  await db.update(user).set({ role: newRole }).where(eq(user.id, id)).execute();
+};
 
 export async function getTraits() {
   const userId = "TODO: implement nextauth";

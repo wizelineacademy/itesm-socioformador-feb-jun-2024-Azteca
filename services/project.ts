@@ -12,7 +12,13 @@ export async function getProjects() {
   if (!userId) throw new Error("You must be signed in");
 
   const projects = await db
-    .selectDistinct()
+    .selectDistinctOn([project.id], {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      startDate: project.startDate,
+      endDate: project.endDate,
+    })
     .from(project)
     .innerJoin(projectMember, eq(project.id, projectMember.projectId))
     .where(
