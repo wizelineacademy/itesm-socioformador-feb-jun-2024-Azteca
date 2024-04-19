@@ -7,22 +7,11 @@ const Login = () => {
   const registerAction = async (formData: FormData) => {
     "use server";
     const name = formData.get("name")?.toString();
+    const jobTitle = formData.get("jobTitle")?.toString();
+    const department = formData.get("department")?.toString();
     const email = formData.get("email")?.toString();
     const password = formData.get("password")?.toString();
-    await registerUser(name, email, password);
-    try {
-      await signIn("credentials", formData);
-    } catch (error) {
-      if (error instanceof AuthError) {
-        switch (error.type) {
-          case "CredentialsSignin":
-            return "Invalid credentials.";
-          default:
-            return "Something went wrong.";
-        }
-      }
-      throw error;
-    }
+    registerUser(name, jobTitle, department, email, password);
   };
 
   return (
@@ -42,7 +31,25 @@ const Login = () => {
             name="name"
             placeholder="Juan Perez"
           />
-          <label className="self-start text-xl text-black">Email</label>
+          <label className="mt-5 self-start text-xl text-black">
+            Job Title
+          </label>
+          <input
+            className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-bone px-2 text-black"
+            type="text"
+            name="jobTitle"
+            placeholder="Backend Developer"
+          />
+          <label className="mt-5 self-start text-xl text-black">
+            Department
+          </label>
+          <input
+            className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-bone px-2 text-black"
+            type="text"
+            name="department"
+            placeholder="IT/Software"
+          />
+          <label className="mt-5 self-start text-xl text-black">Email</label>
           <input
             className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-bone px-2 text-black"
             type="email"
@@ -56,7 +63,6 @@ const Login = () => {
             name="password"
             placeholder="********"
           />
-          {/* Find a darker color for hover */}
           <button
             className="mx-auto my-8 h-12 w-28 rounded-3xl bg-primary text-bone shadow-2xl hover:bg-primary-dark"
             type="submit"
@@ -66,12 +72,12 @@ const Login = () => {
         </form>
         <div className="mx-auto flex justify-center text-sm font-medium">
           <p className="text-black">Already have an account? </p>
-          <Link
+          <a
             href="/login"
             className="ms-1 text-primary hover:text-primary-dark"
           >
             Login
-          </Link>
+          </a>
         </div>
       </section>
     </main>

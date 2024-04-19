@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import db from "@/db/drizzle";
-import { project, projectMember } from "@/db/schema";
+import { project, projectMember, user } from "@/db/schema";
 import { eq, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -61,4 +61,22 @@ export async function createProject({
 
   revalidatePath("/projects");
   redirect("/projects");
+}
+
+export async function getEmployeesInProjectById(projectId: number) {
+  // get all of the projects in which the user is either a member or a manager
+  const res = await db
+    .selectDistinct({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      jobTitle: user.jobTitle,
+      department: user.department,
+      photoUrl: user.photoUrl,
+    })
+    .from(projectMember)
+    .innerJoin(user, eq(projectMember.userId, user.id))
+    .where(eq(projectMember.projectId, projectId));
+
+  return res;
 }

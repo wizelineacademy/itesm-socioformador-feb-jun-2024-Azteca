@@ -8,26 +8,15 @@ import Image from "next/image";
 import JobSVG from "@/public/Job-Profile-Image.svg";
 
 // Services imports
-import { getInfoById, getTraits, getCoWorkers } from "@/services/user";
+import { getInfoById, getTraits } from "@/services/user";
 import { useEffect, useState } from "react";
 
 const Profile = async () => {
   const user = await getInfoById();
+  const traits = await getTraits();
 
-  const Strengths = [
-    "Detail Attention",
-    "Good Communication",
-    "Punctuallity",
-    "Creative",
-    "Discipline",
-    "Proactive",
-  ];
-  const oportunityAreas = [
-    "Lack of Communication",
-    "Ineffective Time Management",
-    "Bad Work Team",
-    "Procrastination",
-  ];
+  const Strengths = traits.strengths;
+  const oportunityAreas = traits.areasOfOportunity;
 
   return (
     <main>
@@ -78,7 +67,6 @@ const Profile = async () => {
             </div>
             <div className="mt-2 flex gap-4">
               <ProjectsCarousel />
-              {/* <ProjectCard /> */}
             </div>
           </div>
         </div>
@@ -93,8 +81,8 @@ const Profile = async () => {
           </div>
           <div className="mb-10 mt-5 flex flex-wrap gap-5">
             {Strengths.map((strength, index) => (
-              <Tooltip message="Lorem ipsum dolor sit amet" key={index}>
-                <Badge text={strength} />
+              <Tooltip message={strength.description!} key={index}>
+                <Badge text={strength.name!} />
               </Tooltip>
             ))}
           </div>
@@ -107,8 +95,8 @@ const Profile = async () => {
           </div>
           <div className="mb-10 mt-5 flex flex-wrap gap-5">
             {oportunityAreas.map((area, index) => (
-              <Tooltip message="Lorem ipsum dolor sit amet" key={index}>
-                <Badge text={area} />
+              <Tooltip message={area.description!} key={index}>
+                <Badge text={area.name!} />
               </Tooltip>
             ))}
           </div>
