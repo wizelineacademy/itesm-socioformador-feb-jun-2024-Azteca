@@ -8,8 +8,6 @@ interface ProjectSurveyProps {
 }
 const ProjectSurvey = ({ showModal, onClose }: ProjectSurveyProps) => {
   const handleClose = () => {};
-  const marks = ["Disagree", "Medium", "Agree"];
-  const label = "How likely are you to recommend this project to a friend?";
   return (
     <Transition appear show={showModal} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -69,7 +67,7 @@ const ProjectSurvey = ({ showModal, onClose }: ProjectSurveyProps) => {
                 </section>
                 <button
                   type="button"
-                  className=" mx-auto mt-12 rounded-full bg-primary px-7 py-2 text-base font-medium text-white"
+                  className=" mx-auto mt-12 rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
                   onClick={onClose}
                 >
                   Submit
