@@ -8,7 +8,6 @@ import UserProfileButton from "@/components/UserProfileButton";
 import CalendarIcon from "@/components/icons/CalendarIcon";
 
 const CreateProject = () => {
-  const [surveyPeriodicity, setSurveyPeriodicity] = useState("");
   const [rangeDates, setRangeDates] = useState<[Date | null, Date | null]>([
     null,
     null,

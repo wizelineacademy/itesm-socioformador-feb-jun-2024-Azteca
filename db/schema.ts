@@ -1,11 +1,13 @@
+import { sql } from "drizzle-orm";
 import {
   boolean,
-  char,
   date,
   integer,
   pgEnum,
   pgTable,
   primaryKey,
+  serial,
+  text,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -26,15 +28,18 @@ export const user = pgTable(
   },
 );
 
-// TODO: serial
 export const project = pgTable("project", {
-  id: integer("id").primaryKey(),
-  managerId: uuid("manager_id").references(() => user.id),
-  name: varchar("name", { length: 64 }),
-  description: varchar("description", { length: 1024 }),
-  startDate: date("start_date"),
-  endDate: date("end_date"),
-  sprintSurveyPeriodicity: integer("sprint_survey_periodicity"),
+  id: serial("id").primaryKey(),
+  managerId: uuid("manager_id")
+    .references(() => user.id)
+    .notNull(),
+  name: varchar("name", { length: 64 }).notNull(),
+  description: varchar("description", { length: 1024 }).notNull(),
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  sprintSurveyPeriodicityInDays: integer(
+    "sprint_survey_periodicity_in_days",
+  ).notNull(),
 });
 
 export const projectMember = pgTable(
@@ -59,7 +64,7 @@ export const traitKindEnum = pgEnum("kind", [
 ]);
 
 export const trait = pgTable("trait", {
-  id: integer("id").primaryKey(),
+  id: serial("id").primaryKey(),
   name: varchar("name", { length: 64 }),
   description: varchar("description", { length: 1024 }),
   kind: traitKindEnum("kind"),
@@ -80,7 +85,7 @@ export const userTrait = pgTable(
 );
 
 export const pipTask = pgTable("pip_task", {
-  id: integer("id").primaryKey(),
+  id: serial("id").primaryKey(),
   userId: uuid("user_id").references(() => user.id),
   title: varchar("title", { length: 64 }),
   description: varchar("description", { length: 256 }),
@@ -90,15 +95,32 @@ export const pipTask = pgTable("pip_task", {
 export const pipResourceKind = pgEnum("role", ["BOOK", "VIDEO", "ARTICLE"]);
 
 export const pipResource = pgTable("pip_resource", {
-  id: integer("id").primaryKey(),
-  userId: uuid("user_id").references(() => user.id),
+  id: serial("id").primaryKey(),
   title: varchar("title", { length: 64 }),
   kind: pipResourceKind("kind"),
   description: varchar("description", { length: 1024 }),
+  embedding: text("embedding")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
 });
 
+export const userResource = pgTable(
+  "user_resource",
+  {
+    userId: uuid("user_id").references(() => user.id),
+    resourceId: serial("resource_id").references(() => pipResource.id),
+  },
+  // composite primary key on (userId, rulerSurveyId)
+  (table) => {
+    return {
+      pk: primaryKey({ columns: [table.userId, table.resourceId] }),
+    };
+  },
+);
+
 export const rulerSurvey = pgTable("ruler_survey", {
-  id: integer("id").primaryKey(),
+  id: serial("id").primaryKey(),
   createdAt: date("created_at"),
 });
 
@@ -122,7 +144,7 @@ export const rulerSurveyAnswers = pgTable(
 );
 
 export const sprintSurvey = pgTable("sprint_survey", {
-  id: integer("sprint_survey_id").primaryKey(),
+  id: serial("sprint_survey_id").primaryKey(),
   projectId: integer("project_id").references(() => project.id),
   createdAt: date("created_at"),
 });
@@ -165,7 +187,7 @@ export const sprintSurveyAnswerCoworkers = pgTable(
 );
 
 export const finalSurvey = pgTable("final_survey", {
-  id: integer("final_survey_id").primaryKey(),
+  id: serial("final_survey_id").primaryKey(),
   created_at: date("created_at"),
   projectId: integer("project_id").references(() => project.id),
 });
