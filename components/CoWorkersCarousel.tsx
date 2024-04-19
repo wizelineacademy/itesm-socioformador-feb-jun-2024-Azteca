@@ -5,7 +5,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import UserProfileButton from "@/components/UserProfileButton";
 import Autoplay from "embla-carousel-autoplay";
 
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { getCoWorkers } from "@/services/user";
 

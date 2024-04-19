@@ -6,11 +6,21 @@ import UserProfileButton from "@/components/UserProfileButton";
 import ChevronRightIcon from "./icons/ChevronRightIcon";
 import PlusIcon from "./icons/PlusIcon";
 
-export default function ProjectCard() {
+interface ProjectProps {
+  name?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export default function ProjectCard({
+  name,
+  startDate,
+  endDate,
+}: ProjectProps) {
   return (
     <div className="flex items-center gap-20 rounded-lg bg-white p-4">
       <div>
-        <h3 className="pb-2 text-lg font-medium">Project 1</h3>
+        <h3 className="pb-2 text-lg font-medium">{name}</h3>
         <p className="pb-4 text-sm text-graySubtitle">In progress</p>
         <div className="ml-[6px]">
           <UserProfileButton size="xs" className="mx-[-6px]" />
