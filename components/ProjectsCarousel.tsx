@@ -24,7 +24,10 @@ export default function EmblaCarousel() {
       <ul className="embla__container">
         {projectsQuery.data.map((project, index) => (
           <li key={index} className="embla__slide__project">
-            <ProjectCard name={projectsQuery.data[index].name} />
+            <ProjectCard
+              id={projectsQuery.data[index].id}
+              name={projectsQuery.data[index].name}
+            />
           </li>
         ))}
       </ul>
