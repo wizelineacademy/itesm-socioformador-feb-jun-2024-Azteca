@@ -22,7 +22,7 @@ const Admin = () => {
   }
 
   return (
-    <div className="flex h-full w-full flex-col items-center">
+    <main className="flex h-full w-full flex-col items-center bg-bone px-7 pb-4">
       <p className="text-4xl font-medium">Dashboard Super Super Admin</p>
       <table className="mt-5 table-auto">
         <thead className="w-full bg-primary/80 text-white">
@@ -56,7 +56,7 @@ const Admin = () => {
           ))}
         </tbody>
       </table>
-    </div>
+    </main>
   );
 };
 

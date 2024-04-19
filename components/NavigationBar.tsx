@@ -8,10 +8,12 @@ import UserIconNavbar from "./UserIconNavbar";
 import DashboardIconNavbar from "./DashboardIconNavbar";
 import ProjectSurvey from "./modals/ProjectSurvey";
 import { useState } from "react";
+import SprintSurvey from "./modals/SprintSurvey";
 
 const NavigationBar = () => {
   const pathname = usePathname();
-  const [showModal, setShowModal] = useState(false);
+  const [showProjectModal, setShowProjectModal] = useState(false);
+  const [showSprintModal, setShowSprintModal] = useState(false);
   const validRoutes = [
     "/pcp",
     "/dashboard",
@@ -28,10 +30,19 @@ const NavigationBar = () => {
   const isManager = true;
   return (
     <>
-      <ProjectSurvey
-        showModal={showModal}
-        onClose={() => setShowModal(false)}
-      />
+      {showProjectModal && (
+        <ProjectSurvey
+          showModal={showProjectModal}
+          onClose={() => setShowProjectModal(false)}
+        />
+      )}
+
+      {showSprintModal && (
+        <SprintSurvey
+          showModal={showSprintModal}
+          onClose={() => setShowSprintModal(false)}
+        />
+      )}
       <nav className="flex items-center justify-between bg-bone">
         <h1 className="text-3xl font-bold text-primary">FEEDBACK FLOW</h1>
         <div className="flex flex-row gap-5 p-1">
@@ -41,7 +52,10 @@ const NavigationBar = () => {
             <ProjectNavbarIcon path="/projects" currentPath={pathname} />
           )}
           <SearchBar placeholder="Search Co-workers ..." expanded={false} />
-          <Notifications setShowModal={() => setShowModal(true)} />
+          <Notifications
+            showProjectModal={() => setShowProjectModal(true)}
+            showSprintModal={() => setShowSprintModal(true)}
+          />
           <UserIconNavbar path="/profile" currentPath={pathname} />
         </div>
       </nav>

@@ -1,7 +1,8 @@
 "use client";
 
 interface NotificationProps {
-  setShowModal: () => void;
+  showProjectModal: () => void;
+  showSprintModal: () => void;
 }
 
 import { Menu, Transition } from "@headlessui/react";
@@ -10,7 +11,10 @@ import CloseIcon from "./icons/CloseIcon";
 import NotificationIcon from "./icons/NotificationIcon";
 import NotificationCard from "./NotificationCard";
 
-const Notifications = ({ setShowModal }: NotificationProps) => {
+const Notifications = ({
+  showProjectModal,
+  showSprintModal,
+}: NotificationProps) => {
   const [isActive, setIsActive] = useState(false);
   const [notifications, setNotifications] = useState([
     {
@@ -30,11 +34,31 @@ const Notifications = ({ setShowModal }: NotificationProps) => {
     },
   ]);
 
-  const handleClickNotification = (index: number): void => {
-    setShowModal();
-    const newNotifications = [...notifications];
+  const onNotificationClick = (notificationType: string) => {
+    switch (notificationType) {
+      case "PROJECT":
+        showProjectModal();
+        break;
+
+      case "SPRINT":
+        showSprintModal();
+        break;
+
+      case "RULER":
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const handleClickNotification = (index: number, type: string): void => {
+    onNotificationClick(type);
+    /*     const newNotifications = [...notifications];
     newNotifications.splice(index, 1);
     setNotifications(newNotifications);
+    setIsActive(false);
+ */
   };
 
   return (
@@ -82,7 +106,7 @@ const Notifications = ({ setShowModal }: NotificationProps) => {
                     <div
                       onClick={() => {
                         close();
-                        handleClickNotification(index);
+                        handleClickNotification(index, notification.type);
                       }}
                       className="w-full cursor-pointer py-1"
                     >
