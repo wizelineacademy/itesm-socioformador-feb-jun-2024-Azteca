@@ -19,8 +19,6 @@ export default function EmblaCarousel() {
     return <div>loading...</div>;
   }
 
-  console.log(projectsQuery.data);
-
   return (
     <div className="embla" ref={emblaRef}>
       <ul className="embla__container">
