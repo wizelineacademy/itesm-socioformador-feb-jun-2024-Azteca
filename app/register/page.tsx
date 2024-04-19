@@ -1,5 +1,5 @@
 import { signIn } from "@/auth";
-import { registerUser } from "@/services/register-page";
+import { registerUser } from "@/services/user";
 import { AuthError } from "next-auth";
 import Link from "next/link";
 

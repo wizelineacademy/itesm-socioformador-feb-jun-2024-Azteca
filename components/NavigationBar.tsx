@@ -10,7 +10,7 @@ import ProjectSurvey from "./modals/ProjectSurvey";
 import { useState } from "react";
 import SprintSurvey from "./modals/SprintSurvey";
 import { useQuery } from "@tanstack/react-query";
-import { getUserRole } from "@/services/navigation-bar-page";
+import { getUserRole } from "@/services/user";
 import Link from "next/link";
 
 const NavigationBar = () => {
@@ -56,7 +56,7 @@ const NavigationBar = () => {
       <nav className="flex items-center justify-between bg-bone">
         <h1 className="text-3xl font-bold text-primary">FEEDBACK FLOW</h1>
         <div className="flex flex-row gap-5 p-1">
-          {userRoleQuery.data && userRoleQuery.data == "ADMIN" && (
+          {userRoleQuery.data && userRoleQuery.data === "ADMIN" && (
             <Link
               href="/admin"
               className="rounded-xl bg-primary px-4 py-2 text-white"
