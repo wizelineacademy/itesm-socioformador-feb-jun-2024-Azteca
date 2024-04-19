@@ -78,7 +78,7 @@ const Admin = () => {
           ))}
         </tbody>
       </table>
-    </div>
+    </main>
   );
 };
 
