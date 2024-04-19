@@ -4,6 +4,7 @@ interface ProjectExtendedCardProps {
   title: string;
   date: string;
   description: string;
+  id: number;
 }
 
 import React from "react";
@@ -13,6 +14,7 @@ import ChevronRightIcon from "./icons/ChevronRightIcon";
 import PlusIcon from "./icons/PlusIcon";
 
 const ProjectExtendedCard = ({
+  id,
   title,
   date,
   description,
@@ -38,7 +40,7 @@ const ProjectExtendedCard = ({
             </button>
           </div>
           <Link
-            href="/projects/1"
+            href={`/projects/${id}`}
             className="flex h-9 w-9 items-center justify-center rounded-full bg-primary"
           >
             <ChevronRightIcon size="h-6 w-6" color="white" />

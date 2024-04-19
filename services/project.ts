@@ -4,6 +4,8 @@ import { auth } from "@/auth";
 import db from "@/db/drizzle";
 import { project, projectMember } from "@/db/schema";
 import { eq, or } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function getProjects() {
   // get all of the projects in which the user is either a member or a manager
@@ -29,4 +31,34 @@ export async function getProjects() {
     );
 
   return projects;
+}
+
+type NewProject = Omit<typeof project.$inferInsert, "managerId">;
+
+export async function createProject({
+  newProject,
+  members,
+}: {
+  newProject: NewProject;
+  members: string[];
+}) {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) throw new Error("You must be signed in");
+
+  const res = await db
+    .insert(project)
+    .values({ ...newProject, managerId: userId })
+    .returning({ id: project.id });
+  const { id: projectId } = res[0];
+
+  await db.insert(projectMember).values(
+    members.map((member) => ({
+      userId: member,
+      projectId,
+    })),
+  );
+
+  revalidatePath("/projects");
+  redirect("/projects");
 }

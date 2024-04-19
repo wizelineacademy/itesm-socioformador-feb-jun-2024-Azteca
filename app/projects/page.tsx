@@ -30,9 +30,10 @@ const Projects = async () => {
           )}
         </div>
         <div className="mx-auto flex max-w-[60%] flex-wrap items-center justify-center gap-6">
-          {projects.map((project, index) => (
+          {projects.map((project) => (
             <ProjectExtendedCard
-              key={index}
+              key={project.id}
+              id={project.id}
               title={project.name}
               date={`${formatDate(project.startDate)} - ${formatDate(project.endDate)}`}
               description={project.description}
