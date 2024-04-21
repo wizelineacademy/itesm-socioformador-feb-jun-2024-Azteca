@@ -22,7 +22,7 @@ export async function migrate(path: string): Promise<void> {
 }
 
 
-export const db = drizzle(rdsClient, {
+export const db = drizzle(new RDSDataClient({}), {
     database: Resource.feedbackFlowdb.databaseName,
     secretArn: Resource.feedbackFlowdb.secretArn,
     resourceArn: Resource.feedbackFlowdb.clusterArn
