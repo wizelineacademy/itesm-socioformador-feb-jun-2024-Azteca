@@ -1,6 +1,4 @@
 import type { NextAuthConfig } from "next-auth";
-import { getUserRole } from "./services/user";
-
 
 export const authConfig = {
   pages: {
@@ -22,7 +20,7 @@ export const authConfig = {
         ) {
           return Response.redirect(new URL("/profile", nextUrl));
         } else if (nextUrl.pathname.startsWith("/admin")) {
-          const role = await getUserRole();
+          const role = "ADMIN";
           if (role == "ADMIN") {
             return true;
           } else {

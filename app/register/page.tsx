@@ -11,7 +11,7 @@ const Login = () => {
     const department = formData.get("department")?.toString();
     const email = formData.get("email")?.toString();
     const password = formData.get("password")?.toString();
-    registerUser(name, jobTitle, department, email, password);
+    registerUser(name, jobTitle, department);
   };
 
   return (
