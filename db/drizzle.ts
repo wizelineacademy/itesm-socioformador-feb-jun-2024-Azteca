@@ -23,9 +23,9 @@ export async function migrate(path: string): Promise<void> {
 
 
 export const db = drizzle(new RDSDataClient({}), {
-    database: Resource.feedbackFlowdb.databaseName,
-    secretArn: Resource.feedbackFlowdb.secretArn,
-    resourceArn: Resource.feedbackFlowdb.clusterArn
+    database: Resource.FeedbackFlowdb3.database,
+    secretArn: Resource.FeedbackFlowdb3.secretArn,
+    resourceArn: Resource.FeedbackFlowdb3.clusterArn
 });
 
   
