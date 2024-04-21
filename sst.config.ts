@@ -1,5 +1,6 @@
 /// <reference path="./.sst/platform/config.d.ts" />
-
+///No cambiar nada de este archivo, es el archivo de configuración de SST
+//putazos al que lo haga
 export default $config({
   app(input) {
     return {
