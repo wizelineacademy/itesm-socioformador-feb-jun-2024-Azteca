@@ -1,0 +1,784 @@
+{
+  "id": "6bf62f3a-abf1-40c7-932b-784919f6daeb",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "5",
+  "dialect": "pg",
+  "tables": {
+    "final_survey": {
+      "name": "final_survey",
+      "schema": "",
+      "columns": {
+        "final_survey_id": {
+          "name": "final_survey_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "project_id": {
+          "name": "project_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "final_survey_project_id_project_id_fk": {
+          "name": "final_survey_project_id_project_id_fk",
+          "tableFrom": "final_survey",
+          "tableTo": "project",
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "final_survey_answer": {
+      "name": "final_survey_answer",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "final_survey_id": {
+          "name": "final_survey_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "question_name": {
+          "name": "question_name",
+          "type": "varchar(8)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "answer": {
+          "name": "answer",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "final_survey_answer_user_id__user_id_fk": {
+          "name": "final_survey_answer_user_id__user_id_fk",
+          "tableFrom": "final_survey_answer",
+          "tableTo": "_user",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "final_survey_answer_final_survey_id_final_survey_final_survey_id_fk": {
+          "name": "final_survey_answer_final_survey_id_final_survey_final_survey_id_fk",
+          "tableFrom": "final_survey_answer",
+          "tableTo": "final_survey",
+          "columnsFrom": ["final_survey_id"],
+          "columnsTo": ["final_survey_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "final_survey_answer_user_id_final_survey_id_pk": {
+          "name": "final_survey_answer_user_id_final_survey_id_pk",
+          "columns": ["user_id", "final_survey_id"]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "pip_resource": {
+      "name": "pip_resource",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kind": {
+          "name": "kind",
+          "type": "role",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(1024)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "embedding": {
+          "name": "embedding",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::text[]"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "pip_task": {
+      "name": "pip_task",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_done": {
+          "name": "is_done",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "pip_task_user_id__user_id_fk": {
+          "name": "pip_task_user_id__user_id_fk",
+          "tableFrom": "pip_task",
+          "tableTo": "_user",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "project": {
+      "name": "project",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "manager_id": {
+          "name": "manager_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(1024)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sprint_survey_periodicity_in_days": {
+          "name": "sprint_survey_periodicity_in_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "project_manager_id__user_id_fk": {
+          "name": "project_manager_id__user_id_fk",
+          "tableFrom": "project",
+          "tableTo": "_user",
+          "columnsFrom": ["manager_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "project_member": {
+      "name": "project_member",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "project_id": {
+          "name": "project_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "project_member_user_id__user_id_fk": {
+          "name": "project_member_user_id__user_id_fk",
+          "tableFrom": "project_member",
+          "tableTo": "_user",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "project_member_project_id_project_id_fk": {
+          "name": "project_member_project_id_project_id_fk",
+          "tableFrom": "project_member",
+          "tableTo": "project",
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "project_member_user_id_project_id_pk": {
+          "name": "project_member_user_id_project_id_pk",
+          "columns": ["user_id", "project_id"]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "ruler_survey": {
+      "name": "ruler_survey",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "ruler_survey_answers": {
+      "name": "ruler_survey_answers",
+      "schema": "",
+      "columns": {
+        "ruler_survey_id": {
+          "name": "ruler_survey_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quadrant": {
+          "name": "quadrant",
+          "type": "quadrant",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "emotion": {
+          "name": "emotion",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ruler_survey_answers_ruler_survey_id_ruler_survey_id_fk": {
+          "name": "ruler_survey_answers_ruler_survey_id_ruler_survey_id_fk",
+          "tableFrom": "ruler_survey_answers",
+          "tableTo": "ruler_survey",
+          "columnsFrom": ["ruler_survey_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "ruler_survey_answers_user_id__user_id_fk": {
+          "name": "ruler_survey_answers_user_id__user_id_fk",
+          "tableFrom": "ruler_survey_answers",
+          "tableTo": "_user",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "ruler_survey_answers_user_id_ruler_survey_id_pk": {
+          "name": "ruler_survey_answers_user_id_ruler_survey_id_pk",
+          "columns": ["user_id", "ruler_survey_id"]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "sprint_survey": {
+      "name": "sprint_survey",
+      "schema": "",
+      "columns": {
+        "sprint_survey_id": {
+          "name": "sprint_survey_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "project_id": {
+          "name": "project_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sprint_survey_project_id_project_id_fk": {
+          "name": "sprint_survey_project_id_project_id_fk",
+          "tableFrom": "sprint_survey",
+          "tableTo": "project",
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "sprint_survey_answer_coworkers": {
+      "name": "sprint_survey_answer_coworkers",
+      "schema": "",
+      "columns": {
+        "sprint_survey_id": {
+          "name": "sprint_survey_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "coworker_id": {
+          "name": "coworker_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "question_name": {
+          "name": "question_name",
+          "type": "varchar(8)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "answer": {
+          "name": "answer",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sprint_survey_answer_coworkers_sprint_survey_id_sprint_survey_sprint_survey_id_fk": {
+          "name": "sprint_survey_answer_coworkers_sprint_survey_id_sprint_survey_sprint_survey_id_fk",
+          "tableFrom": "sprint_survey_answer_coworkers",
+          "tableTo": "sprint_survey",
+          "columnsFrom": ["sprint_survey_id"],
+          "columnsTo": ["sprint_survey_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "sprint_survey_answer_coworkers_user_id__user_id_fk": {
+          "name": "sprint_survey_answer_coworkers_user_id__user_id_fk",
+          "tableFrom": "sprint_survey_answer_coworkers",
+          "tableTo": "_user",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "sprint_survey_answer_coworkers_user_id_sprint_survey_id_pk": {
+          "name": "sprint_survey_answer_coworkers_user_id_sprint_survey_id_pk",
+          "columns": ["user_id", "sprint_survey_id"]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "sprint_survey_answer_project": {
+      "name": "sprint_survey_answer_project",
+      "schema": "",
+      "columns": {
+        "sprint_survey_id": {
+          "name": "sprint_survey_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "question_name": {
+          "name": "question_name",
+          "type": "varchar(8)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "answer": {
+          "name": "answer",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sprint_survey_answer_project_sprint_survey_id_sprint_survey_sprint_survey_id_fk": {
+          "name": "sprint_survey_answer_project_sprint_survey_id_sprint_survey_sprint_survey_id_fk",
+          "tableFrom": "sprint_survey_answer_project",
+          "tableTo": "sprint_survey",
+          "columnsFrom": ["sprint_survey_id"],
+          "columnsTo": ["sprint_survey_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "sprint_survey_answer_project_user_id__user_id_fk": {
+          "name": "sprint_survey_answer_project_user_id__user_id_fk",
+          "tableFrom": "sprint_survey_answer_project",
+          "tableTo": "_user",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "sprint_survey_answer_project_user_id_sprint_survey_id_pk": {
+          "name": "sprint_survey_answer_project_user_id_sprint_survey_id_pk",
+          "columns": ["user_id", "sprint_survey_id"]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "trait": {
+      "name": "trait",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(1024)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kind": {
+          "name": "kind",
+          "type": "kind",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "_user": {
+      "name": "_user",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "job_title": {
+          "name": "job_title",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "department": {
+          "name": "department",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "photo_url": {
+          "name": "photo_url",
+          "type": "varchar(1024)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "name": "role",
+          "type": "role",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "_user_email_unique": {
+          "name": "_user_email_unique",
+          "nullsNotDistinct": false,
+          "columns": ["email"]
+        }
+      }
+    },
+    "user_resource": {
+      "name": "user_resource",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "resource_id": {
+          "name": "resource_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_resource_user_id__user_id_fk": {
+          "name": "user_resource_user_id__user_id_fk",
+          "tableFrom": "user_resource",
+          "tableTo": "_user",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "user_resource_resource_id_pip_resource_id_fk": {
+          "name": "user_resource_resource_id_pip_resource_id_fk",
+          "tableFrom": "user_resource",
+          "tableTo": "pip_resource",
+          "columnsFrom": ["resource_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "user_resource_user_id_resource_id_pk": {
+          "name": "user_resource_user_id_resource_id_pk",
+          "columns": ["user_id", "resource_id"]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "user_trait": {
+      "name": "user_trait",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "trait_id": {
+          "name": "trait_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_trait_user_id__user_id_fk": {
+          "name": "user_trait_user_id__user_id_fk",
+          "tableFrom": "user_trait",
+          "tableTo": "_user",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "user_trait_trait_id_trait_id_fk": {
+          "name": "user_trait_trait_id_trait_id_fk",
+          "tableFrom": "user_trait",
+          "tableTo": "trait",
+          "columnsFrom": ["trait_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "user_trait_user_id_trait_id_pk": {
+          "name": "user_trait_user_id_trait_id_pk",
+          "columns": ["user_id", "trait_id"]
+        }
+      },
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {
+    "role": {
+      "name": "role",
+      "values": {
+        "EMPLOYEE": "EMPLOYEE",
+        "MANAGER": "MANAGER",
+        "ADMIN": "ADMIN"
+      }
+    },
+    "quadrant": {
+      "name": "quadrant",
+      "values": {
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4"
+      }
+    },
+    "kind": {
+      "name": "kind",
+      "values": {
+        "STRENGTH": "STRENGTH",
+        "AREA_OF_OPPORTUNITY": "AREA_OF_OPPORTUNITY"
+      }
+    }
+  },
+  "schemas": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

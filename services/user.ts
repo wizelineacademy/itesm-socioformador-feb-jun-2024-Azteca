@@ -7,7 +7,7 @@ import {
   userTrait,
   userRoleEnum,
 } from "@/db/schema";
-import db from "@/db/drizzle";
+import { db } from "@/db/drizzle";
 import * as schema from "@/db/schema";
 import { eq, not, and, or, asc } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";

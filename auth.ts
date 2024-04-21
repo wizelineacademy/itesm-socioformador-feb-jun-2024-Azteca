@@ -3,7 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 import { authConfig } from "./auth.config";
-import db from "./db/drizzle";
+import { db } from "./db/drizzle";
 import { user } from "./db/schema";
 import { eq } from "drizzle-orm";
 
@@ -21,7 +21,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   ...authConfig,
   providers: [
     Credentials({
-      async authorize(credentials) {
+      async authorize(credentials: any) {
         const parsedCredentials = z
           .object({ email: z.string().email(), password: z.string().min(6) })
           .safeParse(credentials);
