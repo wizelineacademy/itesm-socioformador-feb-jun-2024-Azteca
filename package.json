@@ -39,7 +39,7 @@
     "sharp": "^0.33.3",
     "sst": "ion",
     "svix": "^1.21.0",
-    "zod": "^3.22.4"
+    "zod": "^3.22.5"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
