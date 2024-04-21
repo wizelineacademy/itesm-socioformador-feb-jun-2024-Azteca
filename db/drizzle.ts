@@ -1,31 +1,43 @@
+// Cargar variables de entorno desde .env
+require("dotenv").config();
+
+// Importaciones
 import { Resource } from "sst";
 import { drizzle } from "drizzle-orm/aws-data-api/pg";
-import { RDSDataClient } from "@aws-sdk/client-rds-data"; // Fix: Import RDSDataClient from "@aws-sdk/client-rds-data-node"
-import { migrate as migrateFromOrm } from "drizzle-orm/aws-data-api/pg/migrator";
-import { fromIni } from '@aws-sdk/credential-providers';
+import { migrate } from "drizzle-orm/aws-data-api/pg/migrator";
+import { RDSDataClient } from "@aws-sdk/client-rds-data";
+import { fromIni } from "@aws-sdk/credential-providers";
 
+// Obtener el perfil de AWS desde las variables de entorno o usar 'default'
+const awsProfile = process.env.AWS_PROFILE || "default";
 
-const rdsClient = new RDSDataClient({
-    credentials: fromIni({ profile: process.env['PROFILE'] }),
-    region: 'us-east-2',
+// Configuración del cliente RDSDataClient usando el perfil de AWS
+const sql = new RDSDataClient({
+  credentials: fromIni({ profile: awsProfile }),
+  region: "us-east-1",
 });
 
+console.log("SQL", sql);
 
-export async function migrate(path: string): Promise<void> {
-    console.log("Running migrations...");
-    try {
-        await migrateFromOrm(db, { migrationsFolder: path });
-        console.log("Migrations done.");
-    } catch (error) {
-        console.error("Error during migration:", error);
-    }
-}
-
-
-export const db = drizzle(rdsClient, {
-    database: Resource.FeedbackFlowdb3.database,
-    secretArn: Resource.FeedbackFlowdb3.secretArn,
-    resourceArn: Resource.FeedbackFlowdb3.clusterArn
+// Configuración de la conexión de Drizzle ORM
+export const db = drizzle(sql, {
+  database: Resource.FeedbackFlowdb7.database,
+  secretArn: Resource.FeedbackFlowdb7.secretArn,
+  resourceArn: Resource.FeedbackFlowdb7.clusterArn,
 });
 
-  
+console.log("DB", db);
+
+// Función principal para ejecutar migraciones
+const main = async () => {
+  try {
+    await migrate(db, { migrationsFolder: "drizzlemigrations" });
+    console.log("Migration complete");
+  } catch (error) {
+    console.log(error, "Error running migrations");
+  }
+  process.exit(0);
+};
+
+// Ejecutar la función principal
+main();

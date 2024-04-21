@@ -12,8 +12,7 @@
     "prettier:write": "prettier --write --ignore-unknown .",
     "start": "next start",
     "generate": "drizzle-kit generate:pg --config=drizzle.config.ts",
-    "migrate": "npx tsx db/migrator.ts"
-
+    "migrate": "npx tsx db/drizzle.ts"
   },
   "dependencies": {
     "@aws-sdk/client-rds-data": "^3.556.0",
@@ -42,6 +41,7 @@
     "sharp": "^0.33.3",
     "sst": "ion",
     "svix": "^1.21.0",
+    "ts-node": "^10.9.2",
     "zod": "^3.22.5"
   },
   "devDependencies": {

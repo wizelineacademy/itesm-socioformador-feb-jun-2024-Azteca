@@ -33,12 +33,8 @@
           "name": "final_survey_project_id_project_id_fk",
           "tableFrom": "final_survey",
           "tableTo": "project",
-          "columnsFrom": [
-            "project_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -81,12 +77,8 @@
           "name": "final_survey_answer_user_id__user_id_fk",
           "tableFrom": "final_survey_answer",
           "tableTo": "_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -94,12 +86,8 @@
           "name": "final_survey_answer_final_survey_id_final_survey_final_survey_id_fk",
           "tableFrom": "final_survey_answer",
           "tableTo": "final_survey",
-          "columnsFrom": [
-            "final_survey_id"
-          ],
-          "columnsTo": [
-            "final_survey_id"
-          ],
+          "columnsFrom": ["final_survey_id"],
+          "columnsTo": ["final_survey_id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -107,10 +95,7 @@
       "compositePrimaryKeys": {
         "final_survey_answer_user_id_final_survey_id_pk": {
           "name": "final_survey_answer_user_id_final_survey_id_pk",
-          "columns": [
-            "user_id",
-            "final_survey_id"
-          ]
+          "columns": ["user_id", "final_survey_id"]
         }
       },
       "uniqueConstraints": {}
@@ -197,12 +182,8 @@
           "name": "pip_task_user_id__user_id_fk",
           "tableFrom": "pip_task",
           "tableTo": "_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -263,12 +244,8 @@
           "name": "project_manager_id__user_id_fk",
           "tableFrom": "project",
           "tableTo": "_user",
-          "columnsFrom": [
-            "manager_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["manager_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -311,12 +288,8 @@
           "name": "project_member_user_id__user_id_fk",
           "tableFrom": "project_member",
           "tableTo": "_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -324,12 +297,8 @@
           "name": "project_member_project_id_project_id_fk",
           "tableFrom": "project_member",
           "tableTo": "project",
-          "columnsFrom": [
-            "project_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -337,10 +306,7 @@
       "compositePrimaryKeys": {
         "project_member_user_id_project_id_pk": {
           "name": "project_member_user_id_project_id_pk",
-          "columns": [
-            "user_id",
-            "project_id"
-          ]
+          "columns": ["user_id", "project_id"]
         }
       },
       "uniqueConstraints": {}
@@ -408,12 +374,8 @@
           "name": "ruler_survey_answers_ruler_survey_id_ruler_survey_id_fk",
           "tableFrom": "ruler_survey_answers",
           "tableTo": "ruler_survey",
-          "columnsFrom": [
-            "ruler_survey_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["ruler_survey_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -421,12 +383,8 @@
           "name": "ruler_survey_answers_user_id__user_id_fk",
           "tableFrom": "ruler_survey_answers",
           "tableTo": "_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -434,10 +392,7 @@
       "compositePrimaryKeys": {
         "ruler_survey_answers_user_id_ruler_survey_id_pk": {
           "name": "ruler_survey_answers_user_id_ruler_survey_id_pk",
-          "columns": [
-            "user_id",
-            "ruler_survey_id"
-          ]
+          "columns": ["user_id", "ruler_survey_id"]
         }
       },
       "uniqueConstraints": {}
@@ -471,12 +426,8 @@
           "name": "sprint_survey_project_id_project_id_fk",
           "tableFrom": "sprint_survey",
           "tableTo": "project",
-          "columnsFrom": [
-            "project_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -525,12 +476,8 @@
           "name": "sprint_survey_answer_coworkers_sprint_survey_id_sprint_survey_sprint_survey_id_fk",
           "tableFrom": "sprint_survey_answer_coworkers",
           "tableTo": "sprint_survey",
-          "columnsFrom": [
-            "sprint_survey_id"
-          ],
-          "columnsTo": [
-            "sprint_survey_id"
-          ],
+          "columnsFrom": ["sprint_survey_id"],
+          "columnsTo": ["sprint_survey_id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -538,12 +485,8 @@
           "name": "sprint_survey_answer_coworkers_user_id__user_id_fk",
           "tableFrom": "sprint_survey_answer_coworkers",
           "tableTo": "_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -551,10 +494,7 @@
       "compositePrimaryKeys": {
         "sprint_survey_answer_coworkers_user_id_sprint_survey_id_pk": {
           "name": "sprint_survey_answer_coworkers_user_id_sprint_survey_id_pk",
-          "columns": [
-            "user_id",
-            "sprint_survey_id"
-          ]
+          "columns": ["user_id", "sprint_survey_id"]
         }
       },
       "uniqueConstraints": {}
@@ -594,12 +534,8 @@
           "name": "sprint_survey_answer_project_sprint_survey_id_sprint_survey_sprint_survey_id_fk",
           "tableFrom": "sprint_survey_answer_project",
           "tableTo": "sprint_survey",
-          "columnsFrom": [
-            "sprint_survey_id"
-          ],
-          "columnsTo": [
-            "sprint_survey_id"
-          ],
+          "columnsFrom": ["sprint_survey_id"],
+          "columnsTo": ["sprint_survey_id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -607,12 +543,8 @@
           "name": "sprint_survey_answer_project_user_id__user_id_fk",
           "tableFrom": "sprint_survey_answer_project",
           "tableTo": "_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -620,10 +552,7 @@
       "compositePrimaryKeys": {
         "sprint_survey_answer_project_user_id_sprint_survey_id_pk": {
           "name": "sprint_survey_answer_project_user_id_sprint_survey_id_pk",
-          "columns": [
-            "user_id",
-            "sprint_survey_id"
-          ]
+          "columns": ["user_id", "sprint_survey_id"]
         }
       },
       "uniqueConstraints": {}
@@ -723,9 +652,7 @@
         "_user_email_unique": {
           "name": "_user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       }
     },
@@ -752,12 +679,8 @@
           "name": "user_resource_user_id__user_id_fk",
           "tableFrom": "user_resource",
           "tableTo": "_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -765,12 +688,8 @@
           "name": "user_resource_resource_id_pip_resource_id_fk",
           "tableFrom": "user_resource",
           "tableTo": "pip_resource",
-          "columnsFrom": [
-            "resource_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["resource_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -778,10 +697,7 @@
       "compositePrimaryKeys": {
         "user_resource_user_id_resource_id_pk": {
           "name": "user_resource_user_id_resource_id_pk",
-          "columns": [
-            "user_id",
-            "resource_id"
-          ]
+          "columns": ["user_id", "resource_id"]
         }
       },
       "uniqueConstraints": {}
@@ -809,12 +725,8 @@
           "name": "user_trait_user_id__user_id_fk",
           "tableFrom": "user_trait",
           "tableTo": "_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -822,12 +734,8 @@
           "name": "user_trait_trait_id_trait_id_fk",
           "tableFrom": "user_trait",
           "tableTo": "trait",
-          "columnsFrom": [
-            "trait_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["trait_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -835,10 +743,7 @@
       "compositePrimaryKeys": {
         "user_trait_user_id_trait_id_pk": {
           "name": "user_trait_user_id_trait_id_pk",
-          "columns": [
-            "user_id",
-            "trait_id"
-          ]
+          "columns": ["user_id", "trait_id"]
         }
       },
       "uniqueConstraints": {}
