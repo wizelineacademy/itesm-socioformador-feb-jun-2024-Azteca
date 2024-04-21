@@ -10,7 +10,10 @@
     "lint": "next lint",
     "prettier:check": "prettier --check --ignore-unknown .",
     "prettier:write": "prettier --write --ignore-unknown .",
-    "start": "next start"
+    "start": "next start",
+    "generate": "drizzle-kit generate:pg --config=drizzle.config.ts",
+    "migrate": "npx tsx db/migrator.ts"
+
   },
   "dependencies": {
     "@aws-sdk/client-rds-data": "^3.556.0",

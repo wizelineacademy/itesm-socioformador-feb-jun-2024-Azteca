@@ -1,7 +1,7 @@
 import { Resource } from "sst";
 import { drizzle } from "drizzle-orm/aws-data-api/pg";
 import { RDSDataClient } from "@aws-sdk/client-rds-data"; // Fix: Import RDSDataClient from "@aws-sdk/client-rds-data-node"
-import { migrate as migratePostgres } from "drizzle-orm/aws-data-api/pg/migrator";
+import { migrate as migrateFromOrm } from "drizzle-orm/aws-data-api/pg/migrator";
 import { fromIni } from '@aws-sdk/credential-providers';
 
 
@@ -14,7 +14,7 @@ const rdsClient = new RDSDataClient({
 export async function migrate(path: string): Promise<void> {
     console.log("Running migrations...");
     try {
-        await migratePostgres(db, { migrationsFolder: path });
+        await migrateFromOrm(db, { migrationsFolder: path });
         console.log("Migrations done.");
     } catch (error) {
         console.error("Error during migration:", error);
@@ -22,7 +22,7 @@ export async function migrate(path: string): Promise<void> {
 }
 
 
-export const db = drizzle(new RDSDataClient({}), {
+export const db = drizzle(rdsClient, {
     database: Resource.FeedbackFlowdb3.database,
     secretArn: Resource.FeedbackFlowdb3.secretArn,
     resourceArn: Resource.FeedbackFlowdb3.clusterArn
