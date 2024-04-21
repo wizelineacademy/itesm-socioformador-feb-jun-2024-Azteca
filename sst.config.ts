@@ -8,7 +8,17 @@ export default $config({
       home: "aws",
     };
   },
+  
   async run() {
-    new sst.aws.Nextjs("MyWeb");
+    const database = new sst.aws.Postgres("FeedbackFlowdb", {
+      scaling: {
+       min: "2 ACU",
+       max: "128 ACU" 
+      }
+    });
+
+    new sst.aws.Nextjs("MyWeb", {
+      link: [database]
+    });
   },
 });
