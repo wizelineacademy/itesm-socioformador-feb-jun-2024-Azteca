@@ -1,12 +1,11 @@
 "use client";
-
 interface NotificationProps {
   showProjectModal: () => void;
   showSprintModal: () => void;
 }
 
 import { Menu, Transition } from "@headlessui/react";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 import CloseIcon from "./icons/CloseIcon";
 import NotificationIcon from "./icons/NotificationIcon";
 import NotificationCard from "./NotificationCard";
@@ -54,11 +53,10 @@ const Notifications = ({
 
   const handleClickNotification = (index: number, type: string): void => {
     onNotificationClick(type);
-    /*     const newNotifications = [...notifications];
+    const newNotifications = [...notifications];
     newNotifications.splice(index, 1);
     setNotifications(newNotifications);
     setIsActive(false);
- */
   };
 
   return (

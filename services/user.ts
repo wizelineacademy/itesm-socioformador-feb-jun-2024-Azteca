@@ -48,6 +48,8 @@ export const registerUser = async (
   name: string | undefined,
   email: string | undefined,
   password: string | undefined,
+  department: string | undefined,
+  jobTitle: string | undefined,
 ) => {
   try {
     if (!name || !email || !password) {
@@ -59,6 +61,8 @@ export const registerUser = async (
       email: email,
       password: hashedPassword,
       role: "EMPLOYEE",
+      department: department,
+      jobTitle: jobTitle,
     });
   } catch (error) {
     console.error("Could not register user", error);
