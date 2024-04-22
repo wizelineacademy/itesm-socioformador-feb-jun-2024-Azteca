@@ -150,10 +150,19 @@ const CreateProject = () => {
           {/* Action Buttons */}
           {/* place it at the end */}
           <div className="flex gap-4">
-            <button className="h-fit w-fit self-end rounded-xl bg-white px-10 py-2 text-xl font-medium text-primary drop-shadow-lg">
+            <button
+              className="h-fit w-fit self-end rounded-xl bg-white px-10 py-2 text-xl font-medium text-primary drop-shadow-lg"
+              type="button"
+              onClick={() => {
+                router.replace("/projects");
+              }}
+            >
               Cancel
             </button>
-            <button className="h-fit w-fit self-end rounded-xl bg-primary px-10 py-2 text-xl font-medium text-white drop-shadow-lg">
+            <button
+              className="h-fit w-fit self-end rounded-xl bg-primary px-10 py-2 text-xl font-medium text-white drop-shadow-lg"
+              type="submit"
+            >
               Create
             </button>
           </div>

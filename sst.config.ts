@@ -13,8 +13,8 @@ export default $config({
   async run() {
     const database = new sst.aws.Postgres("FeedbackFlowdb7", {
       scaling: {
-        min: "2 ACU",
-        max: "128 ACU",
+        min: "1 ACU",
+        max: "1 ACU",
       },
     });
 
