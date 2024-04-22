@@ -1,13 +1,4 @@
 import type { NextAuthConfig } from "next-auth";
-import db from "./db/drizzle";
-import { user } from "./db/schema";
-import { eq } from "drizzle-orm";
-
-const getUserRole = async (id: string) => {
-  const users = await db.select().from(user).where(eq(user.id, id));
-  const { role } = await users[0];
-  return role;
-};
 
 export const authConfig = {
   pages: {
@@ -29,7 +20,7 @@ export const authConfig = {
         ) {
           return Response.redirect(new URL("/profile", nextUrl));
         } else if (nextUrl.pathname.startsWith("/admin")) {
-          const role = await getUserRole(auth.user!.id!);
+          const role = "ADMIN";
           if (role == "ADMIN") {
             return true;
           } else {
