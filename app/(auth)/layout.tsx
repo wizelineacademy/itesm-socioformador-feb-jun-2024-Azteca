@@ -10,9 +10,5 @@ export default function AuthLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body className={"h-dvh w-dvw overflow-hidden"}>{children}</body>
-    </html>
-  );
+  return <main className={"h-dvh w-dvw overflow-hidden"}>{children}</main>;
 }
