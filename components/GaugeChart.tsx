@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 
 let gradientIdCounter = 0; // Contador estático fuera del componente
