@@ -12,7 +12,11 @@
     "prettier:write": "prettier --write --ignore-unknown .",
     "start": "next start",
     "generate": "drizzle-kit generate:pg --config=drizzle.config.ts",
-    "migrate": "npx tsx db/drizzle.ts"
+    "migrate": "npx tsx db/drizzle.ts",
+    "deployStaging": "sst deploy --stage staging",
+    "deploy": "sst deploy --stage prod",
+    "test": "jest",
+    "test:e2e": "npx playwright test"
   },
   "dependencies": {
     "@aws-sdk/client-rds-data": "^3.556.0",
