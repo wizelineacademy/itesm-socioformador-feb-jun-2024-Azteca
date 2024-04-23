@@ -20,7 +20,35 @@ export default function EmblaCarousel() {
   });
 
   if (!coworkersQuery.data) {
-    return <div>loading...</div>;
+    return (
+      <div className="flex flex-row items-center justify-between">
+        <UserProfileButton
+          size="md"
+          className=" animate-pulse transition-all duration-200"
+          color="text-grayText"
+        />
+        <UserProfileButton
+          size="md"
+          className=" animate-pulse transition-all  duration-200"
+          color="text-grayText"
+        />
+        <UserProfileButton
+          size="md"
+          className=" animate-pulse transition-all duration-200"
+          color="text-grayText"
+        />
+      </div>
+    );
+  }
+
+  if (coworkersQuery.data.length === 0) {
+    return (
+      <div className="flex h-20 w-full flex-row items-center justify-between">
+        <p className="text-lg text-black">
+          No se encontraron compañeros de trabajo
+        </p>
+      </div>
+    );
   }
 
   return (

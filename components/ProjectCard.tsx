@@ -31,8 +31,6 @@ export default function ProjectCard({
     return <div>loading...</div>;
   }
 
-  console.log(coworkersQuery.data);
-
   return (
     <div className="flex items-center gap-20 rounded-lg bg-white p-4">
       <div>
