@@ -69,8 +69,5 @@
     "prettier-plugin-tailwindcss": "^0.5.13",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
-  },
-  "overrides": {
-    "string-width": "4.2.3"
   }
 }
