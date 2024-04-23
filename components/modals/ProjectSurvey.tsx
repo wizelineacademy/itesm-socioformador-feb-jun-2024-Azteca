@@ -44,23 +44,33 @@ const ProjectSurvey = ({ showModal, onClose }: ProjectSurveyProps) => {
                 <section>
                   <div className="mt-3 flex flex-row flex-wrap justify-around">
                     <Slider
+                      name="efforts"
+                      value={0}
                       label="Do you feel that your efforts were recognized?"
                       className=" pe-10"
                     />
                     <Slider
+                      name="efforts"
+                      value={0}
                       label="Did you feel supported in your personal growth?"
                       className=" ps-10"
                     />
                     <Slider
+                      name="efforts"
+                      value={0}
                       label="Were your ideas and creativity heard in decision-making?"
                       className="mt-8 pe-10"
                     />
                     <Slider
+                      name="efforts"
+                      value={0}
                       label="Were the challenges addressed with opportuninites for growth?"
                       className="mt-8 ps-10"
                     />
                   </div>
                   <Slider
+                    name="efforts"
+                    value={0}
                     label="Was there an atmosphere of respect and trust?"
                     className="mx-auto mt-8 flex-1 px-5"
                   />
