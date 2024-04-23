@@ -3,12 +3,21 @@ import NavigationBar from "@/components/NavigationBar";
 import PipResource from "@/components/PipResource";
 import PipTask from "@/components/PipTask";
 import ProgressBar from "@/components/Progressbar";
-import { getUserTasks, getUserResources } from "@/services/tasks-and-resources";
+import { getUserTasks, getUserResources, updateTask } from "@/services/tasks-and-resources";
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from "react";
 
 const PIP = () => {
   
   const [tasks, setTasks] = useState([]);
+  const tasksQuery =  
+
+  const handleCheckTask = (index: number) => {
+    const newTasks = [...tasks];
+    newTasks[index].isDone = !newTasks[index].isDone;
+    setTasks(newTasks);
+  };
+
   const [resources, setResources] = useState([]);
 
   useEffect(() => {
@@ -46,12 +55,6 @@ const PIP = () => {
   const progressPercentage = Math.round(
     (tasks.filter((task) => task.isDone).length / tasks.length) * 100,
   );
-
-  const handleCheckTask = (index: number) => {
-    const newTasks = [...tasks];
-    newTasks[index].isDone = !newTasks[index].isDone;
-    setTasks(newTasks);
-  };
 
   return (
     <main>

@@ -27,3 +27,7 @@ export async function getUserResources() {
     .where(eq(pipResource.userId, userId));
   return res;
 }
+
+export async function updateTask(taskId: number, isDone: boolean) {
+  await db.update(pipTask).set({ isDone: isDone }).where(eq(pipTask.id, taskId)).execute();
+}
