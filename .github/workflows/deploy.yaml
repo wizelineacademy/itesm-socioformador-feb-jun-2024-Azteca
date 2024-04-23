@@ -52,7 +52,7 @@ jobs:
         run: npm run test
       - name: Run e2e tests with Playwright
         run: npm run test:e2e
-    if: github.event_name == 'pull_request'
+        if: (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/WorkflowCI/CDsemanticversioning') && (github.event_name == 'push' || github.event_name == 'pull_request')
 
   deploy-to-dev:
     name: Deploy to Dev
