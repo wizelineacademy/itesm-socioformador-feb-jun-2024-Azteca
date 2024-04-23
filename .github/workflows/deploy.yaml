@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - dev
+      - WorkflowCI/CDsemanticversioning
     tags:
       - "v*"
   pull_request:

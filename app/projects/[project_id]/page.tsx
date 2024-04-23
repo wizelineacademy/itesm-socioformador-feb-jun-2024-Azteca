@@ -1,5 +1,5 @@
 "use client";
-
+//hola
 import React from "react";
 import { RadarChart, AreaChart } from "@mantine/charts";
 import GaugeChart from "../../../components/GaugeChart";
