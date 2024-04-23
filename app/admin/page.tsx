@@ -55,7 +55,7 @@ const Admin = () => {
           </tr>
         </thead>
         <tbody>
-            {usersQuery.data.map((user) => (
+          {usersQuery.data.map((user) => (
             <tr key={user.id}>
               <td className="border px-4 py-2">{user.name}</td>
               <td className="border px-4 py-2">{user.email}</td>
