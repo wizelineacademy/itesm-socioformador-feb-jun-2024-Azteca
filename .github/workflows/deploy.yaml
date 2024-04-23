@@ -31,4 +31,4 @@ jobs:
 
       - name: Deploy app
         run: |
-          npm ci && npx sst deploy --stage production
+          npm ci && npm run deploy

@@ -6,7 +6,7 @@
     "build": "next build",
     "db:push": "drizzle-kit push:pg",
     "db:studio": "drizzle-kit studio",
-    "deploy": "sst deploy --stage prod",
+    "deploy": "sst deploy --stage production",
     "deployStaging": "sst deploy --stage staging",
     "dev": "next dev",
     "generate": "drizzle-kit generate:pg --config=drizzle.config.ts",
