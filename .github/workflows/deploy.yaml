@@ -41,6 +41,10 @@ jobs:
           sudo dpkg -i sst-linux-amd64.deb
           sst version
 
-      - name: Deploy app
+      - name: Npm ci
         run: |
           npm ci && sst deploy --stage production
+
+      - name: sst deploy
+        run: |
+          NO_BUN=true sst deploy --stage production
