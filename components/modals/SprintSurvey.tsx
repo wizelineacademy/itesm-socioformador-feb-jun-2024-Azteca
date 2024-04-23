@@ -46,7 +46,7 @@ const SprintSurvey = ({ showModal, onClose }: SprintSurveyProps) => {
 
   const [sprintAnswer, setSprintAnswer] = useState<SprintSurveyAnswer>({
     userId: "placeholder",
-    sprintSurveyId: "placeholder",
+    sprintSurveyId: 0,
     projectAnswers: [
       {
         questionKey: "resources",
