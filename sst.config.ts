@@ -16,6 +16,7 @@ export default $config({
         min: "2 ACU",
         max: "128 ACU",
       },
+      databaseName: "FeedbackFlowdb8",
     });
 
     new sst.aws.Nextjs("MyWeb6", {
