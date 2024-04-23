@@ -21,9 +21,9 @@ console.log("SQL", sql);
 
 // Configuración de la conexión de Drizzle ORM
 export const db = drizzle(sql, {
-  database: Resource.FeedbackFlowdb7.database,
-  secretArn: Resource.FeedbackFlowdb7.secretArn,
-  resourceArn: Resource.FeedbackFlowdb7.clusterArn,
+  database: Resource.FeedbackFlowdb8.database,
+  secretArn: Resource.FeedbackFlowdb8.secretArn,
+  resourceArn: Resource.FeedbackFlowdb8.clusterArn,
 });
 
 console.log("DB", db);
