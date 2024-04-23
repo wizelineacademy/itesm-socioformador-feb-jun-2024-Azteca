@@ -3,7 +3,7 @@ interface SliderProps {
   className?: string;
   onChange?: (value: number, key: string) => void;
   name: string;
-  value: number;
+  value?: number;
 }
 const Slider = ({ label, className, onChange, name, value }: SliderProps) => {
   return (

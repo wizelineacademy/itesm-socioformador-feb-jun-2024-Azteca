@@ -38,13 +38,13 @@ const Profile = () => {
           <div className="w-full ps-56 leading-tight text-white">
             {userQuery.isLoading && (
               <div className=" flex flex-col gap-4">
-                <div className="h-10 w-72 animate-pulse rounded-full bg-gray-300 transition-all duration-100" />
+                <div className="h-10 w-80 animate-pulse rounded-full bg-primary-light transition-all duration-100" />
                 <div className="flex flex-row items-center gap-2">
-                  <div className="h-5 w-36 animate-pulse rounded-full bg-gray-300 transition-all duration-100" />
+                  <div className="h-5 w-36 animate-pulse rounded-full bg-primary-light transition-all duration-100" />
                   <p className="font-normal">-</p>
-                  <div className="h-5 w-36 animate-pulse rounded-full bg-gray-300 transition-all duration-100" />
+                  <div className="h-5 w-36 animate-pulse rounded-full bg-primary-light transition-all duration-100" />
                 </div>
-                <div className="h-5 w-32 animate-pulse rounded-full bg-gray-300 transition-all duration-100" />
+                <div className="h-5 w-32 animate-pulse rounded-full bg-primary-light transition-all duration-100" />
               </div>
             )}
             {userQuery.data && (
