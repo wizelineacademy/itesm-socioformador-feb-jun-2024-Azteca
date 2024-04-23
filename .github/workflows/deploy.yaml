@@ -31,7 +31,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.12.2'
+          node-version: "20.12.2"
 
       # TODO: we have to manually update the SST version, or set it with an ENV variable
       # peg the version

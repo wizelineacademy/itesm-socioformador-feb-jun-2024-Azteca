@@ -13,7 +13,10 @@ export type SprintSurveyAnswer = {
   userId: string;
   sprintSurveyId: string;
   projectAnswers: Array<{ questionKey: string; answer: number }>;
-  coworkersAnswers: Array<Object>;
+  coworkersAnswers: Array<{
+    questionKey: keyof SurveyStepTwoAnswer;
+    answers: Array<{ coworkerId: string; answer: number }>;
+  }>;
 };
 
 export type SurveyStepTwoAnswer = {
