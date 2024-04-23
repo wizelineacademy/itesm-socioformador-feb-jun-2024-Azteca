@@ -4,7 +4,7 @@
 export default $config({
   app(input) {
     return {
-      name: "nextjspedro",
+      name: "myweb5-assets-2024-04-23",
       removal: input?.stage === "production" ? "retain" : "remove",
       home: "aws",
     };
