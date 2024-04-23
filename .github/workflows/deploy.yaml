@@ -10,7 +10,8 @@ on:
   pull_request:
     branches:
       - dev
-      -main
+      - main
+      - WorkflowCI/CDsemanticversioning
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
