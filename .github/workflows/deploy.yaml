@@ -36,6 +36,11 @@ jobs:
           tar -xzf sst-linux-x86_64.tar.gz
           sudo mv sst /usr/local/bin/sst
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          run_install: true
+
       - name: Deploy app
         run: |
-          npm ci && npm run deploy
+          pnpm run deploy
