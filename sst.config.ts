@@ -4,7 +4,7 @@
 export default $config({
   app(input) {
     return {
-      name: "CodigoAztecaAppvf2",
+      name: "nextjspedro",
       removal: input?.stage === "production" ? "retain" : "remove",
       home: "aws",
     };
