@@ -105,7 +105,7 @@ const SprintSurvey = ({ showModal, onClose }: SprintSurveyProps) => {
         sprintSurveyStepTwoAnswer[key as keyof SurveyStepTwoAnswer];
       const questionObject: {
         questionKey: keyof SurveyStepTwoAnswer;
-        answers: { userId: string; answer: number }[];
+        answers: { coworkerId: string; answer: number }[];
       } = {
         questionKey: key as keyof SurveyStepTwoAnswer,
         answers: [],
@@ -113,12 +113,11 @@ const SprintSurvey = ({ showModal, onClose }: SprintSurveyProps) => {
       for (let i = 0; i < answersArray.length; i++) {
         answersArray[i].forEach((answer) => {
           questionObject.answers.push({
-            userId: answer.userId,
+            coworkerId: answer.userId,
             answer: i + 1,
           });
         });
       }
-      console.log(questionObject);
       sprintAnswer.coworkersAnswers.push(questionObject);
     });
   };
@@ -131,6 +130,7 @@ const SprintSurvey = ({ showModal, onClose }: SprintSurveyProps) => {
     // Send data to the server
     console.log(sprintAnswer);
     console.log("Completed");
+    //onClose();
   };
 
   return (

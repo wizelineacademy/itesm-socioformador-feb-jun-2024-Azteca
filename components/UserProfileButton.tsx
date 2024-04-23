@@ -1,11 +1,11 @@
 import Image from "next/image";
-import Link from "next/link";
 
 interface UserProfileButtonProps {
   name?: string;
   photoUrl?: string;
   size?: "xs" | "sm" | "md" | "lg";
   className?: string;
+  color?: string;
 }
 
 const UserProfileButton = ({
@@ -13,6 +13,7 @@ const UserProfileButton = ({
   photoUrl,
   size = "md",
   className,
+  color = "text-primary",
 }: UserProfileButtonProps) => {
   const sizes = {
     xs: "h-4 w-4",
@@ -40,7 +41,7 @@ const UserProfileButton = ({
           viewBox="0 0 24 24"
           strokeWidth={1}
           stroke="currentColor"
-          className={`${isActive ? "text-white" : "text-primary"} ${sizes[size]}`}
+          className={`${color} ${sizes[size]}`}
         >
           <path
             strokeLinecap="round"

@@ -16,7 +16,11 @@ export default function EmblaCarousel() {
   });
 
   if (!projectsQuery.data) {
-    return <div>loading...</div>;
+    return (
+      <div className="flex flex-row items-center justify-between">
+        <ProjectCard />
+      </div>
+    );
   }
 
   return (
