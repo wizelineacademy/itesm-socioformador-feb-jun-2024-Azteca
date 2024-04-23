@@ -31,7 +31,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.12.2'
+          node-version: "20.12.2"
 
       # TODO: we have to manually update the SST version, or set it with an ENV variable
       - name: Download and Install SST
@@ -39,7 +39,7 @@ jobs:
           curl -L -o sst-linux-x86_64.tar.gz https://github.com/sst/ion/releases/download/v0.0.298/sst-linux-x86_64.tar.gz
           tar -xzf sst-linux-x86_64.tar.gz
           sudo mv sst /usr/local/bin/sst
-        
+
       - name: Deploy app
         run: |
           npm ci && sst deploy --stage production
