@@ -11,9 +11,6 @@ export default $config({
   },
 
   async run() {
-    
-
-    new sst.aws.Nextjs("MyWeb6", {
-    });
+    new sst.aws.Nextjs("MyWeb6", {});
   },
 });

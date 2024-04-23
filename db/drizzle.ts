@@ -13,30 +13,30 @@ const awsProfile = process.env.AWS_PROFILE || "default";
 
 // Configuración del cliente RDSDataClient usando el perfil de AWS
 //const sql = new RDSDataClient({
-  //credentials: fromIni({ profile: awsProfile }),
-  //region: "us-east-1",
+//credentials: fromIni({ profile: awsProfile }),
+//region: "us-east-1",
 //});
 
 //console.log("SQL", sql);
 
 // Configuración de la conexión de Drizzle ORM
 //export const db = drizzle(sql, {
-  //database: Resource.FeedbackFlowdb8.database,
-  //secretArn: Resource.FeedbackFlowdb8.secretArn,
-  //resourceArn: Resource.FeedbackFlowdb8.clusterArn,
+//database: Resource.FeedbackFlowdb8.database,
+//secretArn: Resource.FeedbackFlowdb8.secretArn,
+//resourceArn: Resource.FeedbackFlowdb8.clusterArn,
 //});
 
 //console.log("DB", db);
 
 // Función principal para ejecutar migraciones
 //const main = async () => {
-  //try {
-    //await migrate(db, { migrationsFolder: "drizzlemigrations" });
-    //console.log("Migration complete");
-  //} catch (error) {
-   // console.log(error, "Error running migrations");
- // }
-  //process.exit(0);
+//try {
+//await migrate(db, { migrationsFolder: "drizzlemigrations" });
+//console.log("Migration complete");
+//} catch (error) {
+// console.log(error, "Error running migrations");
+// }
+//process.exit(0);
 //};
 
 // Ejecutar la función principal
