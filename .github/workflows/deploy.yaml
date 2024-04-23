@@ -89,12 +89,13 @@ jobs:
           sudo dpkg -i sst-linux-amd64.deb
           sst version
       - uses: oven-sh/setup-bun@v1
-      - name: Setup AWS Credentials
-        run: |
-          mkdir -p ~/.aws
-          echo "[default]" > ~/.aws/credentials
-          echo "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
-          echo "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::211125454464:role/GitHub
+          role-duration-seconds: 1200 #adjust as needed for your build time
+          aws-region: us-east-1
+
       - name: Deploy to AWS with SST
         run: |
           bun install
