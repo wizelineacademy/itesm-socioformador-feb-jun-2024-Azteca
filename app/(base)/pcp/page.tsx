@@ -3,106 +3,58 @@ import NavigationBar from "@/components/NavigationBar";
 import PipResource from "@/components/PipResource";
 import PipTask from "@/components/PipTask";
 import ProgressBar from "@/components/Progressbar";
-import { useState } from "react";
+import { getUserTasks, getUserResources, updateTask } from "@/services/tasks-and-resources";
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from "react";
 
 const PIP = () => {
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Ir con el psicólogo",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: false,
-    },
-    {
-      id: 2,
-      title: "Task 2",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: true,
-    },
-    {
-      id: 3,
-      title: "Task 3",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: true,
-    },
-    {
-      id: 4,
-      title: "Task 4",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: false,
-    },
-    {
-      id: 3,
-      title: "Task 3",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: true,
-    },
-    {
-      id: 4,
-      title: "Ir con el psicólogo",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: false,
-    },
-    {
-      id: 3,
-      title: "Task 3",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: true,
-    },
-    {
-      id: 4,
-      title: "Task 4",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: false,
-    },
-    {
-      id: 3,
-      title: "Ir con el psicólogo",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: true,
-    },
-    {
-      id: 4,
-      title: "Task 4",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: false,
-    },
-  ]);
-
-  const resources = [
-    {
-      id: 1,
-      title: "Hábitos Atómicos",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor...",
-      type: "video",
-      link: "https://www.youtube.com",
-    },
-    {
-      id: 2,
-      title: "Resource 2",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      type: "article",
-      link: "https://www.youtube.com",
-    },
-    {
-      id: 3,
-      title: "Resource 3",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      type: "book",
-      link: "https://www.youtube.com",
-    },
-  ];
-
-  const progressPercentage = Math.round(
-    (tasks.filter((task) => task.isDone).length / tasks.length) * 100,
-  );
+  
+  const [tasks, setTasks] = useState([]);
+  const tasksQuery =  
 
   const handleCheckTask = (index: number) => {
     const newTasks = [...tasks];
     newTasks[index].isDone = !newTasks[index].isDone;
     setTasks(newTasks);
   };
+
+  const [resources, setResources] = useState([]);
+
+  useEffect(() => {
+    // Define an async function within the useEffect
+    async function fetchTasks() {
+      try {
+        const data = await getUserTasks();
+        console.log(data);
+        setTasks(data); // Assuming getUserTasks() fetches your data correctly
+      } catch (error) {
+        console.error('Failed to fetch tasks:', error);
+      }
+    }
+
+    // Call the async function
+    fetchTasks();
+  }, []);
+
+  useEffect(() => {
+    // Define an async function within the useEffect
+    async function fetchResources() {
+      try {
+        const data = await getUserResources();
+        console.log(data);
+        setResources(data); // Assuming getUserTasks() fetches your data correctly
+      } catch (error) {
+        console.error('Failed to fetch tasks:', error);
+      }
+    }
+
+    // Call the async function
+    fetchResources();
+  }, []);
+
+  const progressPercentage = Math.round(
+    (tasks.filter((task) => task.isDone).length / tasks.length) * 100,
+  );
 
   return (
     <main>
