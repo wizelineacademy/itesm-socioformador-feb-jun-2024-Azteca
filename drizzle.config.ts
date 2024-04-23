@@ -1,9 +1,9 @@
 //import type { Config } from "drizzle-kit";
 
 //export default {
-  //schema: "./db/schema.ts",
-  //out: "./drizzlemigrations",
-  //driver: "pg",
+//schema: "./db/schema.ts",
+//out: "./drizzlemigrations",
+//driver: "pg",
 //} satisfies Config;
 import dotenv from "dotenv";
 import { type Config } from "drizzle-kit";
