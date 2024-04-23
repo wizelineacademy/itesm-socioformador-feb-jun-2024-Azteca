@@ -16,7 +16,7 @@ jobs:
   DeployApp:
     runs-on: ubuntu-latest
     env:
-      ENV_NAME: ${{ secrets.AUTH_SECRET }}
+      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
 
     steps:
       - name: Git clone the repository
