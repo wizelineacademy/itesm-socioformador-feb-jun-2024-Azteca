@@ -11,16 +11,9 @@ export default $config({
   },
 
   async run() {
-    const database = new sst.aws.Postgres("FeedbackFlowdb8", {
-      scaling: {
-        min: "2 ACU",
-        max: "128 ACU",
-      },
-      databaseName: "FeedbackFlowdb8",
-    });
+    
 
     new sst.aws.Nextjs("MyWeb6", {
-      link: [database],
     });
   },
 });
