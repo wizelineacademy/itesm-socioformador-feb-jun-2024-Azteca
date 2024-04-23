@@ -4,13 +4,13 @@
 export default $config({
   app(input) {
     return {
-      name: "myweb5-assets-2024-04-23",
+      name: "myweb5-assets-2024-04-24",
       removal: input?.stage === "production" ? "retain" : "remove",
       home: "aws",
     };
   },
 
   async run() {
-    new sst.aws.Nextjs("MyWeb6", {});
+    new sst.aws.Nextjs("MyWeb7", {});
   },
 });
