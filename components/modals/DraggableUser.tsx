@@ -3,10 +3,11 @@ import UserIcon from "../icons/UserIcon";
 import Draggable from "../Draggable";
 import Tooltip from "../Tooltip";
 import { useState } from "react";
-import { SurveyCoworker } from "@/constants";
+import { SurveyCoworker } from "@/types";
 
 const DraggableUser = ({ user }: { user: SurveyCoworker }) => {
   const [isDragging, setIsDragging] = useState(false);
+  //TODO: In case of providing a photoUrl, show the photo insted of the UserIcon:
   return (
     <Draggable id={user.userId} data={user} setIsDragging={setIsDragging}>
       {isDragging ? (
