@@ -43,7 +43,7 @@ jobs:
 
       - name: Npm ci
         run: |
-          npm ci && sst deploy --stage production
+          npm ci
 
       - name: sst deploy
         run: |
