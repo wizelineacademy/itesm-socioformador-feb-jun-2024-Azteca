@@ -43,5 +43,4 @@ jobs:
           run_install: true
 
       - name: Deploy app
-        run: |
-          pnpm run deploy
+        run: sst deploy --stage=production
