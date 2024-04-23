@@ -6,16 +6,21 @@ import {
   sprintSurvey,
   sprintSurveyAnswerCoworkers,
   sprintSurveyAnswerProject,
-  finalSurvey,
-  finalSurveyAnswer,
-  rulerSurvey,
-  rulerSurveyAnswers,
 } from "@/db/schema";
 import { eq, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { SprintSurveyAnswer, SurveyStepTwoAnswer } from "@/types";
+
+export async function createSprintSurvey(projectId: number) {
+  const res = await db
+    .insert(sprintSurvey)
+    .values({ projectId: projectId, createdAt: Date.now().toString() })
+    .returning({ id: sprintSurvey.id });
+
+  return res[0];
+}
 
 export async function submitSprintSurveyAnswers(
   surveyAnswer: SprintSurveyAnswer,
