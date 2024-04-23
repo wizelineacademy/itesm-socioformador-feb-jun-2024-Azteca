@@ -7,9 +7,10 @@ interface ProjectSurveyProps {
   onClose: () => void;
 }
 const ProjectSurvey = ({ showModal, onClose }: ProjectSurveyProps) => {
-  const handleClose = () => {};
-  const marks = ["Disagree", "Medium", "Agree"];
-  const label = "How likely are you to recommend this project to a friend?";
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    onClose();
+  };
+
   return (
     <Transition appear show={showModal} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -43,37 +44,41 @@ const ProjectSurvey = ({ showModal, onClose }: ProjectSurveyProps) => {
                 >
                   Project Survey
                 </Dialog.Title>
-                <section>
+                <form onSubmit={handleSubmit}>
                   <div className="mt-3 flex flex-row flex-wrap justify-around">
                     <Slider
+                      name="efforts"
                       label="Do you feel that your efforts were recognized?"
                       className=" pe-10"
                     />
                     <Slider
+                      name="support"
                       label="Did you feel supported in your personal growth?"
                       className=" ps-10"
                     />
                     <Slider
+                      name="decisions"
                       label="Were your ideas and creativity heard in decision-making?"
                       className="mt-8 pe-10"
                     />
                     <Slider
+                      name="opportunities"
                       label="Were the challenges addressed with opportuninites for growth?"
                       className="mt-8 ps-10"
                     />
                   </div>
                   <Slider
+                    name="respect"
                     label="Was there an atmosphere of respect and trust?"
                     className="mx-auto mt-8 flex-1 px-5"
                   />
-                </section>
-                <button
-                  type="button"
-                  className=" mx-auto mt-12 rounded-full bg-primary px-7 py-2 text-base font-medium text-white"
-                  onClick={onClose}
-                >
-                  Submit
-                </button>
+                  <button
+                    type="submit"
+                    className=" mx-auto mt-12 rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
+                  >
+                    Submit
+                  </button>
+                </form>
               </Dialog.Panel>
             </Transition.Child>
           </div>

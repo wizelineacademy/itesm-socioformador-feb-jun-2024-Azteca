@@ -9,14 +9,24 @@ export const authConfig = {
     // while this file is also used in non-Node.js environments
   ],
   callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
+    async authorized({ auth, request: { nextUrl } }) {
       // TODO: this logic conflicts with nextAuth callbackURL, it would be nice to fix it
       const isLoggedIn = !!auth?.user;
+
       if (isLoggedIn) {
         if (
           nextUrl.pathname.startsWith("/login") ||
           nextUrl.pathname.startsWith("/register")
         ) {
+          return Response.redirect(new URL("/profile", nextUrl));
+        } else if (nextUrl.pathname.startsWith("/admin")) {
+          const role = "ADMIN";
+          if (role == "ADMIN") {
+            return true;
+          } else {
+            return Response.redirect(new URL("/forbbiden", nextUrl));
+          }
+        } else if (nextUrl.pathname == "/") {
           return Response.redirect(new URL("/profile", nextUrl));
         } else {
           return true;

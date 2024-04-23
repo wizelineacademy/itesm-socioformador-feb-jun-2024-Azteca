@@ -1,8 +1,9 @@
 interface InterfaceUserIcon {
   color: string;
   size: string;
+  className?: string;
 }
-const UserIcon = ({ color, size }: InterfaceUserIcon) => {
+const UserIcon = ({ color, size, className }: InterfaceUserIcon) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -10,7 +11,7 @@ const UserIcon = ({ color, size }: InterfaceUserIcon) => {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className={`${size} ${color}`}
+      className={`${size} ${color} ${className}`}
     >
       <path
         strokeLinecap="round"

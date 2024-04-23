@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import "@mantine/core/styles.css";
-import "@mantine/dates/styles.css";
-import "@mantine/charts/styles.css";
-import { ColorSchemeScript, MantineProvider } from "@mantine/core";
-import NavigationBar from "@/components/NavigationBar";
 import ReactQueryProvider from "@/utils/ReactQueryProvider";
 
 const poppins = Poppins({
@@ -27,17 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={
-          poppins.className +
-          " h-dvh w-dvw overflow-hidden bg-bone px-7 pb-4 pt-10"
-        }
+        className={poppins.className + " h-dvh w-dvw overflow-hidden bg-bone"}
       >
-        <ReactQueryProvider>
-          <MantineProvider>
-            <NavigationBar />
-            {children}
-          </MantineProvider>
-        </ReactQueryProvider>
+        <ReactQueryProvider>{children}</ReactQueryProvider>
       </body>
     </html>
   );

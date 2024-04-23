@@ -1,0 +1,46 @@
+name: SST workflow
+on:
+  push:
+    branches:
+      - dev # matches every branch
+
+# Concurrency group name ensures concurrent workflow runs wait for any in-progress job to finish
+concurrency:
+  group: merge-${{ github.ref }}
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+
+jobs:
+  DeployApp:
+    runs-on: ubuntu-latest
+    env:
+      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::211125454464:role/GitHub
+          role-duration-seconds: 1200 #adjust as needed for your build time
+          aws-region: us-east-1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.12.2"
+
+      # TODO: we have to manually update the SST version, or set it with an ENV variable
+      # peg the version
+      - name: Install SST
+        run: |
+          wget https://github.com/sst/ion/releases/download/v0.0.298/sst-linux-amd64.deb
+          sudo dpkg -i sst-linux-amd64.deb
+          sst version
+        
+      - name: Deploy app
+        run: |
+          npm ci && sst deploy --stage production

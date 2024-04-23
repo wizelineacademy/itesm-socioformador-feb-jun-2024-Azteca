@@ -1,13 +1,17 @@
 import { signIn } from "@/auth";
-import { registerUser } from "../services/register-page";
+import { registerUser } from "@/services/user";
+import { AuthError } from "next-auth";
+import Link from "next/link";
 
 const Login = () => {
   const registerAction = async (formData: FormData) => {
     "use server";
     const name = formData.get("name")?.toString();
+    const jobTitle = formData.get("jobTitle")?.toString();
+    const department = formData.get("department")?.toString();
     const email = formData.get("email")?.toString();
     const password = formData.get("password")?.toString();
-    registerUser(name, email, password);
+    registerUser(name, email, password, department, jobTitle);
   };
 
   return (
@@ -27,7 +31,25 @@ const Login = () => {
             name="name"
             placeholder="Juan Perez"
           />
-          <label className="self-start text-xl text-black">Email</label>
+          <label className="mt-5 self-start text-xl text-black">
+            Job Title
+          </label>
+          <input
+            className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-bone px-2 text-black"
+            type="text"
+            name="jobTitle"
+            placeholder="Backend Developer"
+          />
+          <label className="mt-5 self-start text-xl text-black">
+            Department
+          </label>
+          <input
+            className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-bone px-2 text-black"
+            type="text"
+            name="department"
+            placeholder="IT/Software"
+          />
+          <label className="mt-5 self-start text-xl text-black">Email</label>
           <input
             className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-bone px-2 text-black"
             type="email"
@@ -41,7 +63,6 @@ const Login = () => {
             name="password"
             placeholder="********"
           />
-          {/* Find a darker color for hover */}
           <button
             className="mx-auto my-8 h-12 w-28 rounded-3xl bg-primary text-bone shadow-2xl hover:bg-primary-dark"
             type="submit"
