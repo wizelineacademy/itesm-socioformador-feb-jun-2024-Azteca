@@ -2,7 +2,7 @@ name: SST workflow
 on:
   push:
     branches:
-      - dev # matches every branch
+      - ion-sst-gh-workflow-pedro # matches every branch
 
 # Concurrency group name ensures concurrent workflow runs wait for any in-progress job to finish
 concurrency:
@@ -37,7 +37,7 @@ jobs:
       # peg the version
       - name: Install SST
         run: |
-          wget https://github.com/sst/ion/releases/download/v0.0.298/sst-linux-amd64.deb
+          wget https://github.com/sst/ion/releases/download/v0.0.193/sst-linux-amd64.deb
           sudo dpkg -i sst-linux-amd64.deb
           sst version
         
