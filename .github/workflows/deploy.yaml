@@ -13,7 +13,8 @@ on:
       - dev
       - main
       - WorkflowCI/CDsemanticversioning
-
+env:
+  AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
