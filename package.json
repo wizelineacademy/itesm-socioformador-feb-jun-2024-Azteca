@@ -6,8 +6,6 @@
     "build": "next build",
     "db:push": "drizzle-kit push:pg",
     "db:studio": "drizzle-kit studio",
-    "deploy": "sst deploy --stage production",
-    "deployStaging": "sst deploy --stage staging",
     "dev": "next dev",
     "generate": "drizzle-kit generate:pg --config=drizzle.config.ts",
     "lint": "next lint",
@@ -35,7 +33,7 @@
     "drizzle-orm": "^0.30.9",
     "embla-carousel-autoplay": "^8.0.1",
     "embla-carousel-react": "^8.0.2",
-    "next": "^14.2.2",
+    "next": "14.1.4",
     "next-auth": "^5.0.0-beta.16",
     "pg": "^8.11.5",
     "react": "^18",
@@ -57,6 +55,8 @@
     "@types/react-beautiful-dnd": "^13.1.8",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
+    "aws-cdk-lib": "2.132.1",
+    "constructs": "10.3.0",
     "drizzle-kit": "^0.20.17",
     "eslint": "^8",
     "eslint-config-next": "14.1.4",
@@ -69,8 +69,5 @@
     "prettier-plugin-tailwindcss": "^0.5.13",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
-  },
-  "resolutions": {
-    "string-width": "4.2.3"
   }
 }
