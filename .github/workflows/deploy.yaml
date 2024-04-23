@@ -38,4 +38,4 @@ jobs:
 
       - name: Deploy app
         run: |
-          npm ci && npm run deploy
+          npm i && npm run deploy
