@@ -3,12 +3,12 @@
 export default $config({
   app(input) {
     return {
-      name: "FeedbackFlow",
+      name: "FeedbackFlowJose",
       removal: input?.stage === "production" ? "retain" : "remove",
       home: "aws",
     };
   },
   async run() {
-    new sst.aws.Nextjs("Nextjs");
+    new sst.aws.Nextjs("NextjsJose");
   },
 });
