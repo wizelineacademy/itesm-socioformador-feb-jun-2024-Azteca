@@ -1,5 +1,5 @@
 "use server";
-import { pipTask, pipResource } from "@/db/schema";
+import { pipTask, pipResource, userResource } from "@/db/schema";
 import db from "@/db/drizzle";
 import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
@@ -22,9 +22,17 @@ export async function getUserResources() {
   if (!userId) throw new Error("You must be signed in");
 
   const res = await db
-    .select()
-    .from(pipResource)
-    .where(eq(pipResource.userId, userId));
+    .select({
+      id: pipResource.id,
+      userId: userResource.userId,
+      title: pipResource.title,
+      description: pipResource.description,
+      kind: pipResource.kind
+    })
+    .from(userResource)
+    .innerJoin(pipResource, eq(userResource.resourceId, pipResource.id))
+    .where(eq(userResource.userId, userId));
+    
   return res;
 }
 
