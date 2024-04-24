@@ -94,7 +94,6 @@ const PIP = () => {
               description={task.description}
               key={index}
               type={task.kind}
-              link={task.title}
             />
           ))}
         </div>

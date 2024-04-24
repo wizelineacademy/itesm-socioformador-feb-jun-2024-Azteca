@@ -7,14 +7,12 @@ interface InterfacePipResource {
   title: string | null;
   description: string | null;
   type: string | null;
-  link: string;
 }
 
 const PipResource = ({
   title,
   description,
   type,
-  link,
 }: InterfacePipResource) => {
   const renderIcon = () => {
     switch (type) {
@@ -52,7 +50,7 @@ const PipResource = ({
         {description}
       </p>
       <button className="mx-auto w-fit rounded-full bg-primary px-7 py-1 text-xs font-medium text-white">
-        <Link href={link}>{renderButtonLabel()}</Link>
+        <Link href="/">{renderButtonLabel()}</Link>
       </button>
     </div>
   );
