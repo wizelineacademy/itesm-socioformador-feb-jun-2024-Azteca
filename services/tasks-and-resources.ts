@@ -9,10 +9,7 @@ export async function getUserTasks() {
   const userId = session?.user?.id;
   if (!userId) throw new Error("You must be signed in");
 
-  const res = await db
-    .select()
-    .from(pipTask)
-    .where(eq(pipTask.userId, userId));
+  const res = await db.select().from(pipTask).where(eq(pipTask.userId, userId));
   return res;
 }
 
