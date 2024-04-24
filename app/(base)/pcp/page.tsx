@@ -3,18 +3,21 @@ import NavigationBar from "@/components/NavigationBar";
 import PipResource from "@/components/PipResource";
 import PipTask from "@/components/PipTask";
 import ProgressBar from "@/components/Progressbar";
-import { getUserTasks, getUserResources, updateTask } from "@/services/tasks-and-resources";
+import {
+  getUserTasks,
+  getUserResources,
+  updateTask,
+} from "@/services/tasks-and-resources";
 // import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from "react";
 
 const PIP = () => {
-
   interface Task {
     id: number;
     userId: string | null;
     title: string | null;
     description: string | null;
-    isDone: boolean | null; 
+    isDone: boolean | null;
   }
 
   interface Resource {
@@ -24,7 +27,7 @@ const PIP = () => {
     description: string | null;
     kind: string | null;
   }
-  
+
   const [tasks, setTasks] = useState<Task[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
 
@@ -41,7 +44,7 @@ const PIP = () => {
         const data = await getUserTasks();
         setTasks(data);
       } catch (error) {
-        console.error('Failed to fetch tasks:', error);
+        console.error("Failed to fetch tasks:", error);
       }
     }
 
@@ -54,7 +57,7 @@ const PIP = () => {
         const data = await getUserResources();
         setResources(data);
       } catch (error) {
-        console.error('Failed to fetch tasks:', error);
+        console.error("Failed to fetch tasks:", error);
       }
     }
 

@@ -9,11 +9,7 @@ interface InterfacePipResource {
   type: string | null;
 }
 
-const PipResource = ({
-  title,
-  description,
-  type,
-}: InterfacePipResource) => {
+const PipResource = ({ title, description, type }: InterfacePipResource) => {
   const renderIcon = () => {
     switch (type) {
       case "video":
