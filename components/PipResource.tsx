@@ -4,9 +4,9 @@ import BookIcon from "./icons/BookIcon";
 import VideoIcon from "./icons/VideoIcon";
 
 interface InterfacePipResource {
-  title: string;
-  description: string;
-  type: string;
+  title: string | null;
+  description: string | null;
+  type: string | null;
   link: string;
 }
 

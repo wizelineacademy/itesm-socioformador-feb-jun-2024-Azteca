@@ -32,6 +32,7 @@ const PIP = () => {
     const newTasks = [...tasks];
     newTasks[index].isDone = !newTasks[index].isDone;
     setTasks(newTasks);
+    updateTask(newTasks[index].id, newTasks[index].isDone);
   };
 
   useEffect(() => {
