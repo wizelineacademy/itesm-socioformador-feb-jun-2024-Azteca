@@ -49,6 +49,12 @@ jobs:
         run: |
           sst unlock --stage production
 
+      - name: sst install
+        env:
+          NO_BUN: true
+        run: |
+          sst install
+
       - name: sst deploy
         env:
           NO_BUN: true
