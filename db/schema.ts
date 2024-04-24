@@ -174,7 +174,7 @@ export const sprintSurveyAnswerCoworkers = pgTable(
       () => sprintSurvey.id,
     ),
     userId: uuid("user_id").references(() => user.id),
-    coworkerId: integer("coworker_id"),
+    coworkerId: uuid("coworker_id").references(() => user.id),
     questionName: varchar("question_name", { length: 8 }),
     answer: integer("answer"),
   },
