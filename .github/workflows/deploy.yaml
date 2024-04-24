@@ -50,5 +50,7 @@ jobs:
           sst unlock --stage production
 
       - name: sst deploy
+        env:
+          NO_BUN: true
         run: |
-          NO_BUN=true sst deploy --stage production
+          sst deploy --stage production
