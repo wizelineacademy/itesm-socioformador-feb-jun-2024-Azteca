@@ -3,52 +3,64 @@ import NavigationBar from "@/components/NavigationBar";
 import PipResource from "@/components/PipResource";
 import PipTask from "@/components/PipTask";
 import ProgressBar from "@/components/Progressbar";
-import { getUserTasks, getUserResources, updateTask } from "@/services/tasks-and-resources";
-import { useMutation, useQuery } from '@tanstack/react-query';
+import {
+  getUserTasks,
+  getUserResources,
+  updateTask,
+} from "@/services/tasks-and-resources";
+// import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from "react";
 
 const PIP = () => {
-  
-  const [tasks, setTasks] = useState([]);
-  const tasksQuery =  
+  interface Task {
+    id: number;
+    userId: string | null;
+    title: string | null;
+    description: string | null;
+    isDone: boolean | null;
+  }
+
+  interface Resource {
+    id: number;
+    userId: string | null;
+    title: string | null;
+    description: string | null;
+    kind: string | null;
+  }
+
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [resources, setResources] = useState<Resource[]>([]);
 
   const handleCheckTask = (index: number) => {
     const newTasks = [...tasks];
     newTasks[index].isDone = !newTasks[index].isDone;
     setTasks(newTasks);
+    updateTask(newTasks[index].id, newTasks[index].isDone);
   };
 
-  const [resources, setResources] = useState([]);
-
   useEffect(() => {
-    // Define an async function within the useEffect
     async function fetchTasks() {
       try {
         const data = await getUserTasks();
-        console.log(data);
-        setTasks(data); // Assuming getUserTasks() fetches your data correctly
+        setTasks(data);
       } catch (error) {
-        console.error('Failed to fetch tasks:', error);
+        console.error("Failed to fetch tasks:", error);
       }
     }
 
-    // Call the async function
     fetchTasks();
   }, []);
 
   useEffect(() => {
-    // Define an async function within the useEffect
     async function fetchResources() {
       try {
         const data = await getUserResources();
-        console.log(data);
-        setResources(data); // Assuming getUserTasks() fetches your data correctly
+        setResources(data);
       } catch (error) {
-        console.error('Failed to fetch tasks:', error);
+        console.error("Failed to fetch tasks:", error);
       }
     }
 
-    // Call the async function
     fetchResources();
   }, []);
 
@@ -84,8 +96,7 @@ const PIP = () => {
               title={task.title}
               description={task.description}
               key={index}
-              type={task.type}
-              link={task.title}
+              type={task.kind}
             />
           ))}
         </div>

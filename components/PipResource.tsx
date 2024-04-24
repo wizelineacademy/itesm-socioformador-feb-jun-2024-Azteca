@@ -4,18 +4,12 @@ import BookIcon from "./icons/BookIcon";
 import VideoIcon from "./icons/VideoIcon";
 
 interface InterfacePipResource {
-  title: string;
-  description: string;
-  type: string;
-  link: string;
+  title: string | null;
+  description: string | null;
+  type: string | null;
 }
 
-const PipResource = ({
-  title,
-  description,
-  type,
-  link,
-}: InterfacePipResource) => {
+const PipResource = ({ title, description, type }: InterfacePipResource) => {
   const renderIcon = () => {
     switch (type) {
       case "video":
@@ -52,7 +46,7 @@ const PipResource = ({
         {description}
       </p>
       <button className="mx-auto w-fit rounded-full bg-primary px-7 py-1 text-xs font-medium text-white">
-        <Link href={link}>{renderButtonLabel()}</Link>
+        <Link href="/">{renderButtonLabel()}</Link>
       </button>
     </div>
   );
