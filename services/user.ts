@@ -52,8 +52,8 @@ export const registerUser = async (
   jobTitle: string | undefined,
 ) => {
   try {
-    if (!name || !email || !password) {
-      throw new Error("Empty email or empty password");
+    if (!name || !email || !password || !department || !jobTitle) {
+      throw new Error("Empty fields");
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     await db.insert(user).values({
