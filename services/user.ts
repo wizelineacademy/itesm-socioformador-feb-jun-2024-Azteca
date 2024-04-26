@@ -14,10 +14,7 @@ import { alias } from "drizzle-orm/pg-core";
 import { auth } from "@/auth";
 import bcrypt from "bcrypt";
 
-export async function getInfoById() {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) throw new Error("You must be signed in");
+export async function getUserInfoById(id: string) {
   const res = await db
     .select({
       id: schema.user.id,
@@ -29,11 +26,19 @@ export async function getInfoById() {
       role: schema.user.role,
     })
     .from(schema.user)
-    .where(eq(schema.user.id, userId));
+    .where(eq(schema.user.id, id));
+
+  if (res.length === 0) {
+    throw new Error("User could not be found");
+  }
   return res[0];
 }
 
-// TODO: this function is duplicated in the middleware
+export async function getUserByEmail(email: string) {
+  const users = await db.select().from(user).where(eq(user.email, email));
+  return users[0];
+}
+
 export const getUserRole = async () => {
   const session = await auth();
   const userId = session?.user?.id;
@@ -91,12 +96,7 @@ export const updateRole = async ({
   await db.update(user).set({ role: newRole }).where(eq(user.id, id)).execute();
 };
 
-export async function getTraits() {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    throw new Error("You most be signed in");
-  }
+export async function getUserTraitsById(id: string) {
   const res = await db
     .select({
       id: schema.trait.id,
@@ -107,7 +107,7 @@ export async function getTraits() {
     .from(schema.trait)
     .innerJoin(schema.userTrait, eq(schema.userTrait.traitId, schema.trait.id))
     .innerJoin(schema.user, eq(schema.userTrait.userId, schema.user.id))
-    .where(eq(schema.user.id, userId));
+    .where(eq(schema.user.id, id));
 
   let strengths_arr = [];
   let areasOfOportunity_arr = [];
