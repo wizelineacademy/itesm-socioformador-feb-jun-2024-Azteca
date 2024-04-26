@@ -22,20 +22,6 @@ const NavigationBar = () => {
   const pathname = usePathname();
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showSprintModal, setShowSprintModal] = useState(false);
-  const validRoutes = [
-    "/pcp",
-    "/dashboard",
-    "/profile",
-    "/projects",
-    "/",
-    "/projects/create",
-    "/projects/1",
-    "/admin",
-  ];
-
-  if (!validRoutes.includes(pathname)) {
-    return null;
-  }
 
   const isManager = true;
   return (
