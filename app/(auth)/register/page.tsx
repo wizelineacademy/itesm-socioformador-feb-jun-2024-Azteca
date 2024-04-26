@@ -12,7 +12,20 @@ const Login = () => {
     const department = formData.get("department")?.toString();
     const email = formData.get("email")?.toString();
     const password = formData.get("password")?.toString();
-    registerUser(name, email, password, department, jobTitle);
+    await registerUser(name, email, password, department, jobTitle);
+    try {
+      await signIn("credentials", formData);
+    } catch (error) {
+      if (error instanceof AuthError) {
+        switch (error.type) {
+          case "CredentialsSignin":
+            return "Invalid credentials.";
+          default:
+            return "Something went wrong.";
+        }
+      }
+      throw error;
+    }
   };
 
   return (

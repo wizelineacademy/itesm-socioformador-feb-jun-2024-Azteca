@@ -3,106 +3,70 @@ import NavigationBar from "@/components/NavigationBar";
 import PipResource from "@/components/PipResource";
 import PipTask from "@/components/PipTask";
 import ProgressBar from "@/components/Progressbar";
-import { useState } from "react";
+import {
+  getUserTasks,
+  getUserResources,
+  updateTask,
+} from "@/services/tasks-and-resources";
+// import { useMutation, useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from "react";
 
 const PIP = () => {
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Ir con el psicólogo",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: false,
-    },
-    {
-      id: 2,
-      title: "Task 2",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: true,
-    },
-    {
-      id: 3,
-      title: "Task 3",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: true,
-    },
-    {
-      id: 4,
-      title: "Task 4",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: false,
-    },
-    {
-      id: 3,
-      title: "Task 3",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: true,
-    },
-    {
-      id: 4,
-      title: "Ir con el psicólogo",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: false,
-    },
-    {
-      id: 3,
-      title: "Task 3",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: true,
-    },
-    {
-      id: 4,
-      title: "Task 4",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: false,
-    },
-    {
-      id: 3,
-      title: "Ir con el psicólogo",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: true,
-    },
-    {
-      id: 4,
-      title: "Task 4",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      isDone: false,
-    },
-  ]);
+  interface Task {
+    id: number;
+    userId: string | null;
+    title: string | null;
+    description: string | null;
+    isDone: boolean | null;
+  }
 
-  const resources = [
-    {
-      id: 1,
-      title: "Hábitos Atómicos",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor...",
-      type: "video",
-      link: "https://www.youtube.com",
-    },
-    {
-      id: 2,
-      title: "Resource 2",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      type: "article",
-      link: "https://www.youtube.com",
-    },
-    {
-      id: 3,
-      title: "Resource 3",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      type: "book",
-      link: "https://www.youtube.com",
-    },
-  ];
+  interface Resource {
+    id: number;
+    userId: string | null;
+    title: string | null;
+    description: string | null;
+    kind: string | null;
+  }
 
-  const progressPercentage = Math.round(
-    (tasks.filter((task) => task.isDone).length / tasks.length) * 100,
-  );
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [resources, setResources] = useState<Resource[]>([]);
 
   const handleCheckTask = (index: number) => {
     const newTasks = [...tasks];
     newTasks[index].isDone = !newTasks[index].isDone;
     setTasks(newTasks);
+    updateTask(newTasks[index].id, newTasks[index].isDone);
   };
+
+  useEffect(() => {
+    async function fetchTasks() {
+      try {
+        const data = await getUserTasks();
+        setTasks(data);
+      } catch (error) {
+        console.error("Failed to fetch tasks:", error);
+      }
+    }
+
+    fetchTasks();
+  }, []);
+
+  useEffect(() => {
+    async function fetchResources() {
+      try {
+        const data = await getUserResources();
+        setResources(data);
+      } catch (error) {
+        console.error("Failed to fetch tasks:", error);
+      }
+    }
+
+    fetchResources();
+  }, []);
+
+  const progressPercentage = Math.round(
+    (tasks.filter((task) => task.isDone).length / tasks.length) * 100,
+  );
 
   return (
     <main>
@@ -132,8 +96,7 @@ const PIP = () => {
               title={task.title}
               description={task.description}
               key={index}
-              type={task.type}
-              link={task.title}
+              type={task.kind}
             />
           ))}
         </div>

@@ -1,7 +1,7 @@
 interface InterfacePipTask {
-  title: string;
-  description: string;
-  isDone: boolean;
+  title: string | null;
+  description: string | null;
+  isDone: boolean | null;
   handleCheck: () => void;
 }
 
@@ -21,7 +21,7 @@ const PipTask = ({
               type="checkbox"
               onChange={handleCheck}
               className="h-6 w-6 transform cursor-pointer appearance-none rounded-full border border-primary border-primary/80 bg-primary-light/20 outline-primary transition-all duration-200 ease-in-out checked:bg-primary hover:scale-110"
-              checked={isDone}
+              checked={isDone || false} // default to false if isDone is null
             />
           </label>
         </div>
