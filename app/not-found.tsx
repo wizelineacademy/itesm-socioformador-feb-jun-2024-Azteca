@@ -25,7 +25,7 @@ export default function NotFound() {
         >
           Regresar a dashboard
         </Link>
-      </section>  
+      </section>
     </main>
   );
 }
