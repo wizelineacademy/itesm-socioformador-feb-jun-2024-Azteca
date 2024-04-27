@@ -55,7 +55,7 @@ const Notifications = ({
     onNotificationClick(type);
     const newNotifications = [...notifications];
     newNotifications.splice(index, 1);
-    // setNotifications(newNotifications);
+    //setNotifications(newNotifications);
     setIsActive(false);
   };
 
