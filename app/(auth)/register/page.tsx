@@ -55,7 +55,7 @@ const Login = () => {
           <p className="text-black">Already have an account? </p>
           <Link
             href="/login"
-            className="ms-1 text-primary hover:text-primary-dark"
+            className="ms-1 cursor-pointer text-primary hover:text-primary-dark hover:underline focus:text-primary-dark focus:underline"
           >
             Log in
           </Link>

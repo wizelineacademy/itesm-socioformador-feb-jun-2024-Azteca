@@ -1,10 +1,12 @@
 "use client";
 
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState } from "react";
 import SprintStepOne from "./SprintStepOne";
 import SprintStepTwo from "./SprintStepTwo";
 import { Coworker, SprintSurveyAnswer, SurveyStepTwoAnswer } from "@/types";
+import SprintStepThree from "./SprintStepThree";
+import SprintStepFour from "./SprintStepFour";
 
 interface SprintSurveyProps {
   showModal: boolean;
@@ -66,6 +68,7 @@ const SprintSurvey = ({ showModal, onClose }: SprintSurveyProps) => {
       },
     ],
     coworkersAnswers: [],
+    coworkersComments: {},
   });
 
   const [sprintSurveyStepTwoAnswer, setSprintSurveyStepTwoAnswer] =
@@ -133,6 +136,11 @@ const SprintSurvey = ({ showModal, onClose }: SprintSurveyProps) => {
     //onClose();
   };
 
+  const modalWidth =
+    step === 3
+      ? "max-w-xl h-30 transition-all duration-500"
+      : "max-w-5xl transition-all";
+
   return (
     <Transition appear show={showModal} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -159,7 +167,9 @@ const SprintSurvey = ({ showModal, onClose }: SprintSurveyProps) => {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Dialog.Panel className="flex w-full max-w-5xl transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel
+                className={`flex h-auto w-full transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl ${modalWidth}`}
+              >
                 <Dialog.Title
                   as="h3"
                   className="text-2xl font-semibold text-black"
@@ -177,6 +187,14 @@ const SprintSurvey = ({ showModal, onClose }: SprintSurveyProps) => {
                     users={users}
                     sprintSurveyStepTwoAnswer={sprintSurveyStepTwoAnswer}
                     setSprintSurveyStepTwoAnswer={setSprintSurveyStepTwoAnswer}
+                  />
+                )}
+                {step === 3 && <SprintStepThree />}
+                {step === 4 && (
+                  <SprintStepFour
+                    users={users}
+                    sprintSurveyAnswer={sprintAnswer}
+                    setSprintSurveyAnswer={setSprintAnswer}
                   />
                 )}
 
@@ -203,11 +221,38 @@ const SprintSurvey = ({ showModal, onClose }: SprintSurveyProps) => {
                       <button
                         type="button"
                         className=" mx-auto  rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
-                        onClick={handleSubmit}
+                        onClick={() => handleNavigation(3)}
                       >
                         Submit
                       </button>
                     </>
+                  )}
+                  {step === 3 && (
+                    <>
+                      <button
+                        type="button"
+                        className=" mx-auto rounded-full bg-primary px-10 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
+                        onClick={handleSubmit}
+                      >
+                        No
+                      </button>
+                      <button
+                        type="button"
+                        className=" mx-auto  rounded-full bg-primary px-10 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
+                        onClick={() => handleNavigation(4)}
+                      >
+                        Yes
+                      </button>
+                    </>
+                  )}
+                  {step === 4 && (
+                    <button
+                      type="button"
+                      className=" mx-auto rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
+                      onClick={handleSubmit}
+                    >
+                      Send feedback
+                    </button>
                   )}
                 </footer>
               </Dialog.Panel>

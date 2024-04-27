@@ -19,8 +19,8 @@ const DraggableUser = ({ user }: { user: SurveyCoworker }) => {
       ) : (
         <Tooltip message={user.name}>
           {user.times > 1 && (
-            <span className=" relative left-3 top-3 flex h-3 w-3 items-center justify-center rounded-full bg-primary-light p-2 font-medium text-white ">
-              {user.times}
+            <span className="relative left-3 top-3 flex h-3 w-3 items-center justify-center rounded-full bg-primary-light p-2 text-[0.6rem] font-medium text-white ">
+              x{user.times}
             </span>
           )}
           <UserIcon size="w-10 h-10" color={user.color || "text-primary"} />

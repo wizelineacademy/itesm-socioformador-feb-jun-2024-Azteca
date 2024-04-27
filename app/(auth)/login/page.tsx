@@ -48,6 +48,10 @@ const Login = () => {
           >
             <FormTextInput name="email" type="email" label="Email" />
             <FormTextInput name="password" type="password" label="Password" />
+            <label
+              id="error"
+              className="text-sm font-medium text-red-600"
+            ></label>
             <button
               className="mx-auto mb-4 mt-12 h-10 w-28 rounded-2xl bg-primary font-medium text-bone shadow-2xl hover:bg-primary-dark"
               type="submit"
@@ -55,7 +59,7 @@ const Login = () => {
               Log in
             </button>
           </form>
-          <button className="text-dark border-primary-dark text-sm hover:border-b hover:text-primary-dark focus:border-b focus:text-primary-dark">
+          <button className="text-dark border-primary-dark text-sm hover:text-primary-dark hover:underline focus:text-primary-dark focus:underline">
             Forgot your password?
           </button>
         </div>
@@ -63,7 +67,7 @@ const Login = () => {
           <p className="text-black">Don&apos;t have an account? </p>
           <Link
             href="/register"
-            className="ms-1 text-primary hover:text-primary-dark"
+            className="ms-1 cursor-pointer text-primary hover:text-primary-dark hover:underline focus:text-primary-dark focus:underline"
           >
             Sign up
           </Link>

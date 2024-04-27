@@ -17,6 +17,7 @@ export type SprintSurveyAnswer = {
     questionKey: keyof SurveyStepTwoAnswer;
     answers: Array<{ coworkerId: string; answer: number }>;
   }>;
+  coworkersComments: { [key: string]: string };
 };
 
 export type SurveyStepTwoAnswer = {
