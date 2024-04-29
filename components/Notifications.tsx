@@ -92,7 +92,11 @@ const Notifications = ({
                   <p className="text-md font-bold text-black">Notifications</p>
                   <p className="">({notifications.length})</p>
                 </div>
-                <CloseIcon size="h-6 w-6" closeFunction={close} />
+                <CloseIcon
+                  size="h-6 w-6"
+                  closeFunction={close}
+                  color="text-black hover:text-red-600"
+                />
               </div>
             )}
           </Menu.Item>

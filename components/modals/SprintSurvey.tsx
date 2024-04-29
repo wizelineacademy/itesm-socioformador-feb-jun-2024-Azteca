@@ -139,7 +139,7 @@ const SprintSurvey = ({ showModal, onClose }: SprintSurveyProps) => {
   const modalWidth =
     step === 3
       ? "max-w-xl h-30 transition-all duration-500"
-      : "max-w-5xl transition-all";
+      : "max-w-5xl transition-all duration-500";
 
   return (
     <Transition appear show={showModal} as={Fragment}>
