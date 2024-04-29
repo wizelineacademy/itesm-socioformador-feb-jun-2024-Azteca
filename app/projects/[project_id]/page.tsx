@@ -2,7 +2,7 @@
 
 import React from "react";
 import { RadarChart, AreaChart } from "@mantine/charts";
-import GaugeChart from "../../../components/GaugeChart";
+import GaugeChart from "@/components/GaugeChart";
 
 // const Project = ({ params: { project_id } }) => {
 const Project = () => {
@@ -55,7 +55,6 @@ const Project = () => {
       growthOportunities: 78,
     },
   ];
-
   const gaugeData = [
     {
       title: "Resources Satisfaction",

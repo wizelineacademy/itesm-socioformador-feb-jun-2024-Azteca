@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 let gradientIdCounter = 0; // Contador estático fuera del componente
 
@@ -10,7 +10,6 @@ interface GradientColor {
 interface GaugeChartProps {
   percentage: number;
   type: string;
-  // type: "half" | "full";
   gradient: GradientColor;
 }
 
