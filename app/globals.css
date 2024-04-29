@@ -69,3 +69,16 @@
 .m_396ce5cb:where([data-selected]) {
   background-color: var(--primary) !important;
 }
+
+.dissolve {
+  animation: dissolve 300ms ease-in-out forwards;
+}
+
+@keyframes dissolve {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

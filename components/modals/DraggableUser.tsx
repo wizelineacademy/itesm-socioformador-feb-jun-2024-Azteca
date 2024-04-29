@@ -19,7 +19,7 @@ const DraggableUser = ({ user }: { user: SurveyCoworker }) => {
       ) : (
         <Tooltip message={user.name}>
           {user.times > 1 && (
-            <span className="relative left-3 top-3 flex h-3 w-3 items-center justify-center rounded-full bg-primary-light p-2 text-[0.6rem] font-medium text-white ">
+            <span className="relative left-3 top-3 flex h-3 w-3 cursor-move items-center justify-center rounded-full bg-primary-light p-2 text-[0.6rem] font-medium text-white ">
               x{user.times}
             </span>
           )}
