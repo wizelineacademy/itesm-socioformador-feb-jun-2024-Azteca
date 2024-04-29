@@ -1,13 +1,4 @@
 import type { NextAuthConfig } from "next-auth";
-import db from "./db/drizzle";
-import { user } from "./db/schema";
-import { eq } from "drizzle-orm";
-
-const getUserRole = async (id: string) => {
-  const users = await db.select().from(user).where(eq(user.id, id));
-  const { role } = await users[0];
-  return role;
-};
 
 export const authConfig = {
   pages: {
@@ -27,16 +18,23 @@ export const authConfig = {
           nextUrl.pathname.startsWith("/login") ||
           nextUrl.pathname.startsWith("/register")
         ) {
-          return Response.redirect(new URL("/profile", nextUrl));
+          return Response.redirect(
+            new URL(`/profile/${auth.user?.id}`, nextUrl),
+          );
         } else if (nextUrl.pathname.startsWith("/admin")) {
-          const role = await getUserRole(auth.user!.id!);
+          // TODO: fix fetch node-gyp error from middleware
+          const res = await fetch("/api/get-role");
+          const { role } = await res.json();
+
           if (role == "ADMIN") {
             return true;
           } else {
             return Response.redirect(new URL("/forbbiden", nextUrl));
           }
-        } else if (nextUrl.pathname == "/") {
-          return Response.redirect(new URL("/profile", nextUrl));
+        } else if (nextUrl.pathname === "/profile" || nextUrl.pathname == "/") {
+          return Response.redirect(
+            new URL(`/profile/${auth.user?.id}`, nextUrl),
+          );
         } else {
           return true;
         }

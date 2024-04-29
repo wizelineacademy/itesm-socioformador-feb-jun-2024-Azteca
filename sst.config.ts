@@ -3,12 +3,12 @@
 export default $config({
   app(input) {
     return {
-      name: "itesm-socioformador-feb-jun-2024-azteca",
+      name: "FeedbackFlow",
       removal: input?.stage === "production" ? "retain" : "remove",
       home: "aws",
     };
   },
   async run() {
-    new sst.aws.Nextjs("MyWeb");
+    new sst.aws.Nextjs("Nextjs");
   },
 });

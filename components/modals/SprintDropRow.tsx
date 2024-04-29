@@ -1,4 +1,4 @@
-import { Coworker } from "@/constants";
+import { Coworker } from "@/types";
 import Droppable from "../Droppable";
 import UserIcon from "../icons/UserIcon";
 import Tooltip from "../Tooltip";

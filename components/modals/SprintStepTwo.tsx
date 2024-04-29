@@ -1,18 +1,24 @@
 "use client";
 import SprintDropRow from "./SprintDropRow";
 import { useState, useEffect } from "react";
-import { Coworker, SurveyCoworker } from "@/constants";
+import { Coworker, SurveyCoworker } from "@/types";
 import { DndContext, DragEndEvent, pointerWithin } from "@dnd-kit/core";
 import SelectableDragUsers from "./SelectableDragUsers";
+import { SurveyStepTwoAnswer } from "@/types";
 
-interface SurveyAnswer {
-  punctuality: Array<Array<Coworker>>;
-  cooperation: Array<Array<Coworker>>;
-  support: Array<Array<Coworker>>;
-  motivates: Array<Array<Coworker>>;
+interface SprintStepTwoProps {
+  sprintSurveyStepTwoAnswer: SurveyStepTwoAnswer;
+  setSprintSurveyStepTwoAnswer: (
+    sprintSurveyStepTwoAnswer: SurveyStepTwoAnswer,
+  ) => void;
+  users: Coworker[];
 }
 
-const SprintStepTwo = () => {
+const SprintStepTwo = ({
+  sprintSurveyStepTwoAnswer,
+  setSprintSurveyStepTwoAnswer,
+  users,
+}: SprintStepTwoProps) => {
   const yellowOpacities = [
     "bg-yellowSurvey/10",
     "bg-yellowSurvey/20",
@@ -65,73 +71,47 @@ const SprintStepTwo = () => {
     "bg-redSurvey/100 rounded-r-lg",
   ];
 
-  const [audioContext, setAudioContext] = useState<AudioContext>();
-  useEffect(() => setAudioContext(new AudioContext()), []);
-
   const playSound = (soundId: string) => {
     const audio = document.getElementById(soundId) as HTMLAudioElement;
     audio.play();
   };
 
-  const [surveyAnswer, setSurveyAnswer] = useState<SurveyAnswer>({
-    punctuality: Array(10)
-      .fill([])
-      .map(() => []),
-    cooperation: Array(10)
-      .fill([])
-      .map(() => []),
-    support: Array(10)
-      .fill([])
-      .map(() => []),
-    motivates: Array(10)
-      .fill([])
-      .map(() => []),
-  });
+  const getRemainingTimes = (userId: string, times: number): number => {
+    let remainingTimes = times;
+    sprintSurveyStepTwoAnswer &&
+      Object.keys(sprintSurveyStepTwoAnswer).forEach((key) => {
+        const subArray =
+          sprintSurveyStepTwoAnswer[key as keyof SurveyStepTwoAnswer];
+        subArray.forEach((subArrayElement) => {
+          if (subArrayElement.some((coworker) => coworker.userId === userId)) {
+            remainingTimes -= 1;
+          }
+        });
+      });
 
-  const users: Coworker[] = [
-    {
-      name: "Pedro Alonso",
-      photoUrl: "",
-      userId: "eorjioerji",
-      color: "text-blue-300",
-    },
-    {
-      name: "Alejandro Mendoza",
-      photoUrl: "",
-      userId: "inenrvoerni",
-      color: "text-red-300",
-    },
-    {
-      name: "Felipe González",
-      photoUrl: "",
-      userId: "wefiweo",
-      color: "text-yellow-300",
-    },
-    {
-      name: "Adrian Ramírez",
-      photoUrl: "",
-      userId: "woiejiew",
-      color: "text-green-300",
-    },
-  ];
+    return remainingTimes;
+  };
 
   const [selectableUsers, setSelectableUsers] = useState<Array<SurveyCoworker>>(
     users.map((user) => {
       return {
         ...user,
-        times: 4,
+        times: getRemainingTimes(user.userId, 4),
       };
     }),
   );
 
   const handleAddItem = (
-    type: keyof SurveyAnswer,
+    type: keyof SurveyStepTwoAnswer,
     position: number,
     coworker: Coworker,
   ) => {
-    const items = surveyAnswer[type];
+    const items = sprintSurveyStepTwoAnswer[type];
     items[position].push(coworker);
-    setSurveyAnswer({ ...surveyAnswer, [type]: items });
+    setSprintSurveyStepTwoAnswer({
+      ...sprintSurveyStepTwoAnswer,
+      [type]: items,
+    });
   };
 
   const handleRemoveUserTimes = (userId: string) => {
@@ -144,8 +124,11 @@ const SprintStepTwo = () => {
     setSelectableUsers(newUsers);
   };
 
-  const existsInArray = (destination: keyof SurveyAnswer, userId: string) => {
-    const searchScope = surveyAnswer[destination];
+  const existsInArray = (
+    destination: keyof SurveyStepTwoAnswer,
+    userId: string,
+  ) => {
+    const searchScope = sprintSurveyStepTwoAnswer[destination];
 
     for (let i = 0; i < searchScope.length; i++) {
       if (searchScope[i].some((coworker) => coworker.userId === userId)) {
@@ -160,7 +143,7 @@ const SprintStepTwo = () => {
     if (!event.over) return;
     const destination = String(event.over.id);
     const destinationData = destination.split("-");
-    const destinationPlace = destinationData[0] as keyof SurveyAnswer;
+    const destinationPlace = destinationData[0] as keyof SurveyStepTwoAnswer;
     const destinationPosition = Number(destinationData[1]);
     const coworker = event.active.data.current as Coworker;
     if (existsInArray(destinationPlace, coworker.userId)) return;
@@ -189,7 +172,7 @@ const SprintStepTwo = () => {
           >
             <SprintDropRow
               name="punctuality"
-              people={surveyAnswer.punctuality}
+              people={sprintSurveyStepTwoAnswer.punctuality}
               title="Is puntual in sessions and meetings?"
               colors={yellowOpacities}
               titlePadding="p-[18px] pe-2"
@@ -197,7 +180,7 @@ const SprintStepTwo = () => {
 
             <SprintDropRow
               name="cooperation"
-              people={surveyAnswer.cooperation}
+              people={sprintSurveyStepTwoAnswer.cooperation}
               title="Cooperation and communication with the peer was smooth"
               colors={purpleOpacities}
               className="mt-6"
@@ -205,7 +188,7 @@ const SprintStepTwo = () => {
             />
             <SprintDropRow
               name="support"
-              people={surveyAnswer["support"]}
+              people={sprintSurveyStepTwoAnswer["support"]}
               title="Offers support or shows appreciation to other team members"
               colors={blueOpacities}
               className="mt-6"
@@ -213,7 +196,7 @@ const SprintStepTwo = () => {
             />
             <SprintDropRow
               name="motivates"
-              people={surveyAnswer.motivates}
+              people={sprintSurveyStepTwoAnswer.motivates}
               title="Motivates other team members to achieve goals"
               colors={redOpacities}
               className="mt-6"
