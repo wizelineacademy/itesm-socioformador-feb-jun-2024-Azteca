@@ -55,7 +55,6 @@ const Project = () => {
       growthOportunities: 78,
     },
   ];
-
   const gaugeData = [
     {
       title: "Resources Satisfaction",

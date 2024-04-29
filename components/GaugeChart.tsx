@@ -11,7 +11,6 @@ interface GradientColor {
 interface GaugeChartProps {
   percentage: number;
   type: string;
-  // type: "half" | "full";
   gradient: GradientColor;
 }
 
