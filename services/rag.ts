@@ -2,7 +2,7 @@
 import dotenv from "dotenv";
 import OpenAI from "openai";
 import db from "@/db/drizzle";
-import { and, eq, gte, lte } from "drizzle-orm";
+import { and, eq, gte, lte, isNull } from "drizzle-orm";
 import { auth } from "@/auth";
 
 import {
@@ -81,7 +81,9 @@ export async function pip_selection() {
 
   // analyze the feedback of each sprint survey
   for (let survey of sprintSurveys) {
-    const coworkersFeedback = await db
+    console.log(survey);
+
+    const coworkersClosedFeedback = await db
       .select({
         userId: sprintSurveyAnswerCoworkers.userId,
         coworkerId: sprintSurveyAnswerCoworkers.coworkerId,
@@ -92,7 +94,22 @@ export async function pip_selection() {
       .innerJoin(
         sprintSurveyAnswerCoworkers,
         eq(sprintSurveyAnswerCoworkers.sprintSurveyId, survey.sprintSurveyId),
-      );
+      )
+      .where(isNull(sprintSurveyAnswerCoworkers.comment));
+
+    const coworkersOpenFeedback = await db
+      .select({
+        userId: sprintSurveyAnswerCoworkers.userId,
+        coworkerId: sprintSurveyAnswerCoworkers.coworkerId,
+        questionName: sprintSurveyAnswerCoworkers.questionName,
+        comment: sprintSurveyAnswerCoworkers.comment,
+      })
+      .from(sprintSurvey)
+      .innerJoin(
+        sprintSurveyAnswerCoworkers,
+        eq(sprintSurveyAnswerCoworkers.sprintSurveyId, survey.sprintSurveyId),
+      )
+      .where(isNull(sprintSurveyAnswerCoworkers.answer));
 
     const userFeedback = await db
       .select({
@@ -130,3 +147,5 @@ export async function create_tasks() {
   // Create the tasks based with the type of the resource (book, video, documental, visit family), the job that must be accomplished (read N pages, read a chapter, visit my family, excercise) and the favorite format of the user (book, video, documental, visit family)
   // Check if the new tasks are related or are very similar to the previous tasks of the user, if this is the case the new task has a custom color indicating that it has been selected more than once
 }
+
+pip_selection();
