@@ -35,6 +35,13 @@ export type ProjectAnswer = {
   comment: string;
 };
 
+export type Notification = {
+  id: number | null;
+  projectName: string | null;
+  date: Date;
+  type: "RULER" | "SPRINT" | "FINAL";
+};
+
 export type Emotion = {
   name: string;
   pleasantness: number;

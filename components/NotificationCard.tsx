@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 import ProjectSurvey from "./modals/ProjectSurvey";
-
-type Notification = {
-  id: number;
-  title: string;
-  type: string;
-};
+import { Notification } from "@/types";
 
 interface NotificationCardProps {
   notification: Notification;
@@ -49,6 +44,12 @@ const NotificationCard = ({
         </svg>
         <div className="ms-4 flex w-full flex-col justify-start">
           <p className="text-md text-start font-bold">{notification.type}</p>
+          <p className="text-md text-start font-bold">
+            {notification.projectName}
+          </p>
+          <p className="text-md text-start font-bold">
+            {notification.date.toISOString()}
+          </p>
           <p className="text-start text-xs">
             You have a pending survery.
             <strong> Click here </strong>
