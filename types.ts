@@ -39,7 +39,7 @@ export type Employee = {
   id: string;
   name: string;
   email: string;
-  photoUrl: string;
+  photoUrl: string | null;
 };
 
 export type Notification = {
