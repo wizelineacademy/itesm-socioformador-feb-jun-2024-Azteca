@@ -52,3 +52,5 @@ next-env.d.ts
 
 # open-next
 .open-next
+#yarn lock
+yarn.lock
