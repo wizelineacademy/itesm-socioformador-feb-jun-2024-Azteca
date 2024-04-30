@@ -26,23 +26,23 @@ const ProjectSurvey = ({ showModal, onClose }: ProjectSurveyProps) => {
       finalSurveyId: 1, // TODO: Harcoded for now (waiting for notifications to be implemented)
       answers: [
         {
-          questionKey: "efforts",
+          questionKey: "PS_RF",
           answer: parseInt(formData.get("efforts")!.toString()),
         },
         {
-          questionKey: "support",
+          questionKey: "PS_SP",
           answer: parseInt(formData.get("support")!.toString()),
         },
         {
-          questionKey: "decisions",
+          questionKey: "PS_LF",
           answer: parseInt(formData.get("support")!.toString()),
         },
         {
-          questionKey: "opportunities",
+          questionKey: "PS_OG",
           answer: parseInt(formData.get("support")!.toString()),
         },
         {
-          questionKey: "respect",
+          questionKey: "PS_RT",
           answer: parseInt(formData.get("support")!.toString()),
         },
       ],
