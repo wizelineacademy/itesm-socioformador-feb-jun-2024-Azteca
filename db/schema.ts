@@ -35,8 +35,8 @@ export const project = pgTable("project", {
     .notNull(),
   name: varchar("name", { length: 64 }).notNull(),
   description: varchar("description", { length: 1024 }).notNull(),
-  startDate: date("start_date").notNull(),
-  endDate: date("end_date").notNull(),
+  startDate: date("start_date", { mode: "date" }).notNull(),
+  endDate: date("end_date", { mode: "date" }).notNull(),
   sprintSurveyPeriodicityInDays: integer(
     "sprint_survey_periodicity_in_days",
   ).notNull(),
@@ -49,8 +49,8 @@ export const projectMember = pgTable(
     projectId: integer("project_id").references(() => project.id, {
       onDelete: "cascade",
     }),
-    startDate: date("start_date"),
-    endDate: date("end_date"),
+    startDate: date("start_date", { mode: "date" }),
+    endDate: date("end_date", { mode: "date" }),
   },
   // composite primary key on (userId, projectId)
 );
@@ -116,7 +116,7 @@ export const userResource = pgTable(
 
 export const rulerSurvey = pgTable("ruler_survey", {
   id: serial("id").primaryKey(),
-  createdAt: date("created_at"),
+  createdAt: date("created_at", { mode: "date" }),
   processed: boolean("processed").default(false),
 });
 
@@ -131,7 +131,7 @@ export const rulerSurveyAnswers = pgTable(
     userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
     quadrant: quadrantEnum("quadrant"),
     emotion: varchar("emotion", { length: 16 }),
-    createdAt: date("created_at"),
+    createdAt: date("created_at", { mode: "date" }),
     comment: text("comment"),
   },
   // composite primary key on (userId, rulerSurveyId)
@@ -142,7 +142,7 @@ export const sprintSurvey = pgTable("sprint_survey", {
   projectId: integer("project_id").references(() => project.id, {
     onDelete: "cascade",
   }),
-  createdAt: date("created_at"),
+  createdAt: date("created_at", { mode: "date" }),
   processed: boolean("processed").default(false),
 });
 
@@ -180,7 +180,7 @@ export const sprintSurveyAnswerCoworkers = pgTable(
 
 export const finalSurvey = pgTable("final_survey", {
   id: serial("final_survey_id").primaryKey(),
-  created_at: date("created_at"),
+  created_at: date("created_at", { mode: "date" }),
   projectId: integer("project_id").references(() => project.id, {
     onDelete: "cascade",
   }),
