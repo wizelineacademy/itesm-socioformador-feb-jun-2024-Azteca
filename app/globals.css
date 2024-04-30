@@ -58,12 +58,10 @@
 }
 
 .m_396ce5cb:where([data-in-range]) {
-  background-color: hsla(
-    var(--primary-h, 240),
-    var(--primary-s, 50%),
-    var(--primary-l, 50%),
-    0.05
-  ) !important;
+  background-color: hsla(var(--primary-h, 240),
+      var(--primary-s, 50%),
+      var(--primary-l, 50%),
+      0.05) !important;
 }
 
 .m_396ce5cb:where([data-selected]) {
@@ -78,6 +76,25 @@
   0% {
     opacity: 1;
   }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.mantine-Popover-dropdown {
+  border-radius: 12px !important;
+}
+
+.dissolve {
+  animation: dissolve 300ms ease-in-out forwards;
+}
+
+@keyframes dissolve {
+  0% {
+    opacity: 1;
+  }
+
   100% {
     opacity: 0;
   }

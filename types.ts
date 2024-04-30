@@ -35,6 +35,13 @@ export type ProjectAnswer = {
   comment: string;
 };
 
+export type Employee = {
+  id: string;
+  name: string;
+  email: string;
+  photoUrl: string;
+};
+
 export type Notification = {
   id: number | null;
   projectName: string | null;
