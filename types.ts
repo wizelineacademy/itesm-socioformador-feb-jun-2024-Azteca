@@ -26,3 +26,9 @@ export type SurveyStepTwoAnswer = {
   support: Array<Array<Coworker>>;
   motivates: Array<Array<Coworker>>;
 };
+
+export type ProjectAnswer = {
+  finalSurveyId: number;
+  answers: Array<{ questionKey: string; answer: number }>;
+  comment: string;
+};
