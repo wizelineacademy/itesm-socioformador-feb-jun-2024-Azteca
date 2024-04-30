@@ -183,7 +183,7 @@ export async function getProjectsProfile(userId: string | null | undefined) {
   return res;
 }
 
-export async function getAllUsers() {
+export async function getAllEmployees() {
   const res = await db
     .select({
       id: schema.user.id,
