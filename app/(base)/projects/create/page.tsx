@@ -65,6 +65,7 @@ const CreateProject = () => {
 
   const [selectedMembers, setSelectedMembers] = useState<Employee[]>([]);
 
+  // TODO: Fecth all members
   const membersData: Employee[] = [
     {
       id: "1",
