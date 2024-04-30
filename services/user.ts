@@ -183,9 +183,15 @@ export async function getProjectsProfile(userId: string | null | undefined) {
   return res;
 }
 
-/*-- GET ALL TRAITS
-SELECT p.*
-FROM project_member pm
-JOIN project p ON pm.project_id = p.id
-WHERE pm.user_id = '5c0bbaeb-d54a-4fc3-a404-afaac7c7a47f';
- */
+export async function getAllUsers() {
+  const res = await db
+    .select({
+      id: schema.user.id,
+      name: schema.user.name,
+      email: schema.user.email,
+      photoUrl: schema.user.photoUrl,
+    })
+    .from(user)
+    .where(not(eq(user.role, "ADMIN")));
+  return res;
+}
