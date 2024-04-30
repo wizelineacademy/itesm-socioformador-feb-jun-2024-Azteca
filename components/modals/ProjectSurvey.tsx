@@ -23,27 +23,27 @@ const ProjectSurvey = ({ showModal, onClose }: ProjectSurveyProps) => {
     // TODO: handle failure cases for this surveys
     const formData = new FormData(event.target as HTMLFormElement);
     mutate({
-      finalSurveyId: 1, // TODO: Harcoded for now (waiting for notifications to be implemented)
+      finalSurveyId: 2, // TODO: Harcoded for now (waiting for notifications to be implemented)
       answers: [
         {
-          questionKey: "efforts",
+          questionKey: "PS_RF",
           answer: parseInt(formData.get("efforts")!.toString()),
         },
         {
-          questionKey: "support",
+          questionKey: "PS_SP",
           answer: parseInt(formData.get("support")!.toString()),
         },
         {
-          questionKey: "decisions",
-          answer: parseInt(formData.get("support")!.toString()),
+          questionKey: "PS_LF",
+          answer: parseInt(formData.get("decisions")!.toString()),
         },
         {
-          questionKey: "opportunities",
-          answer: parseInt(formData.get("support")!.toString()),
+          questionKey: "PS_OG",
+          answer: parseInt(formData.get("opportunities")!.toString()),
         },
         {
-          questionKey: "respect",
-          answer: parseInt(formData.get("support")!.toString()),
+          questionKey: "PS_RT",
+          answer: parseInt(formData.get("respect")!.toString()),
         },
       ],
       comment: formData.get("comments")!.toString(),

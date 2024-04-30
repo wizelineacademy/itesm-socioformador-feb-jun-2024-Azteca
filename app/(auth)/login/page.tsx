@@ -28,13 +28,13 @@ const Login = () => {
           <p className="mb-4 mt-6 text-center text-3xl font-semibold leading-normal text-black">
             Log in to Feedback Flow
           </p>
-          <button className=" group flex w-1/2 flex-row rounded-full border border-primary-light px-4 py-2 hover:bg-primary-dark">
+          <button className=" group flex w-7/12 flex-row rounded-full border border-primary-light px-4 py-2 hover:bg-primary-dark">
             <i className="fi fi-brands-slack text-lg leading-[0px] text-primary-light group-hover:text-white" />
             <p className="mx-auto text-sm font-medium text-black group-hover:text-white">
               Continue with Slack
             </p>
           </button>
-          <button className=" group flex w-1/2 flex-row rounded-full border border-primary-light px-4 py-2 hover:bg-primary-dark">
+          <button className=" group flex w-7/12 flex-row rounded-full border border-primary-light px-4 py-2 hover:bg-primary-dark">
             <i className="fi fi-brands-google text-lg leading-[0px] text-primary-light group-hover:text-white" />
             <p className="mx-auto text-sm font-medium text-black group-hover:text-white">
               Continue with Google
