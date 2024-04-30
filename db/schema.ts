@@ -58,7 +58,7 @@ export const projectMember = pgTable(
   },
 );
 
-export const traitKindEnum = pgEnum("kind", [
+export const traitKindEnum = pgEnum("trait_kind", [
   "STRENGTH",
   "AREA_OF_OPPORTUNITY",
 ]);
@@ -92,12 +92,16 @@ export const pipTask = pgTable("pip_task", {
   isDone: boolean("is_done"),
 });
 
-export const pipResourceKind = pgEnum("role", ["BOOK", "VIDEO", "ARTICLE"]);
+export const pipResourceKind = pgEnum("type_resource", [
+  "BOOK",
+  "VIDEO",
+  "ARTICLE",
+]);
 
 export const pipResource = pgTable("pip_resource", {
   id: serial("id").primaryKey(),
   title: varchar("title", { length: 64 }),
-  kind: pipResourceKind("kind"),
+  kind: pipResourceKind("type_resource"),
   description: varchar("description", { length: 1024 }),
   embedding: text("embedding")
     .array()
@@ -134,6 +138,7 @@ export const rulerSurveyAnswers = pgTable(
     quadrant: quadrantEnum("quadrant"),
     emotion: varchar("emotion", { length: 16 }),
     createdAt: date("created_at"),
+    comment: text("comment"),
   },
   // composite primary key on (userId, rulerSurveyId)
   (table) => {
@@ -177,6 +182,7 @@ export const sprintSurveyAnswerCoworkers = pgTable(
     coworkerId: uuid("coworker_id").references(() => user.id),
     questionName: varchar("question_name", { length: 8 }),
     answer: integer("answer"),
+    comment: text("comment"),
   },
   // composite primary key on (userId, sprintSurveyId)
   (table) => {
@@ -199,6 +205,7 @@ export const finalSurveyAnswer = pgTable(
     finalSurveyId: integer("final_survey_id").references(() => finalSurvey.id),
     questionName: varchar("question_name", { length: 8 }),
     answer: integer("answer"),
+    comment: text("comment"),
   },
   (table) => {
     return {
