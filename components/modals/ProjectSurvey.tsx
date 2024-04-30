@@ -45,39 +45,47 @@ const ProjectSurvey = ({ showModal, onClose }: ProjectSurveyProps) => {
                   Project Survey
                 </Dialog.Title>
                 <form onSubmit={handleSubmit}>
-                  <div className="mt-3 flex flex-row flex-wrap justify-around">
+                  <div className="mt-3 grid grid-cols-2 gap-10">
                     <Slider
                       name="efforts"
                       label="Do you feel that your efforts were recognized?"
-                      className=" pe-10"
                     />
                     <Slider
                       name="support"
                       label="Did you feel supported in your personal growth?"
-                      className=" ps-10"
                     />
                     <Slider
                       name="decisions"
                       label="Were your ideas and creativity heard in decision-making?"
-                      className="mt-8 pe-10"
                     />
                     <Slider
                       name="opportunities"
                       label="Were the challenges addressed with opportuninites for growth?"
-                      className="mt-8 ps-10"
                     />
+                    <Slider
+                      name="respect"
+                      label="Was there an atmosphere of respect and trust?"
+                    />
+                    <div>
+                      <p className="text-sm font-light text-black">
+                        General comments on the project
+                      </p>
+                      <textarea
+                        name="comments"
+                        id="comments"
+                        className="mt-2 h-auto w-full rounded-md border border-black p-2 focus:outline-primary"
+                        placeholder="Optional"
+                      ></textarea>
+                    </div>
                   </div>
-                  <Slider
-                    name="respect"
-                    label="Was there an atmosphere of respect and trust?"
-                    className="mx-auto mt-8 flex-1 px-5"
-                  />
-                  <button
-                    type="submit"
-                    className=" mx-auto mt-12 rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
-                  >
-                    Submit
-                  </button>
+                  <div className="mt-12 flex w-full justify-center">
+                    <button
+                      type="submit"
+                      className="rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
+                    >
+                      Submit
+                    </button>
+                  </div>
                 </form>
               </Dialog.Panel>
             </Transition.Child>
