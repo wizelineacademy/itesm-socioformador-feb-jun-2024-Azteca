@@ -28,53 +28,53 @@ const SprintStepOne = ({
   return (
     <div className="mt-9 grid grid-flow-row grid-cols-2 gap-x-20 gap-y-16">
       <Slider
-        name="resources"
+        name="MS_RF"
         value={
           sprintSurveyAnswer.projectAnswers.find(
-            (answer) => answer.questionKey === "resources",
-          )?.answer || 0
+            (answer) => answer.questionKey === "MS_RF",
+          )?.answer || 1
         }
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          onChangeValue(e, "resources")
+          onChangeValue(e, "MS_RF")
         }
         className="w-full"
         label="Did you have enough resources to complete your activities?"
       />
       <Slider
-        name="responsibilities"
+        name="MS_RA"
         value={
           sprintSurveyAnswer.projectAnswers.find(
-            (answer) => answer.questionKey === "responsibilities",
-          )?.answer || 0
+            (answer) => answer.questionKey === "MS_RA",
+          )?.answer || 1
         }
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          onChangeValue(e, "responsibilities")
+          onChangeValue(e, "MS_RA")
         }
         className="w-full"
         label="Do you agree with the responsibilities you were assigned with?"
       />
       <Slider
-        name="support"
+        name="MS_LS"
         value={
           sprintSurveyAnswer.projectAnswers.find(
-            (answer) => answer.questionKey === "support",
-          )?.answer || 0
+            (answer) => answer.questionKey === "MS_LS",
+          )?.answer || 1
         }
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          onChangeValue(e, "support")
+          onChangeValue(e, "MS_LS")
         }
         className="w-full"
         label="Did you receive support from your manager regarding technical and/or emotional matters?"
       />
       <Slider
-        name="workload"
+        name="MS_WE"
         value={
           sprintSurveyAnswer.projectAnswers.find(
-            (answer) => answer.questionKey === "workload",
-          )?.answer || 0
+            (answer) => answer.questionKey === "MS_WE",
+          )?.answer || 1
         }
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          onChangeValue(e, "workload")
+          onChangeValue(e, "MS_WE")
         }
         className="w-full"
         label="Was the workload and initial project expectations fair according to the deadlines?"

@@ -19,32 +19,14 @@ const Notifications = ({
 }: NotificationProps) => {
   const [isActive, setIsActive] = useState(false);
 
-  /*   const notificationsQuery = useQuery({
+  const notificationsQuery = useQuery({
     queryKey: ["notifications"],
     queryFn: () => getNotifications(),
-  }); */
-
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      title: "RULER",
-      type: "RULER",
-    },
-    {
-      id: 2,
-      title: "Sprint Survey",
-      type: "SPRINT",
-    },
-    {
-      id: 3,
-      title: "Project Survey",
-      type: "PROJECT",
-    },
-  ]);
+  });
 
   const onNotificationClick = (notificationType: string) => {
     switch (notificationType) {
-      case "PROJECT":
+      case "FINAL":
         showProjectModal();
         break;
 
@@ -68,12 +50,11 @@ const Notifications = ({
     setIsActive(false);
   };
 
-  /*   if (notificationsQuery.isLoading) {
+  if (!notificationsQuery.data) {
     return <div>loading...</div>;
-  } else {
-    return <div>loaded</div>;
-  } */
+  }
 
+  // TODO: fix overflow-y of the notifications popup
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div onClick={() => setIsActive(!isActive)}>
@@ -84,7 +65,7 @@ const Notifications = ({
             size="h-6 w-6"
             color={isActive ? "text-white" : "text-primary"}
           />
-          {notifications.length > 0 && (
+          {notificationsQuery.data.length > 0 && (
             <span className=" absolute -right-px -top-px flex h-3 w-3 items-center justify-center rounded-full bg-red-700 " />
           )}
         </Menu.Button>
@@ -105,7 +86,7 @@ const Notifications = ({
               <div className="mt-3 flex flex-row items-center justify-between">
                 <div className="flex flex-row gap-1">
                   <p className="text-md font-bold text-black">Notifications</p>
-                  <p className="">({notifications.length})</p>
+                  <p className="">({notificationsQuery.data.length})</p>
                 </div>
                 <CloseIcon
                   size="h-6 w-6"
@@ -115,8 +96,8 @@ const Notifications = ({
               </div>
             )}
           </Menu.Item>
-          {notifications.length > 0 &&
-            notifications.map((notification, index) => {
+          {notificationsQuery.data.length > 0 &&
+            notificationsQuery.data.map((notification, index) => {
               return (
                 <Menu.Item key={index}>
                   {({ close }) => (
@@ -137,7 +118,7 @@ const Notifications = ({
                 </Menu.Item>
               );
             })}
-          {notifications.length === 0 && (
+          {notificationsQuery.data.length === 0 && (
             <div className="flex h-5/6 w-full items-center justify-center py-1">
               <Menu.Item>
                 <p className="items-center py-2 text-sm">

@@ -9,22 +9,24 @@ export type SurveyCoworker = {
   times: number;
 } & Coworker;
 
+export type SurveyStepTwoAnswer = {
+  //Sprint Survey Coworker Punctuality, Communication, Support, Motivation
+  SS_CWPN: Array<Array<Coworker>>;
+  SS_CWCM: Array<Array<Coworker>>;
+  SS_CWSP: Array<Array<Coworker>>;
+  SS_CWMT: Array<Array<Coworker>>;
+};
+
+export type ProjectSprint = "MS_RF" | "MS_LS" | "MS_RA" | "MS_WE";
+
 export type SprintSurveyAnswer = {
-  userId: string;
   sprintSurveyId: number;
-  projectAnswers: Array<{ questionKey: string; answer: number }>;
+  projectAnswers: Array<{ questionKey: ProjectSprint; answer: number }>;
   coworkersAnswers: Array<{
     questionKey: keyof SurveyStepTwoAnswer;
     answers: Array<{ coworkerId: string; answer: number }>;
   }>;
-  coworkersComments: { [key: string]: string };
-};
-
-export type SurveyStepTwoAnswer = {
-  punctuality: Array<Array<Coworker>>;
-  cooperation: Array<Array<Coworker>>;
-  support: Array<Array<Coworker>>;
-  motivates: Array<Array<Coworker>>;
+  coworkersComments: Array<{ coworkerId: string; comment: string }>;
 };
 
 export type ProjectAnswer = {
@@ -38,4 +40,18 @@ export type Employee = {
   name: string;
   email: string;
   photoUrl: string;
+};
+
+export type Notification = {
+  id: number | null;
+  projectName: string | null;
+  date: Date;
+  type: "RULER" | "SPRINT" | "FINAL";
+};
+
+export type Emotion = {
+  name: string;
+  pleasantness: number;
+  energy: number;
+  description: string;
 };
