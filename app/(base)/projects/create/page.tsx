@@ -24,8 +24,8 @@ const CreateProject = () => {
   ]);
 
   const handleForm = (formData: FormData) => {
-    const startDate = rangeDates[0]?.toISOString();
-    const endDate = rangeDates[1]?.toISOString();
+    const startDate = rangeDates[0];
+    const endDate = rangeDates[1];
     const name = formData.get("name")?.toString();
     const description = formData.get("description")?.toString();
     const sprintSurveyPeriodicityInDays = formData
