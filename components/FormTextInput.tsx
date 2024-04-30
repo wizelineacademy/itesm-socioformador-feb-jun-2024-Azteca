@@ -27,8 +27,8 @@ const FormTextInput = ({ name, type, label }: FormTextInputProps) => {
         required
       />
       <label
-        htmlFor="name"
-        className="absolute -top-2 left-0 flex flex-row items-center justify-between text-sm text-primary-dark transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-lg peer-placeholder-shown:text-gray-500"
+        htmlFor={name}
+        className="absolute -top-2 left-0 flex cursor-text flex-row items-center justify-between text-sm text-primary-dark transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-lg peer-placeholder-shown:text-gray-500"
       >
         {label}
       </label>
