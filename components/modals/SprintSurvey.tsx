@@ -133,7 +133,7 @@ const SprintSurvey = ({ showModal, onClose }: SprintSurveyProps) => {
     // Send data to the server
     console.log(sprintAnswer);
     console.log("Completed");
-    //onClose();
+    onClose();
   };
 
   const modalWidth =

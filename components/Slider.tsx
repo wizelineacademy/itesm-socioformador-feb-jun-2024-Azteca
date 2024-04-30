@@ -1,7 +1,7 @@
 interface SliderProps {
   label: string;
   className?: string;
-  onChange?: (value: number, key: string) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>, key: string) => void;
   name: string;
   value?: number;
 }
@@ -18,7 +18,9 @@ const Slider = ({ label, className, onChange, name, value }: SliderProps) => {
         max={100}
         name={name}
         value={value}
-        onChange={(e) => onChange && onChange(parseInt(e.target.value), name)}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          onChange && onChange(e, name)
+        }
         className="h-1.5 w-full appearance-none rounded-full bg-primary
           [&::-webkit-slider-thumb]:h-5
           [&::-webkit-slider-thumb]:w-5

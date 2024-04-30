@@ -1,3 +1,4 @@
+import React from "react";
 import Slider from "../Slider";
 import { SprintSurveyAnswer } from "@/types";
 
@@ -10,7 +11,11 @@ const SprintStepOne = ({
   sprintSurveyAnswer,
   setSprintSurveyAnswer,
 }: SprintStepOneProps) => {
-  const onChangeValue = (value: number, name: string) => {
+  const onChangeValue = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    name: string,
+  ) => {
+    const value = parseInt(event.target.value);
     const newSprintSurveyAnswer = {
       ...sprintSurveyAnswer,
       projectAnswers: sprintSurveyAnswer.projectAnswers.map((answer) =>
@@ -29,7 +34,9 @@ const SprintStepOne = ({
             (answer) => answer.questionKey === "resources",
           )?.answer || 0
         }
-        onChange={onChangeValue}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          onChangeValue(e, "resources")
+        }
         className="w-full"
         label="Did you have enough resources to complete your activities?"
       />
@@ -40,7 +47,9 @@ const SprintStepOne = ({
             (answer) => answer.questionKey === "responsibilities",
           )?.answer || 0
         }
-        onChange={onChangeValue}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          onChangeValue(e, "responsibilities")
+        }
         className="w-full"
         label="Do you agree with the responsibilities you were assigned with?"
       />
@@ -51,7 +60,9 @@ const SprintStepOne = ({
             (answer) => answer.questionKey === "support",
           )?.answer || 0
         }
-        onChange={onChangeValue}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          onChangeValue(e, "support")
+        }
         className="w-full"
         label="Did you receive support from your manager regarding technical and/or emotional matters?"
       />
@@ -62,7 +73,9 @@ const SprintStepOne = ({
             (answer) => answer.questionKey === "workload",
           )?.answer || 0
         }
-        onChange={onChangeValue}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          onChangeValue(e, "workload")
+        }
         className="w-full"
         label="Was the workload and initial project expectations fair according to the deadlines?"
       />
