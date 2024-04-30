@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import db from "@/db/drizzle";
 import { finalSurvey, finalSurveyAnswer } from "@/db/schema";
-import { eq, or } from "drizzle-orm";
+import { eq, or, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { ProjectAnswer } from "@/types";
@@ -12,7 +12,7 @@ import { comment } from "postcss";
 export async function createProjectSurvey(projectId: number) {
   const res = await db
     .insert(finalSurvey)
-    .values({ created_at: Date.now().toString(), projectId: projectId })
+    .values({ created_at: sql`CURRENT_TIMESTAMP`, projectId: projectId })
     .returning({ id: finalSurvey.id });
 
   return res[0];
@@ -24,7 +24,7 @@ export async function submitProjectAnswer(answers: ProjectAnswer) {
   if (!userId) {
     throw new Error("You most be signed in");
   }
-
+  console.log(userId);
   console.log(answers); // TODO: remove this console log
 
   await db.insert(finalSurveyAnswer).values(
@@ -36,6 +36,7 @@ export async function submitProjectAnswer(answers: ProjectAnswer) {
       comment: "",
     })),
   );
+  console.log("i did it");
   await db.insert(finalSurveyAnswer).values({
     userId: userId,
     finalSurveyId: answers.finalSurveyId,

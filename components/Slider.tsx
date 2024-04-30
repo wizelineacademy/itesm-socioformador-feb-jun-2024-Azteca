@@ -15,7 +15,7 @@ const Slider = ({ label, className, onChange, name, value }: SliderProps) => {
         type="range"
         step={1}
         min={0}
-        max={2}
+        max={10}
         name={name}
         value={value}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
