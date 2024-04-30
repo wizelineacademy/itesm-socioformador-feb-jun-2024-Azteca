@@ -24,8 +24,6 @@ export async function submitProjectAnswer(answers: ProjectAnswer) {
   if (!userId) {
     throw new Error("You most be signed in");
   }
-  console.log(userId);
-  console.log(answers); // TODO: remove this console log
 
   await db.insert(finalSurveyAnswer).values(
     answers.answers.map((item) => ({
@@ -36,7 +34,6 @@ export async function submitProjectAnswer(answers: ProjectAnswer) {
       comment: "",
     })),
   );
-  console.log("i did it");
   await db.insert(finalSurveyAnswer).values({
     userId: userId,
     finalSurveyId: answers.finalSurveyId,
