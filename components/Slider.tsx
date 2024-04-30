@@ -7,7 +7,7 @@ interface SliderProps {
 }
 const Slider = ({ label, className, onChange, name, value }: SliderProps) => {
   return (
-    <div className={`flex w-1/2 flex-col ${className}`}>
+    <div className={`flex w-full flex-col ${className}`}>
       <label className="mb-2 mt-4 block text-sm font-light text-black">
         {label}
       </label>
