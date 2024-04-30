@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { DatePickerInput } from "@mantine/dates";
 import UserProfileButton from "@/components/UserProfileButton";
 import CalendarIcon from "@/components/icons/CalendarIcon";
@@ -16,6 +15,7 @@ import {
   Group,
   Text,
 } from "@mantine/core";
+import { Employee } from "@/types";
 
 const CreateProject = () => {
   const router = useRouter();
@@ -63,61 +63,113 @@ const CreateProject = () => {
     });
   };
 
-  const [selectedMembers, setSelectedMembers] = useState<Coworker[]>([
+  const [selectedMembers, setSelectedMembers] = useState<Employee[]>([]);
+
+  const membersData: Employee[] = [
     {
-      name: "Pedro Alonso Moreno",
-      userId: "6188a6d4-50b3-4c69-b0fc-41db46882b9d",
-    },
-    {
-      name: "Felipe de Jesús",
-      userId: "5c0bbaeb-d54a-4fc3-a404-afaac7c7a47f",
-    },
-    {
+      id: "1",
       name: "Adrián Ramírez",
-      userId: "37837ee0-b671-42a5-83a7-763cb29a52db",
-    },
-  ]);
-  const members: Record<string, { image: string; email: string }> = {
-    "Emily Johnson": {
-      image:
+      email: "adrian-rmz@gmail.com",
+      photoUrl:
         "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-7.png",
-      email: "emily92@gmail.com",
     },
-    "Ava Rodriguez": {
-      image:
+    {
+      id: "2",
+      name: "Pedro Alonso Moreno",
+      email: "pedro-moreno@gmail.com",
+      photoUrl:
         "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-8.png",
-      email: "ava_rose@gmail.com",
     },
-    "Olivia Chen": {
-      image:
+    {
+      id: "3",
+      name: "Felipe de Jesús",
+      email: "felipe-jesus@gmail.com",
+      photoUrl:
         "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-4.png",
-      email: "livvy_globe@gmail.com",
     },
-    "Ethan Barnes": {
-      image:
+    {
+      id: "4",
+      name: "Jose Sanchez",
+      email: "jose-sanchez@gmail.com",
+      photoUrl:
         "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-1.png",
-      email: "ethan_explorer@gmail.com",
     },
-    "Mason Taylor": {
-      image:
+    {
+      id: "5",
+      name: "Eduardo de Valle",
+      email: "eduardo-valle@gmail.com",
+      photoUrl:
         "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
-      email: "mason_musician@gmail.com",
     },
+  ];
+
+  const handleOptionSubmit = (selectedOption: string) => {
+    // Suponemos que el value seleccionado es el nombre del empleado
+    const employeeToAdd = membersData.find(
+      (employee) => employee.name === selectedOption,
+    );
+
+    // Verificar si se encontró un empleado
+    if (employeeToAdd) {
+      // Comprobar si el empleado ya está en selectedMembers para evitar duplicados
+      const isAlreadySelected = selectedMembers.some(
+        (member) => member.id === employeeToAdd.id,
+      );
+      if (!isAlreadySelected) {
+        // Añadir el empleado al estado de selectedMembers
+        setSelectedMembers((currentMembers) => [
+          ...currentMembers,
+          employeeToAdd,
+        ]);
+        console.log("Added: ", employeeToAdd);
+      } else {
+        console.log("Employee already selected:", employeeToAdd);
+      }
+    } else {
+      console.log("No employee found with the name:", selectedOption);
+    }
+    console.log(selectedMembers);
+  };
+
+  const handleOptionRemove = (selectedOption: string) => {
+    // Suponemos que el value seleccionado es el nombre del empleado
+    const employeeToRemove = membersData.find(
+      (employee) => employee.name === selectedOption,
+    );
+
+    // Verificar si se encontró un empleado
+    if (employeeToRemove) {
+      // Filtrar el empleado para eliminarlo de selectedMembers
+      setSelectedMembers((currentMembers) =>
+        currentMembers.filter((member) => member.id !== employeeToRemove.id),
+      );
+      console.log("Removed: ", employeeToRemove);
+    } else {
+      console.log("No employee found with the name to remove:", selectedOption);
+    }
+    console.log(selectedMembers);
   };
 
   const renderMultiSelectOption: MultiSelectProps["renderOption"] = ({
     option,
-  }) => (
-    <Group gap="sm">
-      <Avatar src={members[option.value].image} size={36} radius="xl" />
-      <div>
-        <Text size="sm">{option.value}</Text>
-        <Text size="xs" opacity={0.5}>
-          {members[option.value].email}
-        </Text>
-      </div>
-    </Group>
-  );
+  }) => {
+    const member = membersData.find((member) => member.name === option.value);
+    if (!member) {
+      return null; // or some fallback UI component
+    }
+
+    return (
+      <Group gap="sm">
+        <Avatar src={member.photoUrl} size={36} radius="xl" />
+        <div>
+          <Text size="sm">{member.name}</Text>
+          <Text size="xs" opacity={0.5}>
+            {member.email}
+          </Text>
+        </div>
+      </Group>
+    );
+  };
 
   return (
     <>
@@ -183,13 +235,7 @@ const CreateProject = () => {
                   Members
                 </label>
                 <MultiSelect
-                  data={[
-                    "Emily Johnson",
-                    "Ava Rodriguez",
-                    "Olivia Chen",
-                    "Ethan Barnes",
-                    "Mason Taylor",
-                  ]}
+                  data={membersData.map((member) => member.name)}
                   renderOption={renderMultiSelectOption}
                   maxDropdownHeight={180}
                   // label="Employees of the month"
@@ -205,14 +251,16 @@ const CreateProject = () => {
                     position: "top",
                     middlewares: { flip: false, shift: false },
                   }}
-                  onOptionSubmit={(value) => {
-                    console.log("Added: ", value);
+                  onOptionSubmit={(selectedOption) => {
+                    handleOptionSubmit(selectedOption);
                   }}
-                  onRemove={(value) => {
-                    console.log("Removed: ", value);
+                  onRemove={(selectedOption) => {
+                    handleOptionRemove(selectedOption);
                   }}
                   onClear={() => {
-                    console.log("Cleared");
+                    setSelectedMembers([]);
+                    console.log("Cleared all selected members");
+                    console.log(selectedMembers);
                   }}
                   className="mt-2 gap-2 drop-shadow-lg"
                   styles={{
@@ -267,6 +315,9 @@ const CreateProject = () => {
               <button
                 className="h-fit w-fit self-end rounded-xl bg-primary px-10 py-2 text-xl font-medium text-white drop-shadow-lg"
                 type="submit"
+                onClick={() => {
+                  console.log(selectedMembers);
+                }}
               >
                 Create
               </button>

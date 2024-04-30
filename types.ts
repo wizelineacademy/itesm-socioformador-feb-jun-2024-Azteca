@@ -32,3 +32,10 @@ export type ProjectAnswer = {
   answers: Array<{ questionKey: string; answer: number }>;
   comment: string;
 };
+
+export type Employee = {
+  id: string;
+  name: string;
+  email: string;
+  photoUrl: string;
+};
