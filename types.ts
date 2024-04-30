@@ -32,3 +32,10 @@ export type ProjectAnswer = {
   answers: Array<{ questionKey: string; answer: number }>;
   comment: string;
 };
+
+export type Notification = {
+  id: number | null;
+  projectName: string | null;
+  date: Date;
+  type: "RULER" | "SPRINT" | "FINAL";
+};

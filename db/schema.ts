@@ -114,24 +114,17 @@ export const userResource = pgTable(
   // composite primary key on (userId, resourceId)
 );
 
-export const rulerSurvey = pgTable("ruler_survey", {
-  id: serial("id").primaryKey(),
-  createdAt: date("created_at", { mode: "date" }),
-  processed: boolean("processed").default(false),
-});
-
 export const quadrantEnum = pgEnum("quadrant", ["1", "2", "3", "4"]);
 
 export const rulerSurveyAnswers = pgTable(
   "ruler_survey_answers",
   {
-    rulerSurveyId: integer("ruler_survey_id").references(() => rulerSurvey.id, {
-      onDelete: "cascade",
-    }),
     userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
     quadrant: quadrantEnum("quadrant"),
     emotion: varchar("emotion", { length: 16 }),
-    createdAt: date("created_at", { mode: "date" }),
+    answeredAt: date("answered_at", { mode: "date" }).default(
+      sql`CURRENT_TIMESTAMP::date`,
+    ),
     comment: text("comment"),
   },
   // composite primary key on (userId, rulerSurveyId)
@@ -142,7 +135,7 @@ export const sprintSurvey = pgTable("sprint_survey", {
   projectId: integer("project_id").references(() => project.id, {
     onDelete: "cascade",
   }),
-  createdAt: date("created_at", { mode: "date" }),
+  scheduledAt: date("scheduled_at", { mode: "date" }),
   processed: boolean("processed").default(false),
 });
 
@@ -181,6 +174,7 @@ export const sprintSurveyAnswerCoworkers = pgTable(
 export const finalSurvey = pgTable("final_survey", {
   id: serial("final_survey_id").primaryKey(),
   created_at: date("created_at", { mode: "date" }),
+  scheduledAt: date("scheduled_at", { mode: "date" }),
   projectId: integer("project_id").references(() => project.id, {
     onDelete: "cascade",
   }),
