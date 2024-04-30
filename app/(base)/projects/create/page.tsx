@@ -31,8 +31,8 @@ const CreateProject = () => {
   ]);
 
   const handleForm = (formData: FormData) => {
-    const startDate = rangeDates[0]?.toISOString();
-    const endDate = rangeDates[1]?.toISOString();
+    const startDate = rangeDates[0];
+    const endDate = rangeDates[1];
     const name = formData.get("name")?.toString();
     const description = formData.get("description")?.toString();
     const sprintSurveyPeriodicityInDays = formData
@@ -58,9 +58,7 @@ const CreateProject = () => {
         sprintSurveyPeriodicityInDays: Number(sprintSurveyPeriodicityInDays),
       },
       members: [
-        "6188a6d4-50b3-4c69-b0fc-41db46882b9d", // Pedro
-        "5c0bbaeb-d54a-4fc3-a404-afaac7c7a47f", // Felipe
-        "37837ee0-b671-42a5-83a7-763cb29a52db", // Adrian
+        "fe033269-0851-4257-bf66-de5079892ea7", // Pedro
       ],
     });
   };

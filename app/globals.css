@@ -68,6 +68,34 @@
   background-color: var(--primary) !important;
 }
 
+.dissolve {
+  animation: dissolve 300ms ease-in-out forwards;
+}
+
+@keyframes dissolve {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
 .mantine-Popover-dropdown {
   border-radius: 12px !important;
+}
+
+.dissolve {
+  animation: dissolve 300ms ease-in-out forwards;
+}
+
+@keyframes dissolve {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }

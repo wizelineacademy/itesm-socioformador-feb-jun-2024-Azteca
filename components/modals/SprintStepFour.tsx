@@ -1,4 +1,8 @@
 import { Coworker, SprintSurveyAnswer } from "@/types";
+import Image from "next/image";
+import UserIcon from "../icons/UserIcon";
+import { useState } from "react";
+import CloseIcon from "../icons/CloseIcon";
 
 interface SprintStepFour {
   users: Coworker[];
@@ -11,6 +15,8 @@ const SprintStepFour = ({
   sprintSurveyAnswer,
   setSprintSurveyAnswer,
 }: SprintStepFour) => {
+  const [usersSelected, setUsersSelected] = useState<Coworker[]>([]);
+  const [selectableUsers, setSelectableUsers] = useState<Coworker[]>(users);
   const onChangeValue = (comment: string, userId: string) => {
     setSprintSurveyAnswer({
       ...sprintSurveyAnswer,
@@ -20,26 +26,131 @@ const SprintStepFour = ({
       },
     });
   };
+
+  const onUserSelected = (newUser: Coworker) => {
+    setSelectableUsers(
+      selectableUsers.filter((user) => user.userId !== newUser.userId),
+    );
+  };
+
+  const handleUserSelected = (newUser: Coworker) => {
+    const isUserInArray = usersSelected.find(
+      (user) => user.userId === newUser.userId,
+    );
+    if (isUserInArray) return;
+    setUsersSelected([newUser, ...usersSelected]);
+    onUserSelected(newUser);
+  };
+
+  const onUserDeleted = (deleteUser: Coworker) => {
+    setSelectableUsers([...selectableUsers, deleteUser]);
+  };
+
+  const handleDeleteUserSelected = (deleteUser: Coworker) => {
+    const element = document.getElementById(deleteUser.userId);
+    if (!element) return;
+
+    element.classList.add("dissolve");
+
+    setTimeout(() => {
+      setUsersSelected(
+        usersSelected.filter((user) => user.userId !== deleteUser.userId),
+      );
+      onUserDeleted(deleteUser);
+      //La neta no se porque sigue exisitiendo en el DOM, pero se necesita para que la
+      //la clase no se propague a otro elemento.
+      if (document.body.contains(element)) {
+        element.classList.remove("dissolve");
+      }
+    }, 300);
+  };
+
   return (
     <>
-      <p className="mb-3 mt-2 text-base font-medium text-black ">
-        Every answer field is optional
+      <p className="my-3 self-start text-sm">
+        <strong>Select</strong> the <strong>coworkers</strong> you&apos;d like
+        to give <strong>additional feedback.</strong>
       </p>
-      <div className="grid grid-flow-row grid-cols-2 gap-4">
-        {users.map((user, index) => (
-          <div
-            key={index}
-            className="flex w-full flex-col items-center justify-start"
-          >
-            <label className="w-full font-normal text-black">{user.name}</label>
-            <textarea
-              value={sprintSurveyAnswer.coworkersComments[user.userId] || ""}
-              onChange={(e) => onChangeValue(e.target.value, user.userId)}
-              placeholder="Type some feedback..."
-              className="w-full rounded-lg border border-primary-light p-1 text-sm placeholder:left-1 placeholder:text-sm focus:outline-primary-dark"
-            />
-          </div>
-        ))}
+      <div className=" grid grid-flow-row grid-cols-4 gap-x-4">
+        <section id="users-select" className="col-span-1 mt-2 flex flex-col">
+          <p className="text-base font-medium text-black">Coworkers</p>
+          {selectableUsers.length !== 0 && (
+            <ul className="mt-2 flex h-full w-full appearance-none flex-col gap-y-1 overflow-auto">
+              {selectableUsers.map((user, index) => (
+                <li
+                  className="group flex cursor-pointer flex-row items-center gap-x-2 rounded-xl p-1 hover:bg-primary-light/60"
+                  key={index}
+                  onClick={() => handleUserSelected(user)}
+                >
+                  {user.photoUrl && (
+                    <Image
+                      src={user.photoUrl || ""}
+                      alt={`Coworker ${user.name}`}
+                      width={100}
+                      height={100}
+                    />
+                  )}
+                  {!user.photoUrl && (
+                    <UserIcon
+                      size="h-8 w-8"
+                      color="text-primary group-hover:text-white"
+                    />
+                  )}
+                  <p className="font-lg py-w text-sm text-black group-hover:text-white">
+                    {user.name}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+          {selectableUsers.length === 0 && (
+            <p className="m-auto text-sm font-medium text-grayText">
+              No more selectable users
+            </p>
+          )}
+        </section>
+        <section
+          id="additional-feedback"
+          className="col-span-3 mt-2 flex h-full flex-col"
+        >
+          {usersSelected.length !== 0 && (
+            <div className="mt-2 flex h-44 w-full flex-col gap-y-4 overflow-scroll pe-4 ">
+              {usersSelected.map((user, index) => (
+                <div
+                  key={index}
+                  id={user.userId}
+                  className="flex w-full flex-col items-center justify-start"
+                >
+                  <div className="flex w-full flex-row justify-between">
+                    <label className="w-full font-normal text-black">
+                      {user.name}
+                    </label>
+                    <button type="button">
+                      <CloseIcon
+                        size="h-5 w-5"
+                        color="text-black hover:text-red-600"
+                        closeFunction={() => handleDeleteUserSelected(user)}
+                      />
+                    </button>
+                  </div>
+                  <textarea
+                    value={
+                      sprintSurveyAnswer.coworkersComments[user.userId] || ""
+                    }
+                    onChange={(e) => onChangeValue(e.target.value, user.userId)}
+                    placeholder="Type some feedback..."
+                    className="w-full rounded-lg border border-primary-light p-1 text-sm placeholder:left-1 placeholder:text-sm focus:outline-primary-dark"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+          {usersSelected.length === 0 && (
+            <p className="m-auto self-center text-lg font-medium text-grayText">
+              No selected users
+            </p>
+          )}
+        </section>
       </div>
     </>
   );

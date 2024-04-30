@@ -1,24 +1,26 @@
 interface SliderProps {
   label: string;
   className?: string;
-  onChange?: (value: number, key: string) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>, key: string) => void;
   name: string;
   value?: number;
 }
 const Slider = ({ label, className, onChange, name, value }: SliderProps) => {
   return (
-    <div className={`flex w-1/2 flex-col ${className}`}>
+    <div className={`flex w-full flex-col ${className}`}>
       <label className="mb-2 mt-4 block text-sm font-light text-black">
         {label}
       </label>
       <input
         type="range"
-        step={50}
+        step={1}
         min={0}
-        max={100}
+        max={10}
         name={name}
         value={value}
-        onChange={(e) => onChange && onChange(parseInt(e.target.value), name)}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          onChange && onChange(e, name)
+        }
         className="h-1.5 w-full appearance-none rounded-full bg-primary
           [&::-webkit-slider-thumb]:h-5
           [&::-webkit-slider-thumb]:w-5

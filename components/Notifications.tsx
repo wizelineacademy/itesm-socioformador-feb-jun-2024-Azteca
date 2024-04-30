@@ -1,20 +1,29 @@
 "use client";
-interface NotificationProps {
-  showProjectModal: () => void;
-  showSprintModal: () => void;
-}
 
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import CloseIcon from "./icons/CloseIcon";
 import NotificationIcon from "./icons/NotificationIcon";
 import NotificationCard from "./NotificationCard";
+import { useQuery } from "@tanstack/react-query";
+import { getNotifications } from "@/services/notifications";
+
+interface NotificationProps {
+  showProjectModal: () => void;
+  showSprintModal: () => void;
+}
 
 const Notifications = ({
   showProjectModal,
   showSprintModal,
 }: NotificationProps) => {
   const [isActive, setIsActive] = useState(false);
+
+  /*   const notificationsQuery = useQuery({
+    queryKey: ["notifications"],
+    queryFn: () => getNotifications(),
+  }); */
+
   const [notifications, setNotifications] = useState([
     {
       id: 1,
@@ -53,11 +62,17 @@ const Notifications = ({
 
   const handleClickNotification = (index: number, type: string): void => {
     onNotificationClick(type);
-    const newNotifications = [...notifications];
-    newNotifications.splice(index, 1);
+    // const newNotifications = [...notifications];
+    //newNotifications.splice(index, 1);
     //setNotifications(newNotifications);
     setIsActive(false);
   };
+
+  /*   if (notificationsQuery.isLoading) {
+    return <div>loading...</div>;
+  } else {
+    return <div>loaded</div>;
+  } */
 
   return (
     <Menu as="div" className="relative inline-block text-left">
@@ -92,7 +107,11 @@ const Notifications = ({
                   <p className="text-md font-bold text-black">Notifications</p>
                   <p className="">({notifications.length})</p>
                 </div>
-                <CloseIcon size="h-6 w-6" closeFunction={close} />
+                <CloseIcon
+                  size="h-6 w-6"
+                  closeFunction={close}
+                  color="text-black hover:text-red-600"
+                />
               </div>
             )}
           </Menu.Item>
