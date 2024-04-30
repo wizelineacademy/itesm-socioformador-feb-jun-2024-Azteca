@@ -1,14 +1,53 @@
+"use client";
+
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import Slider from "../Slider";
+import { useMutation } from "@tanstack/react-query";
+import { submitProjectAnswer } from "@/services/projectSurvey";
+import { ProjectAnswer } from "@/types";
 
 interface ProjectSurveyProps {
   showModal: boolean;
   onClose: () => void;
 }
 const ProjectSurvey = ({ showModal, onClose }: ProjectSurveyProps) => {
+  const { mutate } = useMutation({
+    mutationFn: submitProjectAnswer,
+    onSuccess: onClose,
+  });
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    onClose();
+    event.preventDefault();
+
+    // TODO: handle failure cases for this surveys
+    const formData = new FormData(event.target as HTMLFormElement);
+    mutate({
+      finalSurveyId: 1, // TODO: Harcoded for now (waiting for notifications to be implemented)
+      answers: [
+        {
+          questionKey: "efforts",
+          answer: parseInt(formData.get("efforts")!.toString()),
+        },
+        {
+          questionKey: "support",
+          answer: parseInt(formData.get("support")!.toString()),
+        },
+        {
+          questionKey: "decisions",
+          answer: parseInt(formData.get("support")!.toString()),
+        },
+        {
+          questionKey: "opportunities",
+          answer: parseInt(formData.get("support")!.toString()),
+        },
+        {
+          questionKey: "respect",
+          answer: parseInt(formData.get("support")!.toString()),
+        },
+      ],
+      comment: formData.get("comments")!.toString(),
+    });
   };
 
   return (

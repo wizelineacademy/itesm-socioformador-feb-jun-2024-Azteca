@@ -24,6 +24,7 @@ export async function submitProjectAnswer(answers: ProjectAnswer) {
   if (!userId) {
     throw new Error("You most be signed in");
   }
+  console.log(answers); // TODO: remove this console log
   await db.insert(finalSurveyAnswer).values(
     answers.answers.map((item) => ({
       userId: userId,
