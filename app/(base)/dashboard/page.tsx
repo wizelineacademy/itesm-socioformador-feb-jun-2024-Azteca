@@ -106,7 +106,7 @@ const Dashboard = () => {
   };
 
   return (
-    <main className=" mt-2 flex justify-between">
+    <div className=" mt-2 flex justify-between">
       <div className="grid gap-7">
         {/* Gauge Charts */}
         <div className="mt-4 flex justify-between gap-16">
@@ -233,7 +233,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 };
 
