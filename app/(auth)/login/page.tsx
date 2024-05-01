@@ -1,40 +1,41 @@
-import { signIn } from "@/auth";
+"use client";
+import { loginAction } from "@/actions";
 import FormTextInput from "@/components/FormTextInput";
-import { AuthError } from "next-auth";
+import { TextInput } from "@mantine/core";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const Login = () => {
-  const loginAction = async (formData: FormData) => {
-    "use server";
-    try {
-      await signIn("credentials", formData);
-    } catch (error) {
-      if (error instanceof AuthError) {
-        switch (error.type) {
-          case "CredentialsSignin":
-            return "Invalid credentials.";
-          default:
-            return "Something went wrong.";
-        }
+  const [error, setError] = useState<string | null>(null);
+  const emailInput = document.getElementById("email");
+  const clientLoginAction = async (formData: FormData) => {
+    const result = await loginAction(formData);
+    if (result) {
+      switch (result) {
+        case "Invalid credentials.":
+          setError("Email or password is not valid.");
+          break;
+        default:
+          setError("Something went wrong. Try again.");
+          break;
       }
-      throw error;
     }
   };
 
   return (
-    <main className="flex h-dvh w-full items-center justify-center bg-gradient-to-r from-primary to-primary-light">
+    <main className="flex items-center justify-center bg-gradient-to-r from-primary to-primary-light">
       <section className="flex h-fit w-[33%] flex-col justify-center divide-y divide-gray-500 rounded-[20px] bg-bone px-16 py-8 drop-shadow-md">
         <div className="flex w-full flex-col items-center justify-start gap-y-4 pb-8">
           <p className="mb-4 mt-6 text-center text-3xl font-semibold leading-normal text-black">
             Log in to Feedback Flow
           </p>
-          <button className=" group flex w-7/12 flex-row rounded-full border border-primary-light px-4 py-2 hover:bg-primary-dark">
+          <button className=" group flex w-7/12 flex-row rounded-full border border-primary-light px-4 py-2 transition-all duration-200 hover:bg-primary-dark">
             <i className="fi fi-brands-slack text-lg leading-[0px] text-primary-light group-hover:text-white" />
             <p className="mx-auto text-sm font-medium text-black group-hover:text-white">
               Continue with Slack
             </p>
           </button>
-          <button className=" group flex w-7/12 flex-row rounded-full border border-primary-light px-4 py-2 hover:bg-primary-dark">
+          <button className=" group flex w-7/12 flex-row rounded-full border border-primary-light px-4 py-2 transition-all duration-200 hover:bg-primary-dark">
             <i className="fi fi-brands-google text-lg leading-[0px] text-primary-light group-hover:text-white" />
             <p className="mx-auto text-sm font-medium text-black group-hover:text-white">
               Continue with Google
@@ -43,15 +44,17 @@ const Login = () => {
         </div>
         <div className="flex w-full flex-col items-center justify-center pb-6">
           <form
-            action={loginAction}
+            action={clientLoginAction}
             className="flex w-full flex-col justify-center"
           >
             <FormTextInput name="email" type="email" label="Email" />
             <FormTextInput name="password" type="password" label="Password" />
             <label
               id="error"
-              className="text-sm font-medium text-red-600"
-            ></label>
+              className="pt-1.5 text-sm font-medium text-red-600"
+            >
+              {emailInput?.textContent}
+            </label>
             <button
               className="mx-auto mb-4 mt-12 h-10 w-28 rounded-2xl bg-primary font-medium text-bone shadow-2xl hover:bg-primary-dark"
               type="submit"

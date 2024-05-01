@@ -21,9 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={poppins.className + " h-dvh w-dvw overflow-hidden bg-bone"}
-      >
+      <body className={poppins.className + " h-dvh w-dvw bg-bone"}>
         <ReactQueryProvider>{children}</ReactQueryProvider>
       </body>
     </html>

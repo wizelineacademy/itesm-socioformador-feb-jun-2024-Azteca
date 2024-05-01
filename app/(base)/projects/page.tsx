@@ -16,7 +16,7 @@ const Projects = async () => {
   const role = await getUserRole();
 
   return (
-    <main className=" h-dvh w-dvw overflow-hidden">
+    <div>
       <section className="mt-12 flex flex-col">
         <div className="mb-8 flex justify-center gap-5">
           <h3 className="text-4xl font-medium">My Projects</h3>
@@ -41,7 +41,7 @@ const Projects = async () => {
           ))}
         </div>
       </section>
-    </main>
+    </div>
   );
 };
 
