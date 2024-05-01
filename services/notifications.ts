@@ -5,6 +5,7 @@ import db from "@/db/drizzle";
 import {
   finalSurvey,
   project,
+  projectMember,
   rulerSurveyAnswers,
   sprintSurvey,
 } from "@/db/schema";
@@ -26,9 +27,11 @@ export async function getNotifications() {
       date: sprintSurvey.scheduledAt,
     })
     .from(sprintSurvey)
-    .innerJoin(project, eq(sprintSurvey.projectId, project.id))
+    .innerJoin(project, eq(project.id, sprintSurvey.projectId))
+    .innerJoin(projectMember, eq(projectMember.projectId, project.id))
     .where(
       and(
+        eq(projectMember.userId, userId), // the surveys belong to a user's project
         eq(sprintSurvey.processed, false), // the surveys aren't processed
         gte(sql`CURRENT_TIMESTAMP`, sprintSurvey.scheduledAt), // the survey itself is active (i.e. has been scheduled)
       ),
@@ -43,7 +46,7 @@ export async function getNotifications() {
     }
   }
 
-  // TODO: Get the notifications of the final surveys
+  // Get the notifications of the final surveys
   const finalSurveys = await db
     .select({
       id: finalSurvey.id,
@@ -51,9 +54,11 @@ export async function getNotifications() {
       date: finalSurvey.scheduledAt,
     })
     .from(finalSurvey)
-    .innerJoin(project, eq(finalSurvey.projectId, project.id))
+    .innerJoin(project, eq(project.id, finalSurvey.projectId))
+    .innerJoin(projectMember, eq(projectMember.projectId, project.id))
     .where(
       and(
+        eq(projectMember.userId, userId), // the surveys belong to a user's project
         eq(finalSurvey.processed, false), // the surveys aren't processed
         gte(sql`CURRENT_TIMESTAMP`, finalSurvey.scheduledAt), // the survey itself is active (i.e. has been scheduled)
       ),
@@ -68,7 +73,7 @@ export async function getNotifications() {
     }
   }
 
-  // TODO: Get the notifications of the ruler surveys
+  // Get the notifications of the ruler surveys
   const rulerSurveys = await db
     .select()
     .from(rulerSurveyAnswers)
