@@ -2,6 +2,7 @@ import { Emotion } from "@/types";
 import { rulerEmotionsMatrix } from "@/utils/constants";
 
 const RulerSurvey = () => {
+  //TODO: Start working on the modal for the survey, use a bfs to scale the emotions
   return (
     <div className="w-full">
       {rulerEmotionsMatrix.map((row, rowIndex) => (

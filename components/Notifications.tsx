@@ -51,10 +51,15 @@ const Notifications = ({
   };
 
   if (!notificationsQuery.data) {
-    return <div>loading...</div>;
+    return (
+      <button
+        className={`group cursor-not-allowed rounded-full bg-white p-2 drop-shadow-lg`}
+      >
+        <NotificationIcon size="h-6 w-6" color="text-primary" />
+      </button>
+    );
   }
 
-  // TODO: fix overflow-y of the notifications popup
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div onClick={() => setIsActive(!isActive)}>
@@ -80,10 +85,10 @@ const Notifications = ({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className=" absolute right-0 z-50 mt-2 box-content h-72 w-96 origin-top-right rounded-md bg-white px-4 shadow-lg ring-1 ring-black/5 focus:outline-none">
+        <Menu.Items className=" absolute right-0 z-50 mt-2 box-content h-72 w-96 origin-top-right overflow-auto rounded-md bg-white px-4 shadow-lg ring-1 ring-black/5 focus:outline-none">
           <Menu.Item>
             {({ close }) => (
-              <div className="mt-3 flex flex-row items-center justify-between">
+              <div className="sticky top-0 z-50 flex flex-row items-center justify-between bg-white pt-3">
                 <div className="flex flex-row gap-1">
                   <p className="text-md font-bold text-black">Notifications</p>
                   <p className="">({notificationsQuery.data.length})</p>
@@ -106,13 +111,9 @@ const Notifications = ({
                         close();
                         handleClickNotification(index, notification.type);
                       }}
-                      className="w-full cursor-pointer py-1"
+                      className="w-full cursor-pointer overflow-auto py-1"
                     >
-                      <NotificationCard
-                        notification={notification}
-                        onClick={() => {}}
-                        index={index}
-                      />
+                      <NotificationCard notification={notification} />
                     </div>
                   )}
                 </Menu.Item>

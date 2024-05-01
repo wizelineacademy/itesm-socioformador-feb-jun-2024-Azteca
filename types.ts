@@ -17,6 +17,12 @@ export type SurveyStepTwoAnswer = {
   SS_CWMT: Array<Array<Coworker>>;
 };
 
+export type DateObject = {
+  date: string;
+  time: string;
+  dateAsText: string;
+};
+
 export type ProjectSprint = "MS_RF" | "MS_LS" | "MS_RA" | "MS_WE";
 
 export type SprintSurveyAnswer = {
