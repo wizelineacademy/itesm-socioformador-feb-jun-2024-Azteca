@@ -45,7 +45,7 @@ export async function createProject({
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) throw new Error("You must be signed in");
-
+  console.log(newProject, members);
   const res = await db
     .insert(project)
     .values({ ...newProject, managerId: userId })

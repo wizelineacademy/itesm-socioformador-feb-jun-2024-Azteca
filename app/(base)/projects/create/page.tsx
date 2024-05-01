@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DatePickerInput } from "@mantine/dates";
 import UserProfileButton from "@/components/UserProfileButton";
 import CalendarIcon from "@/components/icons/CalendarIcon";
 import { createProject } from "@/services/project";
-import { useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { getAllEmployees } from "@/services/user";
 import { useRouter } from "next/navigation";
 import { Coworker } from "@/types";
 import {
@@ -19,6 +20,11 @@ import { Employee } from "@/types";
 
 const CreateProject = () => {
   const router = useRouter();
+
+  const employeesQuery = useQuery({
+    queryKey: ["employees"],
+    queryFn: () => getAllEmployees(),
+  });
 
   // Mutations
   const createProjectMutation = useMutation({
@@ -38,6 +44,7 @@ const CreateProject = () => {
     const sprintSurveyPeriodicityInDays = formData
       .get("sprint_survey_periodicity_in_days")
       ?.toString();
+    const memberIds = selectedMembers.map((member) => member.id);
 
     if (
       !startDate ||
@@ -57,56 +64,15 @@ const CreateProject = () => {
         description,
         sprintSurveyPeriodicityInDays: Number(sprintSurveyPeriodicityInDays),
       },
-      members: [
-        "fe033269-0851-4257-bf66-de5079892ea7", // Pedro
-      ],
+      members: memberIds,
     });
   };
 
   const [selectedMembers, setSelectedMembers] = useState<Employee[]>([]);
 
-  // TODO: Fecth all members
-  const membersData: Employee[] = [
-    {
-      id: "1",
-      name: "Adrián Ramírez",
-      email: "adrian-rmz@gmail.com",
-      photoUrl:
-        "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-7.png",
-    },
-    {
-      id: "2",
-      name: "Pedro Alonso Moreno",
-      email: "pedro-moreno@gmail.com",
-      photoUrl:
-        "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-8.png",
-    },
-    {
-      id: "3",
-      name: "Felipe de Jesús",
-      email: "felipe-jesus@gmail.com",
-      photoUrl:
-        "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-4.png",
-    },
-    {
-      id: "4",
-      name: "Jose Sanchez",
-      email: "jose-sanchez@gmail.com",
-      photoUrl:
-        "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-1.png",
-    },
-    {
-      id: "5",
-      name: "Eduardo de Valle",
-      email: "eduardo-valle@gmail.com",
-      photoUrl:
-        "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-2.png",
-    },
-  ];
-
   const handleOptionSubmit = (selectedOption: string) => {
     // Suponemos que el value seleccionado es el nombre del empleado
-    const employeeToAdd = membersData.find(
+    const employeeToAdd = employeesQuery.data?.find(
       (employee) => employee.name === selectedOption,
     );
 
@@ -134,7 +100,7 @@ const CreateProject = () => {
 
   const handleOptionRemove = (selectedOption: string) => {
     // Suponemos que el value seleccionado es el nombre del empleado
-    const employeeToRemove = membersData.find(
+    const employeeToRemove = employeesQuery.data?.find(
       (employee) => employee.name === selectedOption,
     );
 
@@ -154,7 +120,9 @@ const CreateProject = () => {
   const renderMultiSelectOption: MultiSelectProps["renderOption"] = ({
     option,
   }) => {
-    const member = membersData.find((member) => member.name === option.value);
+    const member = employeesQuery.data?.find(
+      (member) => member.name === option.value,
+    );
     if (!member) {
       return null; // or some fallback UI component
     }
@@ -171,6 +139,9 @@ const CreateProject = () => {
       </Group>
     );
   };
+
+  if (employeesQuery.isLoading) return <div>Loading...</div>;
+  if (employeesQuery.isError) return <div>Error loading employees.</div>;
 
   return (
     <>
@@ -236,7 +207,7 @@ const CreateProject = () => {
                   Members
                 </label>
                 <MultiSelect
-                  data={membersData.map((member) => member.name)}
+                  data={employeesQuery.data?.map((member) => member.name)}
                   renderOption={renderMultiSelectOption}
                   maxDropdownHeight={180}
                   // label="Employees of the month"
