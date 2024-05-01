@@ -44,6 +44,7 @@ const CreateProject = () => {
     const sprintSurveyPeriodicityInDays = formData
       .get("sprint_survey_periodicity_in_days")
       ?.toString();
+    const memberIds = selectedMembers.map((member) => member.id);
 
     if (
       !startDate ||
@@ -63,9 +64,7 @@ const CreateProject = () => {
         description,
         sprintSurveyPeriodicityInDays: Number(sprintSurveyPeriodicityInDays),
       },
-      members: [
-        "fe033269-0851-4257-bf66-de5079892ea7", // Pedro
-      ],
+      members: memberIds,
     });
   };
 

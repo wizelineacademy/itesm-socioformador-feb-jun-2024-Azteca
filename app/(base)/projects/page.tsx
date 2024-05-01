@@ -4,7 +4,7 @@ import ProjectExtendedCard from "@/components/ProjectExtendedCard";
 import { getProjects } from "@/services/project";
 import { getUserRole } from "@/services/user";
 
-const formatDate = (date: string) => {
+const formatDate = (date: Date) => {
   return new Date(date).toLocaleString("default", {
     month: "short",
     year: "numeric",
