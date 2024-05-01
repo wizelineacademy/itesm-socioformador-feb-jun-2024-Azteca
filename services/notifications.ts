@@ -30,7 +30,6 @@ export async function getNotifications() {
     .where(
       and(
         eq(sprintSurvey.processed, false), // the surveys aren't processed
-        lte(sql`CURRENT_TIMESTAMP`, project.endDate), // the project is active (i.e. hasn't expired)
         gte(sql`CURRENT_TIMESTAMP`, sprintSurvey.scheduledAt), // the survey itself is active (i.e. has been scheduled)
       ),
     );
@@ -56,7 +55,6 @@ export async function getNotifications() {
     .where(
       and(
         eq(finalSurvey.processed, false), // the surveys aren't processed
-        lte(sql`CURRENT_TIMESTAMP`, project.endDate), // the project is active (i.e. hasn't expired)
         gte(sql`CURRENT_TIMESTAMP`, finalSurvey.scheduledAt), // the survey itself is active (i.e. has been scheduled)
       ),
     );

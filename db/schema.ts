@@ -3,6 +3,7 @@ import {
   boolean,
   date,
   integer,
+  json,
   pgEnum,
   pgTable,
   primaryKey,
@@ -97,10 +98,7 @@ export const pipResource = pgTable("pip_resource", {
   title: varchar("title", { length: 64 }),
   kind: pipResourceKind("type_resource"),
   description: varchar("description", { length: 1024 }),
-  embedding: text("embedding")
-    .array()
-    .notNull()
-    .default(sql`'{}'::text[]`),
+  embedding: json("embedding").$type<number[]>(),
 });
 
 export const userResource = pgTable(
@@ -173,7 +171,6 @@ export const sprintSurveyAnswerCoworkers = pgTable(
 
 export const finalSurvey = pgTable("final_survey", {
   id: serial("final_survey_id").primaryKey(),
-  created_at: date("created_at", { mode: "date" }),
   scheduledAt: date("scheduled_at", { mode: "date" }),
   projectId: integer("project_id").references(() => project.id, {
     onDelete: "cascade",

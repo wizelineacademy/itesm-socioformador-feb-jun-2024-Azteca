@@ -3,9 +3,27 @@
 import React from "react";
 import { RadarChart, AreaChart } from "@mantine/charts";
 import GaugeChart from "@/components/GaugeChart";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { deleteProjectById } from "@/services/project";
+import { useRouter } from "next/navigation";
+import { getUserRole } from "@/services/user";
 
-// const Project = ({ params: { project_id } }) => {
-const Project = () => {
+const Project = ({ params }: { params: { project_id: string } }) => {
+  const router = useRouter();
+
+  const { mutate } = useMutation({
+    mutationFn: deleteProjectById,
+    onSuccess: () => {
+      router.replace("/projects");
+      router.refresh();
+    },
+  });
+
+  const userRoleQuery = useQuery({
+    queryKey: ["user-role"],
+    queryFn: () => getUserRole(),
+  });
+
   const radarData = [
     {
       statistic: "Communication",
@@ -85,7 +103,21 @@ const Project = () => {
 
   return (
     <div className="mt-2">
-      <p className="text-3xl font-medium">Project 1</p>
+      <div className="flex justify-between">
+        <p className="text-3xl font-medium">Project 1</p>
+        {userRoleQuery.data &&
+          (userRoleQuery.data === "MANAGER" ||
+            userRoleQuery.data === "ADMIN") && (
+            <button
+              className="rounded-lg bg-red-800 px-3 py-2 text-white"
+              onClick={(e) => {
+                mutate(parseInt(params.project_id));
+              }}
+            >
+              Delete
+            </button>
+          )}
+      </div>
       {/* Gauge Charts */}
       <div className="mt-4 flex justify-between">
         {gaugeData.map((gauge, index) => (
