@@ -29,6 +29,10 @@ const CreateProject = () => {
   // Mutations
   const createProjectMutation = useMutation({
     mutationFn: createProject,
+    onSuccess: () => {
+      router.replace("/projects");
+      router.refresh();
+    },
   });
 
   const [rangeDates, setRangeDates] = useState<[Date | null, Date | null]>([
@@ -167,6 +171,9 @@ const CreateProject = () => {
                 <label htmlFor="duration" className="text-2xl font-medium">
                   Duration
                 </label>
+                <p className="text-gray-500">
+                  Choose the starting date and end date for the project
+                </p>
                 <DatePickerInput
                   leftSection={<CalendarIcon size="h-6 w-6" color="grayText" />}
                   type="range"
@@ -174,7 +181,6 @@ const CreateProject = () => {
                   placeholder="Pick dates range"
                   value={rangeDates}
                   onChange={setRangeDates}
-                  minDate={new Date()}
                   className="mt-2 gap-2 drop-shadow-lg"
                   styles={{
                     input: {
@@ -192,10 +198,14 @@ const CreateProject = () => {
                   htmlFor="sprint_survey_periodicity_in_days"
                   className="text-2xl font-medium"
                 >
-                  Sprint Survey Periodicity Days
+                  Sprint Survey Periodicity (In Days)
                 </label>
+                <p className="text-gray-500">
+                  For example: If set to seven, we will send a survey each week
+                </p>
                 <input
                   type="number"
+                  placeholder="7"
                   id="sprint_survey_periodicity_in_days"
                   name="sprint_survey_periodicity_in_days"
                   className="mt-2 h-full w-full rounded-xl p-2 drop-shadow-lg"

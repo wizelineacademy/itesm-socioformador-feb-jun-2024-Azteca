@@ -2,7 +2,13 @@
 
 import { auth } from "@/auth";
 import db from "@/db/drizzle";
-import { project, projectMember, user } from "@/db/schema";
+import {
+  finalSurvey,
+  project,
+  projectMember,
+  sprintSurvey,
+  user,
+} from "@/db/schema";
 import { eq, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -45,13 +51,15 @@ export async function createProject({
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) throw new Error("You must be signed in");
-  console.log(newProject, members);
+
+  // Create the project and get the id
   const res = await db
     .insert(project)
-    .values({ ...newProject, managerId: userId })
+    .values({ ...newProject, managerId: userId }) // Manager is current user
     .returning({ id: project.id });
   const { id: projectId } = res[0];
 
+  // Link the members to that project
   await db.insert(projectMember).values(
     members.map((member) => ({
       userId: member,
@@ -59,8 +67,32 @@ export async function createProject({
     })),
   );
 
-  revalidatePath("/projects");
-  redirect("/projects");
+  // Create the records for the sprint surveys
+  let currentDate = new Date(newProject.startDate);
+
+  const jumpToNextSprint = () => {
+    currentDate.setDate(
+      currentDate.getDate() + newProject.sprintSurveyPeriodicityInDays,
+    );
+  };
+
+  jumpToNextSprint();
+  while (currentDate <= newProject.endDate) {
+    await db
+      .insert(sprintSurvey)
+      .values({ projectId, scheduledAt: currentDate });
+
+    jumpToNextSprint();
+  }
+
+  // Create the records for the final survey
+  await db
+    .insert(finalSurvey)
+    .values({ projectId, scheduledAt: newProject.endDate });
+}
+
+export async function deleteProjectById(projectId: number) {
+  await db.delete(project).where(eq(project.id, projectId));
 }
 
 export async function getEmployeesInProjectById(projectId: number) {
