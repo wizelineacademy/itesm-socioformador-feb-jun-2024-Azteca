@@ -26,6 +26,7 @@ export type DateObject = {
 export type ProjectSprint = "MS_RF" | "MS_LS" | "MS_RA" | "MS_WE";
 
 export type SprintSurveyAnswer = {
+  userId: string;
   sprintSurveyId: number;
   projectAnswers: Array<{ questionKey: ProjectSprint; answer: number }>;
   coworkersAnswers: Array<{
