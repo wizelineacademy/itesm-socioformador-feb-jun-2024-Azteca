@@ -69,7 +69,7 @@ const PIP = () => {
   );
 
   return (
-    <main>
+    <div>
       <section id="pip-progressbar" className="mt-4">
         <p className=" mb-2 text-3xl font-semibold">Personal Career Plan</p>
         <ProgressBar width={progressPercentage} height={6} />
@@ -101,7 +101,7 @@ const PIP = () => {
           ))}
         </div>
       </section>
-    </main>
+    </div>
   );
 };
 

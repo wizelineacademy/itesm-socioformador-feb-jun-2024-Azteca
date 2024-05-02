@@ -1,7 +1,7 @@
 import { Coworker, SprintSurveyAnswer } from "@/types";
 import Image from "next/image";
 import UserIcon from "../icons/UserIcon";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CloseIcon from "../icons/CloseIcon";
 
 interface SprintStepFour {
@@ -18,12 +18,18 @@ const SprintStepFour = ({
   const [usersSelected, setUsersSelected] = useState<Coworker[]>([]);
   const [selectableUsers, setSelectableUsers] = useState<Coworker[]>(users);
   const onChangeValue = (comment: string, userId: string) => {
+    const newCoworkersComments = [...sprintSurveyAnswer.coworkersComments];
+    const index = newCoworkersComments.findIndex(
+      (coworker) => coworker.coworkerId === userId,
+    );
+    if (index === -1) {
+      newCoworkersComments.push({ coworkerId: userId, comment: comment });
+    } else {
+      newCoworkersComments[index].comment = comment;
+    }
     setSprintSurveyAnswer({
       ...sprintSurveyAnswer,
-      coworkersComments: {
-        ...sprintSurveyAnswer.coworkersComments,
-        [userId]: comment,
-      },
+      coworkersComments: newCoworkersComments,
     });
   };
 
@@ -135,7 +141,9 @@ const SprintStepFour = ({
                   </div>
                   <textarea
                     value={
-                      sprintSurveyAnswer.coworkersComments[user.userId] || ""
+                      sprintSurveyAnswer.coworkersComments.find(
+                        (coworker) => coworker.coworkerId === user.userId,
+                      )?.comment || ""
                     }
                     onChange={(e) => onChangeValue(e.target.value, user.userId)}
                     placeholder="Type some feedback..."

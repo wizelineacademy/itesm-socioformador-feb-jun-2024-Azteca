@@ -3,6 +3,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* * > * {
+  outline: red solid 1px;
+} */
+
 :root {
   --bone: #f8f5f5;
   --primary: #6640d5;
@@ -78,7 +82,20 @@
   0% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
   }
+}
+
+.mantine-Popover-dropdown {
+  border-radius: 12px !important;
+}
+
+.ruler-grid {
+  display: grid;
+  grid-template-columns: repeat(13, minmax(0, 1fr));
+  grid-template-rows: repeat(13, minmax(0, 1fr));
+  gap: 1rem;
+  grid-auto-flow: row;
 }

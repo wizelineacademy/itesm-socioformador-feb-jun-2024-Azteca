@@ -24,15 +24,15 @@ const UserProfileButton = ({
   const isActive = false;
   return (
     <button
-      className={`${className} ${isActive ? "bg-primary" : "bg-white"} group rounded-full p-2 drop-shadow-lg`}
+      className={`${className} ${isActive ? "bg-primary" : "bg-white"} group rounded-full ${photoUrl ? "p-1" : "p-2"} drop-shadow-lg`}
     >
       {photoUrl ? (
         <Image
           src={photoUrl}
           alt={"User profile photo"}
           className={`rounded-full ${sizes[size]}`}
-          width={50}
-          height={50}
+          width={300}
+          height={300}
         />
       ) : (
         <svg

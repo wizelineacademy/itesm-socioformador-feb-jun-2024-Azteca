@@ -4,7 +4,7 @@ import { registerUser } from "@/services/user";
 import { AuthError } from "next-auth";
 import Link from "next/link";
 
-const Login = () => {
+const Register = () => {
   const registerAction = async (formData: FormData) => {
     "use server";
     const name = formData.get("name")?.toString();
@@ -29,7 +29,7 @@ const Login = () => {
   };
 
   return (
-    <main className="flex h-dvh w-full items-center justify-center bg-gradient-to-r from-primary to-primary-light">
+    <div className="flex h-dvh items-center justify-center bg-gradient-to-r from-primary to-primary-light">
       <section className="flex h-fit w-[33%] flex-col justify-center rounded-[20px] bg-bone px-10 py-8 drop-shadow-md ">
         <p className="mt-6 text-center text-3xl font-semibold leading-normal text-black">
           Sign Up
@@ -61,8 +61,8 @@ const Login = () => {
           </Link>
         </div>
       </section>
-    </main>
+    </div>
   );
 };
 
-export default Login;
+export default Register;

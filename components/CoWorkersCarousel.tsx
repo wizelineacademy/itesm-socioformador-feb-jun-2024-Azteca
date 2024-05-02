@@ -56,7 +56,7 @@ export default function EmblaCarousel() {
       <ul className="embla__container px-1 py-3">
         {coworkersQuery.data.map((user, index) => (
           <li key={index} className="embla__slide__coworker">
-            <UserProfileButton size="md" />
+            <UserProfileButton size="md" photoUrl={user.photoUrl || ""} />
           </li>
         ))}
       </ul>

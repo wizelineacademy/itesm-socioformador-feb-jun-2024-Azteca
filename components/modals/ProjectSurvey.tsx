@@ -10,8 +10,13 @@ import { ProjectAnswer } from "@/types";
 interface ProjectSurveyProps {
   showModal: boolean;
   onClose: () => void;
+  projectSurveyId: number;
 }
-const ProjectSurvey = ({ showModal, onClose }: ProjectSurveyProps) => {
+const ProjectSurvey = ({
+  showModal,
+  onClose,
+  projectSurveyId,
+}: ProjectSurveyProps) => {
   const { mutate } = useMutation({
     mutationFn: submitProjectAnswer,
     onSuccess: onClose,
@@ -23,7 +28,7 @@ const ProjectSurvey = ({ showModal, onClose }: ProjectSurveyProps) => {
     // TODO: handle failure cases for this surveys
     const formData = new FormData(event.target as HTMLFormElement);
     mutate({
-      finalSurveyId: 1, // TODO: Harcoded for now (waiting for notifications to be implemented)
+      finalSurveyId: projectSurveyId,
       answers: [
         {
           questionKey: "PS_RF",
@@ -35,15 +40,15 @@ const ProjectSurvey = ({ showModal, onClose }: ProjectSurveyProps) => {
         },
         {
           questionKey: "PS_LF",
-          answer: parseInt(formData.get("support")!.toString()),
+          answer: parseInt(formData.get("decisions")!.toString()),
         },
         {
           questionKey: "PS_OG",
-          answer: parseInt(formData.get("support")!.toString()),
+          answer: parseInt(formData.get("opportunities")!.toString()),
         },
         {
           questionKey: "PS_RT",
-          answer: parseInt(formData.get("support")!.toString()),
+          answer: parseInt(formData.get("respect")!.toString()),
         },
       ],
       comment: formData.get("comments")!.toString(),

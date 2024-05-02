@@ -1,50 +1,37 @@
 "use client";
 
 import { Menu, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Dispatch, Fragment, SetStateAction, useState } from "react";
 import CloseIcon from "./icons/CloseIcon";
 import NotificationIcon from "./icons/NotificationIcon";
 import NotificationCard from "./NotificationCard";
 import { useQuery } from "@tanstack/react-query";
 import { getNotifications } from "@/services/notifications";
+import { Notification } from "@/types";
 
 interface NotificationProps {
   showProjectModal: () => void;
   showSprintModal: () => void;
+  showRulerModal: () => void;
+  setNotificationId: Dispatch<SetStateAction<number>>;
 }
 
 const Notifications = ({
   showProjectModal,
   showSprintModal,
+  showRulerModal,
+  setNotificationId,
 }: NotificationProps) => {
   const [isActive, setIsActive] = useState(false);
 
-  /*   const notificationsQuery = useQuery({
+  const notificationsQuery = useQuery({
     queryKey: ["notifications"],
     queryFn: () => getNotifications(),
-  }); */
-
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      title: "RULER",
-      type: "RULER",
-    },
-    {
-      id: 2,
-      title: "Sprint Survey",
-      type: "SPRINT",
-    },
-    {
-      id: 3,
-      title: "Project Survey",
-      type: "PROJECT",
-    },
-  ]);
+  });
 
   const onNotificationClick = (notificationType: string) => {
     switch (notificationType) {
-      case "PROJECT":
+      case "FINAL":
         showProjectModal();
         break;
 
@@ -53,6 +40,7 @@ const Notifications = ({
         break;
 
       case "RULER":
+        showRulerModal();
         break;
 
       default:
@@ -60,19 +48,27 @@ const Notifications = ({
     }
   };
 
-  const handleClickNotification = (index: number, type: string): void => {
-    onNotificationClick(type);
+  const handleClickNotification = (
+    index: number,
+    notification: Notification,
+  ): void => {
+    setNotificationId(notification.id!);
+    onNotificationClick(notification.type);
     // const newNotifications = [...notifications];
     //newNotifications.splice(index, 1);
     //setNotifications(newNotifications);
     setIsActive(false);
   };
 
-  /*   if (notificationsQuery.isLoading) {
-    return <div>loading...</div>;
-  } else {
-    return <div>loaded</div>;
-  } */
+  if (!notificationsQuery.data) {
+    return (
+      <button
+        className={`group cursor-not-allowed rounded-full bg-white p-2 drop-shadow-lg`}
+      >
+        <NotificationIcon size="h-6 w-6" color="text-primary" />
+      </button>
+    );
+  }
 
   return (
     <Menu as="div" className="relative inline-block text-left">
@@ -84,7 +80,7 @@ const Notifications = ({
             size="h-6 w-6"
             color={isActive ? "text-white" : "text-primary"}
           />
-          {notifications.length > 0 && (
+          {notificationsQuery.data.length > 0 && (
             <span className=" absolute -right-px -top-px flex h-3 w-3 items-center justify-center rounded-full bg-red-700 " />
           )}
         </Menu.Button>
@@ -99,13 +95,13 @@ const Notifications = ({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className=" absolute right-0 z-50 mt-2 box-content h-72 w-96 origin-top-right rounded-md bg-white px-4 shadow-lg ring-1 ring-black/5 focus:outline-none">
+        <Menu.Items className=" absolute right-0 z-50 mt-2 box-content h-72 w-96 origin-top-right overflow-auto rounded-md bg-white px-4 shadow-lg ring-1 ring-black/5 focus:outline-none">
           <Menu.Item>
             {({ close }) => (
-              <div className="mt-3 flex flex-row items-center justify-between">
+              <div className="sticky top-0 z-50 flex flex-row items-center justify-between bg-white pt-3">
                 <div className="flex flex-row gap-1">
                   <p className="text-md font-bold text-black">Notifications</p>
-                  <p className="">({notifications.length})</p>
+                  <p className="">({notificationsQuery.data.length})</p>
                 </div>
                 <CloseIcon
                   size="h-6 w-6"
@@ -115,29 +111,25 @@ const Notifications = ({
               </div>
             )}
           </Menu.Item>
-          {notifications.length > 0 &&
-            notifications.map((notification, index) => {
+          {notificationsQuery.data.length > 0 &&
+            notificationsQuery.data.map((notification, index) => {
               return (
                 <Menu.Item key={index}>
                   {({ close }) => (
                     <div
                       onClick={() => {
                         close();
-                        handleClickNotification(index, notification.type);
+                        handleClickNotification(index, notification);
                       }}
-                      className="w-full cursor-pointer py-1"
+                      className="w-full cursor-pointer overflow-auto py-1"
                     >
-                      <NotificationCard
-                        notification={notification}
-                        onClick={() => {}}
-                        index={index}
-                      />
+                      <NotificationCard notification={notification} />
                     </div>
                   )}
                 </Menu.Item>
               );
             })}
-          {notifications.length === 0 && (
+          {notificationsQuery.data.length === 0 && (
             <div className="flex h-5/6 w-full items-center justify-center py-1">
               <Menu.Item>
                 <p className="items-center py-2 text-sm">

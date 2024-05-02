@@ -1,11 +1,33 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { RadarChart, AreaChart } from "@mantine/charts";
 import GaugeChart from "@/components/GaugeChart";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { deleteProjectById } from "@/services/project";
+import { useRouter } from "next/navigation";
+import { getUserRole } from "@/services/user";
+import ChevronDownIcon from "@/components/icons/ChevronDownIcon";
 
-// const Project = ({ params: { project_id } }) => {
-const Project = () => {
+const Project = ({ params }: { params: { project_id: string } }) => {
+  const router = useRouter();
+
+  const [isUpdateFeedbackPopupOpen, setIsUpdateFeedbackPopupOpen] =
+    useState(false);
+
+  const { mutate } = useMutation({
+    mutationFn: deleteProjectById,
+    onSuccess: () => {
+      router.replace("/projects");
+      router.refresh();
+    },
+  });
+
+  const userRoleQuery = useQuery({
+    queryKey: ["user-role"],
+    queryFn: () => getUserRole(),
+  });
+
   const radarData = [
     {
       statistic: "Communication",
@@ -85,7 +107,58 @@ const Project = () => {
 
   return (
     <div className="mt-2">
-      <p className="text-3xl font-medium">Project 1</p>
+      <div className="flex justify-between">
+        <p className="text-3xl font-medium">Project 1</p>
+        {userRoleQuery.data &&
+          (userRoleQuery.data === "MANAGER" ||
+            userRoleQuery.data === "ADMIN") && (
+            <div className="flex gap-2">
+              {/* Update feedback */}
+              <div className="relative z-10 flex items-center gap-1">
+                {/* popup */}
+                {isUpdateFeedbackPopupOpen && (
+                  <div className="absolute right-full top-full z-0 text-nowrap rounded-xl bg-white p-4 drop-shadow-lg">
+                    <h2 className="mb-10 text-xl font-medium">
+                      Update History
+                    </h2>
+                    <div className="flex gap-20">
+                      <p>Survey 04/04/2024</p>
+                      <p className="text-green-600">Completed</p>
+                    </div>
+                    <div className="flex gap-20">
+                      <p>Survey 04/04/2024</p>
+                      <p className="text-green-600">Completed</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* open-popup-button */}
+                <button
+                  className="h-7 w-7 rounded-lg border border-gray-400 text-primary"
+                  onClick={() => {
+                    setIsUpdateFeedbackPopupOpen(!isUpdateFeedbackPopupOpen);
+                  }}
+                >
+                  <span className="sr-only">Update Feedback Details</span>
+                  <ChevronDownIcon />
+                </button>
+                {/* update-button */}
+                <button className="rounded-lg bg-primary px-3 py-2 text-white">
+                  Update Feedback
+                </button>
+              </div>
+              {/* Delete button */}
+              <button
+                className="rounded-lg bg-red-800 px-3 py-2 text-white"
+                onClick={(e) => {
+                  mutate(parseInt(params.project_id));
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          )}
+      </div>
       {/* Gauge Charts */}
       <div className="mt-4 flex justify-between">
         {gaugeData.map((gauge, index) => (

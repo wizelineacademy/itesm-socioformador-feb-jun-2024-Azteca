@@ -13,7 +13,7 @@ import { getCoworkersInProject } from "@/services/project";
 interface SprintSurveyProps {
   showModal: boolean;
   onClose: () => void;
-  sprintSurveyId: number; // Asegúrate de pasar este ID como prop donde se use SprintSurvey
+  sprintSurveyId: number; 
 }
 
 const SprintSurvey = ({
@@ -40,38 +40,38 @@ const SprintSurvey = ({
     sprintSurveyId: sprintSurveyId,
     projectAnswers: [
       {
-        questionKey: "resources",
-        answer: 50,
+        questionKey: "MS_RF",
+        answer: 1,
       },
       {
-        questionKey: "responsibilities",
-        answer: 50,
+        questionKey: "MS_RA",
+        answer: 1,
       },
       {
-        questionKey: "support",
-        answer: 50,
+        questionKey: "MS_LS",
+        answer: 1,
       },
       {
-        questionKey: "workload",
-        answer: 50,
+        questionKey: "MS_WE",
+        answer: 1,
       },
     ],
     coworkersAnswers: [],
-    coworkersComments: {},
+    coworkersComments: [],
   });
 
   const [sprintSurveyStepTwoAnswer, setSprintSurveyStepTwoAnswer] =
     useState<SurveyStepTwoAnswer>({
-      punctuality: Array(10)
+      SS_CWPN: Array(10)
         .fill([])
         .map(() => []),
-      cooperation: Array(10)
+      SS_CWCM: Array(10)
         .fill([])
         .map(() => []),
-      support: Array(10)
+      SS_CWSP: Array(10)
         .fill([])
         .map(() => []),
-      motivates: Array(10)
+      SS_CWMT: Array(10)
         .fill([])
         .map(() => []),
     });
