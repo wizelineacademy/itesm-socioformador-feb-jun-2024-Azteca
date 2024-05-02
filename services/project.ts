@@ -112,3 +112,18 @@ export async function getEmployeesInProjectById(projectId: number) {
 
   return res;
 }
+
+// This function returns the coworkers in a project that are also in a sprint survey
+export async function getCoworkersInProject(sprintSurveyId: number) {
+  return await db
+    .select({
+      userId: user.id,
+      name: user.name,
+      photoUrl: user.photoUrl,
+    })
+    .from(sprintSurvey)
+    .innerJoin(project, eq(sprintSurvey.projectId, project.id)) // Join sprintSurvey to project
+    .innerJoin(projectMember, eq(project.id, projectMember.projectId)) // Join project to projectMember
+    .innerJoin(user, eq(projectMember.userId, user.id)) // Join projectMember to user
+    .where(eq(sprintSurvey.id, sprintSurveyId)); // Filter by sprintSurveyId
+}

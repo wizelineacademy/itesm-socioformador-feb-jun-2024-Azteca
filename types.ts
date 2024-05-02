@@ -1,6 +1,6 @@
 export type Coworker = {
   name: string;
-  photoUrl?: string;
+  photoUrl?: string | null;
   userId: string;
   color?: string;
 };

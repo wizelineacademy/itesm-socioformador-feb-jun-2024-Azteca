@@ -7,11 +7,13 @@ import SprintStepTwo from "./SprintStepTwo";
 import { Coworker, SprintSurveyAnswer, SurveyStepTwoAnswer } from "@/types";
 import SprintStepThree from "./SprintStepThree";
 import SprintStepFour from "./SprintStepFour";
+import { useQuery } from "@tanstack/react-query";
+import { getCoworkersInProject } from "@/services/project";
 
 interface SprintSurveyProps {
   showModal: boolean;
   onClose: () => void;
-  sprintSurveyId: number;
+  sprintSurveyId: number; 
 }
 
 const SprintSurvey = ({
@@ -20,38 +22,21 @@ const SprintSurvey = ({
   sprintSurveyId,
 }: SprintSurveyProps) => {
   const [step, setStep] = useState<number>(1);
-  const handleNavigation = (step: number) => {
-    setStep(step);
-  };
 
-  const users: Coworker[] = [
-    {
-      name: "Pedro Alonso",
-      photoUrl: "",
-      userId: "eorjioerji",
-      color: "text-blue-300",
-    },
-    {
-      name: "Alejandro Mendoza",
-      photoUrl: "",
-      userId: "inenrvoerni",
-      color: "text-red-300",
-    },
-    {
-      name: "Felipe González",
-      photoUrl: "",
-      userId: "wefiweo",
-      color: "text-yellow-300",
-    },
-    {
-      name: "Adrian Ramírez",
-      photoUrl: "",
-      userId: "woiejiew",
-      color: "text-green-300",
-    },
-  ];
+  // Uso de React Query para obtener datos de los coworkers del proyecto
+  const {
+    data: users,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["coworkers", 34],
+    queryFn: () => getCoworkersInProject(34),
+  });
+  console.log(users);
 
+  // Estado para manejar las respuestas del sprint survey
   const [sprintAnswer, setSprintAnswer] = useState<SprintSurveyAnswer>({
+    userId: "placeholder",
     sprintSurveyId: sprintSurveyId,
     projectAnswers: [
       {
@@ -91,6 +76,10 @@ const SprintSurvey = ({
         .map(() => []),
     });
 
+  const handleNavigation = (step: number) => {
+    setStep(step);
+  };
+
   const isSurveyCompleted = (): boolean => {
     const isStepTwoCompleted = Object.keys(sprintSurveyStepTwoAnswer).every(
       (key) => {
@@ -100,7 +89,7 @@ const SprintSurvey = ({
         subArray.forEach((subArrayElement) => {
           usersInSubarray += subArrayElement.length;
         });
-        return usersInSubarray === users.length;
+        return usersInSubarray === (users?.length ?? 0);
       },
     );
     return isStepTwoCompleted;
@@ -134,11 +123,13 @@ const SprintSurvey = ({
       return;
     }
     parseStepTwoAnswer();
-    // Send data to the server
-    console.log(sprintAnswer);
-    console.log("Completed");
+    console.log(sprintAnswer); // Aquí podrías reemplazar por código para enviar los datos al servidor
     onClose();
   };
+
+  // Renderizando el componente SprintSurvey
+  if (!users) return <div>Loading...</div>;
+  if (isError) return <div>Error loading data</div>;
 
   const modalWidth =
     step === 3
@@ -159,7 +150,6 @@ const SprintSurvey = ({
         >
           <div className="fixed inset-0 bg-black/25" />
         </Transition.Child>
-
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
@@ -201,12 +191,11 @@ const SprintSurvey = ({
                     setSprintSurveyAnswer={setSprintAnswer}
                   />
                 )}
-
                 <footer className="mt-8 flex justify-center">
                   {step === 1 && (
                     <button
                       type="button"
-                      className=" mx-auto rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
+                      className="mx-auto rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
                       onClick={() => handleNavigation(2)}
                     >
                       Next
@@ -216,15 +205,14 @@ const SprintSurvey = ({
                     <>
                       <button
                         type="button"
-                        className=" mx-auto rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
+                        className="mx-auto rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
                         onClick={() => handleNavigation(1)}
                       >
                         Go back
                       </button>
-
                       <button
                         type="button"
-                        className=" mx-auto  rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
+                        className="mx-auto rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
                         onClick={() => handleNavigation(3)}
                       >
                         Submit
@@ -235,14 +223,14 @@ const SprintSurvey = ({
                     <>
                       <button
                         type="button"
-                        className=" mx-auto rounded-full bg-primary px-10 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
+                        className="mx-auto rounded-full bg-primary px-10 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
                         onClick={handleSubmit}
                       >
                         No
                       </button>
                       <button
                         type="button"
-                        className=" mx-auto  rounded-full bg-primary px-10 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
+                        className="mx-auto rounded-full bg-primary px-10 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
                         onClick={() => handleNavigation(4)}
                       >
                         Yes
@@ -252,7 +240,7 @@ const SprintSurvey = ({
                   {step === 4 && (
                     <button
                       type="button"
-                      className=" mx-auto rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
+                      className="mx-auto rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
                       onClick={handleSubmit}
                     >
                       Send feedback
