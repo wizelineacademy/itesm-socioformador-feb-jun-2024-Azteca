@@ -8,6 +8,7 @@ import RulerStepTwo from "./RulerStepTwo";
 interface RulerSurveyProps {
   showModal: boolean;
   onClose: () => void;
+  rulerSurveyId: number;
 }
 
 const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {

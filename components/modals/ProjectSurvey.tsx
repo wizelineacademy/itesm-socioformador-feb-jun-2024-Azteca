@@ -10,8 +10,13 @@ import { ProjectAnswer } from "@/types";
 interface ProjectSurveyProps {
   showModal: boolean;
   onClose: () => void;
+  projectSurveyId: number;
 }
-const ProjectSurvey = ({ showModal, onClose }: ProjectSurveyProps) => {
+const ProjectSurvey = ({
+  showModal,
+  onClose,
+  projectSurveyId,
+}: ProjectSurveyProps) => {
   const { mutate } = useMutation({
     mutationFn: submitProjectAnswer,
     onSuccess: onClose,
@@ -23,7 +28,7 @@ const ProjectSurvey = ({ showModal, onClose }: ProjectSurveyProps) => {
     // TODO: handle failure cases for this surveys
     const formData = new FormData(event.target as HTMLFormElement);
     mutate({
-      finalSurveyId: 2, // TODO: Harcoded for now (waiting for notifications to be implemented)
+      finalSurveyId: projectSurveyId,
       answers: [
         {
           questionKey: "PS_RF",

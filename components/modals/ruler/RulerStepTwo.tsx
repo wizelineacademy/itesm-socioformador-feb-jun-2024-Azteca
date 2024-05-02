@@ -49,7 +49,7 @@ const RulerStepTwo = ({
           Go back
         </button>
         <button
-          type="button"
+          type="submit"
           className=" mx-auto rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
           onClick={onClose}
         >

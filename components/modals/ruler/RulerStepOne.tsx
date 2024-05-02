@@ -1,6 +1,5 @@
 import { Emotion, RulerSurveyAnswer } from "@/types";
 import { rulerEmotionsMatrix } from "@/utils/constants";
-import { emotionBgColor } from "@/utils/utils";
 import { Dispatch } from "react";
 
 interface RulerStepOneProps {
@@ -14,6 +13,15 @@ const RulerStepOne = ({
   nextStep,
   rulerSurveyAnswer,
 }: RulerStepOneProps) => {
+  const emotionBgColor = (emotion: Emotion) => {
+    if (emotion.pleasantness < 0 && emotion.energy < 0) return "bg-blue-400";
+    else if (emotion.pleasantness < 0 && emotion.energy > 0)
+      return "bg-red-400";
+    else if (emotion.pleasantness > 0 && emotion.energy < 0)
+      return "bg-green-400";
+    else return "bg-yellow-400";
+  };
+
   const handleClick = (emotion: Emotion) => {
     const section = document.getElementById("ruler-survey");
     if (section) {
@@ -145,7 +153,7 @@ const RulerStepOne = ({
                   onMouseEnter={() => expandSize(rowIndex, colIndex)}
                   onMouseLeave={() => removeSize()}
                   onClick={() => handleClick(emotion)}
-                  className={`${emotionBgColor(emotion)} h-10 w-14 cursor-pointer rounded-full text-center text-transparent transition-transform duration-500 hover:z-50 hover:scale-150 hover:text-white`}
+                  className={`${emotionBgColor(emotion)} z-10 h-10 w-14 cursor-pointer rounded-full text-center text-transparent transition-transform duration-500 hover:z-50 hover:scale-150 hover:text-white`}
                 >
                   <p className="text-[0.5rem] font-semibold duration-500">
                     {emotion.name}
