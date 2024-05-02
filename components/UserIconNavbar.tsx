@@ -4,7 +4,9 @@ import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import UserIcon from "./icons/UserIcon";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { useQuery } from "@tanstack/react-query";
+import { getUserInfo } from "@/services/user";
 
 interface UserIconInterface {
   path: string;
@@ -12,6 +14,10 @@ interface UserIconInterface {
 }
 const UserIconNavbar = ({ path, currentPath }: UserIconInterface) => {
   const onSite = currentPath === path;
+  const { data: user } = useQuery({
+    queryKey: ["user"],
+    queryFn: () => getUserInfo(),
+  });
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const handleSignOut = async () => {
     await signOut();
@@ -51,7 +57,7 @@ const UserIconNavbar = ({ path, currentPath }: UserIconInterface) => {
           <div className="px-1 py-1 ">
             <Menu.Item>
               <p className="mx-auto items-center px-2 py-2 text-sm">
-                Hola Pedro!
+                Hola {user?.name.split(" ")[0]}!
               </p>
             </Menu.Item>
           </div>

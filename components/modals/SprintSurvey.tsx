@@ -9,6 +9,7 @@ import SprintStepThree from "./SprintStepThree";
 import SprintStepFour from "./SprintStepFour";
 import { useQuery } from "@tanstack/react-query";
 import { getCoworkersInProject } from "@/services/project";
+import toast from "react-hot-toast";
 
 interface SprintSurveyProps {
   showModal: boolean;
@@ -115,10 +116,15 @@ const SprintSurvey = ({
     });
   };
 
-  const handleSubmit = () => {
+  const handleStepTwoAnswer = () => {
     if (!isSurveyCompleted()) {
+      toast.error("Please fill all the fields before submitting the survey");
       return;
     }
+    setStep(3);
+  };
+
+  const handleSubmit = () => {
     parseStepTwoAnswer();
     console.log(sprintAnswer);
     onClose();
@@ -210,7 +216,7 @@ const SprintSurvey = ({
                       <button
                         type="button"
                         className="mx-auto rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
-                        onClick={() => handleNavigation(3)}
+                        onClick={handleStepTwoAnswer}
                       >
                         Submit
                       </button>

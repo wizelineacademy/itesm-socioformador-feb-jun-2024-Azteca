@@ -92,6 +92,12 @@ const Profile = async ({ params }: { params: { id: string } }) => {
             </p>
           </div>
           <div className="mb-10 mt-5 flex flex-wrap gap-5">
+            {traits.strengths.length === 0 && (
+              <p className="text-sm font-medium">
+                Currently you have no strengths available, please ask your
+                manager to update them.
+              </p>
+            )}
             {traits.strengths.map((strength, index) => (
               <Tooltip message={strength.description!} key={index}>
                 <Badge text={strength.name!} />
@@ -108,6 +114,12 @@ const Profile = async ({ params }: { params: { id: string } }) => {
             </p>
           </div>
           <div className="mb-10 mt-5 flex flex-wrap gap-5">
+            {traits.areasOfOportunity.length === 0 && (
+              <p className="text-sm font-medium">
+                Currently you have no areas of opportunity available, please ask
+                your manager to update them.
+              </p>
+            )}
             {traits.areasOfOportunity.map((area, index) => (
               <Tooltip message={area.description!} key={index}>
                 <Badge text={area.name!} />

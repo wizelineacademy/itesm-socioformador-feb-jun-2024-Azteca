@@ -37,6 +37,7 @@
     "pg": "^8.11.5",
     "react": "^18",
     "react-dom": "^18",
+    "react-hot-toast": "^2.4.1",
     "recharts": "^2.12.5",
     "sharp": "^0.33.3",
     "sst": "ion",
