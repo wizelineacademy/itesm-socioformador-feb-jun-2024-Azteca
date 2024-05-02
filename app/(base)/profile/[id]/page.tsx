@@ -29,6 +29,7 @@ const Profile = async ({ params }: { params: { id: string } }) => {
       {/* Banner */}
       <section className="w-100 mx-auto mb-24 mt-6 flex h-52 rounded-xl bg-primary">
         <UserProfileButton
+          photoUrl={user.photoUrl!}
           size="lg"
           className="absolute left-20 top-60 h-fit"
           // photoUrl={BitmojiAdrian}

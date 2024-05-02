@@ -13,7 +13,6 @@ interface UserIconInterface {
 const UserIconNavbar = ({ path, currentPath }: UserIconInterface) => {
   const onSite = currentPath === path;
   const [isClicked, setIsClicked] = useState<boolean>(false);
-  const router = useRouter();
   const handleSignOut = async () => {
     await signOut();
   };
