@@ -59,13 +59,13 @@ const PIP = () => {
       try {
         const data = await getUserResources();
         setResources(data);
+        feedback_analysis(34);
       } catch (error) {
         console.error("Failed to fetch tasks:", error);
       }
     }
 
     fetchResources();
-    feedback_analysis(34);
   }, []);
 
   const progressPercentage = Math.round(

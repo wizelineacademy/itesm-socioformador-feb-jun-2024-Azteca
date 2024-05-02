@@ -16,9 +16,6 @@ import {
   sprintSurveyAnswerProject,
 } from "@/db/schema";
 
-import * as fs from "fs";
-import { unique } from "drizzle-orm/mysql-core";
-
 /*
   This function calculates the cosine similarity between the query and the resources,
   it returns the resources with the highest similarity
@@ -48,6 +45,117 @@ async function cosine_similarity(feedback: string) {
   // sort the resources by similarity in descending order
   resourcesSimilarity.sort((a, b) => b[0]! - a[0]!);
   return resourcesSimilarity;
+}
+
+// This functino processes the open feedback of the user and returns a summary of the feedback
+async function process_open_feedback(feedback: string) {
+  const sentences = feedback.split(".");
+  for (let sentence of sentences) {
+    const wordsPerSentence: number[] = [];
+  }
+
+  // split positive, negative and neutral feedback
+}
+
+// This function performs the analysis of the closed feedback
+async function process_closed_feedback() {}
+
+/*
+  This function groups all the feedback received in a custom structure.
+  Output:
+  {
+    coworkerId_1: {
+      openFeedback: { ... },
+      closedFeedback: { ... }
+    },
+    coworkerId_2: { .... },
+    ....,
+    coworkerId_n: { ... }
+  }
+*/
+async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
+  interface FeedbackCategory {
+    openFeedback: Array<[string, string]>;
+    closedFeedback: Array<[string, number]>;
+  }
+
+  const feedbackRecords: {
+    [userId: string]: { [coworkerId: string]: FeedbackCategory };
+  } = {};
+
+  const coworkersOpenFeedback = await db
+    .select({
+      userId: sprintSurveyAnswerCoworkers.userId,
+      coworkerId: sprintSurveyAnswerCoworkers.coworkerId,
+      questionName: sprintSurveyAnswerCoworkers.questionName,
+      comment: sprintSurveyAnswerCoworkers.comment,
+    })
+    .from(sprintSurvey)
+    .innerJoin(
+      sprintSurveyAnswerCoworkers,
+      eq(sprintSurveyAnswerCoworkers.sprintSurveyId, sprintSurveyId),
+    )
+    .where(
+      and(
+        isNull(sprintSurveyAnswerCoworkers.answer),
+        eq(sprintSurvey.id, sprintSurveyId),
+      ),
+    );
+
+  const coworkersClosedFeedback = await db
+    .select({
+      userId: sprintSurveyAnswerCoworkers.userId,
+      coworkerId: sprintSurveyAnswerCoworkers.coworkerId,
+      questionName: sprintSurveyAnswerCoworkers.questionName,
+      answer: sprintSurveyAnswerCoworkers.answer,
+    })
+    .from(sprintSurvey)
+    .innerJoin(
+      sprintSurveyAnswerCoworkers,
+      eq(sprintSurveyAnswerCoworkers.sprintSurveyId, sprintSurveyId),
+    )
+    .where(
+      and(
+        isNull(sprintSurveyAnswerCoworkers.comment),
+        eq(sprintSurvey.id, sprintSurveyId),
+      ),
+    );
+
+  for (let userId of uniqueWorkers) {
+    var filteredCoworkers = uniqueWorkers.filter(
+      (element): element is string =>
+        typeof element === "string" && element !== userId,
+    );
+
+    feedbackRecords[userId] = {};
+
+    for (let coworkerId of filteredCoworkers) {
+      feedbackRecords[userId][coworkerId] = {
+        openFeedback: [],
+        closedFeedback: [],
+      };
+    }
+  }
+
+  coworkersOpenFeedback.forEach((record) => {
+    if (record.coworkerId !== null && record.coworkerId !== undefined) {
+      feedbackRecords[record.userId!][record.coworkerId].openFeedback.push([
+        record.questionName!,
+        record.comment!,
+      ]);
+    }
+  });
+
+  coworkersClosedFeedback.forEach((record) => {
+    if (record.coworkerId !== null && record.coworkerId !== undefined) {
+      feedbackRecords[record.userId!][record.coworkerId].closedFeedback.push([
+        record.questionName!,
+        record.answer!,
+      ]);
+    }
+  });
+
+  return feedbackRecords;
 }
 
 // This function creates the embeddings of all the new resources without embeddings
@@ -105,68 +213,17 @@ export async function ruler_analysis() {
 export async function feedback_analysis(sprintSurveyId: number) {
   const today = new Date().toISOString().slice(0, 10);
 
-  // get all the unique users of the sprint survey
+  // get all the unique users that belong to the project of the sprint survey
   const uniqueUsers = await db
-    .selectDistinctOn([sprintSurveyAnswerCoworkers.userId])
+    .select({
+      userId: projectMember.userId,
+    })
     .from(sprintSurvey)
-    .innerJoin(
-      sprintSurveyAnswerCoworkers,
-      eq(sprintSurveyAnswerCoworkers.sprintSurveyId, sprintSurveyId),
-    )
-    .where(isNull(sprintSurveyAnswerCoworkers.answer));
+    .innerJoin(project, eq(project.id, sprintSurvey.projectId))
+    .innerJoin(projectMember, eq(projectMember.projectId, project.id));
 
-  for (let user of uniqueUsers) {
-    const userId = user.sprint_survey_answer_coworkers.userId;
+  const ids = uniqueUsers.map((user) => user.userId as string);
 
-    console.log("===========================================");
-    console.log("User ID: ", userId);
-
-    // analyze all the open feedback of the user
-    const coworkersOpenFeedback = await db
-      .select({
-        userId: sprintSurveyAnswerCoworkers.userId,
-        coworkerId: sprintSurveyAnswerCoworkers.coworkerId,
-        questionName: sprintSurveyAnswerCoworkers.questionName,
-        comment: sprintSurveyAnswerCoworkers.comment,
-      })
-      .from(sprintSurvey)
-      .innerJoin(
-        sprintSurveyAnswerCoworkers,
-        eq(sprintSurveyAnswerCoworkers.sprintSurveyId, sprintSurveyId),
-      )
-      .where(
-        and(
-          isNull(sprintSurveyAnswerCoworkers.answer),
-          eq(sprintSurveyAnswerCoworkers.userId, userId!),
-        ),
-      );
-
-    console.log(coworkersOpenFeedback);
-    console.log("\n");
-
-    // analyze all the closed feedback of the user
-    const coworkersClosedFeedback = await db
-      .select({
-        userId: sprintSurveyAnswerCoworkers.userId,
-        coworkerId: sprintSurveyAnswerCoworkers.coworkerId,
-        questionName: sprintSurveyAnswerCoworkers.questionName,
-        answer: sprintSurveyAnswerCoworkers.answer,
-      })
-      .from(sprintSurvey)
-      .innerJoin(
-        sprintSurveyAnswerCoworkers,
-        eq(sprintSurveyAnswerCoworkers.sprintSurveyId, sprintSurveyId),
-      )
-      .where(isNull(sprintSurveyAnswerCoworkers.comment));
-    console.log(coworkersClosedFeedback);
-    console.log("===========================================");
-
-    if (coworkersOpenFeedback.length > 0) {
-      // create new resources based on the open feedback
-    } else {
-      // create new resources based on the closed feedback
-    }
-  }
-
-  console.log("\n\n\n");
+  // feedback ordered, this structure is important to detect similarities between the feedback
+  const orderedFeedback = await group_feedback(sprintSurveyId, ids);
 }
