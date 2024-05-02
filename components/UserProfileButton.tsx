@@ -16,7 +16,8 @@ const UserProfileButton = ({
   color = "text-primary",
 }: UserProfileButtonProps) => {
   const sizes = {
-    xs: "h-4 w-4",
+    "2xs": "h-4 w-4",
+    xs: "h-8 w-8",
     sm: "h-10 w-10",
     md: "h-20 w-20",
     lg: "h-32 w-32",

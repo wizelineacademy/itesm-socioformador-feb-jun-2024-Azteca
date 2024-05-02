@@ -13,7 +13,7 @@ import { getCoworkersInProject } from "@/services/project";
 interface SprintSurveyProps {
   showModal: boolean;
   onClose: () => void;
-  sprintSurveyId: number; 
+  sprintSurveyId: number;
 }
 
 const SprintSurvey = ({
@@ -23,7 +23,6 @@ const SprintSurvey = ({
 }: SprintSurveyProps) => {
   const [step, setStep] = useState<number>(1);
 
-  // Uso de React Query para obtener datos de los coworkers del proyecto
   const {
     data: users,
     isLoading,
@@ -32,9 +31,7 @@ const SprintSurvey = ({
     queryKey: ["coworkers", 34],
     queryFn: () => getCoworkersInProject(34),
   });
-  console.log(users);
 
-  // Estado para manejar las respuestas del sprint survey
   const [sprintAnswer, setSprintAnswer] = useState<SprintSurveyAnswer>({
     userId: "placeholder",
     sprintSurveyId: sprintSurveyId,
@@ -123,12 +120,12 @@ const SprintSurvey = ({
       return;
     }
     parseStepTwoAnswer();
-    console.log(sprintAnswer); // Aquí podrías reemplazar por código para enviar los datos al servidor
+    console.log(sprintAnswer);
     onClose();
   };
 
-  // Renderizando el componente SprintSurvey
-  if (!users) return <div>Loading...</div>;
+  //TODO: Render the loading state into the modal
+  if (!users) return <div></div>;
   if (isError) return <div>Error loading data</div>;
 
   const modalWidth =
