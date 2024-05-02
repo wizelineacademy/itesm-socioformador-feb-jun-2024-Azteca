@@ -3,6 +3,7 @@ import {
   boolean,
   date,
   integer,
+  json,
   pgEnum,
   pgTable,
   primaryKey,
@@ -92,17 +93,18 @@ export const pipTask = pgTable("pip_task", {
   isDone: boolean("is_done"),
 });
 
-export const pipResourceKind = pgEnum("role", ["BOOK", "VIDEO", "ARTICLE"]);
+export const pipResourceKind = pgEnum("type_resource", [
+  "BOOK",
+  "VIDEO",
+  "ARTICLE",
+]);
 
 export const pipResource = pgTable("pip_resource", {
   id: serial("id").primaryKey(),
   title: varchar("title", { length: 64 }),
-  kind: pipResourceKind("kind"),
+  kind: pipResourceKind("type_resource"),
   description: varchar("description", { length: 1024 }),
-  embedding: text("embedding")
-    .array()
-    .notNull()
-    .default(sql`'{}'::text[]`),
+  embedding: json("embedding").$type<number[]>(),
 });
 
 export const userResource = pgTable(
@@ -112,11 +114,6 @@ export const userResource = pgTable(
     resourceId: serial("resource_id").references(() => pipResource.id),
   },
   // composite primary key on (userId, rulerSurveyId)
-  (table) => {
-    return {
-      pk: primaryKey({ columns: [table.userId, table.resourceId] }),
-    };
-  },
 );
 
 export const rulerSurvey = pgTable("ruler_survey", {
@@ -145,8 +142,11 @@ export const rulerSurveyAnswers = pgTable(
 
 export const sprintSurvey = pgTable("sprint_survey", {
   id: serial("sprint_survey_id").primaryKey(),
-  projectId: integer("project_id").references(() => project.id),
-  createdAt: date("created_at"),
+  projectId: integer("project_id").references(() => project.id, {
+    onDelete: "cascade",
+  }),
+  scheduledAt: date("scheduled_at", { mode: "date" }),
+  processed: boolean("processed").default(false),
 });
 
 export const sprintSurveyAnswerProject = pgTable(
@@ -172,18 +172,17 @@ export const sprintSurveyAnswerCoworkers = pgTable(
   {
     sprintSurveyId: integer("sprint_survey_id").references(
       () => sprintSurvey.id,
+      { onDelete: "cascade" },
     ),
-    userId: uuid("user_id").references(() => user.id),
-    coworkerId: uuid("coworker_id").references(() => user.id),
+    userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
+    coworkerId: uuid("coworker_id").references(() => user.id, {
+      onDelete: "cascade",
+    }),
     questionName: varchar("question_name", { length: 8 }),
     answer: integer("answer"),
+    comment: text("comment"),
   },
   // composite primary key on (userId, sprintSurveyId)
-  (table) => {
-    return {
-      pk: primaryKey({ columns: [table.userId, table.sprintSurveyId] }),
-    };
-  },
 );
 
 export const finalSurvey = pgTable("final_survey", {

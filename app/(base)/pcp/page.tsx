@@ -1,4 +1,7 @@
 "use client";
+// import { useMutation, useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from "react";
+
 import NavigationBar from "@/components/NavigationBar";
 import PipResource from "@/components/PipResource";
 import PipTask from "@/components/PipTask";
@@ -8,8 +11,8 @@ import {
   getUserResources,
   updateTask,
 } from "@/services/tasks-and-resources";
-// import { useMutation, useQuery } from '@tanstack/react-query';
-import { useState, useEffect } from "react";
+
+import { feedback_analysis } from "@/services/rag";
 
 const PIP = () => {
   interface Task {
@@ -62,6 +65,7 @@ const PIP = () => {
     }
 
     fetchResources();
+    feedback_analysis(34);
   }, []);
 
   const progressPercentage = Math.round(
