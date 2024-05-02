@@ -13,7 +13,7 @@ const DraggableUser = ({ user }: { user: SurveyCoworker }) => {
       {isDragging ? (
         <UserIcon
           size="w-10 h-10"
-          color={user.color || "text-primary"}
+          color={"text-blue-300" || "text-primary"}
           className=" animate-[spin_1.5s_infinite]  rounded-full bg-white transition-all duration-100"
         />
       ) : (
@@ -23,7 +23,10 @@ const DraggableUser = ({ user }: { user: SurveyCoworker }) => {
               x{user.times}
             </span>
           )}
-          <UserIcon size="w-10 h-10" color={user.color || "text-primary"} />
+          <UserIcon
+            size="w-10 h-10"
+            color={"text-blue-300" || "text-primary"}
+          />
         </Tooltip>
       )}
     </Draggable>
