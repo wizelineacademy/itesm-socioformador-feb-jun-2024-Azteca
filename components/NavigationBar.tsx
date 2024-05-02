@@ -12,7 +12,7 @@ import SprintSurvey from "./modals/SprintSurvey";
 import { useQuery } from "@tanstack/react-query";
 import { getUserRole } from "@/services/user";
 import Link from "next/link";
-import RulerSurvey from "./modals/RulerSurvey";
+import RulerSurvey from "./modals/ruler/RulerSurvey";
 
 const NavigationBar = () => {
   const userRoleQuery = useQuery({
