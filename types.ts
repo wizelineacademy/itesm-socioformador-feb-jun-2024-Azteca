@@ -62,3 +62,8 @@ export type Emotion = {
   energy: number;
   description: string;
 };
+
+export type RulerSurveyAnswer = {
+  emotion: Emotion | null;
+  comment: string | null;
+};

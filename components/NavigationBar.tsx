@@ -12,7 +12,7 @@ import SprintSurvey from "./modals/SprintSurvey";
 import { useQuery } from "@tanstack/react-query";
 import { getUserRole } from "@/services/user";
 import Link from "next/link";
-import RulerSurvey from "./modals/RulerSurvey";
+import RulerSurvey from "./modals/ruler/RulerSurvey";
 
 const NavigationBar = () => {
   const userRoleQuery = useQuery({
@@ -42,7 +42,12 @@ const NavigationBar = () => {
         />
       )}
 
-      {showRulerModal && <RulerSurvey />}
+      {showRulerModal && (
+        <RulerSurvey
+          showModal={showRulerModal}
+          onClose={() => setShowRulerModal(false)}
+        />
+      )}
 
       <nav className="flex items-center justify-between bg-bone">
         <h1 className="text-3xl font-bold text-primary">FEEDBACK FLOW</h1>
@@ -64,6 +69,7 @@ const NavigationBar = () => {
           <Notifications
             showProjectModal={() => setShowProjectModal(true)}
             showSprintModal={() => setShowSprintModal(true)}
+            showRulerModal={() => setShowRulerModal(true)}
           />
           <UserIconNavbar path="/profile" currentPath={pathname} />
         </div>
