@@ -4,6 +4,7 @@ import OpenAI from "openai";
 import db from "@/db/drizzle";
 import { and, eq, gte, lte, isNull, sql } from "drizzle-orm";
 import { auth } from "@/auth";
+import similarity from "compute-cosine-similarity";
 
 import {
   pipTask,
@@ -18,6 +19,38 @@ import {
 import * as fs from "fs";
 import { unique } from "drizzle-orm/mysql-core";
 
+/*
+  This function calculates the cosine similarity between the query and the resources,
+  it returns the resources with the highest similarity
+*/
+async function cosine_similarity(feedback: string) {
+  const resourcesSimilarity = [];
+  const allResources = await db.select().from(pipResource);
+
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_KEY,
+  });
+
+  const response = await openai.embeddings.create({
+    model: "text-embedding-3-small",
+    input: feedback,
+    encoding_format: "float",
+  });
+
+  const feedbackEmbedding = response.data[0].embedding;
+
+  // calculate the cosine similarity between the feedback and the resources
+  for (let resource of allResources) {
+    var resourceSimilarity = similarity(feedbackEmbedding, resource.embedding!);
+    resourcesSimilarity.push([resourceSimilarity, resource.id]);
+  }
+
+  // sort the resources by similarity in descending order
+  resourcesSimilarity.sort((a, b) => b[0]! - a[0]!);
+  return resourcesSimilarity;
+}
+
+// This function creates the embeddings of all the new resources without embeddings
 export async function set_embeddings() {
   /*
   Embeddings models: 
@@ -59,9 +92,7 @@ export async function set_embeddings() {
   }
 }
 
-/*
-  This function analyzes the feedback of the user and creates new resources depending on the answers
-*/
+// This function analyzes the feedback of the user and creates new resources depending on the answers
 export async function ruler_analysis() {
   const session = await auth();
   const userId = session?.user?.id;
@@ -70,9 +101,7 @@ export async function ruler_analysis() {
   // recommend resources only if the mood of the user is negative, check the previous resources recommended to experiment
 }
 
-/*
-  This function is triggered by the manager when the sprint survey is closed
-*/
+// This function is triggered by the manager when the sprint survey is closed
 export async function feedback_analysis(sprintSurveyId: number) {
   const today = new Date().toISOString().slice(0, 10);
 
@@ -131,6 +160,12 @@ export async function feedback_analysis(sprintSurveyId: number) {
       .where(isNull(sprintSurveyAnswerCoworkers.comment));
     console.log(coworkersClosedFeedback);
     console.log("===========================================");
+
+    if (coworkersOpenFeedback.length > 0) {
+      // create new resources based on the open feedback
+    } else {
+      // create new resources based on the closed feedback
+    }
   }
 
   console.log("\n\n\n");
