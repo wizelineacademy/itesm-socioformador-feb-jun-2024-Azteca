@@ -1,23 +1,26 @@
 "use client";
 
 import { Menu, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Dispatch, Fragment, SetStateAction, useState } from "react";
 import CloseIcon from "./icons/CloseIcon";
 import NotificationIcon from "./icons/NotificationIcon";
 import NotificationCard from "./NotificationCard";
 import { useQuery } from "@tanstack/react-query";
 import { getNotifications } from "@/services/notifications";
+import { Notification } from "@/types";
 
 interface NotificationProps {
   showProjectModal: () => void;
   showSprintModal: () => void;
   showRulerModal: () => void;
+  setNotificationId: Dispatch<SetStateAction<number>>;
 }
 
 const Notifications = ({
   showProjectModal,
   showSprintModal,
   showRulerModal,
+  setNotificationId,
 }: NotificationProps) => {
   const [isActive, setIsActive] = useState(false);
 
@@ -45,8 +48,12 @@ const Notifications = ({
     }
   };
 
-  const handleClickNotification = (index: number, type: string): void => {
-    onNotificationClick(type);
+  const handleClickNotification = (
+    index: number,
+    notification: Notification,
+  ): void => {
+    setNotificationId(notification.id!);
+    onNotificationClick(notification.type);
     // const newNotifications = [...notifications];
     //newNotifications.splice(index, 1);
     //setNotifications(newNotifications);
@@ -112,7 +119,7 @@ const Notifications = ({
                     <div
                       onClick={() => {
                         close();
-                        handleClickNotification(index, notification.type);
+                        handleClickNotification(index, notification);
                       }}
                       className="w-full cursor-pointer overflow-auto py-1"
                     >

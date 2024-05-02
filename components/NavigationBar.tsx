@@ -24,6 +24,7 @@ const NavigationBar = () => {
   const [showProjectModal, setShowProjectModal] = useState<boolean>(false);
   const [showSprintModal, setShowSprintModal] = useState<boolean>(false);
   const [showRulerModal, setShowRulerModal] = useState<boolean>(false);
+  const [notificationId, setNotificationId] = useState<number>(0);
 
   const isManager = true;
   return (
@@ -32,6 +33,7 @@ const NavigationBar = () => {
         <ProjectSurvey
           showModal={showProjectModal}
           onClose={() => setShowProjectModal(false)}
+          projectSurveyId={notificationId}
         />
       )}
 
@@ -39,6 +41,7 @@ const NavigationBar = () => {
         <SprintSurvey
           showModal={showSprintModal}
           onClose={() => setShowSprintModal(false)}
+          sprintSurveyId={notificationId}
         />
       )}
 
@@ -46,6 +49,7 @@ const NavigationBar = () => {
         <RulerSurvey
           showModal={showRulerModal}
           onClose={() => setShowRulerModal(false)}
+          rulerSurveyId={notificationId}
         />
       )}
 
@@ -70,6 +74,7 @@ const NavigationBar = () => {
             showProjectModal={() => setShowProjectModal(true)}
             showSprintModal={() => setShowSprintModal(true)}
             showRulerModal={() => setShowRulerModal(true)}
+            setNotificationId={setNotificationId}
           />
           <UserIconNavbar path="/profile" currentPath={pathname} />
         </div>

@@ -38,9 +38,13 @@ export default function ProjectCard({
         <p className="pb-4 text-sm text-graySubtitle">In progress</p>
         <div className="ml-[6px]">
           <ul className="flex">
-            {coworkersQuery.data.map((project, index) => (
+            {coworkersQuery.data.map((coworker, index) => (
               <li key={index}>
-                <UserProfileButton size="xs" className="mx-[-6px]" />
+                <UserProfileButton
+                  size="xs"
+                  className="mx-[-6px]"
+                  photoUrl={coworker.photoUrl || ""}
+                />
               </li>
             ))}
             <button

@@ -11,9 +11,14 @@ import SprintStepFour from "./SprintStepFour";
 interface SprintSurveyProps {
   showModal: boolean;
   onClose: () => void;
+  sprintSurveyId: number;
 }
 
-const SprintSurvey = ({ showModal, onClose }: SprintSurveyProps) => {
+const SprintSurvey = ({
+  showModal,
+  onClose,
+  sprintSurveyId,
+}: SprintSurveyProps) => {
   const [step, setStep] = useState<number>(1);
   const handleNavigation = (step: number) => {
     setStep(step);
@@ -47,7 +52,7 @@ const SprintSurvey = ({ showModal, onClose }: SprintSurveyProps) => {
   ];
 
   const [sprintAnswer, setSprintAnswer] = useState<SprintSurveyAnswer>({
-    sprintSurveyId: 0,
+    sprintSurveyId: sprintSurveyId,
     projectAnswers: [
       {
         questionKey: "MS_RF",

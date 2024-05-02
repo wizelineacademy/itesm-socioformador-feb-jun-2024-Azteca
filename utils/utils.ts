@@ -38,11 +38,3 @@ export const parseDate = (unformattedDate: Date): DateObject => {
     dateAsText: dateAsText,
   };
 };
-
-export const emotionBgColor = (emotion: Emotion) => {
-  if (emotion.pleasantness < 0 && emotion.energy < 0) return "bg-blue-400";
-  else if (emotion.pleasantness < 0 && emotion.energy > 0) return "bg-red-400";
-  else if (emotion.pleasantness > 0 && emotion.energy < 0)
-    return "bg-green-400";
-  else return "bg-yellow-400";
-};
