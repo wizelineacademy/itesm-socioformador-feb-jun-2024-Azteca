@@ -3,6 +3,7 @@ import Image from "next/image";
 import UserIcon from "../icons/UserIcon";
 import { useEffect, useState } from "react";
 import CloseIcon from "../icons/CloseIcon";
+import UserProfileButton from "../UserProfileButton";
 
 interface SprintStepFour {
   users: Coworker[];
@@ -81,7 +82,7 @@ const SprintStepFour = ({
         <section id="users-select" className="col-span-1 mt-2 flex flex-col">
           <p className="text-base font-medium text-black">Coworkers</p>
           {selectableUsers.length !== 0 && (
-            <ul className="mt-2 flex h-full w-full appearance-none flex-col gap-y-1 overflow-auto">
+            <ul className="mt-2 flex h-44 w-full appearance-none flex-col gap-y-1 overflow-auto pe-2">
               {selectableUsers.map((user, index) => (
                 <li
                   className="group flex cursor-pointer flex-row items-center gap-x-2 rounded-xl p-1 hover:bg-primary-light/60"
@@ -89,12 +90,7 @@ const SprintStepFour = ({
                   onClick={() => handleUserSelected(user)}
                 >
                   {user.photoUrl && (
-                    <Image
-                      src={user.photoUrl || ""}
-                      alt={`Coworker ${user.name}`}
-                      width={100}
-                      height={100}
-                    />
+                    <UserProfileButton photoUrl={user.photoUrl} size="sm" />
                   )}
                   {!user.photoUrl && (
                     <UserIcon
@@ -102,7 +98,7 @@ const SprintStepFour = ({
                       color="text-primary group-hover:text-white"
                     />
                   )}
-                  <p className="font-lg py-w text-sm text-black group-hover:text-white">
+                  <p className="font-lg py-w w-[15ch] text-sm text-black group-hover:text-white">
                     {user.name}
                   </p>
                 </li>
