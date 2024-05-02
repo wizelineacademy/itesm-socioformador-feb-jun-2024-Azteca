@@ -11,11 +11,13 @@ import { getNotifications } from "@/services/notifications";
 interface NotificationProps {
   showProjectModal: () => void;
   showSprintModal: () => void;
+  showRulerModal: () => void;
 }
 
 const Notifications = ({
   showProjectModal,
   showSprintModal,
+  showRulerModal,
 }: NotificationProps) => {
   const [isActive, setIsActive] = useState(false);
 
@@ -35,6 +37,7 @@ const Notifications = ({
         break;
 
       case "RULER":
+        showRulerModal();
         break;
 
       default:

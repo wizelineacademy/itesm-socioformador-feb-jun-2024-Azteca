@@ -53,7 +53,7 @@ const Login = () => {
               id="error"
               className="pt-1.5 text-sm font-medium text-red-600"
             >
-              {emailInput?.textContent}
+              {error}
             </label>
             <button
               className="mx-auto mb-4 mt-12 h-10 w-28 rounded-2xl bg-primary font-medium text-bone shadow-2xl hover:bg-primary-dark"

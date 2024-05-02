@@ -1,4 +1,4 @@
-import { DateObject } from "@/types";
+import { DateObject, Emotion } from "@/types";
 
 const months: { [key: string]: string } = {
   "01": "January",
@@ -37,4 +37,12 @@ export const parseDate = (unformattedDate: Date): DateObject => {
     time: `${hour}:${minute}:${second}`,
     dateAsText: dateAsText,
   };
+};
+
+export const emotionBgColor = (emotion: Emotion) => {
+  if (emotion.pleasantness < 0 && emotion.energy < 0) return "bg-blue-400";
+  else if (emotion.pleasantness < 0 && emotion.energy > 0) return "bg-red-400";
+  else if (emotion.pleasantness > 0 && emotion.energy < 0)
+    return "bg-green-400";
+  else return "bg-yellow-400";
 };

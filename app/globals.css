@@ -92,16 +92,10 @@
   border-radius: 12px !important;
 }
 
-.dissolve {
-  animation: dissolve 300ms ease-in-out forwards;
-}
-
-@keyframes dissolve {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
+.ruler-grid {
+  display: grid;
+  grid-template-columns: repeat(13, minmax(0, 1fr));
+  grid-template-rows: repeat(13, minmax(0, 1fr));
+  gap: 1rem;
+  grid-auto-flow: row;
 }
