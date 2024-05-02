@@ -12,6 +12,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { describe } from "node:test";
 
 export const userRoleEnum = pgEnum("role", ["EMPLOYEE", "MANAGER", "ADMIN"]);
 
@@ -114,12 +115,19 @@ export const userResource = pgTable(
 
 export const quadrantEnum = pgEnum("quadrant", ["1", "2", "3", "4"]);
 
+export const rulerEmotion = pgTable("ruler_emotion", {
+  id: integer("id").primaryKey(),
+  name: varchar("name", { length: 16 }),
+  quadrant: quadrantEnum("quadrant"),
+  description: text("description"),
+  embedding: json("embedding").$type<number[]>(),
+});
+
 export const rulerSurveyAnswers = pgTable(
   "ruler_survey_answers",
   {
     userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
-    quadrant: quadrantEnum("quadrant"),
-    emotion: varchar("emotion", { length: 16 }),
+    emotionId: integer("emotion_id").references(() => rulerEmotion.id),
     answeredAt: date("answered_at", { mode: "date" }).default(
       sql`CURRENT_TIMESTAMP::date`,
     ),

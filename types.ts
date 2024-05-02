@@ -56,6 +56,7 @@ export type Notification = {
 };
 
 export type Emotion = {
+  id: number;
   name: string;
   pleasantness: number;
   energy: number;
