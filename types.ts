@@ -68,3 +68,19 @@ export type RulerSurveyAnswer = {
   emotion: Emotion | null;
   comment: string | null;
 };
+
+export type Task = {
+  id: number;
+  userId: string | null;
+  title: string | null;
+  description: string | null;
+  isDone: boolean | null;
+};
+
+export type Resource = {
+  id: number;
+  userId: string | null;
+  title: string | null;
+  description: string | null;
+  kind: string | null;
+};

@@ -34,6 +34,28 @@ export async function getUserInfoById(id: string) {
   return res[0];
 }
 
+export async function getUserInfo() {
+  const session = await auth();
+  const id = session?.user?.id as string;
+  const res = await db
+    .select({
+      id: schema.user.id,
+      name: schema.user.name,
+      email: schema.user.email,
+      jobTitle: schema.user.jobTitle,
+      department: schema.user.department,
+      photoUrl: schema.user.photoUrl,
+      role: schema.user.role,
+    })
+    .from(schema.user)
+    .where(eq(schema.user.id, id));
+
+  if (res.length === 0) {
+    throw new Error("User could not be found");
+  }
+  return res[0];
+}
+
 export async function getUserByEmail(email: string) {
   const users = await db.select().from(user).where(eq(user.email, email));
   return users[0];
