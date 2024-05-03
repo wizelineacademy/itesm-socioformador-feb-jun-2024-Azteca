@@ -80,7 +80,7 @@ jobs:
           echo "POSTGRES_HOST type: $(echo "${{ secrets.POSTGRES_HOST }}" | awk '{print typeof($0)}')"
           echo "POSTGRES_PASSWORD type: $(echo "${{ secrets.POSTGRES_PASSWORD }}" | awk '{print typeof($0)}')"
           echo "POSTGRES_DATABASE type: $(echo "${{ secrets.POSTGRES_DATABASE }}" | awk '{print typeof($0)}')"
-      
+
       - name: Copy Secrets for Production
         run: |
           sst secret set POSTGRES_URL ${{ secrets.POSTGRES_URL }}
