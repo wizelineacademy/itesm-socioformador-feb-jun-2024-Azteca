@@ -10,27 +10,13 @@ export default $config({
   },
   //
   async run() {
-    const POSTGRES_URL = new sst.Secret("PostgresUrl", {
-      value: process.env.POSTGRES_URL,
-    });
-    const POSTGRES_PRISMA_URL = new sst.Secret("PostgresPrismaUrl", {
-      value: process.env.POSTGRES_PRISMA_URL,
-    });
-    const POSTGRES_USER = new sst.Secret("PostgresUser", {
-      value: process.env.POSTGRES_USER,
-    });
-    const POSTGRES_HOST = new sst.Secret("PostgresHost", {
-      value: process.env.POSTGRES_HOST,
-    });
-    const POSTGRES_PASSWORD = new sst.Secret("PostgresPassword", {
-      value: process.env.POSTGRES_PASSWORD,
-    });
-    const POSTGRES_DATABASE = new sst.Secret("PostgresDatabase", {
-      value: process.env.POSTGRES_DATABASE,
-    });
-    const AUTH_SECRET = new sst.Secret("AuthSecret", {
-      value: process.env.AUTH_SECRET,
-    });
+    const POSTGRES_URL = new sst.Secret("PostgresUrl");
+    const POSTGRES_PRISMA_URL = new sst.Secret("PostgresPrismaUrl");
+    const POSTGRES_USER = new sst.Secret("PostgresUser");
+    const POSTGRES_HOST = new sst.Secret("PostgresHost");
+    const POSTGRES_PASSWORD = new sst.Secret("PostgresPassword");
+    const POSTGRES_DATABASE = new sst.Secret("PostgresDatabase");
+    const AUTH_SECRET = new sst.Secret("AuthSecret");
 
     new sst.aws.Nextjs("Nextjs1", {
       link: [
