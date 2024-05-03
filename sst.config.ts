@@ -11,7 +11,7 @@ export default $config({
   //
   async run() {
     const POSTGRES_URL = new sst.Secret("PostgresUrl");
-    const POSTGRES_PRISMA_URL = new sst.Secret("");
+    const POSTGRES_PRISMA_URL = new sst.Secret("PostgresPrismaUrl");
     const POSTGRES_USER = new sst.Secret("PostgresUser");
     const POSTGRES_HOST = new sst.Secret("PostgresHost");
     const POSTGRES_PASSWORD = new sst.Secret("PostgresPassword");
