@@ -13,6 +13,7 @@ const Register = () => {
     const email = formData.get("email")?.toString();
     const password = formData.get("password")?.toString();
     await registerUser(name, email, password, department, jobTitle);
+    console.log("formData", formData);
     try {
       await signIn("credentials", formData);
     } catch (error) {
