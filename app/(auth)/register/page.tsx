@@ -1,4 +1,3 @@
-"use server";
 import { signIn } from "@/auth";
 import FormTextInput from "@/components/FormTextInput";
 import { registerUser } from "@/services/user";
@@ -7,6 +6,7 @@ import Link from "next/link";
 
 const Register = () => {
   const registerAction = async (formData: FormData) => {
+    "use server";
     const name = formData.get("name")?.toString();
     const jobTitle = formData.get("jobTitle")?.toString();
     const department = formData.get("department")?.toString();
