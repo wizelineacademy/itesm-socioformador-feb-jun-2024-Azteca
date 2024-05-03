@@ -8,7 +8,7 @@ export default $config({
       home: "aws",
     };
   },
-  //
+  //PostgresPrismaUrl
   async run() {
     const POSTGRES_URL = new sst.Secret("PostgresUrl");
     const POSTGRES_PRISMA_URL = new sst.Secret("PostgresPrismaUrl");
