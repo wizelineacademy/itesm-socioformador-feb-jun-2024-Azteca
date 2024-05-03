@@ -69,6 +69,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           role-duration-seconds: 1200
           aws-region: us-east-1
+      - name: Debug Values
+        run: |
+          echo "POSTGRES_URL type: $(echo "${{ secrets.POSTGRES_URL }}" | awk '{print typeof($0)}')"
+          echo "POSTGRES_PRISMA_URL type: $(echo "${{ secrets.POSTGRES_PRISMA_URL }}" | awk '{print typeof($0)}')"
       - name: Copy Secrets for Production
         run: |
           sst secret set POSTGRES_URL ${{ secrets.POSTGRES_URL }}
