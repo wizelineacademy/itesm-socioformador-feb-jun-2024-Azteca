@@ -98,15 +98,15 @@ jobs:
 
       - name: Copy Secrets for Production
         run: |
-          sst secret set PostgresUrl $POSTGRES_URL --verbose
-          sst secret set PostgresPrismaUrl $POSTGRES_PRISMA_URL --verbose
-          sst secret set AuthSecret $AUTH_SECRET --verbose
-          sst secret set PostgresUrlNoSsl $POSTGRES_URL_NO_SSL --verbose
-          sst secret set PostgresUrlNonPooling $POSTGRES_URL_NON_POOLING --verbose
-          sst secret set PostgresUser $POSTGRES_USER
-          sst secret set PostgresHost $POSTGRES_HOST
-          sst secret set PostgresPassword $POSTGRES_PASSWORD
-          sst secret set PostgresDatabase $POSTGRES_DATABASE
+          sst secret set PostgresUrl $POSTGRES_URL --stage=dev --verbose
+          sst secret set PostgresPrismaUrl $POSTGRES_PRISMA_URL --stage=dev --verbose
+          sst secret set AuthSecret $AUTH_SECRET --stage=dev --verbose
+          sst secret set PostgresUrlNoSsl $POSTGRES_URL_NO_SSL  --stage=dev --verbose
+          sst secret set PostgresUrlNonPooling $POSTGRES_URL_NON_POOLING --stage=dev --verbose
+          sst secret set PostgresUser $POSTGRES_USER --stage=dev --verbose
+          sst secret set PostgresHost $POSTGRES_HOST --stage=dev --verbose
+          sst secret set PostgresPassword $POSTGRES_PASSWORD --stage=dev --verbose
+          sst secret set PostgresDatabase $POSTGRES_DATABASE --stage=dev --verbose
         env:
           POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
           POSTGRES_PRISMA_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
