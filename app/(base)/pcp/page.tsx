@@ -13,22 +13,6 @@ import { Resource, Task } from "@/types";
 import { useState, useEffect } from "react";
 
 const PIP = () => {
-  interface Task {
-    id: number;
-    userId: string | null;
-    title: string | null;
-    description: string | null;
-    isDone: boolean | null;
-  }
-
-  interface Resource {
-    id: number;
-    userId: string | null;
-    title: string | null;
-    description: string | null;
-    kind: string | null;
-  }
-
   const [tasks, setTasks] = useState<Task[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
 
