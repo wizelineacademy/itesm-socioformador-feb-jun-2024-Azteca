@@ -80,6 +80,9 @@ jobs:
           echo "POSTGRES_HOST type: $(echo "${{ secrets.POSTGRES_HOST }}" | awk '{print typeof($0)}')"
           echo "POSTGRES_PASSWORD type: $(echo "${{ secrets.POSTGRES_PASSWORD }}" | awk '{print typeof($0)}')"
           echo "POSTGRES_DATABASE type: $(echo "${{ secrets.POSTGRES_DATABASE }}" | awk '{print typeof($0)}')"
+      - name: Unlock SST
+        run: |
+          sst unlock
 
       - name: Copy Secrets for Production
         run: |
@@ -92,9 +95,7 @@ jobs:
           sst secret set POSTGRES_HOST ${{ secrets.POSTGRES_HOST }}
           sst secret set POSTGRES_PASSWORD ${{ secrets.POSTGRES_PASSWORD }}
           sst secret set POSTGRES_DATABASE ${{ secrets.POSTGRES_DATABASE }}
-      - name: Unlock SST
-        run: |
-          sst unlock
+
       - name: Deploy to AWS with SST
         run: |
           bun install
