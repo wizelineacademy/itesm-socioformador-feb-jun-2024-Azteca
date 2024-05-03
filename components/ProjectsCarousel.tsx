@@ -21,7 +21,7 @@ export default function ProjectsCarousel() {
   }
 
   return (
-    <ul className="overflow-x-auto">
+    <ul className="mt-2 flex w-full flex-row gap-4 overflow-x-auto">
       {projectsQuery.data.map((project, index) => (
         <li key={index}>
           <ProjectCard

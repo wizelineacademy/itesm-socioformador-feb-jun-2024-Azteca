@@ -6,16 +6,6 @@ import Link from "next/link";
 
 const Login = () => {
   const [error, setError] = useState<string | null>(null);
-  const [emailElement, setEmailElement] = useState<HTMLInputElement | null>(
-    null,
-  );
-
-  useEffect(() => {
-    // This will now safely run on the client side after the component has mounted
-    const emailInput = document.getElementById("email") as HTMLInputElement;
-    setEmailElement(emailInput);
-  }, []);
-  //
   const clientLoginAction = async (formData: FormData) => {
     const result = await loginAction(formData);
     if (result) {

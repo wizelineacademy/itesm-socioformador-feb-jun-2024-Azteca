@@ -32,7 +32,7 @@ export default function ProjectCard({
   }
 
   return (
-    <div className="flex items-center gap-10 rounded-lg bg-white p-4">
+    <div className="flex w-fit items-center gap-10 rounded-lg bg-white p-4">
       <div>
         <h3 className="w-[15ch] pb-2 text-base font-medium">{name}</h3>
         <p className="pb-4 text-sm text-graySubtitle">In progress</p>
