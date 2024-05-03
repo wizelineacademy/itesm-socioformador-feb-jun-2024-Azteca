@@ -24,15 +24,19 @@ export async function getUserResources() {
       userId: userResource.userId,
       title: pipResource.title,
       description: pipResource.description,
-      kind: pipResource.kind
+      kind: pipResource.kind,
     })
     .from(userResource)
     .innerJoin(pipResource, eq(userResource.resourceId, pipResource.id))
     .where(eq(userResource.userId, userId));
-    
+
   return res;
 }
 
 export async function updateTask(taskId: number, isDone: boolean | null) {
-  await db.update(pipTask).set({ isDone: isDone }).where(eq(pipTask.id, taskId)).execute();
+  await db
+    .update(pipTask)
+    .set({ isDone: isDone })
+    .where(eq(pipTask.id, taskId))
+    .execute();
 }
