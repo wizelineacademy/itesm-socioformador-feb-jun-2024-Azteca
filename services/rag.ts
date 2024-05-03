@@ -48,7 +48,7 @@ async function cosine_similarity(feedback: string) {
 }
 
 // This function processes the open feedback of the user and returns a summary of the feedback
-export async function process_open_feedback(feedback: string) {
+async function process_open_feedback(feedback: string) {
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_KEY,
   });
@@ -248,7 +248,7 @@ async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
 }
 
 // This function creates the embeddings of all the new resources without embeddings
-export async function set_embeddings() {
+async function set_embeddings() {
   /*
   Embeddings models: 
     "text-embedding-3-small" - maxEmbeddingSize=1536
@@ -311,7 +311,8 @@ export async function feedback_analysis(sprintSurveyId: number) {
     })
     .from(sprintSurvey)
     .innerJoin(project, eq(project.id, sprintSurvey.projectId))
-    .innerJoin(projectMember, eq(projectMember.projectId, project.id));
+    .innerJoin(projectMember, eq(projectMember.projectId, project.id))
+    .where(eq(sprintSurvey.id, sprintSurveyId));
 
   const ids = uniqueUsers.map((user) => user.userId as string);
 
@@ -335,6 +336,8 @@ export async function feedback_analysis(sprintSurveyId: number) {
           const feedbackSummary = await process_open_feedback(comment[1]);
 
           // add to the primary structure all the summaries of the previos function and the coworker who made the feedback
+          for (let sentiment of feedbackSummary) {
+          }
         }
       }
     }
