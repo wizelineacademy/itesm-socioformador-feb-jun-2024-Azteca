@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 
 const Login = () => {
   const [error, setError] = useState<string | null>(null);
-  const emailInput = document.getElementById("email");
   const clientLoginAction = async (formData: FormData) => {
     const result = await loginAction(formData);
     if (result) {
