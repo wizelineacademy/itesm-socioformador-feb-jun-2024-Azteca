@@ -59,7 +59,7 @@ const PIP = () => {
       try {
         const data = await getUserResources();
         setResources(data);
-        feedback_analysis(34);
+        feedback_analysis(40);
       } catch (error) {
         console.error("Failed to fetch tasks:", error);
       }

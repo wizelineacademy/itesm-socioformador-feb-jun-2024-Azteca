@@ -346,108 +346,122 @@ export async function ruler_analysis() {
 
 // This function is triggered by the manager when the sprint survey is closed
 export async function feedback_analysis(sprintSurveyId: number) {
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_KEY,
-  });
-
-  // get all the unique users that belong to the project of the sprint survey
-  const uniqueUsers = await db
-    .select({
-      userId: projectMember.userId,
-    })
+  // first check that the sprint survey hasnt been processed
+  const processed = await db
+    .select({ processed: sprintSurvey.processed })
     .from(sprintSurvey)
-    .innerJoin(project, eq(project.id, sprintSurvey.projectId))
-    .innerJoin(projectMember, eq(projectMember.projectId, project.id))
     .where(eq(sprintSurvey.id, sprintSurveyId));
 
-  const ids = uniqueUsers.map((user) => user.userId as string);
+  const notProcessed = !processed[0].processed;
 
-  // feedback ordered, this structure is important to detect similarities between the feedback
-  const orderedFeedback = await group_feedback(sprintSurveyId, ids);
+  if (notProcessed) {
+    // get all the unique users that belong to the project of the sprint survey
+    const uniqueUsers = await db
+      .select({
+        userId: projectMember.userId,
+      })
+      .from(sprintSurvey)
+      .innerJoin(project, eq(project.id, sprintSurvey.projectId))
+      .innerJoin(projectMember, eq(projectMember.projectId, project.id))
+      .where(eq(sprintSurvey.id, sprintSurveyId));
 
-  // iterate through all the feedback of the sprint survey and analyze it
-  for (let userId of Object.keys(orderedFeedback)) {
-    for (let coworkerId of Object.keys(
-      orderedFeedback[userId]["coworkersFeedback"],
-    )) {
-      if (
-        orderedFeedback[userId]["coworkersFeedback"][coworkerId].openFeedback
-          .length > 0
-      ) {
-        // iterate through all the open feedback received from the coworker
-        for (let comment of orderedFeedback[userId]["coworkersFeedback"][
-          coworkerId
-        ].openFeedback) {
-          // return structure with a summary of the 4 types of feedback
-          const feedbackSummary = await process_open_feedback(comment[1]);
+    const ids = uniqueUsers.map((user) => user.userId as string);
 
-          // add to the primary structure all the summaries of the previos function and the coworker who made the feedback
-          const negativeFeedbackMap =
-            orderedFeedback[userId].feedbackSummary.negative;
-          for (let feedback of feedbackSummary) {
-            if (feedback in negativeFeedbackMap!) {
-              // the summary emotion already exists, push the actual user in that element
-              orderedFeedback[userId].feedbackSummary.negative[feedback].push(
-                coworkerId,
-              );
-            } else {
-              // the summary emotion doesnt exist, create a new element with the coworker
-              orderedFeedback[userId].feedbackSummary.negative[feedback] = [
-                coworkerId,
-              ];
+    // feedback ordered, this structure is important to detect similarities between the feedback
+    const orderedFeedback = await group_feedback(sprintSurveyId, ids);
+
+    // iterate through all the feedback of the sprint survey and analyze it
+    for (let userId of Object.keys(orderedFeedback)) {
+      for (let coworkerId of Object.keys(
+        orderedFeedback[userId]["coworkersFeedback"],
+      )) {
+        if (
+          orderedFeedback[userId]["coworkersFeedback"][coworkerId].openFeedback
+            .length > 0
+        ) {
+          // iterate through all the open feedback received from the coworker
+          for (let comment of orderedFeedback[userId]["coworkersFeedback"][
+            coworkerId
+          ].openFeedback) {
+            // return structure with a summary of the 4 types of feedback
+            const feedbackSummary = await process_open_feedback(comment[1]);
+
+            console.log(feedbackSummary);
+
+            // add to the primary structure all the summaries of the previos function and the coworker who made the feedback
+            const negativeFeedbackMap =
+              orderedFeedback[userId].feedbackSummary.negative;
+            for (let feedback of feedbackSummary) {
+              if (feedback in negativeFeedbackMap!) {
+                // the summary emotion already exists, push the actual user in that element
+                orderedFeedback[userId].feedbackSummary.negative[feedback].push(
+                  coworkerId,
+                );
+              } else {
+                // the summary emotion doesnt exist, create a new element with the coworker
+                orderedFeedback[userId].feedbackSummary.negative[feedback] = [
+                  coworkerId,
+                ];
+              }
             }
           }
         }
       }
+      // all open feedback summarized, now get the classifications of negative feedback with the most suggestions
+      const feedbackSuggestions: [number, string][] = [];
+      Object.keys(orderedFeedback[userId].feedbackSummary.negative).forEach(
+        (key) => {
+          feedbackSuggestions.push([
+            orderedFeedback[userId].feedbackSummary.negative[key].length,
+            key,
+          ]);
+        },
+      );
+
+      // sort the feedback suggestions by the number of suggestions in descending order
+      feedbackSuggestions.sort((a, b) => b[0] - a[0]);
+
+      // get the feedback classification with the most suggestions
+      const feedbackToCreate = feedbackSuggestions[0][1];
+
+      // get a comment with that classification to recommend resources and tasks
+      const newCoworkerId =
+        orderedFeedback[userId].feedbackSummary.negative[feedbackToCreate][0];
+
+      const feedbackComment =
+        orderedFeedback[userId].coworkersFeedback[newCoworkerId]
+          .openFeedback[0][1];
+
+      // get the resources with the highest similarity to the feedback
+      const resources = await cosine_similarity(feedbackComment);
+
+      // create tasks with the feedback received
+      const tasks = await create_tasks(feedbackComment);
+
+      // insert the selected resources for the user
+      for (let task of tasks) {
+        const [title, description] = task.split(":");
+        await db.insert(pipTask).values({
+          userId: userId,
+          title: title,
+          description: description,
+          isDone: false,
+        });
+      }
+
+      // insert the tasks for the user
+      for (let resource of resources) {
+        await db.insert(userResource).values({
+          userId: userId,
+          resourceId: resource,
+        });
+      }
     }
-    // all open feedback summarized, now get the classifications with the most suggestions
-    const feedbackSuggestions: [number, string][] = [];
-    Object.keys(orderedFeedback[userId].feedbackSummary.negative).forEach(
-      (key) => {
-        feedbackSuggestions.push([
-          orderedFeedback[userId].feedbackSummary.negative[key].length,
-          key,
-        ]);
-      },
-    );
 
-    // sort the feedback suggestions by the number of suggestions in descending order
-    feedbackSuggestions.sort((a, b) => b[0] - a[0]);
-
-    // get the feedback classification with the most suggestions
-    const feedbackToCreate = feedbackSuggestions[0][1];
-
-    // get a comment with that classification to recommend resources and tasks
-    const newCoworkerId =
-      orderedFeedback[userId].feedbackSummary.negative[feedbackToCreate][0];
-
-    const feedbackComment =
-      orderedFeedback[userId].coworkersFeedback[newCoworkerId]
-        .openFeedback[0][1];
-
-    // get the resources with the highest similarity to the feedback
-    const resources = await cosine_similarity(feedbackComment);
-
-    // create tasks with the feedback received
-    const tasks = await create_tasks(feedbackComment);
-
-    // insert the selected resources for the user
-    for (let task of tasks) {
-      const [title, description] = task.split(":");
-      await db.insert(pipTask).values({
-        userId: userId,
-        title: title,
-        description: description,
-        isDone: false,
-      });
-    }
-
-    // insert the tasks for the user
-    for (let resource of resources) {
-      await db.insert(userResource).values({
-        userId: userId,
-        resourceId: resource,
-      });
-    }
+    // mark the sprint survey as processed
+    await db
+      .update(sprintSurvey)
+      .set({ processed: true })
+      .where(eq(sprintSurvey.id, sprintSurveyId));
   }
 }
