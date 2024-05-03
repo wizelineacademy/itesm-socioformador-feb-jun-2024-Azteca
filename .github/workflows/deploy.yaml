@@ -72,7 +72,15 @@ jobs:
       - name: Debug Values
         run: |
           echo "POSTGRES_PRISMA_URL type: $(echo "${{ secrets.POSTGRES_PRISMA_URL }}" | awk '{print typeof($0)}')"
-          echo "POSTGRES_PRISMA_URL value: ${{ secrets.POSTGRES_URL }}"
+          echo "POSTGRES_URL type: $(echo "${{ secrets.POSTGRES_URL }}" | awk '{print typeof($0)}')"
+          echo "AUTH_SECRET type: $(echo "${{ secrets.AUTH_SECRET }}" | awk '{print typeof($0)}')"
+          echo "POSTGRES_URL_NO_SSL type: $(echo "${{ secrets.POSTGRES_URL_NO_SSL }}" | awk '{print typeof($0)}')"
+          echo "POSTGRES_URL_NON_POOLING type: $(echo "${{ secrets.POSTGRES_URL_NON_POOLING }}" | awk '{print typeof($0)}')"
+          echo "POSTGRES_USER type: $(echo "${{ secrets.POSTGRES_USER }}" | awk '{print typeof($0)}')"
+          echo "POSTGRES_HOST type: $(echo "${{ secrets.POSTGRES_HOST }}" | awk '{print typeof($0)}')"
+          echo "POSTGRES_PASSWORD type: $(echo "${{ secrets.POSTGRES_PASSWORD }}" | awk '{print typeof($0)}')"
+          echo "POSTGRES_DATABASE type: $(echo "${{ secrets.POSTGRES_DATABASE }}" | awk '{print typeof($0)}')"
+      
       - name: Copy Secrets for Production
         run: |
           sst secret set POSTGRES_URL ${{ secrets.POSTGRES_URL }}
