@@ -69,6 +69,18 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           role-duration-seconds: 1200
           aws-region: us-east-1
+      - name: Create .env File
+        run: |
+          echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" > .env
+          echo "POSTGRES_URL=${{ secrets.POSTGRES_URL }}" >> .env
+          echo "POSTGRES_PRISMA_URL=${{ secrets.POSTGRES_PRISMA_URL }}" >> .env
+          echo "POSTGRES_URL_NO_SSL=${{ secrets.POSTGRES_URL_NO_SSL }}" >> .env
+          echo "POSTGRES_URL_NON_POOLING=${{ secrets.POSTGRES_URL_NON_POOLING }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "POSTGRES_DATABASE=${{ secrets.POSTGRES_DATABASE }}" >> .env
+
       - name: Debug Values
         run: |
           echo "POSTGRES_PRISMA_URL type: $(echo "${{ secrets.POSTGRES_PRISMA_URL }}" | awk '{print typeof($0)}')"
@@ -86,15 +98,15 @@ jobs:
 
       - name: Copy Secrets for Production
         run: |
-          sst secret set PostgresUrl ${{ secrets.POSTGRES_URL }} --stage=dev
-          sst secret set PostgresPrismaUrl ${{ secrets.POSTGRES_PRISMA_URL }} --stage=dev
-          sst secret set AuthSecret ${{ secrets.AUTH_SECRET }} --stage=dev
-          sst secret set PostgresUrlNoSsl ${{ secrets.POSTGRES_URL_NO_SSL }} --stage=dev
-          sst secret set PostgresUrlNonPooling ${{ secrets.POSTGRES_URL_NON_POOLING }} --stage=dev
-          sst secret set PostgresUser ${{ secrets.POSTGRES_USER }} --stage=dev
-          sst secret set PostgresHost ${{ secrets.POSTGRES_HOST }} --stage=dev
-          sst secret set PostgresPassword ${{ secrets.POSTGRES_PASSWORD }} --stage=dev
-          sst secret set PostgresDatabase ${{ secrets.POSTGRES_DATABASE }} --stage=dev
+          sst secret set PostgresUrl $POSTGRES_URL
+          sst secret set PostgresPrismaUrl $POSTGRES_PRISMA_URL
+          sst secret set AuthSecret $AUTH_SECRET
+          sst secret set PostgresUrlNoSsl $POSTGRES_URL_NO_SSL
+          sst secret set PostgresUrlNonPooling $POSTGRES_URL_NON_POOLING
+          sst secret set PostgresUser $POSTGRES_USER
+          sst secret set PostgresHost $POSTGRES_HOST
+          sst secret set PostgresPassword $POSTGRES_PASSWORD
+          sst secret set PostgresDatabase $POSTGRES_DATABASE
 
       - name: Deploy to AWS with SST
         run: |
