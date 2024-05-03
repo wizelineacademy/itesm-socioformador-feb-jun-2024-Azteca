@@ -3,7 +3,7 @@
 export default $config({
   app(input) {
     return {
-      name: "FeedbackFlow",
+      name: "FeedbackFlowvf",
       removal: input?.stage === "production" ? "retain" : "remove",
       home: "aws",
     };
@@ -32,7 +32,7 @@ export default $config({
       value: process.env.AUTH_SECRET,
     });
 
-    new sst.aws.Nextjs("Nextjs", {
+    new sst.aws.Nextjs("Nextjs1", {
       link: [
         POSTGRES_URL,
         POSTGRES_PRISMA_URL,
