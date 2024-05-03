@@ -3,6 +3,7 @@ import Droppable from "../Droppable";
 import UserIcon from "../icons/UserIcon";
 import Tooltip from "../Tooltip";
 import Draggable from "../Draggable";
+import UserProfileButton from "../UserProfileButton";
 
 interface SprintDropRowProps {
   title: string;
@@ -39,14 +40,22 @@ const SprintDropRow = ({
             className={`${color} last-of-type:border-r-2xl flex h-auto w-20 flex-row items-center justify-center overflow-hidden bg-gradient-to-r text-center transition-all duration-100`}
           >
             {people[index].length < 4 &&
-              people[index].map((person, index) => (
-                <UserIcon
-                  key={index}
-                  size="w-10 h-10"
-                  color={person.color || "text-primary"}
-                  className={`relative ${index > 0 ? "-ml-4" : "ml-0"} z-${50 - index * 10} rounded-full bg-white`}
-                />
-              ))}
+              people[index].map((person, index) =>
+                person.photoUrl ? (
+                  <UserProfileButton
+                    photoUrl={person.photoUrl}
+                    size="sm"
+                    key={index}
+                  />
+                ) : (
+                  <UserIcon
+                    key={index}
+                    size="w-10 h-10"
+                    color={person.color || "text-primary"}
+                    className={`relative ${index > 0 ? "-ml-4" : "ml-0"} z-${50 - index * 10} rounded-full bg-white`}
+                  />
+                ),
+              )}
             {people[index].length >= 4 && (
               <>
                 <div className="relative z-50 box-content flex h-10 w-10 items-center justify-center rounded-full bg-white">

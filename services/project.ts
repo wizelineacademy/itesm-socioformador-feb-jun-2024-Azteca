@@ -2,8 +2,14 @@
 
 import { auth } from "@/auth";
 import db from "@/db/drizzle";
-import { project, projectMember, user } from "@/db/schema";
-import { eq, or } from "drizzle-orm";
+import {
+  finalSurvey,
+  project,
+  projectMember,
+  sprintSurvey,
+  user,
+} from "@/db/schema";
+import { and, eq, ne, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -46,12 +52,14 @@ export async function createProject({
   const userId = session?.user?.id;
   if (!userId) throw new Error("You must be signed in");
 
+  // Create the project and get the id
   const res = await db
     .insert(project)
-    .values({ ...newProject, managerId: userId })
+    .values({ ...newProject, managerId: userId }) // Manager is current user
     .returning({ id: project.id });
   const { id: projectId } = res[0];
 
+  // Link the members to that project
   await db.insert(projectMember).values(
     members.map((member) => ({
       userId: member,
@@ -59,8 +67,32 @@ export async function createProject({
     })),
   );
 
-  revalidatePath("/projects");
-  redirect("/projects");
+  // Create the records for the sprint surveys
+  let currentDate = new Date(newProject.startDate);
+
+  const jumpToNextSprint = () => {
+    currentDate.setDate(
+      currentDate.getDate() + newProject.sprintSurveyPeriodicityInDays,
+    );
+  };
+
+  jumpToNextSprint();
+  while (currentDate <= newProject.endDate) {
+    await db
+      .insert(sprintSurvey)
+      .values({ projectId, scheduledAt: currentDate });
+
+    jumpToNextSprint();
+  }
+
+  // Create the records for the final survey
+  await db
+    .insert(finalSurvey)
+    .values({ projectId, scheduledAt: newProject.endDate });
+}
+
+export async function deleteProjectById(projectId: number) {
+  await db.delete(project).where(eq(project.id, projectId));
 }
 
 export async function getEmployeesInProjectById(projectId: number) {
@@ -79,4 +111,27 @@ export async function getEmployeesInProjectById(projectId: number) {
     .where(eq(projectMember.projectId, projectId));
 
   return res;
+}
+
+// This function returns the coworkers in a project that are also in a sprint survey
+export async function getCoworkersInProject(sprintSurveyId: number) {
+  const session = await auth();
+  const currentUserId = session?.user?.id;
+  if (!currentUserId) throw new Error("You must be signed in");
+  return await db
+    .select({
+      userId: user.id,
+      name: user.name,
+      photoUrl: user.photoUrl,
+    })
+    .from(sprintSurvey)
+    .innerJoin(project, eq(sprintSurvey.projectId, project.id)) // Join sprintSurvey to project
+    .innerJoin(projectMember, eq(project.id, projectMember.projectId)) // Join project to projectMember
+    .innerJoin(user, eq(projectMember.userId, user.id)) // Join projectMember to user
+    .where(
+      and(
+        eq(sprintSurvey.id, sprintSurveyId), // Filter by sprintSurveyId
+        ne(user.id, currentUserId), // Exclude the current user from the results
+      ),
+    );
 }

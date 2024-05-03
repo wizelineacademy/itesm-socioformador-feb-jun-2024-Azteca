@@ -3,28 +3,16 @@ import NavigationBar from "@/components/NavigationBar";
 import PipResource from "@/components/PipResource";
 import PipTask from "@/components/PipTask";
 import ProgressBar from "@/components/Progressbar";
-import { getUserTasks, getUserResources, updateTask } from "@/services/tasks-and-resources";
+import {
+  getUserTasks,
+  getUserResources,
+  updateTask,
+} from "@/services/tasks-and-resources";
+import { Resource, Task } from "@/types";
 // import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from "react";
 
 const PIP = () => {
-
-  interface Task {
-    id: number;
-    userId: string | null;
-    title: string | null;
-    description: string | null;
-    isDone: boolean | null; 
-  }
-
-  interface Resource {
-    id: number;
-    userId: string | null;
-    title: string | null;
-    description: string | null;
-    kind: string | null;
-  }
-  
   const [tasks, setTasks] = useState<Task[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
 
@@ -41,7 +29,7 @@ const PIP = () => {
         const data = await getUserTasks();
         setTasks(data);
       } catch (error) {
-        console.error('Failed to fetch tasks:', error);
+        console.error("Failed to fetch tasks:", error);
       }
     }
 
@@ -54,7 +42,7 @@ const PIP = () => {
         const data = await getUserResources();
         setResources(data);
       } catch (error) {
-        console.error('Failed to fetch tasks:', error);
+        console.error("Failed to fetch tasks:", error);
       }
     }
 
@@ -66,7 +54,7 @@ const PIP = () => {
   );
 
   return (
-    <main>
+    <div>
       <section id="pip-progressbar" className="mt-4">
         <p className=" mb-2 text-3xl font-semibold">Personal Career Plan</p>
         <ProgressBar width={progressPercentage} height={6} />
@@ -74,6 +62,11 @@ const PIP = () => {
       <section id="pip-tasks" className="mt-9 w-full">
         <p className="text-3xl font-medium">Tasks</p>
         <div className="flew-wrap mb-10 mt-2 flex w-full flex-row gap-12 overflow-x-auto pb-3">
+          {tasks.length === 0 && (
+            <p className="text-xl font-light">
+              No tasks available. Ask your manager for an update.
+            </p>
+          )}
           {tasks.map((task, index) => (
             <PipTask
               title={task.title}
@@ -88,6 +81,11 @@ const PIP = () => {
       <section id="pip-resources" className="mt-9 w-full">
         <p className="text-3xl font-medium">Resources</p>
         <div className="flew-wrap mb-10 mt-2 flex w-full flex-row gap-12 overflow-x-auto pb-3">
+          {resources.length === 0 && (
+            <p className="text-xl font-medium">
+              No tasks available. Ask your manager for an update.
+            </p>
+          )}
           {resources.map((task, index) => (
             <PipResource
               title={task.title}
@@ -98,7 +96,7 @@ const PIP = () => {
           ))}
         </div>
       </section>
-    </main>
+    </div>
   );
 };
 

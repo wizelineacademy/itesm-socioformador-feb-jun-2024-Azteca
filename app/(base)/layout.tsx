@@ -10,11 +10,11 @@ export default function BaseLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className={" w-dvh h-dvh overflow-hidden bg-bone px-7 pb-4 pt-10"}>
+    <div className={"px-7 pb-4 pt-10"}>
       <MantineProvider>
         <NavigationBar />
         {children}
       </MantineProvider>
-    </main>
+    </div>
   );
 }
