@@ -14,6 +14,7 @@ import {
   sprintSurvey,
   sprintSurveyAnswerCoworkers,
   sprintSurveyAnswerProject,
+  userResource,
 } from "@/db/schema";
 
 /*
@@ -44,7 +45,52 @@ async function cosine_similarity(feedback: string) {
 
   // sort the resources by similarity in descending order
   resourcesSimilarity.sort((a, b) => b[0]! - a[0]!);
-  return resourcesSimilarity;
+
+  resourcesSimilarity.splice(5);
+
+  // return only the resources ids
+  const resourcesId: number[] = resourcesSimilarity
+    .map(([_, second]) => second)
+    .filter((value): value is number => value !== null);
+  return resourcesId;
+}
+
+// This function creates the tasks for the user based on the feedback received
+async function create_tasks(feedback: string) {
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_KEY,
+  });
+
+  const tasksInstructions: string = `Dado el siguiente párrafo con comentarios que evalúan una persona, crea tareas simples para la persona evaluada para mejorar su rendimiento o bienestar. Las tareas deben ser claras y concizas, deben estar relacionadas al comentario recibido, deben ser tareas simples que no tomen mucho tiempo al usuario pero que le permiten mejorar en su rendimiento o bienestar. Algunos ejemplos de tareas pueden ser "Hacer ejercicio", "Ir con el psicólogo", "Meditar", "Dormir 8 horas diarias", "Comer frutas y verduras", "Visitar a mi familia", etc., pero cuida que sean relacionadas al feedback recibido, que sean sencilas y que sean diferentes.
+
+  Hay otras indicaciones muy importantes que debes seguir por cada tarea:
+  1. Cada tarea debe llevar un título y una descripción.
+  2. El título no debe superar los 64 caracteres y la descripción no debe superar los 256 caracteres.
+  3. Al crear ya sea el título o la descripción de cada tarea no debes usar nunca los caracteres "\n" ni ":" porque esos son caracteres especiales que yo te indicaré donde usar.
+  4. Vas a juntar el título de cada tarea con la descripción donde el separador de en medio es el caracter ":" sin espacios en blanco entre todos los caracteres, solo en el mensaje del título y de la descripción.
+  5. Vas a unir las estructuras de todas las tareas con el caracter "\n" como separador sin espacios en blanco entre la estructura de cada tarea y ese separador.
+  6. La siguiente estructura es ilustrativa de cómo debes regresar el resultado con las 5 tareas, fíjate en estructura no tanto en el contenido:
+  """
+  titulo_1:descripción_1\ntitulo_2:descripcion_2
+  """`;
+
+  const rawTasks = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [
+      {
+        role: "system",
+        content: tasksInstructions,
+      },
+      {
+        role: "user",
+        content: feedback,
+      },
+    ],
+  });
+
+  // clean the results of the generated tasks
+  const tasks = rawTasks.choices[0].message.content!.split("\n");
+  return tasks;
 }
 
 // This function processes the open feedback of the user and returns a summary of the feedback
@@ -152,10 +198,10 @@ async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
   }
 
   interface FeedbackSummary {
-    positive: string[];
-    negative: string[];
-    biased: string[];
-    notUseful: string[];
+    positive: { [sentiment: string]: string[] };
+    negative: { [sentiment: string]: string[] };
+    biased: { [sentiment: string]: string[] };
+    notUseful: { [sentiment: string]: string[] };
   }
 
   const feedbackRecords: {
@@ -213,10 +259,10 @@ async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
     feedbackRecords[userId] = {
       coworkersFeedback: {},
       feedbackSummary: {
-        positive: [],
-        negative: [],
-        biased: [],
-        notUseful: [],
+        positive: {},
+        negative: {},
+        biased: {},
+        notUseful: {},
       },
     };
 
@@ -336,10 +382,72 @@ export async function feedback_analysis(sprintSurveyId: number) {
           const feedbackSummary = await process_open_feedback(comment[1]);
 
           // add to the primary structure all the summaries of the previos function and the coworker who made the feedback
-          for (let sentiment of feedbackSummary) {
+          const negativeFeedbackMap =
+            orderedFeedback[userId].feedbackSummary.negative;
+          for (let feedback of feedbackSummary) {
+            if (feedback in negativeFeedbackMap!) {
+              // the summary emotion already exists, push the actual user in that element
+              orderedFeedback[userId].feedbackSummary.negative[feedback].push(
+                coworkerId,
+              );
+            } else {
+              // the summary emotion doesnt exist, create a new element with the coworker
+              orderedFeedback[userId].feedbackSummary.negative[feedback] = [
+                coworkerId,
+              ];
+            }
           }
         }
       }
+    }
+    // all open feedback summarized, now get the classifications with the most suggestions
+    const feedbackSuggestions: [number, string][] = [];
+    Object.keys(orderedFeedback[userId].feedbackSummary.negative).forEach(
+      (key) => {
+        feedbackSuggestions.push([
+          orderedFeedback[userId].feedbackSummary.negative[key].length,
+          key,
+        ]);
+      },
+    );
+
+    // sort the feedback suggestions by the number of suggestions in descending order
+    feedbackSuggestions.sort((a, b) => b[0] - a[0]);
+
+    // get the feedback classification with the most suggestions
+    const feedbackToCreate = feedbackSuggestions[0][1];
+
+    // get a comment with that classification to recommend resources and tasks
+    const newCoworkerId =
+      orderedFeedback[userId].feedbackSummary.negative[feedbackToCreate][0];
+
+    const feedbackComment =
+      orderedFeedback[userId].coworkersFeedback[newCoworkerId]
+        .openFeedback[0][1];
+
+    // get the resources with the highest similarity to the feedback
+    const resources = await cosine_similarity(feedbackComment);
+
+    // create tasks with the feedback received
+    const tasks = await create_tasks(feedbackComment);
+
+    // insert the selected resources for the user
+    for (let task of tasks) {
+      const [title, description] = task.split(":");
+      await db.insert(pipTask).values({
+        userId: userId,
+        title: title,
+        description: description,
+        isDone: false,
+      });
+    }
+
+    // insert the tasks for the user
+    for (let resource of resources) {
+      await db.insert(userResource).values({
+        userId: userId,
+        resourceId: resource,
+      });
     }
   }
 }
