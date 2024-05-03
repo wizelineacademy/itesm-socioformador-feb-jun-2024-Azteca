@@ -3,7 +3,7 @@
 export default $config({
   app(input) {
     return {
-      name: "FeedbackFlowvf1",
+      name: "feedbackflowteam",
       removal: input?.stage === "production" ? "retain" : "remove",
       home: "aws",
     };
@@ -20,7 +20,7 @@ export default $config({
     const POSTGRES_URL_NO_SSL = new sst.Secret("PostgresUrlNoSsl");
     const POSTGRES_URL_NON_POOLING = new sst.Secret("PostgresUrlNonPooling");
 
-    new sst.aws.Nextjs("Nextjs2", {
+    new sst.aws.Nextjs("FeedbackFlowApp", {
       link: [
         POSTGRES_URL,
         POSTGRES_PRISMA_URL,
