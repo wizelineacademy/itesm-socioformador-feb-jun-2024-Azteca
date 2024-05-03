@@ -47,14 +47,84 @@ async function cosine_similarity(feedback: string) {
   return resourcesSimilarity;
 }
 
-// This functino processes the open feedback of the user and returns a summary of the feedback
-async function process_open_feedback(feedback: string) {
-  const sentences = feedback.split(".");
-  for (let sentence of sentences) {
-    const wordsPerSentence: number[] = [];
+// This function processes the open feedback of the user and returns a summary of the feedback
+export async function process_open_feedback(feedback: string) {
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_KEY,
+  });
+
+  const classificationInstructions: string = `El siguiente query es un párrafo que contiene feedback de un usuario a otro. Realiza las siguientes instrucciones:
+  1. Identifica las ideas claves de todo el párrafo, sepáralo por cada idea tomando en cuenta la coherencia entre las oraciones y las ideas que expresan guardando la conexión del asunto, puedes ignorar signos de puntuación si una misma oración une ideas diferentes, pero tu prioridad es separar las oraciones con ideas atómicas.
+  2. De las oraciones agrupadas por ideas, sepáralas en las siguientes 4 clasificaciones de sentimientos, tomando en cuenta la descripción de cada una:
+    * positive: cualquier cumplido, elogio o felicitación a la persona que recibe el comentario o a su desempeño en el trabajo. Las críticas constructivas si bien son una forma saludable de dar retroalimentación no cuentan como comentario positivo porque destacan una necesidad de la persona evaluada.
+    * negative: cualquier comentario relacionado con críticas constructivas o áreas de mejora en las habilidades de la persona y en su desempeño laboral. Si hay un comentario relacionado con la inteligencia emocional o una crítica a al carácter de la persona sé muy cauteloso y presta atención si el comentario es objetivo y si habla con hechos, ya que es posible que pueda involucrar un ataque personal, tómalo como un comentario constructivo si brinda hechos e información de forma objetiva.
+    * biased: cualquier comentario o crítica relacionada con la raza, color de piel, creencias, sexo, preferencias sexuales de la persona evaluada o comentarios con insultos y ataques personales. No es lo mismo que un comentario negativo porque no es imparcial.
+    * notUseful: cualquier comentario que no sea positivo, ni negativo, ni sesgado, ni aporte ningún tipo de valor a las clasificaciones previas.
+  3. En cada una de las 4 clasificaciones de sentimiento une todas las oraciones en un párrafo. Al unir las oraciones de cada clasificación debe haber una conexión clara entre las ideas, pero es posible que en la unión no haya coherencia gramatical o por signos de puntuación, si ese es el caso puedes modificar ligeramente las palabras o signos para unir todas las oraciones en un párrafo de la clasificación en cuestión, pero no alteres el contenido del mensaje que expresan.
+  4. Separa las 4 clasificaciones con el separador "\n\n" que solo puede aparecer entre la clasificación de cada sentimiento, no en el párrafo formado de oraciones de cada clasificación.
+  5. Si hay clasificaciones de sentimientos que no cuentan con ninguna oración porque ninguna cayó en esa categoría, aun así incluye el nombre del sentimiento con el separador definido en el paso anterior.
+  6. Es importante que en tu respuesta el orden de las clasificaciones de sentimientos sea el mismo en que los presenté en el paso 2.
+  7. No respondas ni expliques tu procedimiento, limítate a cumplir con las instrucciones especificadas con la estructura especificada, haz el análisis de todo el contenido del texto sin dejar oraciones sin procesar.
+  
+  Este es un ejemplo del resultado esperado, la categoría 'Sesgado' se encuentra vacía porque ningún comentario encajó en las instrucciones proporcionadas de ese sentimiento y así se deben representar las categorías cuando ningún comentario pertenezca a ella, recuerda que es solo un ejemplo, pon atención en la estructura, no tanto en el contenido:
+  """
+  positive: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+  \n\n
+  negative: Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat
+  \n\n
+  biased:
+  \n\n
+  notUseful: Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  """`;
+
+  const summarizationInstructions: string =
+    "El siguiente es un párrafo con comentarios negativos o críticas constructivas hacia una persona, no son ataques personales. Quiero que resumas todo el párrafo en algunas categorías, pero solo puedes usar las que yo te diga sin usar opciones afuera de esa lista y debes regresar las categorías separadas por comas y sin espacios entre cada separador, solo regresa las categorías identificadas, no todas las mencionadas, no respondas ni expliques tu procedimiento, limítate a cumplir con las instrucciones especificadas. Las clasificaciones son: Mala gestión de tiempo, Sin inteligencia emocional, Prepotencia, Soberbia, Poca creatividad, Sin iniciativa, Mala comunicación, Mal trabajo en equipo, Falta de ética, y Sin razonamiento crítico. Un ejemplo del resultado que debes regresar es `Sin iniciativa,Mala gestión de tiempo,Mal trabajo en equipo,Mala comunicación`";
+
+  // classify the feedback into 4 categories: positive, negative, biased, not useful
+  const classifiedFeedback = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [
+      {
+        role: "system",
+        content: classificationInstructions,
+      },
+      {
+        role: "user",
+        content: feedback,
+      },
+    ],
+  });
+
+  // clean the results of the classification
+  const sentiments =
+    classifiedFeedback.choices[0].message.content!.split("\n\n");
+  const cleanedSentiments = sentiments.filter((element) => element !== "");
+  var negativeFeedback: string = "";
+  for (let sentiment of cleanedSentiments) {
+    if (sentiment.includes("negative:")) {
+      negativeFeedback = sentiment.substring(10);
+    }
   }
 
-  // split positive, negative and neutral feedback
+  // summarize the negative feedback to be compared with all the feedback given to the same user
+  const summarizedFeedback = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [
+      {
+        role: "system",
+        content: summarizationInstructions,
+      },
+      {
+        role: "user",
+        content: negativeFeedback,
+      },
+    ],
+  });
+
+  const summarizedFeedbackCategories =
+    summarizedFeedback.choices[0].message.content!.split(",");
+
+  return summarizedFeedbackCategories;
 }
 
 // This function performs the analysis of the closed feedback
@@ -245,21 +315,10 @@ export async function feedback_analysis(sprintSurveyId: number) {
 
   const ids = uniqueUsers.map((user) => user.userId as string);
 
-  /*
-  const processedFeedback: {[sentiment: string]: { [specificSentiment:string]: string[] }
-  } = {
-    positive: { },
-    negative: { },
-    biased: { },
-    notUseful: { }
-  };
-  */
-
   // feedback ordered, this structure is important to detect similarities between the feedback
   const orderedFeedback = await group_feedback(sprintSurveyId, ids);
 
   // iterate through all the feedback of the sprint survey and analyze it
-
   for (let userId of Object.keys(orderedFeedback)) {
     for (let coworkerId of Object.keys(
       orderedFeedback[userId]["coworkersFeedback"],
@@ -273,14 +332,11 @@ export async function feedback_analysis(sprintSurveyId: number) {
           coworkerId
         ].openFeedback) {
           // return structure with a summary of the 4 types of feedback
+          const feedbackSummary = await process_open_feedback(comment[1]);
+
           // add to the primary structure all the summaries of the previos function and the coworker who made the feedback
         }
       }
-      /* 
-      else {
-        // no open feedback received from the coworker, recommend resources with the closed feedback
-      }
-      */
     }
   }
 }

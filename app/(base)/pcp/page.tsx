@@ -12,7 +12,7 @@ import {
   updateTask,
 } from "@/services/tasks-and-resources";
 
-import { feedback_analysis } from "@/services/rag";
+import { feedback_analysis, process_open_feedback } from "@/services/rag";
 
 const PIP = () => {
   interface Task {
@@ -60,6 +60,7 @@ const PIP = () => {
         const data = await getUserResources();
         setResources(data);
         feedback_analysis(34);
+        // process_open_feedback();
       } catch (error) {
         console.error("Failed to fetch tasks:", error);
       }
