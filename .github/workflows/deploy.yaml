@@ -71,7 +71,7 @@ jobs:
           aws-region: us-east-1
       - name: Debug Values
         run: |
-          echo "POSTGRES_URL type: $(echo "${{ secrets.POSTGRES_URL }}" | awk '{print typeof($0)}')"
+          echo "POSTGRES_PRISMA_URL type: $(echo "${{ secrets.POSTGRES_PRISMA_URL }}" | awk '{print typeof($0)}')"
           echo "POSTGRES_PRISMA_URL value: ${{ secrets.POSTGRES_URL }}"
       - name: Copy Secrets for Production
         run: |
