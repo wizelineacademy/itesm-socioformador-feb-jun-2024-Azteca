@@ -11,10 +11,8 @@ on:
     branches:
       - dev
       - main
-
 env:
   AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -71,16 +69,56 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           role-duration-seconds: 1200
           aws-region: us-east-1
-      - name: Deploy to AWS with SST
+      - name: Create .env File
+        run: |
+          echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" > .env
+          echo "POSTGRES_URL=${{ secrets.POSTGRES_URL }}" >> .env
+          echo "POSTGRES_PRISMA_URL=${{ secrets.POSTGRES_PRISMA_URL }}" >> .env
+          echo "POSTGRES_URL_NO_SSL=${{ secrets.POSTGRES_URL_NO_SSL }}" >> .env
+          echo "POSTGRES_URL_NON_POOLING=${{ secrets.POSTGRES_URL_NON_POOLING }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "POSTGRES_DATABASE=${{ secrets.POSTGRES_DATABASE }}" >> .env
+
+      - name: Debug Values
+        run: |
+          echo "POSTGRES_PRISMA_URL type: $(echo "${{ secrets.POSTGRES_PRISMA_URL }}" | awk '{print typeof($0)}')"
+          echo "POSTGRES_URL type: $(echo "${{ secrets.POSTGRES_URL }}" | awk '{print typeof($0)}')"
+          echo "AUTH_SECRET type: $(echo "${{ secrets.AUTH_SECRET }}" | awk '{print typeof($0)}')"
+          echo "POSTGRES_URL_NO_SSL type: $(echo "${{ secrets.POSTGRES_URL_NO_SSL }}" | awk '{print typeof($0)}')"
+          echo "POSTGRES_URL_NON_POOLING type: $(echo "${{ secrets.POSTGRES_URL_NON_POOLING }}" | awk '{print typeof($0)}')"
+          echo "POSTGRES_USER type: $(echo "${{ secrets.POSTGRES_USER }}" | awk '{print typeof($0)}')"
+          echo "POSTGRES_HOST type: $(echo "${{ secrets.POSTGRES_HOST }}" | awk '{print typeof($0)}')"
+          echo "POSTGRES_PASSWORD type: $(echo "${{ secrets.POSTGRES_PASSWORD }}" | awk '{print typeof($0)}')"
+          echo "POSTGRES_DATABASE type: $(echo "${{ secrets.POSTGRES_DATABASE }}" | awk '{print typeof($0)}')"
+      - name: Unlock SST
+        run: |
+          sst unlock
+
+      - name: Copy Secrets for Production
+        run: |
+          sst secret set PostgresUrl $POSTGRES_URL --stage=dev --verbose
+          sst secret set PostgresPrismaUrl $POSTGRES_PRISMA_URL --stage=dev --verbose
+          sst secret set AuthSecret $AUTH_SECRET --stage=dev --verbose
+          sst secret set PostgresUrlNoSsl $POSTGRES_URL_NO_SSL  --stage=dev --verbose
+          sst secret set PostgresUrlNonPooling $POSTGRES_URL_NON_POOLING --stage=dev --verbose
+          sst secret set PostgresUser $POSTGRES_USER --stage=dev --verbose
+          sst secret set PostgresHost $POSTGRES_HOST --stage=dev --verbose
+          sst secret set PostgresPassword $POSTGRES_PASSWORD --stage=dev --verbose
+          sst secret set PostgresDatabase $POSTGRES_DATABASE --stage=dev --verbose
         env:
           POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
           POSTGRES_PRISMA_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
           POSTGRES_URL_NO_SSL: ${{ secrets.POSTGRES_URL_NO_SSL }}
           POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
+
+      - name: Deploy to AWS with SST
         run: |
           bun install
           sst deploy --stage=dev --verbose
@@ -106,16 +144,19 @@ jobs:
           role-to-assume: arn:aws:iam::211125454464:role/GitHub
           role-duration-seconds: 1200 #adjust as needed for your build time
           aws-region: us-east-1
+      - name: Copy Secrets for Production
+        run: |
+          sst secret set PostgresUrl ${{ secrets.POSTGRES_URL }}
+          sst secret set PostgresPrismaUrl ${{ secrets.POSTGRES_PRISMA_URL }}
+          sst secret set AuthSecret ${{ secrets.AUTH_SECRET }}
+          sst secret set PostgresUrlNoSsl ${{ secrets.POSTGRES_URL_NO_SSL }}
+          sst secret set PostgresUrlNonPooling ${{ secrets.POSTGRES_URL_NON_POOLING }}
+          sst secret set PostgresUser ${{ secrets.POSTGRES_USER }}
+          sst secret set PostgresHost ${{ secrets.POSTGRES_HOST }}
+          sst secret set PostgresPassword ${{ secrets.POSTGRES_PASSWORD }}
+          sst secret set PostgresDatabase ${{ secrets.POSTGRES_DATABASE }}
+
       - name: Deploy to AWS with SST
-        env:
-          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
-          POSTGRES_PRISMA_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
-          POSTGRES_URL_NO_SSL: ${{ secrets.POSTGRES_URL_NO_SSL }}
-          POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
         run: |
           bun install
           sst deploy --stage=production --verbose

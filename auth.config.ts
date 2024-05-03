@@ -1,6 +1,9 @@
 import type { NextAuthConfig } from "next-auth";
 
 export const authConfig = {
+  trustHost: true,
+  // Remove the trustHostedDomain property
+  // trustHostedDomain: true,
   pages: {
     signIn: "/login",
   },
