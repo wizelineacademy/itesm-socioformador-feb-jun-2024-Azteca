@@ -98,15 +98,15 @@ jobs:
 
       - name: Copy Secrets for Production
         run: |
-          sst secret set PostgresUrl $POSTGRES_URL --stage=dev
-          sst secret set PostgresPrismaUrl $POSTGRES_PRISMA_URL --stage=dev
-          sst secret set AuthSecret $AUTH_SECRET --stage=dev
-          sst secret set PostgresUrlNoSsl $POSTGRES_URL_NO_SSL --stage=dev
-          sst secret set PostgresUrlNonPooling $POSTGRES_URL_NON_POOLING --stage=dev
-          sst secret set PostgresUser $POSTGRES_USER --stage=dev
-          sst secret set PostgresHost $POSTGRES_HOST --stage=dev
-          sst secret set PostgresPassword $POSTGRES_PASSWORD --stage=dev
-          sst secret set PostgresDatabase $POSTGRES_DATABASE --stage=dev
+          sst secret set PostgresUrl $POSTGRES_URL 
+          sst secret set PostgresPrismaUrl $POSTGRES_PRISMA_URL
+          sst secret set AuthSecret $AUTH_SECRET
+          sst secret set PostgresUrlNoSsl $POSTGRES_URL_NO_SSL
+          sst secret set PostgresUrlNonPooling $POSTGRES_URL_NON_POOLING
+          sst secret set PostgresUser $POSTGRES_USER
+          sst secret set PostgresHost $POSTGRES_HOST
+          sst secret set PostgresPassword $POSTGRES_PASSWORD
+          sst secret set PostgresDatabase $POSTGRES_DATABASE
 
       - name: Deploy to AWS with SST
         run: |
