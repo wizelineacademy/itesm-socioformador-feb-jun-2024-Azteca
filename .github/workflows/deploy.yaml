@@ -11,10 +11,8 @@ on:
     branches:
       - dev
       - main
-
 env:
   AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -64,19 +62,6 @@ jobs:
           sudo dpkg -i sst-linux-amd64.deb
           sst version
       - uses: oven-sh/setup-bun@v1
-      - name: Create .env file
-        uses: SpicyPizza/create-envfile@v2.0
-        with:
-        directory: itesm-socioformador-feb-jun-2024-Azteca-3   # Asegúrate de que este directorio es correcto
-        POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
-        POSTGRES_PRISMA_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
-        AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-        POSTGRES_URL_NO_SSL: ${{ secrets.POSTGRES_URL_NO_SSL }}
-        POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
-        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-        POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-        POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -84,27 +69,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           role-duration-seconds: 1200
           aws-region: us-east-1
-      - name: Copy Secrets for Production
-        run: |
-            sst secret set POSTGRES_URL ${{ secrets.POSTGRES_URL }}
-            sst secret set POSTGRES_PRISMA_URL ${{ secrets.POSTGRES_PRISMA_URL }}
-            sst secret set AUTH_SECRET ${{ secrets.AUTH_SECRET }}
-            sst secret set POSTGRES_URL_NO_SSL ${{ secrets.POSTGRES_URL_NO_SSL }}
-            sst secret set POSTGRES_URL_NON_POOLING ${{ secrets.POSTGRES_URL_NON_POOLING }}
-            sst secret set POSTGRES_USER ${{ secrets.POSTGRES_USER }}
-            sst secret set POSTGRES_HOST ${{ secrets.POSTGRES_HOST }}
-            sst secret set POSTGRES_PASSWORD ${{ secrets.POSTGRES_PASSWORD }}
-            sst secret set POSTGRES_DATABASE ${{ secrets.POSTGRES_DATABASE }}
       - name: Deploy to AWS with SST
-        env:
-          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
-          POSTGRES_PRISMA_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
-          POSTGRES_URL_NO_SSL: ${{ secrets.POSTGRES_URL_NO_SSL }}
-          POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
         run: |
           bun install
           sst deploy --stage=dev --verbose
@@ -130,28 +95,8 @@ jobs:
           role-to-assume: arn:aws:iam::211125454464:role/GitHub
           role-duration-seconds: 1200 #adjust as needed for your build time
           aws-region: us-east-1
-      - name: Copy Secrets for Production
-        run: |
-              sst secret set POSTGRES_URL ${{ secrets.POSTGRES_URL }}
-              sst secret set POSTGRES_PRISMA_URL ${{ secrets.POSTGRES_PRISMA_URL }}
-              sst secret set AUTH_SECRET ${{ secrets.AUTH_SECRET }}
-              sst secret set POSTGRES_URL_NO_SSL ${{ secrets.POSTGRES_URL_NO_SSL }}
-              sst secret set POSTGRES_URL_NON_POOLING ${{ secrets.POSTGRES_URL_NON_POOLING }}
-              sst secret set POSTGRES_USER ${{ secrets.POSTGRES_USER }}
-              sst secret set POSTGRES_HOST ${{ secrets.POSTGRES_HOST }}
-              sst secret set POSTGRES_PASSWORD ${{ secrets.POSTGRES_PASSWORD }}
-              sst secret set POSTGRES_DATABASE ${{ secrets.POSTGRES_DATABASE }}
 
       - name: Deploy to AWS with SST
-        env:
-          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
-          POSTGRES_PRISMA_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
-          POSTGRES_URL_NO_SSL: ${{ secrets.POSTGRES_URL_NO_SSL }}
-          POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
         run: |
           bun install
           sst deploy --stage=production --verbose
