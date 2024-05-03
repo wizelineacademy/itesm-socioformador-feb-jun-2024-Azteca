@@ -43,7 +43,6 @@ export default $config({
         POSTGRES_URL_NO_SSL: POSTGRES_URL_NO_SSL.value,
         POSTGRES_URL_NON_POOLING: POSTGRES_URL_NON_POOLING.value,
       },
-      
     });
   },
 });
