@@ -16,7 +16,7 @@ import { SprintSurveyAnswer, SurveyStepTwoAnswer } from "@/types";
 export async function createSprintSurvey(projectId: number) {
   const res = await db
     .insert(sprintSurvey)
-    .values({ projectId: projectId, createdAt: sql`CURRENT_TIMESTAMP` })
+    .values({ projectId: projectId, scheduledAt: sql`CURRENT_TIMESTAMP` })
     .returning({ id: sprintSurvey.id });
 
   return res[0];
