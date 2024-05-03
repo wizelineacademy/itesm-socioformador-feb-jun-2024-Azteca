@@ -131,6 +131,7 @@ export async function getCoworkersInProject(sprintSurveyId: number) {
     .where(
       and(
         eq(sprintSurvey.id, sprintSurveyId), // Filter by sprintSurveyId
-        ne(user.id, currentUserId) // Exclude the current user from the results
-      )
-    )}
+        ne(user.id, currentUserId), // Exclude the current user from the results
+      ),
+    );
+}

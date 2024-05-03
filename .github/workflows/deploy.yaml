@@ -84,7 +84,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install SST
-        run: | 
+        run: |
           wget https://github.com/sst/ion/releases/download/v0.0.298/sst-linux-amd64.deb 
           sudo dpkg -i sst-linux-amd64.deb
           sst version
