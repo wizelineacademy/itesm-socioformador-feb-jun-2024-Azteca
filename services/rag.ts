@@ -75,12 +75,24 @@ async function process_closed_feedback() {}
 */
 async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
   interface FeedbackCategory {
-    openFeedback: Array<[string, string]>;
-    closedFeedback: Array<[string, number]>;
+    [coworkerId: string]: {
+      openFeedback: Array<[string, string]>;
+      closedFeedback: Array<[string, number]>;
+    };
+  }
+
+  interface FeedbackSummary {
+    positive: string[];
+    negative: string[];
+    biased: string[];
+    notUseful: string[];
   }
 
   const feedbackRecords: {
-    [userId: string]: { [coworkerId: string]: FeedbackCategory };
+    [userId: string]: {
+      coworkersFeedback: FeedbackCategory;
+      feedbackSummary: FeedbackSummary;
+    };
   } = {};
 
   const coworkersOpenFeedback = await db
@@ -121,16 +133,25 @@ async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
       ),
     );
 
+  // initialize the empty structure with the keys
   for (let userId of uniqueWorkers) {
     var filteredCoworkers = uniqueWorkers.filter(
       (element): element is string =>
         typeof element === "string" && element !== userId,
     );
 
-    feedbackRecords[userId] = {};
+    feedbackRecords[userId] = {
+      coworkersFeedback: {},
+      feedbackSummary: {
+        positive: [],
+        negative: [],
+        biased: [],
+        notUseful: [],
+      },
+    };
 
     for (let coworkerId of filteredCoworkers) {
-      feedbackRecords[userId][coworkerId] = {
+      feedbackRecords[userId]["coworkersFeedback"][coworkerId] = {
         openFeedback: [],
         closedFeedback: [],
       };
@@ -139,19 +160,17 @@ async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
 
   coworkersOpenFeedback.forEach((record) => {
     if (record.coworkerId !== null && record.coworkerId !== undefined) {
-      feedbackRecords[record.userId!][record.coworkerId].openFeedback.push([
-        record.questionName!,
-        record.comment!,
-      ]);
+      feedbackRecords[record.userId!]["coworkersFeedback"][
+        record.coworkerId
+      ].openFeedback.push([record.questionName!, record.comment!]);
     }
   });
 
   coworkersClosedFeedback.forEach((record) => {
     if (record.coworkerId !== null && record.coworkerId !== undefined) {
-      feedbackRecords[record.userId!][record.coworkerId].closedFeedback.push([
-        record.questionName!,
-        record.answer!,
-      ]);
+      feedbackRecords[record.userId!]["coworkersFeedback"][
+        record.coworkerId
+      ].closedFeedback.push([record.questionName!, record.answer!]);
     }
   });
 
@@ -211,7 +230,9 @@ export async function ruler_analysis() {
 
 // This function is triggered by the manager when the sprint survey is closed
 export async function feedback_analysis(sprintSurveyId: number) {
-  const today = new Date().toISOString().slice(0, 10);
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_KEY,
+  });
 
   // get all the unique users that belong to the project of the sprint survey
   const uniqueUsers = await db
@@ -224,6 +245,42 @@ export async function feedback_analysis(sprintSurveyId: number) {
 
   const ids = uniqueUsers.map((user) => user.userId as string);
 
+  /*
+  const processedFeedback: {[sentiment: string]: { [specificSentiment:string]: string[] }
+  } = {
+    positive: { },
+    negative: { },
+    biased: { },
+    notUseful: { }
+  };
+  */
+
   // feedback ordered, this structure is important to detect similarities between the feedback
   const orderedFeedback = await group_feedback(sprintSurveyId, ids);
+
+  // iterate through all the feedback of the sprint survey and analyze it
+
+  for (let userId of Object.keys(orderedFeedback)) {
+    for (let coworkerId of Object.keys(
+      orderedFeedback[userId]["coworkersFeedback"],
+    )) {
+      if (
+        orderedFeedback[userId]["coworkersFeedback"][coworkerId].openFeedback
+          .length > 0
+      ) {
+        // iterate through all the open feedback received from the coworker
+        for (let comment of orderedFeedback[userId]["coworkersFeedback"][
+          coworkerId
+        ].openFeedback) {
+          // return structure with a summary of the 4 types of feedback
+          // add to the primary structure all the summaries of the previos function and the coworker who made the feedback
+        }
+      }
+      /* 
+      else {
+        // no open feedback received from the coworker, recommend resources with the closed feedback
+      }
+      */
+    }
+  }
 }
