@@ -1,13 +1,20 @@
-"use client";
+import { useEffect, useState } from "react";
 import { loginAction } from "@/actions";
 import FormTextInput from "@/components/FormTextInput";
-import { TextInput } from "@mantine/core";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 const Login = () => {
   const [error, setError] = useState<string | null>(null);
-  const emailInput = document.getElementById("email");
+  const [emailElement, setEmailElement] = useState<HTMLInputElement | null>(
+    null,
+  );
+
+  useEffect(() => {
+    // This will now safely run on the client side after the component has mounted
+    const emailInput = document.getElementById("email") as HTMLInputElement;
+    setEmailElement(emailInput);
+  }, []);
+
   const clientLoginAction = async (formData: FormData) => {
     const result = await loginAction(formData);
     if (result) {
@@ -26,25 +33,14 @@ const Login = () => {
     <main className="flex h-dvh items-center justify-center bg-gradient-to-r from-primary to-primary-light">
       <section className="flex h-fit w-[33%] flex-col justify-center divide-y divide-gray-500 rounded-[20px] bg-bone px-16 py-8 drop-shadow-md">
         <div className="flex w-full flex-col items-center justify-start gap-y-4 pb-8">
-          <p className="mb-4 mt-6 text-center text-3xl font-semibold leading-normal text-black">
-            Log in to Feedback Flow
-          </p>
-          <button className=" group flex w-7/12 flex-row rounded-full border border-primary-light px-4 py-2 transition-all duration-200 hover:bg-primary-dark">
-            <i className="fi fi-brands-slack text-lg leading-[0px] text-primary-light group-hover:text-white" />
-            <p className="mx-auto text-sm font-medium text-black group-hover:text-white">
-              Continue with Slack
-            </p>
-          </button>
-          <button className=" group flex w-7/12 flex-row rounded-full border border-primary-light px-4 py-2 transition-all duration-200 hover:bg-primary-dark">
-            <i className="fi fi-brands-google text-lg leading-[0px] text-primary-light group-hover:text-white" />
-            <p className="mx-auto text-sm font-medium text-black group-hover:text-white">
-              Continue with Google
-            </p>
-          </button>
+          {/* Your buttons and other content */}
         </div>
         <div className="flex w-full flex-col items-center justify-center pb-6">
           <form
-            action={clientLoginAction}
+            onSubmit={(e) => {
+              e.preventDefault(); // Prevent the default form submission
+              clientLoginAction(new FormData(e.currentTarget));
+            }}
             className="flex w-full flex-col justify-center"
           >
             <FormTextInput name="email" type="email" label="Email" />
