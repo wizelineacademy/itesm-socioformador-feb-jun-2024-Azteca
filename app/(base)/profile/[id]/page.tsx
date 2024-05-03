@@ -77,9 +77,7 @@ const Profile = async ({ params }: { params: { id: string } }) => {
                 Show More
               </p>
             </div>
-            <div className="mt-2 flex gap-4">
-              <ProjectsCarousel />
-            </div>
+            <ProjectsCarousel />
           </div>
         </div>
 
