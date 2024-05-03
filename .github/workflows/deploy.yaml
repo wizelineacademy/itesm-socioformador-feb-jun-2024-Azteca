@@ -92,6 +92,9 @@ jobs:
           sst secret set POSTGRES_HOST ${{ secrets.POSTGRES_HOST }}
           sst secret set POSTGRES_PASSWORD ${{ secrets.POSTGRES_PASSWORD }}
           sst secret set POSTGRES_DATABASE ${{ secrets.POSTGRES_DATABASE }}
+      - name: Unlock SST
+        run: |
+          sst unlock
       - name: Deploy to AWS with SST
         run: |
           bun install
