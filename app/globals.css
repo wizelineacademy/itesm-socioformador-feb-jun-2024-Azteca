@@ -3,9 +3,9 @@
 @tailwind components;
 @tailwind utilities;
 
-* > * {
+/* * > * {
   outline: red solid 1px;
-}
+} */
 
 :root {
   --bone: #f8f5f5;
