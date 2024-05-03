@@ -62,19 +62,6 @@ jobs:
           sudo dpkg -i sst-linux-amd64.deb
           sst version
       - uses: oven-sh/setup-bun@v1
-      - name: Create .env file for Production
-        uses: SpicyPizza/create-envfile@v2.0
-        with:
-        directory: itesm-socioformador-feb-jun-2024-Azteca-3 # Asegúrate de que este directorio es correcto
-        POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
-        POSTGRES_PRISMA_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
-        AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-        POSTGRES_URL_NO_SSL: ${{ secrets.POSTGRES_URL_NO_SSL }}
-        POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
-        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-        POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-        POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
