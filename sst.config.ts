@@ -8,6 +8,7 @@ export default $config({
       home: "aws",
     };
   },
+  //
   async run() {
     const POSTGRES_URL = new sst.Secret("PostgresUrl", {
       value: process.env.POSTGRES_URL,
