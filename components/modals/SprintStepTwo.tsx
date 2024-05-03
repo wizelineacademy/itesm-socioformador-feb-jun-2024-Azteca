@@ -171,32 +171,32 @@ const SprintStepTwo = ({
             collisionDetection={pointerWithin}
           >
             <SprintDropRow
-              name="punctuality"
-              people={sprintSurveyStepTwoAnswer.punctuality}
+              name="SS_CWPN"
+              people={sprintSurveyStepTwoAnswer.SS_CWPN}
               title="Is puntual in sessions and meetings?"
               colors={yellowOpacities}
               titlePadding="p-[18px] pe-2"
             />
 
             <SprintDropRow
-              name="cooperation"
-              people={sprintSurveyStepTwoAnswer.cooperation}
+              name="SS_CWCM"
+              people={sprintSurveyStepTwoAnswer.SS_CWCM}
               title="Cooperation and communication with the peer was smooth"
               colors={purpleOpacities}
               className="mt-6"
               titlePadding="p-2"
             />
             <SprintDropRow
-              name="support"
-              people={sprintSurveyStepTwoAnswer["support"]}
+              name="SS_CWSP"
+              people={sprintSurveyStepTwoAnswer.SS_CWSP}
               title="Offers support or shows appreciation to other team members"
               colors={blueOpacities}
               className="mt-6"
               titlePadding="p-2"
             />
             <SprintDropRow
-              name="motivates"
-              people={sprintSurveyStepTwoAnswer.motivates}
+              name="SS_CWMT"
+              people={sprintSurveyStepTwoAnswer.SS_CWMT}
               title="Motivates other team members to achieve goals"
               colors={redOpacities}
               className="mt-6"

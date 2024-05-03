@@ -7,7 +7,7 @@ import {
   sprintSurveyAnswerCoworkers,
   sprintSurveyAnswerProject,
 } from "@/db/schema";
-import { eq, or } from "drizzle-orm";
+import { eq, or, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -16,7 +16,7 @@ import { SprintSurveyAnswer, SurveyStepTwoAnswer } from "@/types";
 export async function createSprintSurvey(projectId: number) {
   const res = await db
     .insert(sprintSurvey)
-    .values({ projectId: projectId, createdAt: Date.now().toString() })
+    .values({ projectId: projectId, scheduledAt: sql`CURRENT_TIMESTAMP` })
     .returning({ id: sprintSurvey.id });
 
   return res[0];

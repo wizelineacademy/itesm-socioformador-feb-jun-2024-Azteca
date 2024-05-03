@@ -4,7 +4,9 @@ import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import UserIcon from "./icons/UserIcon";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { useQuery } from "@tanstack/react-query";
+import { getUserInfo } from "@/services/user";
 
 interface UserIconInterface {
   path: string;
@@ -12,8 +14,11 @@ interface UserIconInterface {
 }
 const UserIconNavbar = ({ path, currentPath }: UserIconInterface) => {
   const onSite = currentPath === path;
+  const { data: user } = useQuery({
+    queryKey: ["user"],
+    queryFn: () => getUserInfo(),
+  });
   const [isClicked, setIsClicked] = useState<boolean>(false);
-  const router = useRouter();
   const handleSignOut = async () => {
     await signOut();
   };
@@ -48,11 +53,11 @@ const UserIconNavbar = ({ path, currentPath }: UserIconInterface) => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
+        <Menu.Items className="absolute right-0 z-50 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
           <div className="px-1 py-1 ">
             <Menu.Item>
               <p className="mx-auto items-center px-2 py-2 text-sm">
-                Hola Pedro!
+                Hola {user?.name.split(" ")[0]}!
               </p>
             </Menu.Item>
           </div>

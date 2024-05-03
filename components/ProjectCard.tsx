@@ -32,25 +32,29 @@ export default function ProjectCard({
   }
 
   return (
-    <div className="flex items-center gap-20 rounded-lg bg-white p-4">
+    <div className="flex items-center gap-10 rounded-lg bg-white p-4">
       <div>
-        <h3 className="pb-2 text-lg font-medium">{name}</h3>
+        <h3 className="w-[15ch] pb-2 text-base font-medium">{name}</h3>
         <p className="pb-4 text-sm text-graySubtitle">In progress</p>
         <div className="ml-[6px]">
           <ul className="flex">
-            {coworkersQuery.data.map((project, index) => (
+            {coworkersQuery.data.map((coworker, index) => (
               <li key={index}>
-                <UserProfileButton size="xs" className="mx-[-6px]" />
+                <UserProfileButton
+                  size="xs"
+                  className="mx-[-6px]"
+                  photoUrl={coworker.photoUrl || ""}
+                />
               </li>
             ))}
-            <button
+            {/*             <button
               disabled
               className={
                 "group mx-[-6px] rounded-full bg-white p-2 text-primary drop-shadow-lg"
               }
             >
               <PlusIcon size="h-4 w-4" color="primary" />
-            </button>
+            </button> */}
           </ul>
         </div>
       </div>

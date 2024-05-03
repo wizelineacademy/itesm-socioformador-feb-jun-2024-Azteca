@@ -1,5 +1,3 @@
-"use client";
-
 import UserProfileButton from "@/components/UserProfileButton";
 import CoWorkersCarousel from "@/components/CoWorkersCarousel";
 import ProjectsCarousel from "@/components/ProjectsCarousel";
@@ -7,28 +5,31 @@ import Tooltip from "@/components/Tooltip";
 import Badge from "@/components/Badge";
 import Image from "next/image";
 import JobSVG from "@/public/Job-Profile-Image.svg";
+import { getUserInfoById, getUserTraitsById } from "@/services/user";
 
-// Services imports
-import { getInfoById, getTraits } from "@/services/user";
-import BadgeSkeleton from "@/components/skeletons/BadgeSkeleton";
-import { useQuery } from "@tanstack/react-query";
+const Profile = async ({ params }: { params: { id: string } }) => {
+  let user;
+  let traits;
 
-const Profile = () => {
-  const userQuery = useQuery({
-    queryKey: ["userData"],
-    queryFn: () => getInfoById(),
-  });
-
-  const traitsQuery = useQuery({
-    queryKey: ["traits"],
-    queryFn: () => getTraits(),
-  });
+  try {
+    user = await getUserInfoById(params.id);
+    traits = await getUserTraitsById(params.id);
+  } catch (e) {
+    return (
+      <main>
+        <h1 className="pt-20 text-center text-3xl">
+          El usuario no fue encontrado :(
+        </h1>
+      </main>
+    );
+  }
 
   return (
     <main>
       {/* Banner */}
       <section className="w-100 mx-auto mb-24 mt-6 flex h-52 rounded-xl bg-primary">
         <UserProfileButton
+          photoUrl={user.photoUrl!}
           size="lg"
           className="absolute left-20 top-60 h-fit"
           // photoUrl={BitmojiAdrian}
@@ -36,32 +37,20 @@ const Profile = () => {
         />
         <div className="flex w-5/6 flex-row items-center justify-between">
           <div className="w-full ps-56 leading-tight text-white">
-            {userQuery.isLoading && (
-              <div className=" flex flex-col gap-4">
-                <div className="h-10 w-80 animate-pulse rounded-full bg-primary-light transition-all duration-100" />
-                <div className="flex flex-row items-center gap-2">
-                  <div className="h-5 w-36 animate-pulse rounded-full bg-primary-light transition-all duration-100" />
-                  <p className="font-normal">-</p>
-                  <div className="h-5 w-36 animate-pulse rounded-full bg-primary-light transition-all duration-100" />
-                </div>
-                <div className="h-5 w-32 animate-pulse rounded-full bg-primary-light transition-all duration-100" />
-              </div>
-            )}
-            {userQuery.data && (
-              <>
-                <h2 className=" text-3xl font-semibold">
-                  {userQuery.data.name}
-                </h2>
-                <div className="flex flex-row items-center gap-2 text-xl">
-                  <p className="font-medium">{userQuery.data.role}</p>
-                  <p className="font-normal">-</p>
-                  <p className="font-normal">{userQuery.data.department}</p>
-                </div>
-                <p className="font-light">{userQuery.data.email}</p>
-              </>
-            )}
+            <h2 className=" text-3xl font-semibold">{user.name}</h2>
+            <div className="flex flex-row items-center gap-2 text-xl">
+              <p className="font-medium">{user.role}</p>
+              <p className="font-normal">-</p>
+              <p className="font-normal">{user.department}</p>
+            </div>
+            <p className="font-light">{user.email}</p>
           </div>
-          <Image src={JobSVG} alt="image" className="hidden md:block" />
+          <Image
+            src={JobSVG}
+            alt="image"
+            className="hidden md:block"
+            priority
+          />
         </div>
       </section>
 
@@ -103,21 +92,17 @@ const Profile = () => {
             </p>
           </div>
           <div className="mb-10 mt-5 flex flex-wrap gap-5">
-            {traitsQuery.isLoading && (
-              <>
-                {Array(12)
-                  .fill(0)
-                  .map((item, index) => (
-                    <BadgeSkeleton key={index} />
-                  ))}
-              </>
+            {traits.strengths.length === 0 && (
+              <p className="text-sm font-medium">
+                Currently you have no strengths available, please ask your
+                manager to update them.
+              </p>
             )}
-            {traitsQuery.data &&
-              traitsQuery.data.strengths.map((strength, index) => (
-                <Tooltip message={strength.description!} key={index}>
-                  <Badge text={strength.name!} />
-                </Tooltip>
-              ))}
+            {traits.strengths.map((strength, index) => (
+              <Tooltip message={strength.description!} key={index}>
+                <Badge text={strength.name!} />
+              </Tooltip>
+            ))}
           </div>
           {/* Oportunity Areas */}
           <div className="mx-auto flex justify-between">
@@ -129,21 +114,17 @@ const Profile = () => {
             </p>
           </div>
           <div className="mb-10 mt-5 flex flex-wrap gap-5">
-            {traitsQuery.isLoading && (
-              <>
-                {Array(12)
-                  .fill(0)
-                  .map((item, index) => (
-                    <BadgeSkeleton key={index} />
-                  ))}
-              </>
+            {traits.areasOfOportunity.length === 0 && (
+              <p className="text-sm font-medium">
+                Currently you have no areas of opportunity available, please ask
+                your manager to update them.
+              </p>
             )}
-            {traitsQuery.data &&
-              traitsQuery.data.areasOfOportunity.map((area, index) => (
-                <Tooltip message={area.description!} key={index}>
-                  <Badge text={area.name!} />
-                </Tooltip>
-              ))}
+            {traits.areasOfOportunity.map((area, index) => (
+              <Tooltip message={area.description!} key={index}>
+                <Badge text={area.name!} />
+              </Tooltip>
+            ))}
           </div>
         </div>
       </section>
