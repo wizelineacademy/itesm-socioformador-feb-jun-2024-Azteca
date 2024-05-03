@@ -107,6 +107,16 @@ jobs:
           sst secret set PostgresHost $POSTGRES_HOST
           sst secret set PostgresPassword $POSTGRES_PASSWORD
           sst secret set PostgresDatabase $POSTGRES_DATABASE
+        env:
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+          POSTGRES_PRISMA_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          POSTGRES_URL_NO_SSL: ${{ secrets.POSTGRES_URL_NO_SSL }}
+          POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
 
       - name: Deploy to AWS with SST
         run: |
