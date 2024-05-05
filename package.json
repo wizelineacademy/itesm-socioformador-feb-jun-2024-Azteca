@@ -9,7 +9,7 @@
     "dev": "next dev",
     "generate": "drizzle-kit generate:pg --config=drizzle.config.ts",
     "lint": "next lint",
-    "migrate": "npx tsx db/drizzle.ts",
+    "migrate": "sst shell bun tsx migrate.ts",
     "prettier:check": "prettier --check --ignore-unknown .",
     "prettier:write": "prettier --write --ignore-unknown .",
     "start": "next start",

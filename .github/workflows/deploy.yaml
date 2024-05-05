@@ -145,6 +145,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           role-duration-seconds: 1200
           aws-region: us-east-1
+          
       - name: Run Database Migrations
         run: npm run migrate
 
