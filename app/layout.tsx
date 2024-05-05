@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
+import ReactQueryProvider from "@/utils/ReactQueryProvider";
+import { Toaster } from "react-hot-toast";
 
 const poppins = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -19,15 +20,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // if the current route is login or register, we don't want to show the nav bar
-
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body className={poppins.className + " h-dvh w-dvw bg-bone"}>
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en">
+      <body className={poppins.className + " h-dvh w-dvw bg-bone"}>
+        <ReactQueryProvider>{children}</ReactQueryProvider>
+        <Toaster position="top-center" />
+      </body>
+    </html>
   );
 }

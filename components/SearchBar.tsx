@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface SearchBarInterface {
   placeholder: string;
@@ -9,6 +9,14 @@ interface SearchBarInterface {
 
 const SearchBar = ({ placeholder, expanded = true }: SearchBarInterface) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isExpanded) {
+      inputRef.current?.focus();
+    }
+  }, [isExpanded]);
+
   return expanded ? (
     <div className="flex h-10 w-64 items-center rounded-full bg-white drop-shadow-lg">
       <svg
@@ -35,7 +43,7 @@ const SearchBar = ({ placeholder, expanded = true }: SearchBarInterface) => {
     </div>
   ) : (
     <div
-      className={`flex items-center overflow-hidden rounded-full bg-white p-2 drop-shadow-lg transition-all duration-700 ${isExpanded ? "w-64" : "w-10"}`}
+      className={`flex items-center overflow-hidden rounded-full bg-white p-2 drop-shadow-lg transition-all duration-500 ${isExpanded ? "w-64" : "w-10 hover:scale-[1.175]"}`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -56,6 +64,7 @@ const SearchBar = ({ placeholder, expanded = true }: SearchBarInterface) => {
         className={`transform transition-transform duration-700 ${isExpanded ? "-translate-x-0" : "hidden -translate-x-full"}`}
       >
         <input
+          ref={inputRef}
           name="search"
           type="text"
           placeholder={placeholder}

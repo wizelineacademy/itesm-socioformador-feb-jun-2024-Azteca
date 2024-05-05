@@ -1,14 +1,6 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Client } from "pg";
+import { drizzle } from "drizzle-orm/vercel-postgres";
+import { sql } from "@vercel/postgres";
 
-const client = new Client({
-  host: "127.0.0.1",
-  port: 5432,
-  user: "postgres",
-  password: "mysecretpassword",
-  database: "feedbackflow_db",
-});
-
-const db = drizzle(client);
+const db = drizzle(sql);
 
 export default db;

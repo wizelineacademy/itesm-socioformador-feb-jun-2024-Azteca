@@ -8,43 +8,18 @@ Una plataforma de retroalimentación y evaluación para empleados dentro de una 
 
 # 📚 Usage
 
-To spawn the postgres container and get into it
-
-```bash
-docker pull postgres
-docker run --name feedbackflow-postgres -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 postgres
-docker exec -it feedbackflow-postgres psql -U postgres
-```
-
-Create the database before running
-
-```sql
-CREATE DATABASE feedbackflow_db;
-\l
-```
-
-Push the schema directly to the database
-
-```bash
-npx drizzle-kit push:pg
-```
-
-Show the created tables
-
-```
-\c feedbackflow_db
-\dt
-```
-
 Make sure you have the right `.env.local` file in your project
 
 ```env
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<YOUR KEY>
-CLERK_SECRET_KEY=<YOUR KEY>
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
+POSTGRES_URL=<YOUR KEY>
+POSTGRES_PRISMA_URL=<YOUR KEY>
+POSTGRES_URL_NO_SSL=<YOUR KEY>
+POSTGRES_URL_NON_POOLING=<YOUR KEY>
+POSTGRES_USER=<YOUR KEY>
+POSTGRES_HOST=<YOUR KEY>
+POSTGRES_PASSWORD=<YOUR KEY>
+POSTGRES_DATABASE=<YOUR KEY>
+AUTH_SECRET=<YOUR KEY>
 ```
 
 To run the app
