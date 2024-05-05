@@ -19,6 +19,12 @@ export default $config({
     const AUTH_SECRET = new sst.Secret("AuthSecret");
     const POSTGRES_URL_NO_SSL = new sst.Secret("PostgresUrlNoSsl");
     const POSTGRES_URL_NON_POOLING = new sst.Secret("PostgresUrlNonPooling");
+    const database = new sst.aws.Postgres("FeedbackFlowdb", {
+      scaling: {
+       min: "2 ACU",
+       max: "128 ACU" 
+      }
+    });
 
     new sst.aws.Nextjs("FeedbackFlowAppf", {
       link: [
@@ -31,6 +37,7 @@ export default $config({
         AUTH_SECRET,
         POSTGRES_URL_NO_SSL,
         POSTGRES_URL_NON_POOLING,
+        database,
       ],
       environment: {
         POSTGRES_URL: POSTGRES_URL.value,
