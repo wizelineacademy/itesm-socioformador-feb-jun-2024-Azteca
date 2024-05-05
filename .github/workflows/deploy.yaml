@@ -144,7 +144,9 @@ jobs:
           role-to-assume: arn:aws:iam::211125454464:role/GitHub
           role-duration-seconds: 1200 #adjust as needed for your build time
           aws-region: us-east-1
-     
+      - name: Run Database Migrations
+        run: npm run migrate
+
       - name: Deploy to AWS with SST
         run: |
           bun install

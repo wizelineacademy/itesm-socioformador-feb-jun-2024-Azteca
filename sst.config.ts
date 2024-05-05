@@ -21,9 +21,9 @@ export default $config({
     const POSTGRES_URL_NON_POOLING = new sst.Secret("PostgresUrlNonPooling");
     const database = new sst.aws.Postgres("FeedbackFlowdb", {
       scaling: {
-       min: "2 ACU",
-       max: "128 ACU" 
-      }
+        min: "2 ACU",
+        max: "128 ACU",
+      },
     });
 
     new sst.aws.Nextjs("FeedbackFlowAppf", {
