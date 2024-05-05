@@ -3,7 +3,7 @@ import Image from "next/image";
 interface UserProfileButtonProps {
   name?: string;
   photoUrl?: string;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg"| "2xs" | "xs";
   className?: string;
   color?: string;
 }
