@@ -1,6 +1,5 @@
 // Cargar variables de entorno desde .env
 require("dotenv").config();
-
 // Importaciones
 import { Resource } from "sst";
 //import { drizzle } from "drizzle-orm/aws-data-api/pg";
@@ -8,9 +7,6 @@ import { migrate } from "drizzle-orm/aws-data-api/pg/migrator";
 import { RDSDataClient } from "@aws-sdk/client-rds-data";
 import { fromIni } from "@aws-sdk/credential-providers";
 import { drizzle } from "drizzle-orm/vercel-postgres";
-import { sql } from "@vercel/postgres";
-
-
 
 // Obtener el perfil de AWS desde las variables de entorno o usar 'default'
 const awsProfile = process.env.AWS_PROFILE || "default";
@@ -25,9 +21,9 @@ const sql = new RDSDataClient({
 
 // Configuración de la conexión de Drizzle ORM
 export const db = drizzle(sql, {
-  database: Resource.FeedbackFlowdb.database,
-  secretArn: Resource.FeedbackFlowdb.secretArn,
-  resourceArn: Resource.FeedbackFlowdb.clusterArn,
+  database: Resource.Postgres.database,
+  secretArn: Resource.Postgres.secretArn,
+  resourceArn: Resource.Postgres.clusterArn,
 });
 
 //console.log("DB", db);
