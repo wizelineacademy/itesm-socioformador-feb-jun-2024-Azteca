@@ -1,5 +1,5 @@
 import Link from "next/link";
-import ProjectIcon from "./icons/ProjectIcon";
+import ProjectIcon from "../components/icons/ProjectIcon";
 
 interface ProjectIconNavbarInterface {
   path: string;
