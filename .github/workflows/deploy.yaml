@@ -144,18 +144,7 @@ jobs:
           role-to-assume: arn:aws:iam::211125454464:role/GitHub
           role-duration-seconds: 1200 #adjust as needed for your build time
           aws-region: us-east-1
-      - name: Copy Secrets for Production
-        run: |
-          sst secret set PostgresUrl ${{ secrets.POSTGRES_URL }}
-          sst secret set PostgresPrismaUrl ${{ secrets.POSTGRES_PRISMA_URL }}
-          sst secret set AuthSecret ${{ secrets.AUTH_SECRET }}
-          sst secret set PostgresUrlNoSsl ${{ secrets.POSTGRES_URL_NO_SSL }}
-          sst secret set PostgresUrlNonPooling ${{ secrets.POSTGRES_URL_NON_POOLING }}
-          sst secret set PostgresUser ${{ secrets.POSTGRES_USER }}
-          sst secret set PostgresHost ${{ secrets.POSTGRES_HOST }}
-          sst secret set PostgresPassword ${{ secrets.POSTGRES_PASSWORD }}
-          sst secret set PostgresDatabase ${{ secrets.POSTGRES_DATABASE }}
-
+     
       - name: Deploy to AWS with SST
         run: |
           bun install
