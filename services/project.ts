@@ -9,7 +9,7 @@ import {
   sprintSurvey,
   user,
 } from "@/db/schema";
-import { eq, or } from "drizzle-orm";
+import { and, eq, ne, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -115,6 +115,9 @@ export async function getEmployeesInProjectById(projectId: number) {
 
 // This function returns the coworkers in a project that are also in a sprint survey
 export async function getCoworkersInProject(sprintSurveyId: number) {
+  const session = await auth();
+  const currentUserId = session?.user?.id;
+  if (!currentUserId) throw new Error("You must be signed in");
   return await db
     .select({
       userId: user.id,
@@ -125,5 +128,10 @@ export async function getCoworkersInProject(sprintSurveyId: number) {
     .innerJoin(project, eq(sprintSurvey.projectId, project.id)) // Join sprintSurvey to project
     .innerJoin(projectMember, eq(project.id, projectMember.projectId)) // Join project to projectMember
     .innerJoin(user, eq(projectMember.userId, user.id)) // Join projectMember to user
-    .where(eq(sprintSurvey.id, sprintSurveyId)); // Filter by sprintSurveyId
+    .where(
+      and(
+        eq(sprintSurvey.id, sprintSurveyId), // Filter by sprintSurveyId
+        ne(user.id, currentUserId), // Exclude the current user from the results
+      ),
+    );
 }
