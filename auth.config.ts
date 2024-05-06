@@ -12,33 +12,7 @@ export const authConfig = {
     async authorized({ auth, request: { nextUrl } }) {
       // TODO: this logic conflicts with nextAuth callbackURL, it would be nice to fix it
       const isLoggedIn = !!auth?.user;
-
-      if (isLoggedIn) {
-        if (
-          nextUrl.pathname.startsWith("/login") ||
-          nextUrl.pathname.startsWith("/register")
-        ) {
-          return Response.redirect(
-            new URL(`/profile/${auth.user?.id}`, nextUrl),
-          );
-        } else if (nextUrl.pathname.startsWith("/admin")) {
-          // TODO: fix fetch node-gyp error from middleware
-          const res = await fetch("/api/get-role");
-          const { role } = await res.json();
-
-          if (role == "ADMIN") {
-            return true;
-          } else {
-            return Response.redirect(new URL("/forbbiden", nextUrl));
-          }
-        } else if (nextUrl.pathname === "/profile" || nextUrl.pathname == "/") {
-          return Response.redirect(
-            new URL(`/profile/${auth.user?.id}`, nextUrl),
-          );
-        } else {
-          return true;
-        }
-      } else {
+      if (!isLoggedIn) {
         if (
           nextUrl.pathname.startsWith("/login") ||
           nextUrl.pathname.startsWith("/register")
@@ -47,6 +21,27 @@ export const authConfig = {
         }
         return false; // Redirect unauthenticated users to login page
       }
+
+      if (nextUrl.pathname.startsWith("/admin")) {
+        // TODO: fix fetch node-gyp error from middleware
+        const res = await fetch("/api/get-role");
+        const { role } = await res.json();
+
+        if (role === "ADMIN") return true;
+
+        return Response.redirect(new URL("/forbbiden", nextUrl));
+      }
+
+      if (
+        nextUrl.pathname.startsWith("/login") ||
+        nextUrl.pathname.startsWith("/register")
+      )
+        return Response.redirect(new URL(`/profile/${auth.user?.id}`, nextUrl));
+
+      if (nextUrl.pathname === "/profile" || nextUrl.pathname == "/")
+        return Response.redirect(new URL(`/profile/${auth.user?.id}`, nextUrl));
+
+      return true;
     },
     async jwt({ token, user: jwtUser, account, profile, trigger }) {
       // Persist the OAuth access_token and or the user id to the token right after signin
