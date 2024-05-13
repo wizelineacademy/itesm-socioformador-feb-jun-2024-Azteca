@@ -1,3 +1,4 @@
+"use client";
 import { Coworker, SprintSurveyAnswer } from "@/types/types";
 import Image from "next/image";
 import UserIcon from "../icons/UserIcon";

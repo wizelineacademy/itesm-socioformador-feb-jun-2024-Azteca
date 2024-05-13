@@ -1,4 +1,6 @@
-import { Emotion, RulerSurveyAnswer } from "@/types/types";
+"use client";
+
+import { Emotion, RulerSurveyAnswer } from "@/types";
 import { rulerEmotionsMatrix } from "@/utils/constants";
 import { Dispatch } from "react";
 

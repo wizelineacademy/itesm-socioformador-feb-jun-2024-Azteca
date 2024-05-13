@@ -1,3 +1,5 @@
+"use client";
+
 interface CloseIconInterface {
   size: string;
   color: string;

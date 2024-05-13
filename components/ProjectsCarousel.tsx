@@ -2,7 +2,6 @@
 
 import React from "react";
 import ProjectCard from "@/components/ProjectCard";
-
 import { useQuery } from "@tanstack/react-query";
 import { getProjectsProfile } from "@/services/user";
 
@@ -13,21 +12,18 @@ export default function ProjectsCarousel() {
   });
 
   if (!projectsQuery.data) {
-    return (
-      <div className="flex flex-row items-center justify-between">
-        <ProjectCard />
-      </div>
-    );
+    return <p>loading...</p>;
+  }
+
+  if (projectsQuery.data.length === 0) {
+    return <p>There are no projects active, insert svg here</p>;
   }
 
   return (
     <ul className="mt-2 flex w-full flex-row gap-4 overflow-x-auto">
       {projectsQuery.data.map((project, index) => (
         <li key={index}>
-          <ProjectCard
-            id={projectsQuery.data[index].id}
-            name={projectsQuery.data[index].name}
-          />
+          <ProjectCard id={project.id} name={project.name} />
         </li>
       ))}
     </ul>

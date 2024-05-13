@@ -1,4 +1,6 @@
-import { Emotion, RulerSurveyAnswer } from "@/types/types";
+"use client";
+
+import { Emotion, RulerSurveyAnswer } from "@/types";
 import { Dispatch } from "react";
 
 interface RulerStepTwoProps {
