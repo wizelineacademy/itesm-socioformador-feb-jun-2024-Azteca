@@ -37,7 +37,7 @@ export async function submitSprintSurveyAnswers(
   // Insert Cokorkers Answers
   surveyAnswer.coworkersAnswers.forEach((answer) => {
     submitSprintCoworkersAns(
-      surveyAnswer.userId,
+      surveyAnswer.userId!,
       surveyAnswer.sprintSurveyId,
       answer,
     );
