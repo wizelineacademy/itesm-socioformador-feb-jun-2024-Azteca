@@ -3,9 +3,10 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import Slider from "../Slider";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { submitProjectAnswer } from "@/services/projectSurvey";
 import { ProjectAnswer } from "@/types";
+import { getUserId } from "@/services/user";
 
 interface ProjectSurveyProps {
   showModal: boolean;
@@ -21,13 +22,17 @@ const ProjectSurvey = ({
     mutationFn: submitProjectAnswer,
     onSuccess: onClose,
   });
-
+  const { data: userId } = useQuery({
+    queryKey: ["userId"],
+    queryFn: async () => await getUserId(),
+  });
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     // TODO: handle failure cases for this surveys
     const formData = new FormData(event.target as HTMLFormElement);
     mutate({
+      userId: userId,
       finalSurveyId: projectSurveyId,
       answers: [
         {

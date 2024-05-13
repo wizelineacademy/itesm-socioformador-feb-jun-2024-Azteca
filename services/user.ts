@@ -56,6 +56,11 @@ export async function getUserInfo() {
   return res[0];
 }
 
+export async function getUserId() {
+  const session = await auth();
+  return session?.user?.id as string;
+}
+
 export async function getUserByEmail(email: string) {
   const users = await db.select().from(user).where(eq(user.email, email));
   return users[0];
