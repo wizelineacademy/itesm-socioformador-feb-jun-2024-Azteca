@@ -12,7 +12,7 @@ import { comment } from "postcss";
 export async function createProjectSurvey(projectId: number) {
   const res = await db
     .insert(finalSurvey)
-    .values({ created_at: sql`CURRENT_TIMESTAMP`, projectId: projectId })
+    .values({ scheduledAt: sql`CURRENT_TIMESTAMP`, projectId: projectId })
     .returning({ id: finalSurvey.id });
 
   return res[0];
