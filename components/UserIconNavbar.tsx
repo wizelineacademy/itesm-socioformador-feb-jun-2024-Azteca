@@ -3,7 +3,7 @@ import { Menu, Transition } from "@headlessui/react";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import UserIcon from "./icons/UserIcon";
+import UserIcon from "../components/icons/UserIcon";
 import { signOut, useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
 import { getUserInfo } from "@/services/user";

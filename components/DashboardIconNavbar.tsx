@@ -1,5 +1,5 @@
 import Link from "next/link";
-import DashboardIcon from "./icons/DashboardIcon";
+import DashboardIcon from "../components/icons/DashboardIcon";
 
 interface DashboardIconInterface {
   path: string;

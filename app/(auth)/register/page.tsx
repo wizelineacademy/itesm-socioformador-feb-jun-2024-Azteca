@@ -14,6 +14,7 @@ const Register = () => {
         toast.error("Network error. Try again.");
       else if (result === "GeneralError")
         toast.error("There was an error saving the data. Try again.");
+
     }
   };
 

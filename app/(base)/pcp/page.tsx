@@ -2,7 +2,7 @@
 import NavigationBar from "@/components/NavigationBar";
 import PipResource from "@/components/PipResource";
 import PipTask from "@/components/PipTask";
-import ProgressBar from "@/components/Progressbar";
+import ProgressBar from "@/components/ProgressBar";
 import {
   getUserTasks,
   getUserResources,
