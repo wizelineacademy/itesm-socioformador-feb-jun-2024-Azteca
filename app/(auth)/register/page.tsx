@@ -1,31 +1,20 @@
-import { signIn } from "@/auth";
+"use client";
+import { registerAction } from "@/actions";
 import FormTextInput from "@/components/FormTextInput";
-import { registerUser } from "@/services/user";
-import { AuthError } from "next-auth";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 const Register = () => {
-  const registerAction = async (formData: FormData) => {
-    "use server";
-    const name = formData.get("name")?.toString();
-    const jobTitle = formData.get("jobTitle")?.toString();
-    const department = formData.get("department")?.toString();
-    const email = formData.get("email")?.toString();
-    const password = formData.get("password")?.toString();
-    await registerUser(name, email, password, department, jobTitle);
-    console.log("formData", formData);
-    try {
-      await signIn("credentials", formData);
-    } catch (error) {
-      if (error instanceof AuthError) {
-        switch (error.type) {
-          case "CredentialsSignin":
-            return "Invalid credentials.";
-          default:
-            return "Something went wrong.";
-        }
-      }
-      throw error;
+  const clientRegisterAction = async (formData: FormData) => {
+    const result = await registerAction(formData);
+    if (result) {
+      if (result === "UniqueConstraintViolation")
+        toast.error("Email already registered.");
+      else if (result === "ConnectionError")
+        toast.error("Network error. Try again.");
+      else if (result === "GeneralError")
+        toast.error("There was an error saving the data. Try again.");
+
     }
   };
 
@@ -38,7 +27,10 @@ const Register = () => {
         <p className="mb-4 text-center text-xl">
           Start getting smart feedback today!
         </p>
-        <form action={registerAction} className="flex flex-col justify-center">
+        <form
+          action={clientRegisterAction}
+          className="flex flex-col justify-center"
+        >
           <FormTextInput name="name" type="text" label="Name" />
           <FormTextInput name="email" type="email" label="Email" />
           <FormTextInput name="password" type="password" label="Password" />

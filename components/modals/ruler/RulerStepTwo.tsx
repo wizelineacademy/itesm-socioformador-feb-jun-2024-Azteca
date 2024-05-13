@@ -1,3 +1,5 @@
+"use client";
+
 import { Emotion, RulerSurveyAnswer } from "@/types";
 import { Dispatch } from "react";
 

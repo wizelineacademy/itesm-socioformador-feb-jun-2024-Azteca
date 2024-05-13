@@ -4,7 +4,11 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import SprintStepOne from "./SprintStepOne";
 import SprintStepTwo from "./SprintStepTwo";
-import { Coworker, SprintSurveyAnswer, SurveyStepTwoAnswer } from "@/types";
+import {
+  Coworker,
+  SprintSurveyAnswer,
+  SurveyStepTwoAnswer,
+} from "@/types/types";
 import SprintStepThree from "./SprintStepThree";
 import SprintStepFour from "./SprintStepFour";
 import { useQuery } from "@tanstack/react-query";

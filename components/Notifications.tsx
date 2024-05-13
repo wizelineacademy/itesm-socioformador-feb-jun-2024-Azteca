@@ -7,7 +7,7 @@ import NotificationIcon from "./icons/NotificationIcon";
 import NotificationCard from "./NotificationCard";
 import { useQuery } from "@tanstack/react-query";
 import { getNotifications } from "@/services/notifications";
-import { Notification } from "@/types";
+import { Notification } from "@/types/types";
 
 interface NotificationProps {
   showProjectModal: () => void;

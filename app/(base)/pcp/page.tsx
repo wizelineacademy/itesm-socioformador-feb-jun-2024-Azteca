@@ -8,7 +8,7 @@ import {
   getUserResources,
   updateTask,
 } from "@/services/tasks-and-resources";
-import { Resource, Task } from "@/types";
+import { Resource, Task } from "@/types/types";
 // import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from "react";
 
