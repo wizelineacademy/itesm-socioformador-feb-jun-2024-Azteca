@@ -136,6 +136,7 @@ const RulerStepOne = ({
           element.classList.remove("scale-[1.1]");
           element.classList.remove("scale-[1.35]");
           element.classList.remove("scale-[1.05]");
+          element.classList.remove("z-50");
           element.classList.add("text-transparent");
         }
       }
