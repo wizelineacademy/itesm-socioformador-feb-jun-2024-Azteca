@@ -1,6 +1,6 @@
 "use client";
 
-import { Emotion, RulerSurveyAnswer } from "@/types";
+import { Emotion, RulerSurveyAnswer } from "@/types/types";
 import { rulerEmotionsMatrix } from "@/utils/constants";
 import { Dispatch } from "react";
 
@@ -136,6 +136,7 @@ const RulerStepOne = ({
           element.classList.remove("scale-[1.1]");
           element.classList.remove("scale-[1.35]");
           element.classList.remove("scale-[1.05]");
+          element.classList.remove("z-50");
           element.classList.add("text-transparent");
         }
       }

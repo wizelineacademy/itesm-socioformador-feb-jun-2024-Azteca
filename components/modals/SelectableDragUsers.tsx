@@ -11,7 +11,13 @@ const SelectableDragUsers = ({ users }: SelectableDragUsersProps) => {
     <div className={`flex flex-row items-center justify-around`}>
       {users.map(
         (user, index) =>
-          user.times > 0 && <DraggableUser key={index} user={user} />,
+          user.times > 0 && (
+            <DraggableUser
+              key={index}
+              user={user as Coworker}
+              times={user.times}
+            />
+          ),
       )}
     </div>
   );

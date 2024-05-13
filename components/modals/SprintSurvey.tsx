@@ -127,7 +127,7 @@ const SprintSurvey = ({
 
   const handleStepTwoAnswer = () => {
     if (!isSurveyCompleted()) {
-      toast.error("Please fill all the fields before submitting the survey");
+      toast.error("Please fill all the fields before submitting the survey.");
       return;
     }
     setStep(3);
