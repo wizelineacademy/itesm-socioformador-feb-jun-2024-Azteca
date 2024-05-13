@@ -1,4 +1,4 @@
-import { Coworker, SprintSurveyAnswer } from "@/types";
+import { Coworker, SprintSurveyAnswer } from "@/types/types";
 import Image from "next/image";
 import UserIcon from "../icons/UserIcon";
 import { useEffect, useState } from "react";

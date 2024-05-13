@@ -1,5 +1,5 @@
 "use client";
-import { Coworker, SurveyCoworker } from "@/types";
+import { Coworker, SurveyCoworker } from "@/types/types";
 import DraggableUser from "./DraggableUser";
 
 interface SelectableDragUsersProps {

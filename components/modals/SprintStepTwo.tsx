@@ -1,10 +1,10 @@
 "use client";
 import SprintDropRow from "./SprintDropRow";
 import { useState, useEffect } from "react";
-import { Coworker, SurveyCoworker } from "@/types";
+import { Coworker, SurveyCoworker } from "@/types/types";
 import { DndContext, DragEndEvent, pointerWithin } from "@dnd-kit/core";
 import SelectableDragUsers from "./SelectableDragUsers";
-import { SurveyStepTwoAnswer } from "@/types";
+import { SurveyStepTwoAnswer } from "@/types/types";
 
 interface SprintStepTwoProps {
   sprintSurveyStepTwoAnswer: SurveyStepTwoAnswer;

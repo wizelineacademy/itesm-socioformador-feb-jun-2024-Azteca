@@ -3,18 +3,18 @@ import { useEffect, useState } from "react";
 import { loginAction } from "@/actions";
 import FormTextInput from "@/components/FormTextInput";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 const Login = () => {
-  const [error, setError] = useState<string | null>(null);
   const clientLoginAction = async (formData: FormData) => {
     const result = await loginAction(formData);
     if (result) {
       switch (result) {
         case "Invalid credentials.":
-          setError("Email or password is not valid.");
+          toast.error("Email or password is not valid.");
           break;
         default:
-          setError("Something went wrong. Try again.");
+          toast.error("Something went wrong. Try again.");
           break;
       }
     }
@@ -47,12 +47,6 @@ const Login = () => {
           >
             <FormTextInput name="email" type="email" label="Email" />
             <FormTextInput name="password" type="password" label="Password" />
-            <label
-              id="error"
-              className="pt-1.5 text-sm font-medium text-red-600"
-            >
-              {error}
-            </label>
             <button
               className="mx-auto mb-4 mt-12 h-10 w-28 rounded-2xl bg-primary font-medium text-bone shadow-2xl hover:bg-primary-dark"
               type="submit"

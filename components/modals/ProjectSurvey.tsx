@@ -5,7 +5,7 @@ import { Fragment } from "react";
 import Slider from "../Slider";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { submitProjectAnswer } from "@/services/projectSurvey";
-import { ProjectAnswer } from "@/types";
+import { ProjectAnswer } from "@/types/types";
 import { getUserId } from "@/services/user";
 
 interface ProjectSurveyProps {
