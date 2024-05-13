@@ -10,6 +10,7 @@ import SprintStepFour from "./SprintStepFour";
 import { useQuery } from "@tanstack/react-query";
 import { getCoworkersInProject } from "@/services/project";
 import toast from "react-hot-toast";
+import { getUserId } from "@/services/user";
 
 interface SprintSurveyProps {
   showModal: boolean;
@@ -23,7 +24,6 @@ const SprintSurvey = ({
   sprintSurveyId,
 }: SprintSurveyProps) => {
   const [step, setStep] = useState<number>(1);
-
   const {
     data: users,
     isLoading,
@@ -33,8 +33,13 @@ const SprintSurvey = ({
     queryFn: () => getCoworkersInProject(34),
   });
 
+  const { data: userId } = useQuery({
+    queryKey: ["userId"],
+    queryFn: async () => await getUserId(),
+  });
+
   const [sprintAnswer, setSprintAnswer] = useState<SprintSurveyAnswer>({
-    userId: "placeholder",
+    userId: userId,
     sprintSurveyId: sprintSurveyId,
     projectAnswers: [
       {
