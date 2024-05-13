@@ -83,23 +83,25 @@ export const registerUser = async (
   department: string | undefined,
   jobTitle: string | undefined,
 ) => {
-  try {
-    if (!name || !email || !password || !department || !jobTitle) {
-      throw new Error("Empty fields");
-    }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await db.insert(user).values({
+  if (!name || !email || !password || !department || !jobTitle) {
+    throw new Error("Empty fields");
+  }
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await db
+    .insert(user)
+    .values({
       name: name,
       email: email,
       password: hashedPassword,
       role: "EMPLOYEE",
       department: department,
       jobTitle: jobTitle,
+    })
+    .catch((dbError: any) => {
+      if (dbError.code === "23505")
+        throw new Error("Email already registered", dbError.code);
+      else throw new Error("Error registering the user", dbError.code);
     });
-  } catch (error) {
-    console.error("Could not register user", error);
-    throw new Error("Could not register user");
-  }
 };
 
 export const getUsers = async () => {

@@ -8,7 +8,7 @@ import { createProject } from "@/services/project";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { getAllEmployees } from "@/services/user";
 import { useRouter } from "next/navigation";
-import { Coworker } from "@/types";
+import { Coworker } from "@/types/types";
 import {
   MultiSelect,
   MultiSelectProps,
@@ -16,7 +16,7 @@ import {
   Group,
   Text,
 } from "@mantine/core";
-import { Employee } from "@/types";
+import { Employee } from "@/types/types";
 
 const CreateProject = () => {
   const router = useRouter();

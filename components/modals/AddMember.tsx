@@ -1,7 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { useState, Fragment } from "react";
 import UserProfileButton from "../UserProfileButton";
-import { Coworker } from "@/types";
+import { Coworker } from "@/types/types";
 import {
   MultiSelect,
   MultiSelectProps,
