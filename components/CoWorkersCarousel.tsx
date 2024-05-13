@@ -4,6 +4,8 @@ import React from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import UserProfileButton from "@/components/UserProfileButton";
 import Autoplay from "embla-carousel-autoplay";
+import { Tooltip } from "@mantine/core";
+import Link from "next/link";
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -55,9 +57,13 @@ export default function EmblaCarousel() {
     <div className="embla" ref={emblaRef}>
       <ul className="embla__container px-1 py-3">
         {coworkersQuery.data.map((user, index) => (
-          <li key={index} className="embla__slide__coworker">
-            <UserProfileButton size="md" photoUrl={user.photoUrl || ""} />
-          </li>
+          <Tooltip.Floating label={user.name} key={index}>
+            <li className="embla__slide__coworker">
+              <Link href={`/profile/${user.id}`} className="">
+                <UserProfileButton size="md" photoUrl={user.photoUrl || ""} />
+              </Link>
+            </li>
+          </Tooltip.Floating>
         ))}
       </ul>
     </div>

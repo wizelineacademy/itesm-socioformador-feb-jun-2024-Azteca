@@ -45,6 +45,7 @@ const Profile = async ({ params }: { params: { id: string } }) => {
             </div>
             <p className="font-light">{user.email}</p>
           </div>
+
           <Image
             src={JobSVG}
             alt="image"
