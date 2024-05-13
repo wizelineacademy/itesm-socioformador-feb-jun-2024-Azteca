@@ -57,7 +57,7 @@ export default function EmblaCarousel() {
     <div className="embla" ref={emblaRef}>
       <ul className="embla__container px-1 py-3">
         {coworkersQuery.data.map((user, index) => (
-          <Tooltip.Floating label={user.name} key={index}>
+          <Tooltip.Floating label={user.name} color="#6640D5" key={index}>
             <li className="embla__slide__coworker">
               <Link href={`/profile/${user.id}`} className="">
                 <UserProfileButton size="md" photoUrl={user.photoUrl || ""} />
