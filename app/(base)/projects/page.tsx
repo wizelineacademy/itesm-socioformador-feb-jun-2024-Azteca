@@ -1,8 +1,8 @@
 import React from "react";
 import Link from "next/link";
-import ProjectExtendedCard from "@/components/ProjectExtendedCard";
 import { getProjects } from "@/services/project";
 import { getUserRole } from "@/services/user";
+import ProjectCard from "@/components/ProjectCard";
 
 const formatDate = (date: Date) => {
   return new Date(date).toLocaleString("default", {
@@ -31,10 +31,10 @@ const Projects = async () => {
         </div>
         <div className="mx-auto flex max-w-[60%] flex-wrap items-center justify-center gap-6">
           {projects.map((project) => (
-            <ProjectExtendedCard
+            <ProjectCard
               key={project.id}
               id={project.id}
-              title={project.name}
+              name={project.name}
               date={`${formatDate(project.startDate)} - ${formatDate(project.endDate)}`}
               description={project.description}
             />
