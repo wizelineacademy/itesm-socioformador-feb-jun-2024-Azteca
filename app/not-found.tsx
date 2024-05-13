@@ -6,13 +6,13 @@ import { usePathname } from "next/navigation";
 export default function NotFound() {
   const pathName = usePathname();
   return (
-    <main className="w-dvh flex h-dvh flex-col items-center justify-center overflow-hidden">
+    <main className="w-dvh flex h-dvh flex-col items-center justify-center">
       <Image
         src={"/FeedbackFlowLogo.png"}
-        width={400}
-        height={400}
+        width={350}
+        height={350}
         alt="Logo Feedback Flow"
-        className="absolute -bottom-12 -right-12 hidden opacity-60 md:block"
+        className="absolute -bottom-0 -right-0 hidden opacity-60 md:block"
       />
       <section className="relative flex w-full flex-col gap-4 from-primary to-primary-light  px-10 py-20 text-center text-white after:absolute after:inset-0 after:-z-10 after:-skew-y-6 after:bg-gradient-to-r">
         <h2 className="text-3xl font-bold">404 -Ruta No Encontrada</h2>

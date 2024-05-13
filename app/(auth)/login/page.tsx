@@ -28,10 +28,7 @@ const Login = () => {
         </div>
         <div className="flex w-full flex-col items-center justify-center pb-6">
           <form
-            onSubmit={(e) => {
-              e.preventDefault(); // Prevent the default form submission
-              clientLoginAction(new FormData(e.currentTarget));
-            }}
+            action={clientLoginAction}
             className="flex w-full flex-col justify-center"
           >
             <FormTextInput name="email" type="email" label="Email" />

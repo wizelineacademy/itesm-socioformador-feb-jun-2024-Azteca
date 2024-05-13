@@ -24,13 +24,13 @@ const UserIconNavbar = ({ path, currentPath }: UserIconInterface) => {
   };
 
   useEffect(() => {
-    const onCLickOutsideButton = (e: MouseEvent) => {
+    const onClickOutsideButton = (e: MouseEvent) => {
       if (!(e.target as HTMLElement).closest(".group")) {
         setIsClicked(false);
       }
     };
-    document.addEventListener("click", onCLickOutsideButton);
-    return () => document.removeEventListener("click", onCLickOutsideButton);
+    document.addEventListener("click", onClickOutsideButton);
+    return () => document.removeEventListener("click", onClickOutsideButton);
   }, []);
 
   return (
