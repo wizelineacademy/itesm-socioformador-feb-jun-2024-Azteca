@@ -113,12 +113,12 @@ export const userResource = pgTable(
   // composite primary key on (userId, resourceId)
 );
 
-export const quadrantEnum = pgEnum("quadrant", ["1", "2", "3", "4"]);
-
+// export const quadrantEnum = pgEnum("quadrant", ["1", "2", "3", "4"]);
 export const rulerEmotion = pgTable("ruler_emotion", {
   id: integer("id").primaryKey(),
   name: varchar("name", { length: 16 }),
-  quadrant: quadrantEnum("quadrant"),
+  pleasantness: integer("pleasantness"),
+  energy: integer("energy"),
   description: text("description"),
   embedding: json("embedding").$type<number[]>(),
 });
