@@ -11,8 +11,13 @@ import { getUserInfo } from "@/services/user";
 interface UserIconInterface {
   path: string;
   currentPath: string;
+  showSettingsModal: () => void;
 }
-const UserIconNavbar = ({ path, currentPath }: UserIconInterface) => {
+const UserIconNavbar = ({
+  path,
+  currentPath,
+  showSettingsModal,
+}: UserIconInterface) => {
   const onSite = currentPath === path;
   const { data: user } = useQuery({
     queryKey: ["user"],
@@ -57,7 +62,7 @@ const UserIconNavbar = ({ path, currentPath }: UserIconInterface) => {
           <div className="px-1 py-1 ">
             <Menu.Item>
               <p className="mx-auto items-center px-2 py-2 text-sm">
-                Hola {user?.name.split(" ")[0]}!
+                Hello {user?.name.split(" ")[0]}!
               </p>
             </Menu.Item>
           </div>
@@ -74,21 +79,27 @@ const UserIconNavbar = ({ path, currentPath }: UserIconInterface) => {
                         : "text-gray-900"
                   }  group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                 >
-                  Ir a perfil
+                  Go Profile
                 </Link>
               )}
             </Menu.Item>
-            <Menu.Item>
-              {({ active }) => (
-                <button
-                  className={`${
-                    active ? "bg-primary/75 text-white" : "text-gray-900"
-                  } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                >
-                  Cambiar tema
-                </button>
-              )}
-            </Menu.Item>
+            <div
+              onClick={() => {
+                showSettingsModal();
+              }}
+            >
+              <Menu.Item>
+                {({ active }) => (
+                  <button
+                    className={`${
+                      active ? "bg-primary/75 text-white" : "text-gray-900"
+                    } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                  >
+                    Settings
+                  </button>
+                )}
+              </Menu.Item>
+            </div>
           </div>
           <div className="px-1 py-1" onClick={handleSignOut}>
             {" "}
@@ -99,7 +110,7 @@ const UserIconNavbar = ({ path, currentPath }: UserIconInterface) => {
                     active ? "bg-red-700 text-white" : "text-gray-900"
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                 >
-                  Cerrar sesión
+                  Sign Out
                 </button>
               )}
             </Menu.Item>
