@@ -1,5 +1,4 @@
 "use client";
-
 interface FormTextInputProps {
   name: string;
   type: string;

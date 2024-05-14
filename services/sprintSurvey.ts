@@ -11,7 +11,7 @@ import { eq, or, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { SprintSurveyAnswer, SurveyStepTwoAnswer } from "@/types";
+import { SprintSurveyAnswer, SurveyStepTwoAnswer } from "@/types/types";
 
 export async function createSprintSurvey(projectId: number) {
   const res = await db
@@ -37,7 +37,7 @@ export async function submitSprintSurveyAnswers(
   // Insert Cokorkers Answers
   surveyAnswer.coworkersAnswers.forEach((answer) => {
     submitSprintCoworkersAns(
-      surveyAnswer.userId,
+      surveyAnswer.userId!,
       surveyAnswer.sprintSurveyId,
       answer,
     );

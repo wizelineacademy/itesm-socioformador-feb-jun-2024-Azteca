@@ -2,8 +2,10 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import RulerStepOne from "./RulerStepOne";
-import { Emotion, RulerSurveyAnswer } from "@/types";
+import { Emotion, RulerSurveyAnswer } from "@/types/types";
 import RulerStepTwo from "./RulerStepTwo";
+import { getUserId } from "@/services/user";
+import { useQuery } from "@tanstack/react-query";
 
 interface RulerSurveyProps {
   showModal: boolean;
@@ -13,8 +15,13 @@ interface RulerSurveyProps {
 
 const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
   const [step, setStep] = useState<number>(1);
+  const { data: userId } = useQuery({
+    queryKey: ["userId"],
+    queryFn: async () => await getUserId(),
+  });
   const [rulerSurveyAnswer, setRulerSurveyAnswer] = useState<RulerSurveyAnswer>(
     {
+      userId: userId,
       emotion: null,
       comment: null,
     },
@@ -41,6 +48,7 @@ const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
   };
 
   const handleSubmit = () => {
+    console.log(rulerSurveyAnswer);
     onClose();
   };
 

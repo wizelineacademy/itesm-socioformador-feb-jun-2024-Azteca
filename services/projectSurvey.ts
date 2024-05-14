@@ -6,7 +6,7 @@ import { finalSurvey, finalSurveyAnswer } from "@/db/schema";
 import { eq, or, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { ProjectAnswer } from "@/types";
+import { ProjectAnswer } from "@/types/types";
 import { comment } from "postcss";
 
 export async function createProjectSurvey(projectId: number) {

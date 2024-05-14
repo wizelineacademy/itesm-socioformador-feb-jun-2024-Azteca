@@ -1,6 +1,6 @@
 import React from "react";
 import Slider from "../Slider";
-import { SprintSurveyAnswer } from "@/types";
+import { SprintSurveyAnswer } from "@/types/types";
 
 interface SprintStepOneProps {
   sprintSurveyAnswer: SprintSurveyAnswer;

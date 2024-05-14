@@ -26,7 +26,7 @@ export type DateObject = {
 export type ProjectSprint = "MS_RF" | "MS_LS" | "MS_RA" | "MS_WE";
 
 export type SprintSurveyAnswer = {
-  userId: string;
+  userId: string | undefined;
   sprintSurveyId: number;
   projectAnswers: Array<{ questionKey: ProjectSprint; answer: number }>;
   coworkersAnswers: Array<{
@@ -37,6 +37,7 @@ export type SprintSurveyAnswer = {
 };
 
 export type ProjectAnswer = {
+  userId: string | undefined;
   finalSurveyId: number;
   answers: Array<{ questionKey: string; answer: number }>;
   comment: string;
@@ -65,6 +66,7 @@ export type Emotion = {
 };
 
 export type RulerSurveyAnswer = {
+  userId: string | undefined;
   emotion: Emotion | null;
   comment: string | null;
 };

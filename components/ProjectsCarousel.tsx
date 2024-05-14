@@ -15,6 +15,10 @@ export default function ProjectsCarousel() {
   });
 
   if (!projectsQuery.data) {
+    return <p>loading...</p>;
+  }
+
+  if (projectsQuery.data.length === 0) {
     return (
       <div className="mb-6 mt-3 flex flex-wrap items-center justify-center gap-5 rounded-lg bg-slate-300/20 py-4">
         <div className="flex flex-col items-center justify-center">
@@ -37,10 +41,7 @@ export default function ProjectsCarousel() {
     <ul className="mt-2 flex w-full flex-row gap-4 overflow-x-auto">
       {projectsQuery.data.map((project, index) => (
         <li key={index}>
-          <ProjectCard
-            id={projectsQuery.data[index].id}
-            name={projectsQuery.data[index].name}
-          />
+          <ProjectCard id={project.id} name={project.name} />
         </li>
       ))}
     </ul>

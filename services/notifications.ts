@@ -10,7 +10,7 @@ import {
   sprintSurvey,
 } from "@/db/schema";
 import { eq, and, lte, sql, gte } from "drizzle-orm";
-import { Notification } from "@/types";
+import { Notification } from "@/types/types";
 
 export async function getNotifications() {
   const session = await auth();
