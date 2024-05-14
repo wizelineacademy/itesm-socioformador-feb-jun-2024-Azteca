@@ -2,8 +2,9 @@ import Image from "next/image";
 
 interface UserProfileButtonProps {
   name?: string;
-  photoUrl?: string;
-  size?: "sm" | "md" | "lg" | "2xs" | "xs";
+  sprint-survey-dnd-fix
+  photoUrl?: string | null | undefined;
+  size?: "xs" | "sm" | "md" | "lg";
   className?: string;
   color?: string;
 }
