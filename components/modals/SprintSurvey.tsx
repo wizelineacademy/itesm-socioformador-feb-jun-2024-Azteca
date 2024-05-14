@@ -144,7 +144,6 @@ const SprintSurvey = ({
   const handleSubmit = () => {
     parseStepTwoAnswer();
     submitSurveyAnswers.mutate();
-    console.log(sprintAnswer);
     onClose();
   };
 

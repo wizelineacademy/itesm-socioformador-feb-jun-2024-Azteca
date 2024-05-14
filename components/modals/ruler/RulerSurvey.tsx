@@ -57,7 +57,6 @@ const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
 
   const handleSubmit = () => {
     submitRulerAnswers.mutate();
-    console.log(rulerSurveyAnswer);
     onClose();
   };
 
