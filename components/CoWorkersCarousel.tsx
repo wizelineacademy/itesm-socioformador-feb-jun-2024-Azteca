@@ -13,14 +13,14 @@ import { useQuery } from "@tanstack/react-query";
 
 import { getCoWorkers } from "@/services/user";
 
-export default function EmblaCarousel() {
+export default function EmblaCarousel({ userId }: { userId: string }) {
   const [emblaRef] = useEmblaCarousel({ loop: true }, [
     Autoplay({ delay: 2000 }),
   ]);
 
   const coworkersQuery = useQuery({
     queryKey: ["coworkers"],
-    queryFn: () => getCoWorkers(),
+    queryFn: () => getCoWorkers(userId),
   });
 
   if (!coworkersQuery.data) {

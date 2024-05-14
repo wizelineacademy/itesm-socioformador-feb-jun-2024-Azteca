@@ -68,7 +68,7 @@ const Profile = async ({ params }: { params: { id: string } }) => {
               </p>
             </div>
             <div className="mt-2">
-              <CoWorkersCarousel />
+              <CoWorkersCarousel userId={params.id} />
             </div>
           </div>
           {/* Projects */}
@@ -79,7 +79,7 @@ const Profile = async ({ params }: { params: { id: string } }) => {
                 Show More
               </p>
             </div>
-            <ProjectsCarousel />
+            <ProjectsCarousel userId={params.id} />
           </div>
         </div>
 

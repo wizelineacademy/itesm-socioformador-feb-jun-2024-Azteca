@@ -8,10 +8,10 @@ import NoData from "@/public/NoData.svg";
 import { useQuery } from "@tanstack/react-query";
 import { getProjectsProfile } from "@/services/user";
 
-export default function ProjectsCarousel() {
+export default function ProjectsCarousel({ userId }: { userId: string }) {
   const projectsQuery = useQuery({
     queryKey: ["projects"],
-    queryFn: () => getProjectsProfile(null),
+    queryFn: () => getProjectsProfile(userId),
   });
 
   if (!projectsQuery.data) {
