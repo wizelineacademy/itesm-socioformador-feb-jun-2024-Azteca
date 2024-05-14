@@ -6,9 +6,7 @@ import {
   sprintSurveyAnswerCoworkers,
   sprintSurveyAnswerProject,
 } from "@/db/schema";
-import { eq, or, sql } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { sql } from "drizzle-orm";
 
 import { SprintSurveyAnswer, SurveyStepTwoAnswer } from "@/types/types";
 
@@ -24,10 +22,13 @@ export async function createSprintSurvey(projectId: number) {
 export async function submitSprintSurveyAnswers(
   surveyAnswer: SprintSurveyAnswer,
 ) {
+  // Get the User ID of the user logged
+  const session = await auth();
+  const userId = session?.user?.id as string;
   // Insert Project Answers
   await db.insert(sprintSurveyAnswerProject).values(
     surveyAnswer.projectAnswers.map((projAns) => ({
-      userId: surveyAnswer.userId,
+      userId: userId,
       sprintSurveyId: surveyAnswer.sprintSurveyId,
       questionName: projAns.questionKey,
       answer: projAns.answer,
@@ -35,24 +36,18 @@ export async function submitSprintSurveyAnswers(
   );
   // Insert Cokorkers Answers
   surveyAnswer.coworkersAnswers.forEach((answer) => {
-    submitSprintCoworkersAns(
-      surveyAnswer.userId!,
-      surveyAnswer.sprintSurveyId,
-      answer,
-    );
+    submitSprintCoworkersAns(userId, surveyAnswer.sprintSurveyId, answer);
   });
 
   await db.insert(sprintSurveyAnswerCoworkers).values(
     surveyAnswer.coworkersComments.map((comments) => ({
-      userId: surveyAnswer.userId,
+      userId: userId,
       sprintSurveyId: surveyAnswer.sprintSurveyId,
       questionName: "SS_CWCT",
       coworkerId: comments.coworkerId,
       comment: comments.comment,
     })),
   );
-
-  return "ANSWER SUBMITED";
 }
 
 async function submitSprintCoworkersAns(
