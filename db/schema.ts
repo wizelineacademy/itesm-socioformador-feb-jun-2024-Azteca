@@ -121,6 +121,15 @@ export const rulerSurvey = pgTable("ruler_survey", {
   createdAt: date("created_at"),
 });
 
+export const rulerEmotion = pgTable("ruler_emotion", {
+  id: integer("id").primaryKey(),
+  name: varchar("name", { length: 16 }),
+  pleasantness: integer("pleasantness"),
+  energy: integer("energy"),
+  description: text("description"),
+  embedding: json("embedding").$type<number[]>(),
+});
+
 export const quadrantEnum = pgEnum("quadrant", ["1", "2", "3", "4"]);
 
 export const rulerSurveyAnswers = pgTable(
