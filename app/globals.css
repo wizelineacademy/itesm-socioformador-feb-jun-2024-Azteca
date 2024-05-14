@@ -3,7 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* * > * {
+/* *>* {
   outline: red solid 1px;
 } */
 
@@ -62,12 +62,10 @@
 }
 
 .m_396ce5cb:where([data-in-range]) {
-  background-color: hsla(
-    var(--primary-h, 240),
-    var(--primary-s, 50%),
-    var(--primary-l, 50%),
-    0.05
-  ) !important;
+  background-color: hsla(var(--primary-h, 240),
+      var(--primary-s, 50%),
+      var(--primary-l, 50%),
+      0.05) !important;
 }
 
 .m_396ce5cb:where([data-selected]) {

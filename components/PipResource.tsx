@@ -1,7 +1,7 @@
 import Link from "next/link";
-import ArticleIcon from "./icons/ArticleIcon";
-import BookIcon from "./icons/BookIcon";
-import VideoIcon from "./icons/VideoIcon";
+import ArticleIcon from "../components/icons/ArticleIcon";
+import BookIcon from "../components/icons/BookIcon";
+import VideoIcon from "../components/icons/VideoIcon";
 
 interface InterfacePipResource {
   title: string | null;
