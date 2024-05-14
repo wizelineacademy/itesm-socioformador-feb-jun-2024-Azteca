@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, Fragment } from "react";
+import { useState, Fragment, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { Tabs, rem } from "@mantine/core";
+import { Tabs, rem, ColorInput, useMantineColorScheme } from "@mantine/core";
 import { Dropzone, IMAGE_MIME_TYPE, FileWithPath } from "@mantine/dropzone";
-import { Tab } from "@headlessui/react";
+import SunIcon from "../icons/SunIcon";
+import MoonIcon from "../icons/MoonIcon";
 
 interface SettingsProps {
   showModal: boolean;
@@ -12,6 +13,10 @@ interface SettingsProps {
 }
 const Settings = ({ showModal, onClose }: SettingsProps) => {
   const [file, setFile] = useState<FileWithPath[]>([]);
+  const [color, setColor] = useState("#6640D5");
+  const { setColorScheme, clearColorScheme } = useMantineColorScheme();
+
+  useEffect(() => console.log(color), [color]);
 
   return (
     <Transition appear show={showModal} as={Fragment}>
@@ -110,7 +115,51 @@ const Settings = ({ showModal, onClose }: SettingsProps) => {
                   </Tabs.Panel>
 
                   <Tabs.Panel value="colorTheme">
-                    Settings tab content
+                    <div className=" mt-6 min-h-96">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setColorScheme("light")}
+                          className="flex gap-2 rounded-lg border bg-white p-2"
+                        >
+                          <SunIcon color="text-black" size="h-6 w-6" />
+                          <p className="text-black">Light</p>
+                        </button>
+                        <button
+                          onClick={() => setColorScheme("dark")}
+                          className="flex gap-2 rounded-lg border bg-black p-2"
+                        >
+                          <MoonIcon color="text-white" size="h-6 w-6" />
+                          <p className="text-white">Dark</p>
+                        </button>
+                      </div>
+                      <div className="mt-6 w-56">
+                        <ColorInput
+                          size="md"
+                          radius="xl"
+                          aria-label="Theme Color"
+                          description="Select a color"
+                          value={color}
+                          onChangeEnd={setColor}
+                          format="hex"
+                          swatches={[
+                            "#2e2e2e",
+                            "#868e96",
+                            "#fa5252",
+                            "#e64980",
+                            "#be4bdb",
+                            "#7950f2",
+                            "#4c6ef5",
+                            "#228be6",
+                            "#15aabf",
+                            "#12b886",
+                            "#40c057",
+                            "#82c91e",
+                            "#fab005",
+                            "#fd7e14",
+                          ]}
+                        />
+                      </div>
+                    </div>
                   </Tabs.Panel>
                 </Tabs>
               </Dialog.Panel>
