@@ -5,6 +5,7 @@ import Tooltip from "@/components/Tooltip";
 import Badge from "@/components/Badge";
 import Image from "next/image";
 import JobSVG from "@/public/Job-Profile-Image.svg";
+import NoData from "@/public/NoData.svg";
 import { getUserInfoById, getUserTraitsById } from "@/services/user";
 
 const Profile = async ({ params }: { params: { id: string } }) => {
@@ -45,9 +46,10 @@ const Profile = async ({ params }: { params: { id: string } }) => {
             </div>
             <p className="font-light">{user.email}</p>
           </div>
+
           <Image
             src={JobSVG}
-            alt="image"
+            alt="Banner Image"
             className="hidden md:block"
             priority
           />
@@ -89,12 +91,26 @@ const Profile = async ({ params }: { params: { id: string } }) => {
               Show More
             </p>
           </div>
-          <div className="mb-10 mt-5 flex flex-wrap gap-5">
+          <div
+            className={
+              traits.strengths.length === 0
+                ? "mb-6 mt-3 flex flex-wrap items-center justify-center gap-5 rounded-lg bg-slate-300/20 py-4"
+                : "mb-10 mt-5 flex flex-wrap gap-5"
+            }
+          >
             {traits.strengths.length === 0 && (
-              <p className="text-sm font-medium">
-                Currently you have no strengths available, please ask your
-                manager to update them.
-              </p>
+              <div className="flex flex-col items-center justify-center">
+                <Image
+                  src={NoData}
+                  alt="No Data Image"
+                  className="hidden md:block"
+                  priority
+                  height={70}
+                />
+                <p className="text-center text-sm font-medium text-grayText">
+                  No strengths available yet
+                </p>
+              </div>
             )}
             {traits.strengths.map((strength, index) => (
               <Tooltip message={strength.description!} key={index}>
@@ -102,21 +118,36 @@ const Profile = async ({ params }: { params: { id: string } }) => {
               </Tooltip>
             ))}
           </div>
+
           {/* Oportunity Areas */}
           <div className="mx-auto flex justify-between">
             <h3 className="text-2xl font-medium text-black">
-              Oportunity Areas
+              Opportunity Areas
             </h3>
             <p className="cursor-pointer self-center text-sm text-graySubtitle">
               Show More
             </p>
           </div>
-          <div className="mb-10 mt-5 flex flex-wrap gap-5">
+          <div
+            className={
+              traits.areasOfOportunity.length === 0
+                ? "mb-6 mt-3 flex flex-wrap justify-center gap-5 rounded-lg bg-slate-300/20 py-4"
+                : "mb-10 mt-5 flex flex-wrap gap-5"
+            }
+          >
             {traits.areasOfOportunity.length === 0 && (
-              <p className="text-sm font-medium">
-                Currently you have no areas of opportunity available, please ask
-                your manager to update them.
-              </p>
+              <div className="flex w-full flex-col items-center justify-center">
+                <Image
+                  src={NoData}
+                  alt="No Data Image"
+                  className="hidden md:block"
+                  priority
+                  height={70}
+                />
+                <p className="text-sm font-medium text-grayText">
+                  No areas of opportunity available yet
+                </p>
+              </div>
             )}
             {traits.areasOfOportunity.map((area, index) => (
               <Tooltip message={area.description!} key={index}>

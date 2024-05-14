@@ -10,7 +10,7 @@ export default function BaseLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className={"px-7 pb-4 pt-10"}>
+    <div className={"px-7 pt-10"}>
       <MantineProvider>
         <NavigationBar />
         {children}
