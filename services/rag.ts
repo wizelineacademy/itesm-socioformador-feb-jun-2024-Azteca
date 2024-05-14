@@ -91,7 +91,8 @@ async function create_tasks(feedback: string) {
 
   // clean the results of the generated tasks
   const tasks = rawTasks.choices[0].message.content!.split("\n");
-  return tasks;
+  const cleanedTasks = tasks.filter((element) => element !== "");
+  return cleanedTasks;
 }
 
 // This function processes the open feedback of the user and returns a summary of the feedback
@@ -354,7 +355,6 @@ export async function ruler_analysis() {
 
 // This function is triggered by the manager when the sprint survey is closed
 export async function feedback_analysis(sprintSurveyIds: number[]) {
-
   for (let sprintSurveyId of sprintSurveyIds) {
     // first check that the sprint survey hasnt been processed
     const processed = await db
