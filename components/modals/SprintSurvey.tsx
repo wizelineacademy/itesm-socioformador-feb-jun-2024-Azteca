@@ -11,8 +11,9 @@ import {
 } from "@/types/types";
 import SprintStepThree from "./SprintStepThree";
 import SprintStepFour from "./SprintStepFour";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { getCoworkersInProject } from "@/services/project";
+import { submitSprintSurveyAnswers } from "@/services/sprintSurvey";
 import toast from "react-hot-toast";
 import { getUserId } from "@/services/user";
 
@@ -133,8 +134,16 @@ const SprintSurvey = ({
     setStep(3);
   };
 
+  const submitSurveyAnswers = useMutation({
+    mutationFn: () => submitSprintSurveyAnswers(sprintAnswer),
+    onSuccess: () => {
+      console.log("ANSWER SUMBITED");
+    },
+  });
+
   const handleSubmit = () => {
     parseStepTwoAnswer();
+    submitSurveyAnswers.mutate();
     console.log(sprintAnswer);
     onClose();
   };

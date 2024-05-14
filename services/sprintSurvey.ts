@@ -1,5 +1,4 @@
 "use server";
-
 import { auth } from "@/auth";
 import db from "@/db/drizzle";
 import {
@@ -42,6 +41,18 @@ export async function submitSprintSurveyAnswers(
       answer,
     );
   });
+
+  await db.insert(sprintSurveyAnswerCoworkers).values(
+    surveyAnswer.coworkersComments.map((comments) => ({
+      userId: surveyAnswer.userId,
+      sprintSurveyId: surveyAnswer.sprintSurveyId,
+      questionName: "SS_CWCT",
+      coworkerId: comments.coworkerId,
+      comment: comments.comment,
+    })),
+  );
+
+  return "ANSWER SUBMITED";
 }
 
 async function submitSprintCoworkersAns(
