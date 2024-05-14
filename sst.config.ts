@@ -10,6 +10,8 @@ export default $config({
   },
   //PostgresPrismaUrl
   async run() {
+    const myBucket = new sst.aws.Bucket("ProBucket");
+
     const POSTGRES_URL = new sst.Secret("PostgresUrl");
     const POSTGRES_PRISMA_URL = new sst.Secret("PostgresPrismaUrl");
     const POSTGRES_USER = new sst.Secret("PostgresUser");
@@ -31,6 +33,7 @@ export default $config({
         AUTH_SECRET,
         POSTGRES_URL_NO_SSL,
         POSTGRES_URL_NON_POOLING,
+        myBucket,
       ],
       environment: {
         POSTGRES_URL: POSTGRES_URL.value,
