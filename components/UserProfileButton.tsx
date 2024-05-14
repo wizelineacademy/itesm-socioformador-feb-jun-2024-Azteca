@@ -2,7 +2,6 @@ import Image from "next/image";
 
 interface UserProfileButtonProps {
   name?: string;
-  sprint-survey-dnd-fix
   photoUrl?: string | null | undefined;
   size?: "xs" | "sm" | "md" | "lg";
   className?: string;
