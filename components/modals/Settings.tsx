@@ -48,73 +48,28 @@ const Settings = ({ showModal, onClose }: SettingsProps) => {
                 </Dialog.Title>
                 <Tabs color="violet" defaultValue="profileImage" style={{}}>
                   <Tabs.List grow justify="space-between">
-                    <Tabs.Tab value="profileImage">Profile Image</Tabs.Tab>
-                    <Tabs.Tab value="bannerImage">Banner Image</Tabs.Tab>
-                    <Tabs.Tab value="colorTheme">Color Theme</Tabs.Tab>
+                    <Tabs.Tab
+                      value="profileImage"
+                      style={{ fontWeight: 500, fontSize: "16px" }}
+                    >
+                      Profile Image
+                    </Tabs.Tab>
+                    <Tabs.Tab
+                      value="bannerImage"
+                      style={{ fontWeight: 500, fontSize: "16px" }}
+                    >
+                      Banner Image
+                    </Tabs.Tab>
+                    <Tabs.Tab
+                      value="colorTheme"
+                      style={{ fontWeight: 500, fontSize: "16px" }}
+                    >
+                      Color Theme
+                    </Tabs.Tab>
                   </Tabs.List>
 
                   <Tabs.Panel value="profileImage">
-                    <p>Profile Image</p>
-                    <div>
-                      <input
-                        type="file"
-                        onChange={(e) => {
-                          // setFile(e.target.files?.[0]);
-                        }}
-                      />
-                      <button
-                        onClick={() => {
-                          console.log(file);
-                        }}
-                      >
-                        Upload
-                      </button>
-                    </div>
-                  </Tabs.Panel>
-
-                  <Tabs.Panel value="bannerImage">
-                    Messages tab content
-                  </Tabs.Panel>
-
-                  <Tabs.Panel value="colorTheme">
-                    Settings tab content
-                  </Tabs.Panel>
-                </Tabs>
-                <Tab.Group>
-                  <Tab.List className="flex space-x-1 rounded-xl bg-gray-200 p-1">
-                    <Tab as={Fragment}>
-                      {({ selected }) => (
-                        <button
-                          className={`w-full rounded-lg py-2.5 text-sm font-medium leading-5 transition 
-                ${selected ? "bg-[#6640D5] text-white shadow" : "text-gray-700 hover:bg-gray-100 hover:text-[#6640D5]"}`}
-                        >
-                          Profile Image
-                        </button>
-                      )}
-                    </Tab>
-                    <Tab as={Fragment}>
-                      {({ selected }) => (
-                        <button
-                          className={`w-full rounded-lg py-2.5 text-sm font-medium leading-5 transition 
-                ${selected ? "bg-[#6640D5] text-white shadow" : "text-gray-700 hover:bg-gray-100 hover:text-[#6640D5]"}`}
-                        >
-                          Banner Image
-                        </button>
-                      )}
-                    </Tab>
-                    <Tab as={Fragment}>
-                      {({ selected }) => (
-                        <button
-                          className={`w-full rounded-lg py-2.5 text-sm font-medium leading-5 transition 
-                ${selected ? "bg-[#6640D5] text-white shadow" : "text-gray-700 hover:bg-gray-100 hover:text-[#6640D5]"}`}
-                        >
-                          Color Theme
-                        </button>
-                      )}
-                    </Tab>
-                  </Tab.List>
-                  <Tab.Panels className="mt-2">
-                    <Tab.Panel className="rounded-xl bg-white p-4 shadow">
+                    <div className="mt-6">
                       <Dropzone
                         onDrop={(file) => {
                           console.log("accepted files", file);
@@ -135,26 +90,29 @@ const Settings = ({ showModal, onClose }: SettingsProps) => {
                           </p>
                         </div>
                       </Dropzone>
-                      {/* if file lenght > 0 show upload button */}
-                      {file.length > 0 && (
+                      <div className="flex justify-center">
                         <button
-                          onClick={() => {
-                            console.log(file);
-                          }}
-                          className="mt-4 rounded-lg bg-primary px-4 py-2 text-white"
+                          disabled={file.length === 0}
+                          className={`${
+                            file.length === 0
+                              ? "bg-gray-300"
+                              : "bg-primary hover:bg-primary-dark"
+                          } mt-4 rounded-lg px-10 py-2 text-white`}
                         >
                           Upload
                         </button>
-                      )}
-                    </Tab.Panel>
-                    <Tab.Panel className="rounded-xl bg-white p-4 shadow">
-                      <p>Content 2</p>
-                    </Tab.Panel>
-                    <Tab.Panel className="rounded-xl bg-white p-4 shadow">
-                      <p>Content 3</p>
-                    </Tab.Panel>
-                  </Tab.Panels>
-                </Tab.Group>
+                      </div>
+                    </div>
+                  </Tabs.Panel>
+
+                  <Tabs.Panel value="bannerImage">
+                    Messages tab content
+                  </Tabs.Panel>
+
+                  <Tabs.Panel value="colorTheme">
+                    Settings tab content
+                  </Tabs.Panel>
+                </Tabs>
               </Dialog.Panel>
             </Transition.Child>
           </div>
