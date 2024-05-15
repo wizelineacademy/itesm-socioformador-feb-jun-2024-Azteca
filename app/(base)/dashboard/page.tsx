@@ -39,7 +39,7 @@ const Dashboard = () => {
       gradient: { start: "#988511", end: "#FEDE1C" },
     },
     {
-      title: "Self Steem Level",
+      title: "Self Perception Level",
       percentage: 64,
       type: "half",
       gradient: { start: "#295A95", end: "#4598FB" },
@@ -120,7 +120,7 @@ const Dashboard = () => {
                 type={gauge.type}
                 gradient={gauge.gradient}
               />
-              <p className="mx-auto mt-2 max-w-48 text-center text-xl font-medium text-graySubtitle">
+              <p className="mx-auto mt-4 max-w-56 text-center text-xl font-medium text-graySubtitle">
                 {gauge.title}
               </p>
             </div>
