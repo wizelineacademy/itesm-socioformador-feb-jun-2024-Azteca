@@ -176,7 +176,38 @@ async function process_open_feedback(feedback: string) {
 }
 
 // This function performs the analysis of the closed feedback
-async function process_closed_feedback() {}
+async function process_closed_feedback(answers: [string, number][]) {
+  const ordinaryPerformance = 7;
+  const userCategories = { goodCategories: [], badCategories: [] };
+
+  // the good and bad categories must not contradict themselves across different questions
+  const categoriesPerQuestion = {
+    X: { goodCategories: [], badCategories: [] },
+    Y: { goodCategories: [], badCategories: [] },
+    Z: { goodCategories: [], badCategories: [] },
+  };
+
+  type QuestionName = keyof typeof categoriesPerQuestion;
+
+  for (let answer of answers) {
+    let questionName: QuestionName = answer[0] as QuestionName;
+    let answerValue = answer[1];
+
+    if (answerValue > ordinaryPerformance) {
+      // asign all the great categories to the user
+      let questionCategories =
+        categoriesPerQuestion[questionName]["goodCategories"];
+      userCategories["goodCategories"].push(...questionCategories);
+    } else if (answerValue < ordinaryPerformance) {
+      // asign all the bad categories to the user
+      let questionCategories =
+        categoriesPerQuestion[questionName]["badCategories"];
+      userCategories["badCategories"].push(...questionCategories);
+    }
+  }
+
+  return userCategories;
+}
 
 /*
   This function groups all the feedback received in a custom structure.
@@ -380,8 +411,6 @@ export async function feedback_analysis(sprintSurveyIds: number[]) {
       // feedback ordered, this structure is important to detect similarities between the feedback
       const orderedFeedback = await group_feedback(sprintSurveyId, ids);
 
-      console.log(orderedFeedback);
-
       // iterate through all the feedback of the sprint survey and analyze it
       for (let userId of Object.keys(orderedFeedback)) {
         for (let coworkerId of Object.keys(
@@ -395,12 +424,9 @@ export async function feedback_analysis(sprintSurveyIds: number[]) {
             for (let comment of orderedFeedback[userId]["coworkersFeedback"][
               coworkerId
             ].openFeedback) {
-              // return structure with a summary of the 4 types of feedback
               const feedbackSummary = await process_open_feedback(comment[1]);
 
-              console.log(feedbackSummary);
-
-              // add to the primary structure all the summaries of the previos function and the coworker who made the feedback
+              // add to the primary structure all the summaries of the previous function and the coworker who made the feedback
               const negativeFeedbackMap =
                 orderedFeedback[userId].feedbackSummary.negative;
               for (let feedback of feedbackSummary) {
@@ -417,9 +443,15 @@ export async function feedback_analysis(sprintSurveyIds: number[]) {
                 }
               }
             }
+          } else {
+            // no open feedback received from the coworker, process closed feedback
+            const answers =
+              orderedFeedback[userId]["coworkersFeedback"][coworkerId]
+                .closedFeedback;
+            const feedbackSummary = await process_closed_feedback(answers);
           }
         }
-        // all open feedback summarized, now get the classifications of negative feedback with the most suggestions
+        // all feedback summarized, now get the classifications of negative feedback with the most suggestions
         const feedbackSuggestions: [number, string][] = [];
         Object.keys(orderedFeedback[userId].feedbackSummary.negative).forEach(
           (key) => {
