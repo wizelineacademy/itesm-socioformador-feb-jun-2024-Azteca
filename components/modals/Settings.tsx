@@ -1,15 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment } from "react";
+import {
+  Tabs,
+  rem,
+  ColorInput,
+  useMantineColorScheme,
+  Image,
+} from "@mantine/core";
+import { Dropzone, IMAGE_MIME_TYPE, FileWithPath } from "@mantine/dropzone";
+import SunIcon from "../icons/SunIcon";
+import MoonIcon from "../icons/MoonIcon";
+import NextImage from "next/image";
+import Banner1 from "@/public/Banner1.svg";
+import Banner2 from "@/public/Banner2.svg";
+import Banner3 from "@/public/Banner3.svg";
+import Banner4 from "@/public/Banner4.svg";
 
 interface SettingsProps {
   showModal: boolean;
   onClose: () => void;
 }
+
+const images = [Banner1, Banner2, Banner3, Banner4];
+
 const Settings = ({ showModal, onClose }: SettingsProps) => {
-  const [file, setFile] = useState<File>();
+  const [file, setFile] = useState<FileWithPath[]>([]);
+  const [color, setColor] = useState("#6640D5");
+  const { setColorScheme, clearColorScheme } = useMantineColorScheme();
+  const [selectedImage, setSelectedImage] = useState<number | null>(null);
+
+  const handleImageClick = (index: number) => {
+    setSelectedImage(index);
+    console.log(selectedImage);
+  };
+
+  const preview = file.map((image, index) => {
+    const imageUrl = URL.createObjectURL(image);
+    return (
+      <Image
+        key={index}
+        src={imageUrl}
+        alt="Image Preview"
+        onLoad={() => URL.revokeObjectURL(imageUrl)}
+        style={{
+          width: rem(200),
+          height: rem(200),
+          margin: "auto",
+        }}
+      />
+    );
+  });
 
   return (
     <Transition appear show={showModal} as={Fragment}>
@@ -44,38 +86,177 @@ const Settings = ({ showModal, onClose }: SettingsProps) => {
                 >
                   Settings
                 </Dialog.Title>
-                <div>
-                  <ul>
-                    <li>
-                      <p>Profile Image</p>
-                      <div>
-                        <input
-                          type="file"
-                          onChange={(e) => {
-                            setFile(e.target.files?.[0]);
+                <Tabs color="violet" defaultValue="profileImage" style={{}}>
+                  <Tabs.List grow justify="space-between">
+                    <Tabs.Tab
+                      value="profileImage"
+                      style={{ fontWeight: 500, fontSize: "16px" }}
+                    >
+                      Profile Image
+                    </Tabs.Tab>
+                    <Tabs.Tab
+                      value="bannerImage"
+                      style={{ fontWeight: 500, fontSize: "16px" }}
+                    >
+                      Banner Image
+                    </Tabs.Tab>
+                    <Tabs.Tab
+                      value="colorTheme"
+                      style={{ fontWeight: 500, fontSize: "16px" }}
+                    >
+                      Color Theme
+                    </Tabs.Tab>
+                  </Tabs.List>
+
+                  <Tabs.Panel value="profileImage">
+                    <div className="mt-6">
+                      {file.length === 0 ? (
+                        <Dropzone
+                          onDrop={(file) => {
+                            console.log("accepted files", file);
+                            setFile(file);
                           }}
-                        />
+                          onReject={(file) =>
+                            console.log("rejected files", file)
+                          }
+                          maxSize={5 * 1024 ** 2}
+                          maxFiles={1}
+                          accept={IMAGE_MIME_TYPE}
+                        >
+                          <div className="pointer-events-none flex min-h-56 flex-col items-center justify-center  text-center">
+                            <p className=" text-xl">
+                              Drag image here or click to select file
+                            </p>
+                            <p className="text-md text-grayText">
+                              Attach one image to change your profile picture,
+                              should not exceed 5mb
+                            </p>
+                          </div>
+                        </Dropzone>
+                      ) : (
+                        preview
+                      )}
+                      <div className="mt-2 flex justify-center gap-10">
                         <button
+                          disabled={file.length === 0}
+                          className={`${
+                            file.length === 0
+                              ? "bg-gray-300"
+                              : "bg-white hover:bg-white/80"
+                          } mt-4 rounded-lg px-10 py-2 font-medium text-primary drop-shadow-lg`}
                           onClick={() => {
-                            console.log(file);
+                            setFile([]);
+                            setFile([]);
                           }}
+                        >
+                          Reset
+                        </button>
+                        <button
+                          disabled={file.length === 0}
+                          className={`${
+                            file.length === 0
+                              ? "bg-gray-300"
+                              : "bg-primary hover:bg-primary-dark"
+                          } mt-4 rounded-lg px-10 py-2 font-medium text-white drop-shadow-lg`}
                         >
                           Upload
                         </button>
                       </div>
-                    </li>
-                    <li>
-                      <button className="flex items-center gap-2">
-                        <p>Banner Image</p>
+                    </div>
+                  </Tabs.Panel>
+
+                  <Tabs.Panel value="bannerImage">
+                    <div className="container mx-auto p-4">
+                      <p className="mb-2 text-grayText">Select an Image</p>
+                      <div className="flex space-x-4">
+                        {images.map((src, index) => (
+                          <div
+                            key={index}
+                            className={`rounded border-2 ${selectedImage === index ? "border-primary" : "border-transparent"}`}
+                            onClick={() => handleImageClick(index)}
+                          >
+                            <NextImage
+                              src={src}
+                              alt={`Banner ${index + 1}`}
+                              className="cursor-pointer"
+                              width={200} // specify the width of the image
+                              height={200} // specify the height of the image
+                              layout="responsive" // layout optimization for responsiveness
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-2 flex justify-center">
+                        <button
+                          disabled={selectedImage === null}
+                          className={`${
+                            selectedImage === null
+                              ? "bg-gray-300"
+                              : "bg-primary hover:bg-primary-dark"
+                          } mt-4 rounded-lg px-10 py-2 font-medium text-white drop-shadow-lg`}
+                        >
+                          Upload
+                        </button>
+                      </div>
+                    </div>
+                  </Tabs.Panel>
+
+                  <Tabs.Panel value="colorTheme">
+                    <div className="my-6 flex justify-center gap-10">
+                      <div>
+                        <p className="text-grayText">Select a mode</p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setColorScheme("light")}
+                            className="flex gap-2 rounded-lg border bg-white p-2"
+                          >
+                            <SunIcon color="text-black" size="h-6 w-6" />
+                            <p className="text-black">Light</p>
+                          </button>
+                          <button
+                            onClick={() => setColorScheme("dark")}
+                            className="flex gap-2 rounded-lg border bg-black p-2"
+                          >
+                            <MoonIcon color="text-white" size="h-6 w-6" />
+                            <p className="text-white">Dark</p>
+                          </button>
+                        </div>
+                      </div>
+                      <div className=" w-56">
+                        <p className="text-grayText">Select a color</p>
+                        <ColorInput
+                          size="md"
+                          radius="xl"
+                          aria-label="Theme Color"
+                          value={color}
+                          onChangeEnd={setColor}
+                          format="hex"
+                          swatches={[
+                            "#2e2e2e",
+                            "#868e96",
+                            "#fa5252",
+                            "#e64980",
+                            "#be4bdb",
+                            "#7950f2",
+                            "#4c6ef5",
+                            "#228be6",
+                            "#15aabf",
+                            "#12b886",
+                            "#40c057",
+                            "#82c91e",
+                            "#fab005",
+                            "#fd7e14",
+                          ]}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex justify-center">
+                      <button className="mt-4 rounded-lg bg-primary px-10 py-2 font-medium text-white drop-shadow-lg hover:bg-primary-dark">
+                        Update
                       </button>
-                    </li>
-                    <li>
-                      <button className="flex items-center gap-2">
-                        <p>Theme Color</p>
-                      </button>
-                    </li>
-                  </ul>
-                </div>
+                    </div>
+                  </Tabs.Panel>
+                </Tabs>
               </Dialog.Panel>
             </Transition.Child>
           </div>
