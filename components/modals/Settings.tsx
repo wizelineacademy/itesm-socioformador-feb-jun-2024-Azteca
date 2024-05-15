@@ -250,6 +250,11 @@ const Settings = ({ showModal, onClose }: SettingsProps) => {
                         />
                       </div>
                     </div>
+                    <div className="flex justify-center">
+                      <button className="mt-4 rounded-lg bg-primary px-10 py-2 font-medium text-white drop-shadow-lg hover:bg-primary-dark">
+                        Update
+                      </button>
+                    </div>
                   </Tabs.Panel>
                 </Tabs>
               </Dialog.Panel>
