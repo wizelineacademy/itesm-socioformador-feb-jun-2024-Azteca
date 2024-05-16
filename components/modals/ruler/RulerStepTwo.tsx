@@ -28,7 +28,7 @@ const RulerStepTwo = ({
       return "border-yellow-100 bg-yellow-100/20 focus:outline-yellow-200 focus-within:outline-yellow-200";
   };
   return (
-    <div className={`flex h-40 flex-col bg-gradient-radial to-white to-70%`}>
+    <div className={`flex h-40 flex-col`}>
       <div className="mt-4 flex flex-col items-center ">
         <label className="self-start text-base font-medium text-black">
           Why did you feel this way? (Optional)
