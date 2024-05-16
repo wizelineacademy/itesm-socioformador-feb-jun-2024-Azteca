@@ -2,11 +2,10 @@
 import { Menu, Transition } from "@headlessui/react";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import UserIcon from "../components/icons/UserIcon";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
 import { getUserInfo } from "@/services/user";
+import UserProfileButton from "./UserProfileButton";
 
 interface UserIconInterface {
   path: string;
@@ -42,11 +41,17 @@ const UserIconNavbar = ({
     <Menu as="div" className="relative inline-block text-left">
       <Menu.Button
         onClick={() => setIsClicked(!isClicked)}
-        className={`${onSite || isClicked ? "bg-primary" : "bg-white transition-all delay-0 hover:scale-[1.175]"} group rounded-full p-2 drop-shadow-lg`}
+        className={`${onSite || isClicked ? "bg-primary" : "bg-white transition-all delay-0 hover:scale-[1.175]"} flex rounded-full drop-shadow-lg`}
       >
-        <UserIcon
+        {/*         <UserIcon
           size="h-6 w-6"
           color={onSite || isClicked ? "text-white" : "text-primary"}
+        /> */}
+        <UserProfileButton
+          size="xs"
+          color={onSite || isClicked ? "text-white" : "text-primary"}
+          photoUrl={user?.photoUrl}
+          className="m-auto"
         />
       </Menu.Button>
       <Transition

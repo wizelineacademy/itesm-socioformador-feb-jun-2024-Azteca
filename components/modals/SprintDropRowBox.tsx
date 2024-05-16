@@ -3,7 +3,7 @@ import Droppable from "../Droppable";
 import Draggable from "../Draggable";
 import UserProfileButton from "../UserProfileButton";
 import UserIcon from "../icons/UserIcon";
-import { MouseEvent, useEffect, useState } from "react";
+import { MouseEvent, useEffect, useRef, useState } from "react";
 
 interface SprintDropRowBoxProps {
   index: number;
@@ -24,30 +24,58 @@ const SprintDropRowBox = ({
   };
   const [showExpandedUsers, setShowExpandedUsers] = useState<boolean>(false);
   const [position, setPosition] = useState<positionType>({ x: 0, y: 0 });
+  const expandedBoxRef = useRef<HTMLDivElement>(null);
 
   const handleSetExpandedPosition = (e: MouseEvent<HTMLDivElement>) => {
-    //TODO: Check if it can be improved with a ref pointing to the expanded
     const rect = e.currentTarget.getBoundingClientRect();
-    const windowWidth = window.innerWidth,
-      windowHeight = window.innerHeight;
-
-    const xDiff = windowWidth - rect.left - 220,
-      yDiff = windowHeight - rect.top;
-    let newX: number = 0,
-      newY: number = 0;
-    if (xDiff > 220) {
-      newX = rect.left - 220;
-    } else newX = rect.left - 470;
-    if (yDiff > 400) {
-      newY = rect.top - 35;
-    } else newY = rect.top - 160;
-
+    console.log(rect);
     setPosition({
-      x: newX,
-      y: newY,
+      x: rect.x,
+      y: rect.y,
     });
-    setShowExpandedUsers(!showExpandedUsers);
+    setShowExpandedUsers((prev) => !prev);
   };
+
+  useEffect(() => {
+    if (showExpandedUsers && expandedBoxRef.current) {
+      const modal = document
+        .getElementsByClassName("sprint-survey-modal")[0]
+        .getBoundingClientRect();
+      const modalWidth = modal?.width,
+        modalHeight = modal?.height;
+      if (!modalWidth || !modalHeight) return;
+
+      const expandedBoxRect = expandedBoxRef.current.getBoundingClientRect();
+      const expandedBoxWidth = expandedBoxRect.width,
+        expandedBoxHeight = expandedBoxRect.height;
+
+      let newX = position.x,
+        newY = position.y;
+
+      const boxFitsHorizontally = modalWidth > position.x + expandedBoxWidth,
+        boxFitsVertically = modalHeight - position.y > expandedBoxHeight;
+
+      const windowWidth = window.innerWidth;
+      const horizontalAspectRatio = windowWidth;
+      if (boxFitsHorizontally) {
+        newX = position.x;
+      } else {
+        // newX = modalWidth - (windowWidth - position.x) * 0.64;
+        newX = modalWidth - expandedBoxWidth;
+      }
+
+      if (boxFitsVertically) {
+        newY = position.y;
+      } else {
+        newY = position.y - expandedBoxHeight;
+      }
+
+      setPosition({
+        x: newX,
+        y: newY,
+      });
+    }
+  }, [showExpandedUsers]);
 
   const getUserPosition = (index: number, size: number) => {
     if (size === 1) {
@@ -123,11 +151,12 @@ const SprintDropRowBox = ({
 
       {showExpandedUsers && (
         <div
+          ref={expandedBoxRef}
           style={{
             top: position.y,
             left: position.x,
           }}
-          className="absolute z-[100] grid w-60 grid-flow-row grid-cols-3 place-items-center gap-1 rounded-lg bg-white p-2 shadow-md"
+          className="absolute z-[100] grid w-60 grid-flow-row grid-cols-4 place-items-center gap-1 rounded-lg bg-white p-2 shadow-md"
         >
           {coworkers[index].map((person, personIndex) => (
             <Draggable

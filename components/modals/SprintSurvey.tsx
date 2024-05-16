@@ -182,7 +182,7 @@ const SprintSurvey = ({
               leaveTo="opacity-0"
             >
               <Dialog.Panel
-                className={`flex h-auto w-full transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl ${modalWidth}`}
+                className={`sprint-survey-modal flex h-auto w-full transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl ${modalWidth}`}
               >
                 <Dialog.Title
                   as="h3"
