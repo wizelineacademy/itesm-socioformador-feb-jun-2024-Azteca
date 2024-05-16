@@ -11,8 +11,7 @@ import {
 import { Resource, Task } from "@/types/types";
 // import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from "react";
-import NoData from "@/public/NoData.svg";
-import Image from "next/image";
+import NoDataCard from "@/components/NoDataCard";
 
 const PIP = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -66,18 +65,7 @@ const PIP = () => {
         <div className="flew-wrap mb-10 mt-2 flex w-full flex-row gap-12 overflow-x-auto pb-3">
           {tasks.length === 0 && (
             <div className="mx-auto flex justify-center">
-              <div className="flex flex-col items-center justify-center">
-                <Image
-                  src={NoData}
-                  alt="No Data Image"
-                  className="hidden md:block"
-                  priority
-                  height={70}
-                />
-                <p className="text-center text-sm font-medium text-grayText">
-                  No tasks available. Ask your manager for an update.
-                </p>
-              </div>
+              <NoDataCard text="No tasks available. Ask your manager for an update." />
             </div>
           )}
           {tasks.map((task, index) => (
@@ -96,18 +84,7 @@ const PIP = () => {
         <div className="flew-wrap mb-10 mt-2 flex w-full flex-row gap-12 overflow-x-auto pb-3">
           {resources.length === 0 && (
             <div className="mx-auto flex justify-center">
-              <div className="flex flex-col items-center justify-center">
-                <Image
-                  src={NoData}
-                  alt="No Data Image"
-                  className="hidden md:block"
-                  priority
-                  height={70}
-                />
-                <p className="text-center text-sm font-medium text-grayText">
-                  No resources available. Ask your manager for an update.
-                </p>
-              </div>
+              <NoDataCard text="No resources available. Ask your manager for an update." />
             </div>
           )}
           {resources.map((task, index) => (
