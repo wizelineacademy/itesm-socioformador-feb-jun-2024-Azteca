@@ -94,16 +94,18 @@ const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
                   className="flex flex-row items-center justify-between text-black"
                 >
                   <p className="text-2xl font-semibold">Ruler Survey</p>
-                  {step === 1 && (
-                    <div className="flex h-8 w-[40ch] flex-col text-end text-sm">
-                      <span className={getEmotionTextColor() + " font-medium"}>
-                        {rulerSurveyAnswer.emotion?.name}
-                      </span>
-                      <span className="">
-                        {rulerSurveyAnswer.emotion?.description}
-                      </span>
-                    </div>
-                  )}
+                  <div className="flex h-8 min-w-fit max-w-[40ch] flex-col justify-center self-end text-sm">
+                    <span
+                      className={
+                        getEmotionTextColor() + " text-end font-medium"
+                      }
+                    >
+                      {rulerSurveyAnswer.emotion?.name}
+                    </span>
+                    {step === 1 && (
+                      <span>{rulerSurveyAnswer.emotion?.description}</span>
+                    )}
+                  </div>
                 </Dialog.Title>
                 {step === 1 && (
                   <RulerStepOne

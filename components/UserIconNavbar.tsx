@@ -40,6 +40,7 @@ const UserIconNavbar = ({
   return (
     <Menu as="div" className="relative inline-block text-left">
       <Menu.Button
+        as="div"
         onClick={() => setIsClicked(!isClicked)}
         className={`${onSite || isClicked ? "bg-primary" : "bg-white transition-all delay-0 hover:scale-[1.175]"} flex rounded-full drop-shadow-lg`}
       >

@@ -40,10 +40,6 @@
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
 }
 
-:root {
-  --primary: #6640d5;
-}
-
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
