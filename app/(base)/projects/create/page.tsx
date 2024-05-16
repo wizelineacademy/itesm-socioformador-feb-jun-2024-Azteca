@@ -217,6 +217,7 @@ const CreateProject = () => {
                   Members
                 </label>
                 <MultiSelect
+                  // TODO: make this handle duplicate users
                   data={employeesQuery.data?.map((member) => member.name)}
                   renderOption={renderMultiSelectOption}
                   maxDropdownHeight={180}

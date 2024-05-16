@@ -1,8 +1,4 @@
 "use client";
-// import { useMutation, useQuery } from '@tanstack/react-query';
-import { useState, useEffect } from "react";
-
-import NavigationBar from "@/components/NavigationBar";
 import PipResource from "@/components/PipResource";
 import PipTask from "@/components/PipTask";
 import ProgressBar from "@/components/ProgressBar";
@@ -12,7 +8,6 @@ import {
   updateTask,
 } from "@/services/tasks-and-resources";
 import { Resource, Task } from "@/types/types";
-// import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from "react";
 import NoDataCard from "@/components/NoDataCard";
 

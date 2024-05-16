@@ -27,7 +27,9 @@ export const authConfig = {
 
       if (nextUrl.pathname.startsWith("/admin")) {
         // TODO: fix fetch node-gyp error from middleware
-        const res = await fetch("/api/get-role");
+        const res = await fetch(
+          new URL(`/api/get-role?userId=${auth.user?.id}`, nextUrl),
+        );
         const { role } = await res.json();
 
         if (role === "ADMIN") return true;
