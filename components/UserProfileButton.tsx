@@ -2,8 +2,8 @@ import Image from "next/image";
 
 interface UserProfileButtonProps {
   name?: string;
-  photoUrl?: string;
-  size?: "sm" | "md" | "lg" | "2xs" | "xs";
+  photoUrl?: string | null | undefined;
+  size?: "2xs" | "xs" | "sm" | "md" | "lg";
   className?: string;
   color?: string;
 }
@@ -16,7 +16,7 @@ const UserProfileButton = ({
   color = "text-primary",
 }: UserProfileButtonProps) => {
   const sizes = {
-    "2xs": "h-4 w-4",
+    ["2xs"]: "h-6 w-6",
     xs: "h-8 w-8",
     sm: "h-10 w-10",
     md: "h-20 w-20",

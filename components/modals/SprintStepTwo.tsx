@@ -5,6 +5,7 @@ import { Coworker, SurveyCoworker } from "@/types/types";
 import { DndContext, DragEndEvent, pointerWithin } from "@dnd-kit/core";
 import SelectableDragUsers from "./SelectableDragUsers";
 import { SurveyStepTwoAnswer } from "@/types/types";
+import toast from "react-hot-toast";
 
 interface SprintStepTwoProps {
   sprintSurveyStepTwoAnswer: SurveyStepTwoAnswer;
@@ -101,6 +102,49 @@ const SprintStepTwo = ({
     }),
   );
 
+  const verifyRepeated = (
+    newPositionName: keyof SurveyStepTwoAnswer,
+    newPositionNumber: number,
+    prevPositionName: keyof SurveyStepTwoAnswer | "base",
+    prevPositionNumber: number,
+    coworker: Coworker,
+  ) => {
+    if (prevPositionName === "base") {
+      if (existsInRow(newPositionName, coworker.userId)) return;
+      else {
+        handleAddItem(newPositionName, newPositionNumber, coworker);
+        handleRemoveUserTimes(coworker.userId);
+      }
+      return;
+    } else if (newPositionName === prevPositionName) {
+      const scopeItems = sprintSurveyStepTwoAnswer[newPositionName];
+      scopeItems[prevPositionNumber] = scopeItems[prevPositionNumber].filter(
+        (user) => user.userId != coworker.userId,
+      );
+      scopeItems[newPositionNumber].push(coworker);
+      setSprintSurveyStepTwoAnswer({
+        ...sprintSurveyStepTwoAnswer,
+        [newPositionName]: scopeItems,
+      });
+      playSound("drop-audio");
+      return;
+    }
+    if (existsInRow(newPositionName, coworker.userId)) return;
+
+    const newItems = sprintSurveyStepTwoAnswer[newPositionName];
+    newItems[newPositionNumber].push(coworker);
+    const prevItems = sprintSurveyStepTwoAnswer[prevPositionName];
+    prevItems[prevPositionNumber] = prevItems[prevPositionNumber].filter(
+      (user) => user.userId != coworker.userId,
+    );
+    setSprintSurveyStepTwoAnswer({
+      ...sprintSurveyStepTwoAnswer,
+      [newPositionName]: newItems,
+      [prevPositionName]: prevItems,
+    });
+    playSound("drop-audio");
+  };
+
   const handleAddItem = (
     type: keyof SurveyStepTwoAnswer,
     position: number,
@@ -112,6 +156,7 @@ const SprintStepTwo = ({
       ...sprintSurveyStepTwoAnswer,
       [type]: items,
     });
+    playSound("drop-audio");
   };
 
   const handleRemoveUserTimes = (userId: string) => {
@@ -124,32 +169,56 @@ const SprintStepTwo = ({
     setSelectableUsers(newUsers);
   };
 
-  const existsInArray = (
+  const existsInRow = (
     destination: keyof SurveyStepTwoAnswer,
     userId: string,
   ) => {
     const searchScope = sprintSurveyStepTwoAnswer[destination];
-
     for (let i = 0; i < searchScope.length; i++) {
       if (searchScope[i].some((coworker) => coworker.userId === userId)) {
         playSound("invalid-audio");
+        toast.error("El usuario seleccionado ya está en la fila.");
         return true;
       }
     }
     return false;
   };
 
+  const existsInPosition = (
+    destination: keyof SurveyStepTwoAnswer,
+    position: number,
+    userId: string,
+  ) => {
+    const searchScope = sprintSurveyStepTwoAnswer[destination][position];
+    if (searchScope.some((coworker) => coworker.userId === userId)) {
+      playSound("invalid-audio");
+      toast.error("No puede agregar a un mismo usuario dos veces en una fila.");
+      return true;
+    }
+    return false;
+  };
+
   const handleDragEnd = async (event: DragEndEvent) => {
     if (!event.over) return;
-    const destination = String(event.over.id);
+    const destination = event.over.id as string;
     const destinationData = destination.split("-");
     const destinationPlace = destinationData[0] as keyof SurveyStepTwoAnswer;
     const destinationPosition = Number(destinationData[1]);
+
     const coworker = event.active.data.current as Coworker;
-    if (existsInArray(destinationPlace, coworker.userId)) return;
-    handleAddItem(destinationPlace, destinationPosition, coworker);
-    playSound("drop-audio");
-    handleRemoveUserTimes(String(event?.active?.data?.current?.userId));
+    if (
+      existsInPosition(destinationPlace, destinationPosition, coworker.userId)
+    )
+      return;
+    const draggedCoworkerId = event?.active?.id as string;
+    const previousPosition = draggedCoworkerId.split("-");
+    verifyRepeated(
+      destinationPlace,
+      destinationPosition,
+      previousPosition[0] as keyof SurveyStepTwoAnswer | "base",
+      Number(previousPosition[1]),
+      coworker,
+    );
   };
 
   return (

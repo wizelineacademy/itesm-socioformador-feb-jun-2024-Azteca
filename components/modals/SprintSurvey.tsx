@@ -11,8 +11,9 @@ import {
 } from "@/types/types";
 import SprintStepThree from "./SprintStepThree";
 import SprintStepFour from "./SprintStepFour";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { getCoworkersInProject } from "@/services/project";
+import { submitSprintSurveyAnswers } from "@/services/sprintSurvey";
 import toast from "react-hot-toast";
 import { getUserId } from "@/services/user";
 
@@ -127,15 +128,22 @@ const SprintSurvey = ({
 
   const handleStepTwoAnswer = () => {
     if (!isSurveyCompleted()) {
-      toast.error("Please fill all the fields before submitting the survey");
+      toast.error("Please fill all the fields before submitting the survey.");
       return;
     }
     setStep(3);
   };
 
+  const submitSurveyAnswers = useMutation({
+    mutationFn: () => submitSprintSurveyAnswers(sprintAnswer),
+    onSuccess: () => {
+      console.log("ANSWER SUMBITED");
+    },
+  });
+
   const handleSubmit = () => {
     parseStepTwoAnswer();
-    console.log(sprintAnswer);
+    submitSurveyAnswers.mutate();
     onClose();
   };
 
@@ -174,7 +182,7 @@ const SprintSurvey = ({
               leaveTo="opacity-0"
             >
               <Dialog.Panel
-                className={`flex h-auto w-full transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl ${modalWidth}`}
+                className={`sprint-survey-modal flex h-auto w-full transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl ${modalWidth}`}
               >
                 <Dialog.Title
                   as="h3"

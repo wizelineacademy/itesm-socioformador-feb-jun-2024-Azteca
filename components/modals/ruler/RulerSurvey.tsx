@@ -5,7 +5,8 @@ import RulerStepOne from "./RulerStepOne";
 import { Emotion, RulerSurveyAnswer } from "@/types/types";
 import RulerStepTwo from "./RulerStepTwo";
 import { getUserId } from "@/services/user";
-import { useQuery } from "@tanstack/react-query";
+import { submitRulerSurveyAnswer } from "@/services/rulerSurvey";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 interface RulerSurveyProps {
   showModal: boolean;
@@ -47,8 +48,15 @@ const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
     else return "text-yellow-500";
   };
 
+  const submitRulerAnswers = useMutation({
+    mutationFn: () => submitRulerSurveyAnswer(rulerSurveyAnswer),
+    onSuccess: () => {
+      console.log("ANSWER SUMBITED");
+    },
+  });
+
   const handleSubmit = () => {
-    console.log(rulerSurveyAnswer);
+    submitRulerAnswers.mutate();
     onClose();
   };
 

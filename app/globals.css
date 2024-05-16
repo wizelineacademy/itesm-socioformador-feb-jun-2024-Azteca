@@ -3,7 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* * > * {
+/* *>* {
   outline: red solid 1px;
 } */
 
@@ -22,6 +22,7 @@
 
 .embla__slide__coworker {
   flex: 0 0 20%;
+  /* flex: 0 0 20.25%; */
   min-width: 0;
 }
 

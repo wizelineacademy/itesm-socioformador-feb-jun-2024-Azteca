@@ -1,4 +1,7 @@
 "use client";
+// import { useMutation, useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from "react";
+
 import NavigationBar from "@/components/NavigationBar";
 import PipResource from "@/components/PipResource";
 import PipTask from "@/components/PipTask";
@@ -11,6 +14,7 @@ import {
 import { Resource, Task } from "@/types/types";
 // import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from "react";
+import NoDataCard from "@/components/NoDataCard";
 
 const PIP = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -63,9 +67,9 @@ const PIP = () => {
         <p className="text-3xl font-medium">Tasks</p>
         <div className="flew-wrap mb-10 mt-2 flex w-full flex-row gap-12 overflow-x-auto pb-3">
           {tasks.length === 0 && (
-            <p className="text-xl font-light">
-              No tasks available. Ask your manager for an update.
-            </p>
+            <div className="mx-auto flex justify-center">
+              <NoDataCard text="No tasks available. Ask your manager for an update." />
+            </div>
           )}
           {tasks.map((task, index) => (
             <PipTask
@@ -82,9 +86,9 @@ const PIP = () => {
         <p className="text-3xl font-medium">Resources</p>
         <div className="flew-wrap mb-10 mt-2 flex w-full flex-row gap-12 overflow-x-auto pb-3">
           {resources.length === 0 && (
-            <p className="text-xl font-medium">
-              No tasks available. Ask your manager for an update.
-            </p>
+            <div className="mx-auto flex justify-center">
+              <NoDataCard text="No resources available. Ask your manager for an update." />
+            </div>
           )}
           {resources.map((task, index) => (
             <PipResource

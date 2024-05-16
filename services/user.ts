@@ -155,11 +155,13 @@ export async function getUserTraitsById(id: string) {
   return traits;
 }
 
-export async function getCoWorkers() {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    throw new Error("You most be signed in");
+export async function getCoWorkers(userId: string | null | undefined) {
+  if (!userId || userId === undefined) {
+    const session = await auth();
+    userId = session?.user?.id;
+    if (!userId) {
+      throw new Error("You most be signed in");
+    }
   }
   const pm = alias(schema.projectMember, "pm");
   const pm2 = alias(schema.projectMember, "pm2");

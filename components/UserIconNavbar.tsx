@@ -2,17 +2,21 @@
 import { Menu, Transition } from "@headlessui/react";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import UserIcon from "../components/icons/UserIcon";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
 import { getUserInfo } from "@/services/user";
+import UserProfileButton from "./UserProfileButton";
 
 interface UserIconInterface {
   path: string;
   currentPath: string;
+  showSettingsModal: () => void;
 }
-const UserIconNavbar = ({ path, currentPath }: UserIconInterface) => {
+const UserIconNavbar = ({
+  path,
+  currentPath,
+  showSettingsModal,
+}: UserIconInterface) => {
   const onSite = currentPath === path;
   const { data: user } = useQuery({
     queryKey: ["user"],
@@ -37,11 +41,17 @@ const UserIconNavbar = ({ path, currentPath }: UserIconInterface) => {
     <Menu as="div" className="relative inline-block text-left">
       <Menu.Button
         onClick={() => setIsClicked(!isClicked)}
-        className={`${onSite || isClicked ? "bg-primary" : "bg-white transition-all delay-0 hover:scale-[1.175]"} group rounded-full p-2 drop-shadow-lg`}
+        className={`${onSite || isClicked ? "bg-primary" : "bg-white transition-all delay-0 hover:scale-[1.175]"} flex rounded-full drop-shadow-lg`}
       >
-        <UserIcon
+        {/*         <UserIcon
           size="h-6 w-6"
           color={onSite || isClicked ? "text-white" : "text-primary"}
+        /> */}
+        <UserProfileButton
+          size="xs"
+          color={onSite || isClicked ? "text-white" : "text-primary"}
+          photoUrl={user?.photoUrl}
+          className="m-auto"
         />
       </Menu.Button>
       <Transition
@@ -57,7 +67,7 @@ const UserIconNavbar = ({ path, currentPath }: UserIconInterface) => {
           <div className="px-1 py-1 ">
             <Menu.Item>
               <p className="mx-auto items-center px-2 py-2 text-sm">
-                Hola {user?.name.split(" ")[0]}!
+                Hello {user?.name.split(" ")[0]}!
               </p>
             </Menu.Item>
           </div>
@@ -74,21 +84,27 @@ const UserIconNavbar = ({ path, currentPath }: UserIconInterface) => {
                         : "text-gray-900"
                   }  group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                 >
-                  Ir a perfil
+                  Go Profile
                 </Link>
               )}
             </Menu.Item>
-            <Menu.Item>
-              {({ active }) => (
-                <button
-                  className={`${
-                    active ? "bg-primary/75 text-white" : "text-gray-900"
-                  } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                >
-                  Cambiar tema
-                </button>
-              )}
-            </Menu.Item>
+            <div
+              onClick={() => {
+                showSettingsModal();
+              }}
+            >
+              <Menu.Item>
+                {({ active }) => (
+                  <button
+                    className={`${
+                      active ? "bg-primary/75 text-white" : "text-gray-900"
+                    } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                  >
+                    Settings
+                  </button>
+                )}
+              </Menu.Item>
+            </div>
           </div>
           <div className="px-1 py-1" onClick={handleSignOut}>
             {" "}
@@ -99,7 +115,7 @@ const UserIconNavbar = ({ path, currentPath }: UserIconInterface) => {
                     active ? "bg-red-700 text-white" : "text-gray-900"
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                 >
-                  Cerrar sesión
+                  Sign Out
                 </button>
               )}
             </Menu.Item>
