@@ -18,6 +18,27 @@ import {
   userResource,
 } from "@/db/schema";
 
+interface FeedbackCategory {
+  [coworkerId: string]: {
+    openFeedback: Array<[string, string]>;
+    closedFeedback: Array<[string, number]>;
+  };
+}
+
+interface FeedbackSummary {
+  positive: { [sentiment: string]: string[] };
+  negative: { [sentiment: string]: string[] };
+  biased: { [sentiment: string]: string[] };
+  notUseful: { [sentiment: string]: string[] };
+}
+
+interface FeedbackRecords {
+  [userId: string]: {
+    coworkersFeedback: FeedbackCategory;
+    feedbackSummary: FeedbackSummary;
+  };
+}
+
 /*
   This function calculates the cosine similarity between the query and the resources,
   it returns the resources with the highest similarity
@@ -96,7 +117,8 @@ async function create_tasks(feedback: string) {
 }
 
 // This function processes the open feedback of the user and returns a summary of the feedback
-async function process_open_feedback(feedback: string) {
+// feedback
+async function process_open_feedback(userFeedback: FeedbackRecords) {
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_KEY,
   });
@@ -230,26 +252,7 @@ async function process_closed_feedback(answers: [string, number][]) {
   }
 */
 async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
-  interface FeedbackCategory {
-    [coworkerId: string]: {
-      openFeedback: Array<[string, string]>;
-      closedFeedback: Array<[string, number]>;
-    };
-  }
-
-  interface FeedbackSummary {
-    positive: { [sentiment: string]: string[] };
-    negative: { [sentiment: string]: string[] };
-    biased: { [sentiment: string]: string[] };
-    notUseful: { [sentiment: string]: string[] };
-  }
-
-  const feedbackRecords: {
-    [userId: string]: {
-      coworkersFeedback: FeedbackCategory;
-      feedbackSummary: FeedbackSummary;
-    };
-  } = {};
+  const feedbackRecords: FeedbackRecords = {};
 
   const coworkersOpenFeedback = await db
     .select({
@@ -421,26 +424,24 @@ export async function feedback_analysis(sprintSurveyIds: number[]) {
               .openFeedback.length > 0
           ) {
             // iterate through all the open feedback received from the coworker
-            for (let comment of orderedFeedback[userId]["coworkersFeedback"][
-              coworkerId
-            ].openFeedback) {
-              const feedbackSummary = await process_open_feedback(comment[1]);
+            const userFeedbackSummary = await process_open_feedback(
+              orderedFeedback[userId],
+            );
 
-              // add to the primary structure all the summaries of the previous function and the coworker who made the feedback
-              const negativeFeedbackMap =
-                orderedFeedback[userId].feedbackSummary.negative;
-              for (let feedback of feedbackSummary) {
-                if (feedback in negativeFeedbackMap!) {
-                  // the summary emotion already exists, push the actual user in that element
-                  orderedFeedback[userId].feedbackSummary.negative[
-                    feedback
-                  ].push(coworkerId);
-                } else {
-                  // the summary emotion doesnt exist, create a new element with the coworker
-                  orderedFeedback[userId].feedbackSummary.negative[feedback] = [
-                    coworkerId,
-                  ];
-                }
+            // add to the primary structure all the summaries of the previous function and the coworker who made the feedback
+            const negativeFeedbackMap =
+              orderedFeedback[userId].feedbackSummary.negative;
+            for (let feedback of feedbackSummary) {
+              if (feedback in negativeFeedbackMap!) {
+                // the summary emotion already exists, push the actual user in that element
+                orderedFeedback[userId].feedbackSummary.negative[feedback].push(
+                  coworkerId,
+                );
+              } else {
+                // the summary emotion doesnt exist, create a new element with the coworker
+                orderedFeedback[userId].feedbackSummary.negative[feedback] = [
+                  coworkerId,
+                ];
               }
             }
           } else {
