@@ -13,7 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getUserRole } from "@/services/user";
 import Link from "next/link";
 import RulerSurvey from "./modals/ruler/RulerSurvey";
-import Settings from "./modals/Settings";
+import Settings from "./modals/SettingsDialog";
 
 const NavigationBar = () => {
   const userRoleQuery = useQuery({
