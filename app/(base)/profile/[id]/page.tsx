@@ -5,8 +5,8 @@ import Tooltip from "@/components/Tooltip";
 import Badge from "@/components/Badge";
 import Image from "next/image";
 import JobSVG from "@/public/Job-Profile-Image.svg";
-import NoData from "@/public/NoData.svg";
 import { getUserInfoById, getUserTraitsById } from "@/services/user";
+import NoDataCard from "@/components/NoDataCard";
 
 const Profile = async ({ params }: { params: { id: string } }) => {
   let user;
@@ -99,18 +99,7 @@ const Profile = async ({ params }: { params: { id: string } }) => {
             }
           >
             {traits.strengths.length === 0 && (
-              <div className="flex flex-col items-center justify-center">
-                <Image
-                  src={NoData}
-                  alt="No Data Image"
-                  className="hidden md:block"
-                  priority
-                  height={70}
-                />
-                <p className="text-center text-sm font-medium text-grayText">
-                  No strengths available yet
-                </p>
-              </div>
+              <NoDataCard text="No strengths available yet" />
             )}
             {traits.strengths.map((strength, index) => (
               <Tooltip message={strength.description!} key={index}>
@@ -136,18 +125,7 @@ const Profile = async ({ params }: { params: { id: string } }) => {
             }
           >
             {traits.areasOfOportunity.length === 0 && (
-              <div className="flex w-full flex-col items-center justify-center">
-                <Image
-                  src={NoData}
-                  alt="No Data Image"
-                  className="hidden md:block"
-                  priority
-                  height={70}
-                />
-                <p className="text-sm font-medium text-grayText">
-                  No areas of opportunity available yet
-                </p>
-              </div>
+              <NoDataCard text="No areas of opportunity available yet" />
             )}
             {traits.areasOfOportunity.map((area, index) => (
               <Tooltip message={area.description!} key={index}>
