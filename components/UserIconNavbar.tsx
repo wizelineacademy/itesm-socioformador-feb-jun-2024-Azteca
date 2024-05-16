@@ -52,7 +52,7 @@ const UserIconNavbar = ({
           size="xs"
           color={onSite || isClicked ? "text-white" : "text-primary"}
           photoUrl={user?.photoUrl}
-          className="m-auto"
+          className="m-auto bg-transparent"
         />
       </Menu.Button>
       <Transition
