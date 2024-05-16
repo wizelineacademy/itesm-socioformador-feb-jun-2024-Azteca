@@ -1,6 +1,16 @@
+@import url("https://cdn-uicons.flaticon.com/2.3.0/uicons-brands/css/uicons-brands.css");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* *>* {
+  outline: red solid 1px;
+} */
+
+:root {
+  --bone: #f8f5f5;
+  --primary: #6640d5;
+}
 
 .embla {
   overflow: hidden;
@@ -12,6 +22,7 @@
 
 .embla__slide__coworker {
   flex: 0 0 20%;
+  /* flex: 0 0 20.25%; */
   min-width: 0;
 }
 
@@ -62,4 +73,30 @@
 
 .m_396ce5cb:where([data-selected]) {
   background-color: var(--primary) !important;
+}
+
+.dissolve {
+  animation: dissolve 300ms ease-in-out forwards;
+}
+
+@keyframes dissolve {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.mantine-Popover-dropdown {
+  border-radius: 12px !important;
+}
+
+.ruler-grid {
+  display: grid;
+  grid-template-columns: repeat(13, minmax(0, 1fr));
+  grid-template-rows: repeat(13, minmax(0, 1fr));
+  gap: 1rem;
+  grid-auto-flow: row;
 }

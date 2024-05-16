@@ -1,40 +1,37 @@
 "use client";
 
 import React from "react";
-import useEmblaCarousel from "embla-carousel-react";
 import ProjectCard from "@/components/ProjectCard";
+import NoDataCard from "@/components/NoDataCard";
 
 import { useQuery } from "@tanstack/react-query";
 import { getProjectsProfile } from "@/services/user";
 
-export default function EmblaCarousel() {
-  const [emblaRef] = useEmblaCarousel({ loop: true }, []);
-
+export default function ProjectsCarousel({ userId }: { userId: string }) {
   const projectsQuery = useQuery({
     queryKey: ["projects"],
-    queryFn: () => getProjectsProfile(null),
+    queryFn: () => getProjectsProfile(userId),
   });
 
   if (!projectsQuery.data) {
+    return <p>loading...</p>;
+  }
+
+  if (projectsQuery.data.length === 0) {
     return (
-      <div className="flex flex-row items-center justify-between">
-        <ProjectCard />
+      <div className="mb-6 mt-3 flex flex-wrap items-center justify-center gap-5 rounded-lg bg-slate-300/20 py-4">
+        <NoDataCard text="No projects found" />
       </div>
     );
   }
 
   return (
-    <div className="embla" ref={emblaRef}>
-      <ul className="embla__container">
-        {projectsQuery.data.map((project, index) => (
-          <li key={index} className="embla__slide__project">
-            <ProjectCard
-              id={projectsQuery.data[index].id}
-              name={projectsQuery.data[index].name}
-            />
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul className="mt-2 flex w-full flex-row gap-4 overflow-x-auto">
+      {projectsQuery.data.map((project, index) => (
+        <li key={index}>
+          <ProjectCard id={project.id} name={project.name} />
+        </li>
+      ))}
+    </ul>
   );
 }

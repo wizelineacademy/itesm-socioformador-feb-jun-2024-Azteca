@@ -1,64 +1,70 @@
-import { signIn } from "@/auth";
-import { AuthError } from "next-auth";
+"use client";
+import { useEffect, useState } from "react";
+import { loginAction } from "@/actions";
+import FormTextInput from "@/components/FormTextInput";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 const Login = () => {
-  const loginAction = async (formData: FormData) => {
-    "use server";
-    try {
-      await signIn("credentials", formData);
-    } catch (error) {
-      if (error instanceof AuthError) {
-        switch (error.type) {
-          case "CredentialsSignin":
-            return "Invalid credentials.";
-          default:
-            return "Something went wrong.";
-        }
+  const clientLoginAction = async (formData: FormData) => {
+    const result = await loginAction(formData);
+    if (result) {
+      switch (result) {
+        case "Invalid credentials.":
+          toast.error("Email or password is not valid.");
+          break;
+        default:
+          toast.error("Something went wrong. Try again.");
+          break;
       }
-      throw error;
     }
   };
 
   return (
-    <main className="flex h-dvh w-full items-center justify-center bg-gradient-to-r from-primary to-primary-light">
-      <section className="h-5/6 w-[30%] rounded-[20px] bg-bone drop-shadow-md">
-        <p className="mx-8 mt-10 text-center text-4xl font-medium leading-normal text-black">
-          Welcome to Feedback Flow
-        </p>
-        <form
-          className="mx-12 mt-8 flex flex-col justify-center"
-          action={loginAction}
-        >
-          <label className="self-start text-xl text-black">Email</label>
-          <input
-            className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-bone px-2 text-black"
-            type="email"
-            name="email"
-            placeholder="mail@gmail.com"
-          />
-          <label className="mt-5 self-start text-xl text-black">Password</label>
-          <input
-            className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-bone px-2 text-black"
-            name="password"
-            type="password"
-            placeholder="********"
-          />
-          {/* Find a darker color for hover */}
-          <button
-            className="mx-auto my-8 h-12 w-28 rounded-3xl bg-primary text-bone shadow-2xl hover:bg-primary-dark"
-            type="submit"
-          >
-            Login
+    <main className="flex h-dvh items-center justify-center bg-gradient-to-r from-primary to-primary-light">
+      <section className="flex h-fit w-[33%] flex-col justify-center divide-y divide-gray-500 rounded-[20px] bg-bone px-16 py-8 drop-shadow-md">
+        <div className="flex w-full flex-col items-center justify-start gap-y-4 pb-8">
+          <p className="mb-4 mt-6 text-center text-3xl font-semibold leading-normal text-black">
+            Log in to Feedback Flow
+          </p>
+          <button className=" group flex w-7/12 flex-row rounded-full border border-primary-light px-4 py-2 transition-all duration-200 hover:bg-primary-dark">
+            <i className="fi fi-brands-slack text-lg leading-[0px] text-primary-light group-hover:text-white" />
+            <p className="mx-auto text-sm font-medium text-black group-hover:text-white">
+              Continue with Slack
+            </p>
           </button>
-        </form>
-        <div className="mx-auto flex justify-center text-sm font-medium">
+          <button className=" group flex w-7/12 flex-row rounded-full border border-primary-light px-4 py-2 transition-all duration-200 hover:bg-primary-dark">
+            <i className="fi fi-brands-google text-lg leading-[0px] text-primary-light group-hover:text-white" />
+            <p className="mx-auto text-sm font-medium text-black group-hover:text-white">
+              Continue with Google
+            </p>
+          </button>
+        </div>
+        <div className="flex w-full flex-col items-center justify-center pb-6">
+          <form
+            action={clientLoginAction}
+            className="flex w-full flex-col justify-center"
+          >
+            <FormTextInput name="email" type="email" label="Email" />
+            <FormTextInput name="password" type="password" label="Password" />
+            <button
+              className="mx-auto mb-4 mt-12 h-10 w-28 rounded-2xl bg-primary font-medium text-bone shadow-2xl hover:bg-primary-dark"
+              type="submit"
+            >
+              Log in
+            </button>
+          </form>
+          <button className="text-dark border-primary-dark text-sm hover:text-primary-dark hover:underline focus:text-primary-dark focus:underline">
+            Forgot your password?
+          </button>
+        </div>
+        <div className="mx-auto mb-6 flex w-full justify-center pt-6 text-sm font-medium">
           <p className="text-black">Don&apos;t have an account? </p>
           <Link
             href="/register"
-            className="ms-1 text-primary hover:text-primary-dark"
+            className="ms-1 cursor-pointer text-primary hover:text-primary-dark hover:underline focus:text-primary-dark focus:underline"
           >
-            Register
+            Sign up
           </Link>
         </div>
       </section>

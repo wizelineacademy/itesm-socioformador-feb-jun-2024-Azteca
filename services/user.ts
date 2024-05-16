@@ -14,10 +14,7 @@ import { alias } from "drizzle-orm/pg-core";
 import { auth } from "@/auth";
 import bcrypt from "bcrypt";
 
-export async function getInfoById() {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) throw new Error("You must be signed in");
+export async function getUserInfoById(id: string) {
   const res = await db
     .select({
       id: schema.user.id,
@@ -29,11 +26,46 @@ export async function getInfoById() {
       role: schema.user.role,
     })
     .from(schema.user)
-    .where(eq(schema.user.id, userId));
+    .where(eq(schema.user.id, id));
+
+  if (res.length === 0) {
+    throw new Error("User could not be found");
+  }
   return res[0];
 }
 
-// TODO: this function is duplicated in the middleware
+export async function getUserInfo() {
+  const session = await auth();
+  const id = session?.user?.id as string;
+  const res = await db
+    .select({
+      id: schema.user.id,
+      name: schema.user.name,
+      email: schema.user.email,
+      jobTitle: schema.user.jobTitle,
+      department: schema.user.department,
+      photoUrl: schema.user.photoUrl,
+      role: schema.user.role,
+    })
+    .from(schema.user)
+    .where(eq(schema.user.id, id));
+
+  if (res.length === 0) {
+    throw new Error("User could not be found");
+  }
+  return res[0];
+}
+
+export async function getUserId() {
+  const session = await auth();
+  return session?.user?.id as string;
+}
+
+export async function getUserByEmail(email: string) {
+  const users = await db.select().from(user).where(eq(user.email, email));
+  return users[0];
+}
+
 export const getUserRole = async () => {
   const session = await auth();
   const userId = session?.user?.id;
@@ -51,23 +83,25 @@ export const registerUser = async (
   department: string | undefined,
   jobTitle: string | undefined,
 ) => {
-  try {
-    if (!name || !email || !password) {
-      throw new Error("Empty email or empty password");
-    }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await db.insert(user).values({
+  if (!name || !email || !password || !department || !jobTitle) {
+    throw new Error("Empty fields");
+  }
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await db
+    .insert(user)
+    .values({
       name: name,
       email: email,
       password: hashedPassword,
       role: "EMPLOYEE",
       department: department,
       jobTitle: jobTitle,
+    })
+    .catch((dbError: any) => {
+      if (dbError.code === "23505")
+        throw new Error("Email already registered", dbError.code);
+      else throw new Error("Error registering the user", dbError.code);
     });
-  } catch (error) {
-    console.error("Could not register user", error);
-    throw new Error("Could not register user");
-  }
 };
 
 export const getUsers = async () => {
@@ -91,12 +125,7 @@ export const updateRole = async ({
   await db.update(user).set({ role: newRole }).where(eq(user.id, id)).execute();
 };
 
-export async function getTraits() {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    throw new Error("You most be signed in");
-  }
+export async function getUserTraitsById(id: string) {
   const res = await db
     .select({
       id: schema.trait.id,
@@ -107,7 +136,7 @@ export async function getTraits() {
     .from(schema.trait)
     .innerJoin(schema.userTrait, eq(schema.userTrait.traitId, schema.trait.id))
     .innerJoin(schema.user, eq(schema.userTrait.userId, schema.user.id))
-    .where(eq(schema.user.id, userId));
+    .where(eq(schema.user.id, id));
 
   let strengths_arr = [];
   let areasOfOportunity_arr = [];
@@ -126,11 +155,13 @@ export async function getTraits() {
   return traits;
 }
 
-export async function getCoWorkers() {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    throw new Error("You most be signed in");
+export async function getCoWorkers(userId: string | null | undefined) {
+  if (!userId || userId === undefined) {
+    const session = await auth();
+    userId = session?.user?.id;
+    if (!userId) {
+      throw new Error("You most be signed in");
+    }
   }
   const pm = alias(schema.projectMember, "pm");
   const pm2 = alias(schema.projectMember, "pm2");
@@ -183,9 +214,15 @@ export async function getProjectsProfile(userId: string | null | undefined) {
   return res;
 }
 
-/*-- GET ALL TRAITS
-SELECT p.*
-FROM project_member pm
-JOIN project p ON pm.project_id = p.id
-WHERE pm.user_id = '5c0bbaeb-d54a-4fc3-a404-afaac7c7a47f';
- */
+export async function getAllEmployees() {
+  const res = await db
+    .select({
+      id: schema.user.id,
+      name: schema.user.name,
+      email: schema.user.email,
+      photoUrl: schema.user.photoUrl,
+    })
+    .from(user)
+    .where(not(eq(user.role, "ADMIN")));
+  return res;
+}

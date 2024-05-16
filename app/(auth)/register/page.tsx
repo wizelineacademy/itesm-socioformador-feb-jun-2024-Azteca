@@ -1,87 +1,60 @@
-import { signIn } from "@/auth";
-import { registerUser } from "@/services/user";
-import { AuthError } from "next-auth";
+"use client";
+import { registerAction } from "@/actions";
+import FormTextInput from "@/components/FormTextInput";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
-const Login = () => {
-  const registerAction = async (formData: FormData) => {
-    "use server";
-    const name = formData.get("name")?.toString();
-    const jobTitle = formData.get("jobTitle")?.toString();
-    const department = formData.get("department")?.toString();
-    const email = formData.get("email")?.toString();
-    const password = formData.get("password")?.toString();
-    registerUser(name, email, password, department, jobTitle);
+const Register = () => {
+  const clientRegisterAction = async (formData: FormData) => {
+    const result = await registerAction(formData);
+    if (result) {
+      if (result === "UniqueConstraintViolation")
+        toast.error("Email already registered.");
+      else if (result === "ConnectionError")
+        toast.error("Network error. Try again.");
+      else if (result === "GeneralError")
+        toast.error("There was an error saving the data. Try again.");
+    }
   };
 
   return (
-    <main className="flex h-dvh w-full items-center justify-center bg-gradient-to-r from-primary to-primary-light">
-      <section className="h-5/6 w-[30%] rounded-[20px] bg-bone drop-shadow-md">
-        <p className="mx-8 mt-10 text-center text-4xl font-medium leading-normal text-black">
-          Register
+    <div className="flex h-dvh items-center justify-center bg-gradient-to-r from-primary to-primary-light">
+      <section className="flex h-fit w-[33%] flex-col justify-center rounded-[20px] bg-bone px-10 py-8 drop-shadow-md ">
+        <p className="mt-6 text-center text-3xl font-semibold leading-normal text-black">
+          Sign Up
+        </p>
+        <p className="mb-4 text-center text-xl">
+          Start getting smart feedback today!
         </p>
         <form
-          action={registerAction}
-          className="mx-12 mt-8 flex flex-col justify-center"
+          action={clientRegisterAction}
+          className="flex flex-col justify-center"
         >
-          <label className="self-start text-xl text-black">Name</label>
-          <input
-            className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-bone px-2 text-black"
-            type="text"
-            name="name"
-            placeholder="Juan Perez"
-          />
-          <label className="mt-5 self-start text-xl text-black">
-            Job Title
-          </label>
-          <input
-            className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-bone px-2 text-black"
-            type="text"
-            name="jobTitle"
-            placeholder="Backend Developer"
-          />
-          <label className="mt-5 self-start text-xl text-black">
-            Department
-          </label>
-          <input
-            className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-bone px-2 text-black"
-            type="text"
-            name="department"
-            placeholder="IT/Software"
-          />
-          <label className="mt-5 self-start text-xl text-black">Email</label>
-          <input
-            className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-bone px-2 text-black"
-            type="email"
-            name="email"
-            placeholder="mail@gmail.com"
-          />
-          <label className="mt-5 self-start text-xl text-black">Password</label>
-          <input
-            className="text-md mt-2 h-12 w-full rounded-2xl border border-black bg-bone px-2 text-black"
-            type="password"
-            name="password"
-            placeholder="********"
-          />
+          <FormTextInput name="name" type="text" label="Name" />
+          <FormTextInput name="email" type="email" label="Email" />
+          <FormTextInput name="password" type="password" label="Password" />
+          <FormTextInput name="jobTitle" type="text" label="Job Title" />
+          <FormTextInput name="department" type="text" label="Department" />
+
           <button
-            className="mx-auto my-8 h-12 w-28 rounded-3xl bg-primary text-bone shadow-2xl hover:bg-primary-dark"
+            className="mx-auto mb-2 mt-12 h-10 w-28 rounded-2xl bg-primary text-bone shadow-2xl hover:bg-primary-dark"
             type="submit"
           >
             Register
           </button>
         </form>
-        <div className="mx-auto flex justify-center text-sm font-medium">
+        <div className="mx-auto mb-6 flex justify-center text-sm font-medium">
           <p className="text-black">Already have an account? </p>
-          <a
+          <Link
             href="/login"
-            className="ms-1 text-primary hover:text-primary-dark"
+            className="ms-1 cursor-pointer text-primary hover:text-primary-dark hover:underline focus:text-primary-dark focus:underline"
           >
-            Login
-          </a>
+            Log in
+          </Link>
         </div>
       </section>
-    </main>
+    </div>
   );
 };
 
-export default Login;
+export default Register;

@@ -2,8 +2,8 @@ import Image from "next/image";
 
 interface UserProfileButtonProps {
   name?: string;
-  photoUrl?: string;
-  size?: "xs" | "sm" | "md" | "lg";
+  photoUrl?: string | null | undefined;
+  size?: "2xs" | "xs" | "sm" | "md" | "lg";
   className?: string;
   color?: string;
 }
@@ -16,7 +16,8 @@ const UserProfileButton = ({
   color = "text-primary",
 }: UserProfileButtonProps) => {
   const sizes = {
-    xs: "h-4 w-4",
+    ["2xs"]: "h-6 w-6",
+    xs: "h-8 w-8",
     sm: "h-10 w-10",
     md: "h-20 w-20",
     lg: "h-32 w-32",
@@ -24,15 +25,15 @@ const UserProfileButton = ({
   const isActive = false;
   return (
     <button
-      className={`${className} ${isActive ? "bg-primary" : "bg-white"} group rounded-full p-2 drop-shadow-lg`}
+      className={`${className} ${isActive ? "bg-primary" : "bg-white"} group rounded-full ${photoUrl ? "p-1" : "p-2"} drop-shadow-lg`}
     >
       {photoUrl ? (
         <Image
           src={photoUrl}
           alt={"User profile photo"}
           className={`rounded-full ${sizes[size]}`}
-          width={50}
-          height={50}
+          width={300}
+          height={300}
         />
       ) : (
         <svg
