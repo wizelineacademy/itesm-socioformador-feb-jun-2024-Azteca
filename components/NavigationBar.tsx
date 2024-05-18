@@ -14,6 +14,7 @@ import { getUserRole } from "@/services/user";
 import Link from "next/link";
 import RulerSurvey from "./modals/ruler/RulerSurvey";
 import Settings from "./modals/SettingsDialog";
+import ComboBoxSearch from "./ComboBoxSearch";
 
 const NavigationBar = () => {
   const userRoleQuery = useQuery({
@@ -27,6 +28,7 @@ const NavigationBar = () => {
   const [showRulerModal, setShowRulerModal] = useState<boolean>(false);
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
   const [notificationId, setNotificationId] = useState<number>(0);
+  const [searchExpanded, setSearchExpanded] = useState<boolean>(false);
 
   const isManager = true;
   return (
@@ -78,7 +80,7 @@ const NavigationBar = () => {
           {isManager && (
             <ProjectNavbarIcon path="/projects" currentPath={pathname} />
           )}
-          <SearchBar placeholder="Search Co-workers ..." expanded={false} />
+          <ComboBoxSearch />
           <Notifications
             showProjectModal={() => setShowProjectModal(true)}
             showSprintModal={() => setShowSprintModal(true)}
