@@ -28,12 +28,17 @@ const RulerStepTwo = ({
       return "border-yellow-100 bg-yellow-100/20 focus:outline-yellow-200 focus-within:outline-yellow-200";
   };
   return (
-    <div className={`flex h-40 flex-col`}>
+    <form action={onClose} className={`flex h-40 flex-col`}>
       <div className="mt-4 flex flex-col items-center ">
-        <label className="self-start text-base font-medium text-black">
+        <label
+          htmlFor="emotion-description"
+          className="self-start text-base font-medium text-black"
+        >
           Why did you feel this way? (Optional)
         </label>
         <textarea
+          id="emotion-description"
+          name="emotion-description"
           placeholder="Explain more about your emotion..."
           value={rulerSurveyAnswer.comment || ""}
           onChange={(e) =>
@@ -53,12 +58,11 @@ const RulerStepTwo = ({
         <button
           type="submit"
           className=" mx-auto rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
-          onClick={onClose}
         >
           Submit
         </button>
       </div>
-    </div>
+    </form>
   );
 };
 
