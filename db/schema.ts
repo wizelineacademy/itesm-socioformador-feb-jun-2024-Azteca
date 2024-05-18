@@ -82,6 +82,7 @@ export const userTrait = pgTable(
 
 export const pipTask = pgTable("pip_task", {
   id: serial("id").primaryKey(),
+  sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
   userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 64 }),
   description: varchar("description", { length: 256 }),
@@ -96,6 +97,7 @@ export const pipResourceKind = pgEnum("type_resource", [
 
 export const pipResource = pgTable("pip_resource", {
   id: serial("id").primaryKey(),
+  sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
   title: varchar("title", { length: 64 }),
   kind: pipResourceKind("type_resource"),
   description: varchar("description", { length: 1024 }),
