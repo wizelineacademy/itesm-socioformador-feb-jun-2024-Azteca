@@ -136,6 +136,54 @@ export const rulerSurveyAnswers = pgTable(
   // composite primary key on (userId, rulerSurveyId)
 );
 
+export const questionTypeEnum = pgEnum("type", [
+  "SPRINT_QUESTION",
+  "COWORKER_QUESTION",
+  "FINAL_PROJECT_QUESTION",
+]);
+
+export const question = pgTable("question", {
+  id: serial("question_id").primaryKey(),
+  description: text("description"),
+  type: questionTypeEnum("type").notNull(),
+});
+
+export const positiveSkill = pgTable("positive_skill", {
+  id: serial("positive_skill_id").primaryKey(),
+  skill: varchar("skill", { length: 30 }),
+});
+
+export const negativeSkill = pgTable("negative_skill", {
+  id: serial("negative_skill_id").primaryKey(),
+  skill: varchar("skill", { length: 30 }),
+});
+
+export const questionPositiveSkill = pgTable("question_positive_skill", {
+  questionId: integer("question_id").references(() => question.id),
+  positiveSkillId: integer("positive_skill_id").references(
+    () => positiveSkill.id,
+  ),
+});
+
+export const questionNegativeSkill = pgTable("question_negative_skill", {
+  questionId: integer("question_id").references(() => question.id),
+  negativeSkillId: integer("negative_skill_id").references(
+    () => negativeSkill.id,
+  ),
+});
+
+export const sprintSurveyQuestion = pgTable("sprint_survey_question", {
+  sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
+  questionId: integer("question_id").references(() => question.id),
+});
+
+export const resourcePositiveSkill = pgTable("resource_positive_skill", {
+  pipResourceId: integer("pip_resource_id").references(() => pipResource.id),
+  positiveSkillId: integer("positive_skill_id").references(
+    () => positiveSkill.id,
+  ),
+});
+
 export const sprintSurvey = pgTable("sprint_survey", {
   id: serial("sprint_survey_id").primaryKey(),
   projectId: integer("project_id").references(() => project.id, {
