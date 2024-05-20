@@ -138,7 +138,7 @@ export const rulerSurveyAnswers = pgTable(
   // composite primary key on (userId, rulerSurveyId)
 );
 
-export const questionTypeEnum = pgEnum("type", [
+export const questionTypeEnum = pgEnum("type_question", [
   "SPRINT_QUESTION",
   "COWORKER_QUESTION",
   "FINAL_PROJECT_QUESTION",
@@ -203,7 +203,7 @@ export const sprintSurveyAnswerProject = pgTable(
       { onDelete: "cascade" },
     ),
     userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
-    questionName: varchar("question_name", { length: 8 }),
+    questionId: integer("question_id").references(() => question.id),
     answer: integer("answer"),
   },
   // composite primary key on (userId, sprintSurveyId)
@@ -220,7 +220,7 @@ export const sprintSurveyAnswerCoworkers = pgTable(
     coworkerId: uuid("coworker_id").references(() => user.id, {
       onDelete: "cascade",
     }),
-    questionName: varchar("question_name", { length: 8 }),
+    questionId: integer("question_id").references(() => question.id),
     answer: integer("answer"),
     comment: text("comment"),
   },
@@ -243,7 +243,7 @@ export const finalSurveyAnswer = pgTable(
     finalSurveyId: integer("final_survey_id").references(() => finalSurvey.id, {
       onDelete: "cascade",
     }),
-    questionName: varchar("question_name", { length: 8 }),
+    questionId: integer("question_id").references(() => question.id),
     answer: integer("answer"),
     comment: text("comment"),
   },
