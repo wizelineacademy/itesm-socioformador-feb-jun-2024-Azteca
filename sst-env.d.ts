@@ -1,12 +1,12 @@
 /* tslint:disable */
 /* eslint-disable */
-import "sst"
+import "sst";
 declare module "sst" {
   export interface Resource {
     FeedbackFlowBucket: {
-      name: string
-      type: "sst.aws.Bucket"
-    }
+      name: string;
+      type: "sst.aws.Bucket";
+    };
   }
 }
-export {}
+export {};
