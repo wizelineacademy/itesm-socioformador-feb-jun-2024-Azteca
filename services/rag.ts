@@ -326,117 +326,112 @@ export async function ruler_analysis() {
 }
 
 // Main function
-export async function feedback_analysis(sprintSurveyIds: number[]) {
-  for (let sprintSurveyId of sprintSurveyIds) {
-    const processed = await db
-      .select({ processed: sprintSurvey.processed })
+export async function feedback_analysis(sprintSurveyId: number) {
+  const processed = await db
+    .select({ processed: sprintSurvey.processed })
+    .from(sprintSurvey)
+    .where(eq(sprintSurvey.id, sprintSurveyId));
+
+  const notProcessed = !processed[0].processed;
+
+  if (notProcessed) {
+    const uniqueProjectUsers = await db
+      .select({
+        userId: projectMember.userId,
+      })
       .from(sprintSurvey)
+      .innerJoin(project, eq(project.id, sprintSurvey.projectId))
+      .innerJoin(projectMember, eq(projectMember.projectId, project.id))
       .where(eq(sprintSurvey.id, sprintSurveyId));
 
-    const notProcessed = !processed[0].processed;
+    const ids = uniqueProjectUsers.map((user) => user.userId as string);
+    const orderedFeedback = await group_feedback(sprintSurveyId, ids);
 
-    if (notProcessed) {
-      const uniqueProjectUsers = await db
-        .select({
-          userId: projectMember.userId,
-        })
-        .from(sprintSurvey)
-        .innerJoin(project, eq(project.id, sprintSurvey.projectId))
-        .innerJoin(projectMember, eq(projectMember.projectId, project.id))
-        .where(eq(sprintSurvey.id, sprintSurveyId));
-
-      const ids = uniqueProjectUsers.map((user) => user.userId as string);
-      const orderedFeedback = await group_feedback(sprintSurveyId, ids);
-
-      // iterate through each unique user of the project
-      for (let userId of Object.keys(orderedFeedback)) {
-        for (let coworkerId of Object.keys(
-          orderedFeedback[userId]["coworkersFeedback"],
-        )) {
-          if (
+    // iterate through each unique user of the project
+    for (let userId of Object.keys(orderedFeedback)) {
+      for (let coworkerId of Object.keys(
+        orderedFeedback[userId]["coworkersFeedback"],
+      )) {
+        if (
+          orderedFeedback[userId]["coworkersFeedback"][coworkerId].openFeedback
+            .length > 0
+        ) {
+          const userFeedbackSummary = await process_open_feedback(
             orderedFeedback[userId]["coworkersFeedback"][coworkerId]
-              .openFeedback.length > 0
-          ) {
-            const userFeedbackSummary = await process_open_feedback(
-              orderedFeedback[userId]["coworkersFeedback"][coworkerId]
-                .openFeedback[0][1],
-            );
+              .openFeedback[0][1],
+          );
 
-            const negativeFeedbackMap =
-              orderedFeedback[userId].feedbackSummary.negative;
+          const negativeFeedbackMap =
+            orderedFeedback[userId].feedbackSummary.negative;
 
-            // summarize the overall feedback received by the cowoeker
-            for (let feedback of userFeedbackSummary) {
-              if (feedback in negativeFeedbackMap!) {
-                orderedFeedback[userId].feedbackSummary.negative[feedback].push(
-                  coworkerId,
-                );
-              } else {
-                orderedFeedback[userId].feedbackSummary.negative[feedback] = [
-                  coworkerId,
-                ];
-              }
+          // summarize the overall feedback received by the cowoeker
+          for (let feedback of userFeedbackSummary) {
+            if (feedback in negativeFeedbackMap!) {
+              orderedFeedback[userId].feedbackSummary.negative[feedback].push(
+                coworkerId,
+              );
+            } else {
+              orderedFeedback[userId].feedbackSummary.negative[feedback] = [
+                coworkerId,
+              ];
             }
-          } else {
-            const answers =
-              orderedFeedback[userId]["coworkersFeedback"][coworkerId]
-                .closedFeedback;
-            const feedbackSummary = await process_closed_feedback(answers);
           }
-        }
-        // all feedback summarized, now get the classifications of negative feedback with the most suggestions
-        const feedbackSuggestions: [number, string][] = [];
-        Object.keys(orderedFeedback[userId].feedbackSummary.negative).forEach(
-          (key) => {
-            feedbackSuggestions.push([
-              orderedFeedback[userId].feedbackSummary.negative[key].length,
-              key,
-            ]);
-          },
-        );
-
-        feedbackSuggestions.sort((a, b) => b[0] - a[0]);
-
-        // get the feedback classification with the most suggestions
-        const feedbackToCreate = feedbackSuggestions[0][1];
-
-        // get a comment with that classification to recommend resources and tasks
-        const newCoworkerId =
-          orderedFeedback[userId].feedbackSummary.negative[feedbackToCreate][0];
-
-        const feedbackComment =
-          orderedFeedback[userId].coworkersFeedback[newCoworkerId]
-            .openFeedback[0][1];
-
-        // get the resources with the highest similarity to the feedback
-        const resources = await cosine_similarity(feedbackComment);
-
-        // create tasks with the feedback received
-        const tasks = await create_tasks(feedbackComment);
-
-        // insert the selected tasks and resources
-        for (let task of tasks) {
-          const [title, description] = task.split(":");
-          await db.insert(pipTask).values({
-            userId: userId,
-            title: title,
-            description: description,
-            isDone: false,
-          });
-        }
-
-        for (let resource of resources) {
-          await db.insert(userResource).values({
-            userId: userId,
-            resourceId: resource,
-          });
+        } else {
+          const answers =
+            orderedFeedback[userId]["coworkersFeedback"][coworkerId]
+              .closedFeedback;
+          const feedbackSummary = await process_closed_feedback(answers);
         }
       }
 
-      await db
-        .update(sprintSurvey)
-        .set({ processed: true })
-        .where(eq(sprintSurvey.id, sprintSurveyId));
+      // all feedback summarized, now get the classifications of negative feedback with the most suggestions
+      const feedbackSuggestions: [number, string][] = [];
+      Object.keys(orderedFeedback[userId].feedbackSummary.negative).forEach(
+        (key) => {
+          feedbackSuggestions.push([
+            orderedFeedback[userId].feedbackSummary.negative[key].length,
+            key,
+          ]);
+        },
+      );
+
+      feedbackSuggestions.sort((a, b) => b[0] - a[0]);
+
+      const feedbackToCreate = feedbackSuggestions[0][1];
+
+      const newCoworkerId =
+        orderedFeedback[userId].feedbackSummary.negative[feedbackToCreate][0];
+
+      const feedbackComment =
+        orderedFeedback[userId].coworkersFeedback[newCoworkerId]
+          .openFeedback[0][1];
+
+      // select the best tasks and resource
+      const resources = await cosine_similarity(feedbackComment);
+
+      const tasks = await create_tasks(feedbackComment);
+
+      for (let task of tasks) {
+        const [title, description] = task.split(":");
+        await db.insert(pipTask).values({
+          userId: userId,
+          title: title,
+          description: description,
+          isDone: false,
+        });
+      }
+
+      for (let resource of resources) {
+        await db.insert(userResource).values({
+          userId: userId,
+          resourceId: resource,
+        });
+      }
     }
+
+    await db
+      .update(sprintSurvey)
+      .set({ processed: true })
+      .where(eq(sprintSurvey.id, sprintSurveyId));
   }
 }
