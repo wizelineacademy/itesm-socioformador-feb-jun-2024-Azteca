@@ -47,7 +47,6 @@ export const authConfig = {
         const segments = nextUrl.pathname.split("/");
         const userId = segments[2]; // '2' because 'segments' is ['', 'dashboard', '<user_id>']
         const managerId = auth.user!.id;
-
         const res = await fetch(
           new URL(
             `/api/is-managed-by?userId=${userId}&managerId=${managerId}`,

@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 interface UserProfileButtonProps {
-  name?: string;
+  active?: boolean;
   photoUrl?: string | null | undefined;
   size?: "2xs" | "xs" | "sm" | "md" | "lg";
   className?: string;
@@ -9,7 +9,7 @@ interface UserProfileButtonProps {
 }
 
 const UserProfileButton = ({
-  name,
+  active = false,
   photoUrl,
   size = "md",
   className,
@@ -22,13 +22,13 @@ const UserProfileButton = ({
     md: "h-20 w-20",
     lg: "h-32 w-32",
   };
-  const isActive = false;
   return (
     <button
-      className={`${className} ${isActive ? "bg-primary" : "bg-white"} group rounded-full p-1 drop-shadow-lg`}
+      className={`${className} ${active ? "bg-primary" : "bg-white"} group rounded-full p-1 drop-shadow-lg`}
     >
       {photoUrl ? (
         <Image
+          priority
           src={photoUrl}
           alt={"User profile photo"}
           className={`rounded-full ${sizes[size]}`}
@@ -40,7 +40,7 @@ const UserProfileButton = ({
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
-          strokeWidth={1}
+          strokeWidth={1.4}
           stroke="currentColor"
           className={`${color} ${sizes[size]}`}
         >
