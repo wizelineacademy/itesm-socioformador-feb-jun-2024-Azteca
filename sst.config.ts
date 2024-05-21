@@ -14,8 +14,12 @@ export default $config({
       public: true,
     });
 
+    const queue = new sst.aws.Queue("FeedbackFlowQueue", {
+      fifo: false,
+    });
+
     new sst.aws.Nextjs("FeedbackFlowAppf", {
-      link: [bucket],
+      link: [bucket, queue],
     });
   },
 });
