@@ -18,9 +18,6 @@ const Traits: React.FC<TraitsProps> = ({ title, traits, emptyMessage }) => (
   <div>
     <div className="mx-auto flex justify-between">
       <h3 className="text-2xl font-medium text-black">{title}</h3>
-      <p className="cursor-pointer self-center text-sm text-graySubtitle">
-        Show More
-      </p>
     </div>
     <div
       className={
