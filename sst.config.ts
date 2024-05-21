@@ -10,13 +10,8 @@ export default $config({
   },
 
   async run() {
-    let secrets: sst.Secret[] = [];
-
-    if ($app.stage === "prod") {
-      const AuthSecret = new sst.Secret("AuthSecret");
-      const PostgresURL = new sst.Secret("PostgresURL");
-      secrets = [AuthSecret, PostgresURL];
-    }
+    const AuthSecret = new sst.Secret("AuthSecret");
+    const PostgresURL = new sst.Secret("PostgresURL");
 
     const bucket = new sst.aws.Bucket("FeedbackFlowBucket", {
       public: true,
@@ -27,7 +22,7 @@ export default $config({
     });
 
     new sst.aws.Nextjs("FeedbackFlowAppf", {
-      link: [...secrets, bucket, queue],
+      link: [bucket, queue, AuthSecret, PostgresURL],
     });
   },
 });

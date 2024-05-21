@@ -7,7 +7,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "dev": "next dev",
-    "dev:sst": "sst dev next dev --stage dev",
+    "dev:sst": "./dev-sst.sh",
     "generate": "drizzle-kit generate:pg --config=drizzle.config.ts",
     "lint": "next lint",
     "migrate": "npx tsx db/drizzle.ts",
