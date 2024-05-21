@@ -15,7 +15,8 @@
     "prettier:write": "prettier --write --ignore-unknown .",
     "start": "next start",
     "test": "jest",
-    "test:e2e": "npx playwright test"
+    "test:e2e": "npx playwright test",
+    "tsc": "tsc"
   },
   "dependencies": {
     "@aws-sdk/credential-providers": "^3.556.0",
