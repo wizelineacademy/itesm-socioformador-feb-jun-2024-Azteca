@@ -1,3 +1,5 @@
+"use client";
+
 import UserProfileButton from "@/components/UserProfileButton";
 import CoWorkersCarousel from "@/components/CoWorkersCarousel";
 import ProjectsCarousel from "@/components/ProjectsCarousel";
@@ -5,18 +7,39 @@ import Tooltip from "@/components/Tooltip";
 import Badge from "@/components/Badge";
 import Image from "next/image";
 import JobSVG from "@/public/Job-Profile-Image.svg";
+import { useQuery } from "@tanstack/react-query";
 import { getUserInfoById, getUserTraitsById } from "@/services/user";
 import NoDataCard from "@/components/NoDataCard";
 import Link from "next/link";
 
-const Profile = async ({ params }: { params: { id: string } }) => {
-  let user;
-  let traits;
+const Profile = ({ params }: { params: { id: string } }) => {
+  const {
+    data: user,
+    error: userError,
+    isLoading: userLoading,
+  } = useQuery({
+    queryKey: ["user", params.id],
+    queryFn: () => getUserInfoById(params.id),
+  });
 
-  try {
-    user = await getUserInfoById(params.id);
-    traits = await getUserTraitsById(params.id);
-  } catch (e) {
+  const {
+    data: traits,
+    error: traitsError,
+    isLoading: traitsLoading,
+  } = useQuery({
+    queryKey: ["traits", params.id],
+    queryFn: () => getUserTraitsById(params.id),
+  });
+
+  if (userLoading || traitsLoading) {
+    return (
+      <main>
+        <h1 className="pt-20 text-center text-3xl">Cargando...</h1>
+      </main>
+    );
+  }
+
+  if (userError || traitsError || !user || !traits) {
     return (
       <main>
         <h1 className="pt-20 text-center text-3xl">
@@ -34,8 +57,6 @@ const Profile = async ({ params }: { params: { id: string } }) => {
           photoUrl={user.photoUrl!}
           size="lg"
           className="absolute left-20 top-60 h-fit"
-          // photoUrl={BitmojiAdrian}
-          // photoUrl="https://static.wikia.nocookie.net/heroe/images/0/08/Lucario_SSBU.png/revision/latest?cb=20200104023610&path-prefix=es"
         />
         <div className="flex w-5/6 flex-row items-center justify-between">
           <div className="w-full ps-56 leading-tight text-white">
@@ -91,7 +112,7 @@ const Profile = async ({ params }: { params: { id: string } }) => {
         </div>
 
         <div className="w-5/12">
-          {/* Strenghts */}
+          {/* Strengths */}
           <div className="mx-auto flex justify-between">
             <h3 className="text-2xl font-medium text-black">Strengths</h3>
             <p className="cursor-pointer self-center text-sm text-graySubtitle">
@@ -115,7 +136,7 @@ const Profile = async ({ params }: { params: { id: string } }) => {
             ))}
           </div>
 
-          {/* Oportunity Areas */}
+          {/* Opportunity Areas */}
           <div className="mx-auto flex justify-between">
             <h3 className="text-2xl font-medium text-black">
               Opportunity Areas
