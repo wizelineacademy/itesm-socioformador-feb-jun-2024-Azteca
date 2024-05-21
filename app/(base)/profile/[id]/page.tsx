@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getUserInfoById, getUserTraitsById } from "@/services/user";
@@ -9,8 +7,10 @@ import CoWorkersCarousel from "@/components/CoWorkersCarousel";
 import ProjectsCarousel from "@/components/ProjectsCarousel";
 import Traits from "@/components/Profile/Traits";
 
-const Profile: React.FC<{ params: { id: string } }> = ({ params }) => {
-  const {
+const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
+  const user = await getUserInfoById(params.id);
+  const traits = await getUserTraitsById(params.id);
+  /*   const {
     data: user,
     error: userError,
     isLoading: userLoading,
@@ -37,31 +37,31 @@ const Profile: React.FC<{ params: { id: string } }> = ({ params }) => {
   }
 
   if (userError || traitsError || !user || !traits) {
-// import Tooltip from "@/components/Tooltip";
-// import Badge from "@/components/Badge";
-// import Image from "next/image";
-// import JobSVG from "@/public/Job-Profile-Image.svg";
-// import {
-//   getUserId,
-//   getUserInfoById,
-//   getUserManagedBy,
-//   getUserTraitsById,
-// } from "@/services/user";
-// import NoDataCard from "@/components/NoDataCard";
-// import Link from "next/link";
+    // import Tooltip from "@/components/Tooltip";
+    // import Badge from "@/components/Badge";
+    // import Image from "next/image";
+    // import JobSVG from "@/public/Job-Profile-Image.svg";
+    // import {
+    //   getUserId,
+    //   getUserInfoById,
+    //   getUserManagedBy,
+    //   getUserTraitsById,
+    // } from "@/services/user";
+    // import NoDataCard from "@/components/NoDataCard";
+    // import Link from "next/link";
 
-// const Profile = async ({ params }: { params: { id: string } }) => {
-//   let user,
-//     traits,
-//     activeUserId: string = "",
-//     isManagedBy;
+    // const Profile = async ({ params }: { params: { id: string } }) => {
+    //   let user,
+    //     traits,
+    //     activeUserId: string = "",
+    //     isManagedBy;
 
-//   try {
-//     user = await getUserInfoById(params.id);
-//     traits = await getUserTraitsById(params.id);
-//     activeUserId = await getUserId();
-//     isManagedBy = await getUserManagedBy(activeUserId, params.id);
-//   } catch (e) {
+    //   try {
+    //     user = await getUserInfoById(params.id);
+    //     traits = await getUserTraitsById(params.id);
+    //     activeUserId = await getUserId();
+    //     isManagedBy = await getUserManagedBy(activeUserId, params.id);
+    //   } catch (e) {
     return (
       <main>
         <h1 className="pt-20 text-center text-3xl">
@@ -69,13 +69,14 @@ const Profile: React.FC<{ params: { id: string } }> = ({ params }) => {
         </h1>
       </main>
     );
-  }
+  } */
 
   return (
     <main>
       <ProfileBanner user={user} />
       {/* Banner */}
-<!--       <section className="w-100 mx-auto mb-24 mt-6 flex h-52 rounded-xl bg-primary">
+      {/*        
+      <section className="w-100 mx-auto mb-24 mt-6 flex h-52 rounded-xl bg-primary">
         <UserProfileButton
           photoUrl={user.photoUrl!}
           size="lg"
@@ -107,7 +108,8 @@ const Profile: React.FC<{ params: { id: string } }> = ({ params }) => {
             priority
           />
         </div>
-      </section> -->
+      </section>
+      */}
 
       {/* Data */}
       <section className="w-100 mx-auto flex justify-between space-x-10">
