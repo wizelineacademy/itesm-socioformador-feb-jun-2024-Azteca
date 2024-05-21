@@ -36,6 +36,11 @@ jobs:
         run: |
           sst unlock --stage prod
 
+      - name: Copy Secrets for Production
+        run: |
+          sst secret set AuthSecret ${{ secrets.AUTH_SECRET }} --stage=prod
+          sst secret set PostgresURL ${{ secrets.POSTGRES_URL }} --stage=prod
+
       - name: Deploy to AWS with SST
         run: |
           bun install
