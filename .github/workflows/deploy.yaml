@@ -23,7 +23,7 @@ jobs:
           wget https://github.com/sst/ion/releases/download/v0.0.384/sst-linux-amd64.deb 
           sudo dpkg -i sst-linux-amd64.deb
 
-      - name: Install BUN
+      - name: Install Bun
         uses: oven-sh/setup-bun@v1
 
       - name: Configure AWS credentials
