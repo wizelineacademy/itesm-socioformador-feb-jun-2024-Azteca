@@ -23,6 +23,10 @@ export default $config({
 
     new sst.aws.Nextjs("FeedbackFlowAppf", {
       link: [bucket, queue, AuthSecret, PostgresURL],
+      environment: {
+        AUTH_SECRET: AuthSecret.value,
+        POSTGRES_URL: PostgresURL.value,
+      },
     });
   },
 });
