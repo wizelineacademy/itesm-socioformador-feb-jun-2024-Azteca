@@ -34,11 +34,12 @@ export async function submitProjectAnswer(answers: ProjectAnswer) {
       comment: "",
     })),
   );
-  await db.insert(finalSurveyAnswer).values({
-    userId: userId,
-    finalSurveyId: answers.finalSurveyId,
-    questionName: "PS_CT",
-    answer: null,
-    comment: answers.comment,
-  });
+  // TODO: felipe pls fix this
+  // await db.insert(finalSurveyAnswer).values({
+  //   userId: userId,
+  //   finalSurveyId: answers.finalSurveyId,
+  //   questionName: "PS_CT",
+  //   answer: null,
+  //   comment: answers.comment,
+  // });
 }

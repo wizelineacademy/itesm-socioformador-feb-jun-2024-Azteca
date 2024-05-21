@@ -1,67 +1,29 @@
-name: 🚀 CI/CD Codigo Azteca prod y pruebas
+name: deploy
 
 on:
   push:
     branches:
       - main
-      - dev
-    tags:
-      - "v*"
-  pull_request:
-    branches:
-      - dev
-      - main
+
 env:
   AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-permissions:
-  actions: write
-  contents: read
+  POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
 
 jobs:
-  lint-and-test:
-    name: Lint, Test, and Check Formatting
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "20.x"
-      - name: Cache Dependencies and Builds
-        uses: actions/cache@v3
-        with:
-          path: |
-            .next/
-            .open-next/
-            .sst/
-            node_modules/
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
-      - name: Install Dependencies
-        run: npm install
-      - name: Check Formatting with Prettier
-        run: npm run prettier:check
-      - name: Lint
-        run: npm run lint
-        if: (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/WorkflowCI/CDsemanticversioning') && (github.event_name == 'push' || github.event_name == 'pull_request')
+      - name: Git checkout
+        uses: actions/checkout@v4
 
-  deploy-to-dev:
-    name: Deploy to Dev
-    runs-on: ubuntu-latest
-    needs: lint-and-test
-    if: (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/WorkflowCI/CDsemanticversioning') && github.event_name == 'push'
-    steps:
-      - uses: actions/checkout@v3
       - name: Install SST
         run: |
-          wget https://github.com/sst/ion/releases/download/v0.0.298/sst-linux-amd64.deb
+          wget https://github.com/sst/ion/releases/download/v0.0.384/sst-linux-amd64.deb 
           sudo dpkg -i sst-linux-amd64.deb
-          sst version
-      - uses: oven-sh/setup-bun@v1
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -69,104 +31,17 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           role-duration-seconds: 1200
           aws-region: us-east-1
-      - name: Create .env File
-        run: |
-          echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" > .env
-          echo "POSTGRES_URL=${{ secrets.POSTGRES_URL }}" >> .env
-          echo "POSTGRES_PRISMA_URL=${{ secrets.POSTGRES_PRISMA_URL }}" >> .env
-          echo "POSTGRES_URL_NO_SSL=${{ secrets.POSTGRES_URL_NO_SSL }}" >> .env
-          echo "POSTGRES_URL_NON_POOLING=${{ secrets.POSTGRES_URL_NON_POOLING }}" >> .env
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
-          echo "POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" >> .env
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
-          echo "POSTGRES_DATABASE=${{ secrets.POSTGRES_DATABASE }}" >> .env
 
-      - name: Debug Values
-        run: |
-          echo "POSTGRES_PRISMA_URL type: $(echo "${{ secrets.POSTGRES_PRISMA_URL }}" | awk '{print typeof($0)}')"
-          echo "POSTGRES_URL type: $(echo "${{ secrets.POSTGRES_URL }}" | awk '{print typeof($0)}')"
-          echo "AUTH_SECRET type: $(echo "${{ secrets.AUTH_SECRET }}" | awk '{print typeof($0)}')"
-          echo "POSTGRES_URL_NO_SSL type: $(echo "${{ secrets.POSTGRES_URL_NO_SSL }}" | awk '{print typeof($0)}')"
-          echo "POSTGRES_URL_NON_POOLING type: $(echo "${{ secrets.POSTGRES_URL_NON_POOLING }}" | awk '{print typeof($0)}')"
-          echo "POSTGRES_USER type: $(echo "${{ secrets.POSTGRES_USER }}" | awk '{print typeof($0)}')"
-          echo "POSTGRES_HOST type: $(echo "${{ secrets.POSTGRES_HOST }}" | awk '{print typeof($0)}')"
-          echo "POSTGRES_PASSWORD type: $(echo "${{ secrets.POSTGRES_PASSWORD }}" | awk '{print typeof($0)}')"
-          echo "POSTGRES_DATABASE type: $(echo "${{ secrets.POSTGRES_DATABASE }}" | awk '{print typeof($0)}')"
       - name: Unlock SST
         run: |
-          sst unlock
+          sst unlock --stage prod
 
       - name: Copy Secrets for Production
         run: |
-          sst secret set PostgresUrl $POSTGRES_URL --stage=dev --verbose
-          sst secret set PostgresPrismaUrl $POSTGRES_PRISMA_URL --stage=dev --verbose
-          sst secret set AuthSecret $AUTH_SECRET --stage=dev --verbose
-          sst secret set PostgresUrlNoSsl $POSTGRES_URL_NO_SSL  --stage=dev --verbose
-          sst secret set PostgresUrlNonPooling $POSTGRES_URL_NON_POOLING --stage=dev --verbose
-          sst secret set PostgresUser $POSTGRES_USER --stage=dev --verbose
-          sst secret set PostgresHost $POSTGRES_HOST --stage=dev --verbose
-          sst secret set PostgresPassword $POSTGRES_PASSWORD --stage=dev --verbose
-          sst secret set PostgresDatabase $POSTGRES_DATABASE --stage=dev --verbose
-        env:
-          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
-          POSTGRES_PRISMA_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
-          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-          POSTGRES_URL_NO_SSL: ${{ secrets.POSTGRES_URL_NO_SSL }}
-          POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
+          sst secret set AuthSecret ${{ secrets.AUTH_SECRET }} --stage=prod
+          sst secret set PostgresURL ${{ secrets.POSTGRES_URL }} --stage=prod
 
       - name: Deploy to AWS with SST
         run: |
           bun install
-          sst deploy --stage=dev --verbose
-      - name: Clean up AWS profile
-        run: rm -rf ~/.aws
-
-  deploy-to-production:
-    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/WorkflowCI/CDsemanticversioning') && github.event_name == 'push'
-    name: Deploy to Production
-    runs-on: ubuntu-latest
-    needs: lint-and-test
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install SST
-        run: |
-          wget https://github.com/sst/ion/releases/download/v0.0.298/sst-linux-amd64.deb 
-          sudo dpkg -i sst-linux-amd64.deb
-          sst version
-      - uses: oven-sh/setup-bun@v1
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          role-duration-seconds: 1200
-          aws-region: us-east-1
-      - name: Create .env File
-        run: |
-          echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" > .env
-
-      - name: Unlock SST
-        run: |
-          sst unlock --stage produccion
-      - name: Copy Secrets for Production
-        run: |
-          sst secret set AuthSecret $AUTH_SECRET --stage=produccion --verbose
-
-        env:
-          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
-      - name: Install tsx
-        run: npm install -g tsx
-
-      - name: Deploy to AWS with SST
-        run: |
-          bun install
-          sst deploy --stage=produccion --verbose
-      - name: Run database migrations
-        run: npm run migrate
-
-      - name: Clean up AWS profile
-        run: rm -rf ~/.aws
+          sst deploy --stage=prod --verbose

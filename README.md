@@ -11,15 +11,8 @@ Una plataforma de retroalimentación y evaluación para empleados dentro de una 
 Make sure you have the right `.env.local` file in your project
 
 ```env
-POSTGRES_URL=<YOUR KEY>
-POSTGRES_PRISMA_URL=<YOUR KEY>
-POSTGRES_URL_NO_SSL=<YOUR KEY>
-POSTGRES_URL_NON_POOLING=<YOUR KEY>
-POSTGRES_USER=<YOUR KEY>
-POSTGRES_HOST=<YOUR KEY>
-POSTGRES_PASSWORD=<YOUR KEY>
-POSTGRES_DATABASE=<YOUR KEY>
 AUTH_SECRET=<YOUR KEY>
+POSTGRES_URL=<YOUR KEY>
 ```
 
 To run the app

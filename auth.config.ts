@@ -37,6 +37,35 @@ export const authConfig = {
         return Response.redirect(new URL("/forbbiden", nextUrl));
       }
 
+      if (nextUrl.pathname === "/dashboard") {
+        return Response.redirect(
+          new URL(`/dashboard/${auth.user?.id}`, nextUrl),
+        );
+      }
+
+      if (nextUrl.pathname.startsWith("/dashboard")) {
+        const segments = nextUrl.pathname.split("/");
+        const userId = segments[2]; // '2' because 'segments' is ['', 'dashboard', '<user_id>']
+        const managerId = auth.user!.id;
+
+        const res = await fetch(
+          new URL(
+            `/api/is-managed-by?userId=${userId}&managerId=${managerId}`,
+            nextUrl,
+          ),
+        );
+        const { isManagedBy } = await res.json();
+
+        if (
+          userId === managerId || // if i'm trying to see my own dashboard
+          isManagedBy // or it's a dashboard from someone I manage
+        ) {
+          return true;
+        } else {
+          return Response.redirect(new URL("/forbbiden", nextUrl));
+        }
+      }
+
       if (
         nextUrl.pathname.startsWith("/login") ||
         nextUrl.pathname.startsWith("/register")

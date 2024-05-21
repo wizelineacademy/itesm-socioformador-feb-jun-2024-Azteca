@@ -9,7 +9,7 @@ import {
 } from "@/db/schema";
 import db from "@/db/drizzle";
 import * as schema from "@/db/schema";
-import { eq, not, and, or, asc } from "drizzle-orm";
+import { eq, not, and, or, asc, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { auth } from "@/auth";
 import bcrypt from "bcrypt";
@@ -224,5 +224,19 @@ export async function getAllEmployees() {
     })
     .from(user)
     .where(not(eq(user.role, "ADMIN")));
+  return res;
+}
+export async function searchUsers(query: string) {
+  const res = await db
+    .select({
+      id: schema.user.id,
+      name: schema.user.name,
+      email: schema.user.email,
+      photoUrl: schema.user.photoUrl,
+    })
+    .from(schema.user)
+    .where(sql`${schema.user.name} ILIKE ${`%${query}%`}`)
+    .orderBy(asc(schema.user.name));
+
   return res;
 }
