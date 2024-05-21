@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { getUserRole } from "@/services/user";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon";
 
-const Project = ({ params }: { params: { project_id: string } }) => {
+const Project = ({ params }: { params: { projectId: string } }) => {
   const router = useRouter();
 
   const [isUpdateFeedbackPopupOpen, setIsUpdateFeedbackPopupOpen] =
@@ -151,7 +151,7 @@ const Project = ({ params }: { params: { project_id: string } }) => {
               <button
                 className="rounded-lg bg-red-800 px-3 py-2 text-white"
                 onClick={(e) => {
-                  mutate(parseInt(params.project_id));
+                  mutate(parseInt(params.projectId));
                 }}
               >
                 Delete
