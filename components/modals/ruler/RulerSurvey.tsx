@@ -7,6 +7,7 @@ import RulerStepTwo from "./RulerStepTwo";
 import { getUserId } from "@/services/user";
 import { submitRulerSurveyAnswer } from "@/services/rulerSurvey";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 interface RulerSurveyProps {
   showModal: boolean;
@@ -51,7 +52,10 @@ const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
   const submitRulerAnswers = useMutation({
     mutationFn: () => submitRulerSurveyAnswer(rulerSurveyAnswer),
     onSuccess: () => {
-      console.log("ANSWER SUMBITED");
+      toast.success("Encuesta enviada exitosamente!");
+    },
+    onError: () => {
+      toast.error("Error al enviar la encuesta");
     },
   });
 

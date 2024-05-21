@@ -32,7 +32,7 @@ const SprintStepOne = ({
         value={
           sprintSurveyAnswer.projectAnswers.find(
             (answer) => answer.questionKey === "MS_RF",
-          )?.answer || 1
+          )?.answer || 6
         }
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           onChangeValue(e, "MS_RF")
@@ -45,7 +45,7 @@ const SprintStepOne = ({
         value={
           sprintSurveyAnswer.projectAnswers.find(
             (answer) => answer.questionKey === "MS_RA",
-          )?.answer || 1
+          )?.answer || 6
         }
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           onChangeValue(e, "MS_RA")
@@ -58,7 +58,7 @@ const SprintStepOne = ({
         value={
           sprintSurveyAnswer.projectAnswers.find(
             (answer) => answer.questionKey === "MS_LS",
-          )?.answer || 1
+          )?.answer || 6
         }
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           onChangeValue(e, "MS_LS")
@@ -71,7 +71,7 @@ const SprintStepOne = ({
         value={
           sprintSurveyAnswer.projectAnswers.find(
             (answer) => answer.questionKey === "MS_WE",
-          )?.answer || 1
+          )?.answer || 6
         }
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           onChangeValue(e, "MS_WE")
