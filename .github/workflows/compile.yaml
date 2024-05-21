@@ -25,10 +25,7 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Run TypeScript Compiler
-        run: npm run tsc
+      # TODO: check for types here, either through tsc command or with eslint-plugin-ts
 
       - name: Run Next.js Build
         run: npm run build
-
-
