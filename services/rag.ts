@@ -20,7 +20,7 @@ import {
 
 interface FeedbackCategory {
   [coworkerId: string]: {
-    openFeedback: Array<[number, string]>;
+    openFeedback: string;
     closedFeedback: Array<[number, number]>;
   };
 }
@@ -259,7 +259,7 @@ async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
 
     for (let coworkerId of filteredCoworkers) {
       feedbackRecords[userId]["coworkersFeedback"][coworkerId] = {
-        openFeedback: [],
+        openFeedback: "",
         closedFeedback: [],
       };
     }
@@ -269,7 +269,7 @@ async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
     if (record.coworkerId !== null && record.coworkerId !== undefined) {
       feedbackRecords[record.userId!]["coworkersFeedback"][
         record.coworkerId
-      ].openFeedback.push([record.questionId!, record.comment!]);
+      ].openFeedback = record.comment!;
     }
   });
 
@@ -352,36 +352,6 @@ export async function feedback_analysis(sprintSurveyId: number) {
       for (let coworkerId of Object.keys(
         orderedFeedback[userId]["coworkersFeedback"],
       )) {
-        if (
-          orderedFeedback[userId]["coworkersFeedback"][coworkerId].openFeedback
-            .length > 0
-        ) {
-          const userFeedbackSummary = await process_open_feedback(
-            orderedFeedback[userId]["coworkersFeedback"][coworkerId]
-              .openFeedback[0][1],
-          );
-
-          const negativeFeedbackMap =
-            orderedFeedback[userId].feedbackSummary.negative;
-
-          // summarize the overall feedback received by the cowoeker
-          for (let feedback of userFeedbackSummary) {
-            if (feedback in negativeFeedbackMap!) {
-              orderedFeedback[userId].feedbackSummary.negative[feedback].push(
-                coworkerId,
-              );
-            } else {
-              orderedFeedback[userId].feedbackSummary.negative[feedback] = [
-                coworkerId,
-              ];
-            }
-          }
-        } else {
-          const answers =
-            orderedFeedback[userId]["coworkersFeedback"][coworkerId]
-              .closedFeedback;
-          const feedbackSummary = await process_closed_feedback(answers);
-        }
       }
 
       // all feedback summarized, now get the classifications of negative feedback with the most suggestions
