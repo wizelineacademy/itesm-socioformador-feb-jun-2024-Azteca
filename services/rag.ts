@@ -39,10 +39,6 @@ interface FeedbackRecords {
   };
 }
 
-/*
-  This function calculates the cosine similarity between the query and the resources,
-  it returns the resources with the highest similarity
-*/
 async function cosine_similarity(feedback: string) {
   const resourcesSimilarity = [];
   const allResources = await db.select().from(pipResource);
@@ -77,7 +73,6 @@ async function cosine_similarity(feedback: string) {
   return resourcesId;
 }
 
-// This function creates the tasks for the user based on the feedback received
 async function create_tasks(feedback: string) {
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_KEY,
@@ -116,8 +111,6 @@ async function create_tasks(feedback: string) {
   return cleanedTasks;
 }
 
-// This function processes the open feedback of the user and returns a summary of the feedback
-// feedback
 async function process_open_feedback(userFeedback: FeedbackRecords) {
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_KEY,
@@ -197,7 +190,6 @@ async function process_open_feedback(userFeedback: FeedbackRecords) {
   return summarizedFeedbackCategories;
 }
 
-// This function performs the analysis of the closed feedback
 async function process_closed_feedback(answers: [string, number][]) {
   const ordinaryPerformance = 7;
   const userCategories = { goodCategories: [], badCategories: [] };
@@ -231,26 +223,6 @@ async function process_closed_feedback(answers: [string, number][]) {
   return userCategories;
 }
 
-/*
-  This function groups all the feedback received in a custom structure.
-  Output:
-  {
-    coworkerId_1: {
-      coworkersFeedback: {
-        coworkerId_2: {
-          openFeedback: [[questionName, comment], ...],
-          closedFeedback: [[questionName, answer], ...]
-        },
-      },
-      feedbackSummary: {
-        positive: {},
-        negative: {},
-        biased: {},
-        notUseful: {}
-      }
-    }
-  }
-*/
 async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
   const feedbackRecords: FeedbackRecords = {};
 
@@ -336,18 +308,9 @@ async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
   return feedbackRecords;
 }
 
-// This function creates the embeddings of all the new resources without embeddings
 async function set_resources_embeddings() {
-  /*
-  Embeddings models: 
-    "text-embedding-3-small" - maxEmbeddingSize=1536
-    "text-embedding-ada-002" - maxEmbeddingSize=1536
-    "text-embedding-3-large" - maxEmbeddingSize=3072
-  */
-
   try {
-    // resources without embeddings
-    const resources = await db
+    const noEmbeddingResources = await db
       .select()
       .from(pipResource)
       .where(sql`embedding::text = '[]'`);
@@ -356,7 +319,7 @@ async function set_resources_embeddings() {
       apiKey: process.env.OPENAI_KEY,
     });
 
-    for (let resource of resources) {
+    for (let resource of noEmbeddingResources) {
       const description = resource.description as string;
 
       const response = await openai.embeddings.create({
@@ -378,7 +341,6 @@ async function set_resources_embeddings() {
   }
 }
 
-// This function analyzes the feedback of the user and creates new resources depending on the answers
 export async function ruler_analysis() {
   const session = await auth();
   const userId = session?.user?.id;
@@ -387,10 +349,9 @@ export async function ruler_analysis() {
   // recommend resources only if the mood of the user is negative, check the previous resources recommended to experiment
 }
 
-// This function is triggered by the manager when the sprint survey is closed
+// Main function
 export async function feedback_analysis(sprintSurveyIds: number[]) {
   for (let sprintSurveyId of sprintSurveyIds) {
-    // first check that the sprint survey hasnt been processed
     const processed = await db
       .select({ processed: sprintSurvey.processed })
       .from(sprintSurvey)
@@ -399,8 +360,7 @@ export async function feedback_analysis(sprintSurveyIds: number[]) {
     const notProcessed = !processed[0].processed;
 
     if (notProcessed) {
-      // get all the unique users that belong to the project of the sprint survey
-      const uniqueUsers = await db
+      const uniqueProjectUsers = await db
         .select({
           userId: projectMember.userId,
         })
@@ -409,12 +369,10 @@ export async function feedback_analysis(sprintSurveyIds: number[]) {
         .innerJoin(projectMember, eq(projectMember.projectId, project.id))
         .where(eq(sprintSurvey.id, sprintSurveyId));
 
-      const ids = uniqueUsers.map((user) => user.userId as string);
-
-      // feedback ordered, this structure is important to detect similarities between the feedback
+      const ids = uniqueProjectUsers.map((user) => user.userId as string);
       const orderedFeedback = await group_feedback(sprintSurveyId, ids);
 
-      // iterate through all the feedback of the sprint survey and analyze it
+      // iterate through each unique user of the project
       for (let userId of Object.keys(orderedFeedback)) {
         for (let coworkerId of Object.keys(
           orderedFeedback[userId]["coworkersFeedback"],
@@ -423,29 +381,26 @@ export async function feedback_analysis(sprintSurveyIds: number[]) {
             orderedFeedback[userId]["coworkersFeedback"][coworkerId]
               .openFeedback.length > 0
           ) {
-            // iterate through all the open feedback received from the coworker
             const userFeedbackSummary = await process_open_feedback(
               orderedFeedback[userId],
             );
 
-            // add to the primary structure all the summaries of the previous function and the coworker who made the feedback
             const negativeFeedbackMap =
               orderedFeedback[userId].feedbackSummary.negative;
+
+            // summarize the overall feedback received by the cowoeker
             for (let feedback of feedbackSummary) {
               if (feedback in negativeFeedbackMap!) {
-                // the summary emotion already exists, push the actual user in that element
                 orderedFeedback[userId].feedbackSummary.negative[feedback].push(
                   coworkerId,
                 );
               } else {
-                // the summary emotion doesnt exist, create a new element with the coworker
                 orderedFeedback[userId].feedbackSummary.negative[feedback] = [
                   coworkerId,
                 ];
               }
             }
           } else {
-            // no open feedback received from the coworker, process closed feedback
             const answers =
               orderedFeedback[userId]["coworkersFeedback"][coworkerId]
                 .closedFeedback;
@@ -463,7 +418,6 @@ export async function feedback_analysis(sprintSurveyIds: number[]) {
           },
         );
 
-        // sort the feedback suggestions by the number of suggestions in descending order
         feedbackSuggestions.sort((a, b) => b[0] - a[0]);
 
         // get the feedback classification with the most suggestions
@@ -483,7 +437,7 @@ export async function feedback_analysis(sprintSurveyIds: number[]) {
         // create tasks with the feedback received
         const tasks = await create_tasks(feedbackComment);
 
-        // insert the selected resources for the user
+        // insert the selected tasks and resources
         for (let task of tasks) {
           const [title, description] = task.split(":");
           await db.insert(pipTask).values({
@@ -494,7 +448,6 @@ export async function feedback_analysis(sprintSurveyIds: number[]) {
           });
         }
 
-        // insert the tasks for the user
         for (let resource of resources) {
           await db.insert(userResource).values({
             userId: userId,
@@ -503,7 +456,6 @@ export async function feedback_analysis(sprintSurveyIds: number[]) {
         }
       }
 
-      // mark the sprint survey as processed
       await db
         .update(sprintSurvey)
         .set({ processed: true })
