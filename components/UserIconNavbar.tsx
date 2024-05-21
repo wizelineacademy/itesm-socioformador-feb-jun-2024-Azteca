@@ -17,7 +17,7 @@ const UserIconNavbar = ({
   currentPath,
   showSettingsModal,
 }: UserIconInterface) => {
-  const onSite = currentPath === path;
+  const onSite = currentPath.startsWith(path);
   const { data: user } = useQuery({
     queryKey: ["user"],
     queryFn: () => getUserInfo(),

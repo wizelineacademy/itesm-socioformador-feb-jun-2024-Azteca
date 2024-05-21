@@ -14,7 +14,6 @@
     "prettier:check": "prettier --check --ignore-unknown .",
     "prettier:write": "prettier --write --ignore-unknown .",
     "start": "next start",
-    "test": "jest",
     "test:e2e": "npx playwright test"
   },
   "dependencies": {
@@ -64,7 +63,6 @@
     "drizzle-kit": "^0.21.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.4",
-    "jest": "^29.7.0",
     "playwright": "^1.43.1",
     "postcss": "^8.4.38",
     "postcss-preset-mantine": "^1.14.4",
