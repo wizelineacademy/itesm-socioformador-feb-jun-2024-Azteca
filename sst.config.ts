@@ -4,7 +4,7 @@ export default $config({
   app(input) {
     return {
       name: "feedbackflowteamf",
-      removal: input?.stage === "production" ? "retain" : "remove",
+      removal: input?.stage === "prod" ? "retain" : "remove",
       home: "aws",
     };
   },
@@ -12,7 +12,7 @@ export default $config({
   async run() {
     let secrets: sst.Secret[] = [];
 
-    if (process.env.NODE_ENV === "production") {
+    if ($app.stage === "prod") {
       const AuthSecret = new sst.Secret("AuthSecret");
       const PostgresURL = new sst.Secret("PostgresURL");
       secrets = [AuthSecret, PostgresURL];
