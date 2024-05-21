@@ -137,7 +137,10 @@ const SprintSurvey = ({
   const submitSurveyAnswers = useMutation({
     mutationFn: () => submitSprintSurveyAnswers(sprintAnswer),
     onSuccess: () => {
-      console.log("ANSWER SUMBITED");
+      toast.success("Encuesta enviada exitosamente!");
+    },
+    onError: () => {
+      toast.error("Error al enviar la encuesta");
     },
   });
 

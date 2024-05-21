@@ -7,6 +7,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { submitProjectAnswer } from "@/services/projectSurvey";
 import { ProjectAnswer } from "@/types/types";
 import { getUserId } from "@/services/user";
+import toast from "react-hot-toast";
 
 interface ProjectSurveyProps {
   showModal: boolean;
@@ -20,7 +21,16 @@ const ProjectSurvey = ({
 }: ProjectSurveyProps) => {
   const { mutate } = useMutation({
     mutationFn: submitProjectAnswer,
-    onSuccess: onClose,
+    onSuccess: () => {
+      console.log("Encuesta enviada");
+      toast.success("Encuesta enviada exitosamente!");
+      onClose();
+    },
+    onError: () => {
+      console.log("Error al enviar la encuesta");
+      toast.error("Error al enviar la encuesta");
+      onClose();
+    },
   });
   const { data: userId } = useQuery({
     queryKey: ["userId"],

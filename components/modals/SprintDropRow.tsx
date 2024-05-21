@@ -1,8 +1,4 @@
 import { Coworker } from "@/types/types";
-import Droppable from "../Droppable";
-import UserIcon from "../icons/UserIcon";
-import UserProfileButton from "../UserProfileButton";
-import Draggable from "../Draggable";
 import SprintDropRowBox from "./SprintDropRowBox";
 
 interface SprintDropRowProps {

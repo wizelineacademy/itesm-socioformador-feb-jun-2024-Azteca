@@ -34,8 +34,7 @@ const ComboBoxSearch = () => {
 
   const handleSelect = (person: Person | null) => {
     if (person) {
-      console.log("Usuario seleccionado:", person); // Aquí puedes ver las propiedades del usuario seleccionado
-      router.push(`/profile/${person.id}`); // Redirige a la URL del perfil del usuario seleccionado
+      router.push(`/profile/${person.id}`);
       setIsExpanded(false);
     } else {
       console.log("Usuario no seleccionado");

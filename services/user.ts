@@ -6,6 +6,7 @@ import {
   user,
   userTrait,
   userRoleEnum,
+  project,
 } from "@/db/schema";
 import db from "@/db/drizzle";
 import * as schema from "@/db/schema";
@@ -13,6 +14,7 @@ import { eq, not, and, or, asc, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { auth } from "@/auth";
 import bcrypt from "bcrypt";
+import { NEXT_URL } from "next/dist/client/components/app-router-headers";
 
 export async function getUserInfoById(id: string) {
   const res = await db
@@ -239,4 +241,22 @@ export async function searchUsers(query: string) {
     .orderBy(asc(schema.user.name));
 
   return res;
+}
+
+export async function getUserManagedBy(userId: string, managerId: string) {
+  const res = await db
+    .select()
+    .from(project)
+    .innerJoin(projectMember, eq(project.id, projectMember.projectId))
+    .where(
+      and(eq(projectMember.userId, userId), eq(project.managerId, managerId)),
+    );
+
+  if (res.length >= 1) {
+    // if there's at least one match, then return true
+    return false;
+  }
+
+  // if no matches, return false
+  return false;
 }
