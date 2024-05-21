@@ -20,8 +20,8 @@ import {
 
 interface FeedbackCategory {
   [coworkerId: string]: {
-    openFeedback: Array<[string, string]>;
-    closedFeedback: Array<[string, number]>;
+    openFeedback: Array<[number, string]>;
+    closedFeedback: Array<[number, number]>;
   };
 }
 
@@ -111,7 +111,7 @@ async function create_tasks(feedback: string) {
   return cleanedTasks;
 }
 
-async function process_open_feedback(userFeedback: FeedbackRecords) {
+async function process_open_feedback(userFeedback: string) {
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_KEY,
   });
@@ -153,7 +153,7 @@ async function process_open_feedback(userFeedback: FeedbackRecords) {
       },
       {
         role: "user",
-        content: feedback,
+        content: userFeedback,
       },
     ],
   });
@@ -190,35 +190,11 @@ async function process_open_feedback(userFeedback: FeedbackRecords) {
   return summarizedFeedbackCategories;
 }
 
-async function process_closed_feedback(answers: [string, number][]) {
+async function process_closed_feedback(answers: [number, number][]) {
   const ordinaryPerformance = 7;
   const userCategories = { goodCategories: [], badCategories: [] };
 
-  // the good and bad categories must not contradict themselves across different questions
-  const categoriesPerQuestion = {
-    X: { goodCategories: [], badCategories: [] },
-    Y: { goodCategories: [], badCategories: [] },
-    Z: { goodCategories: [], badCategories: [] },
-  };
-
-  type QuestionName = keyof typeof categoriesPerQuestion;
-
-  for (let answer of answers) {
-    let questionName: QuestionName = answer[0] as QuestionName;
-    let answerValue = answer[1];
-
-    if (answerValue > ordinaryPerformance) {
-      // asign all the great categories to the user
-      let questionCategories =
-        categoriesPerQuestion[questionName]["goodCategories"];
-      userCategories["goodCategories"].push(...questionCategories);
-    } else if (answerValue < ordinaryPerformance) {
-      // asign all the bad categories to the user
-      let questionCategories =
-        categoriesPerQuestion[questionName]["badCategories"];
-      userCategories["badCategories"].push(...questionCategories);
-    }
-  }
+  // get the classifications of each closed question
 
   return userCategories;
 }
@@ -230,7 +206,7 @@ async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
     .select({
       userId: sprintSurveyAnswerCoworkers.userId,
       coworkerId: sprintSurveyAnswerCoworkers.coworkerId,
-      questionName: sprintSurveyAnswerCoworkers.questionName,
+      questionId: sprintSurveyAnswerCoworkers.questionId,
       comment: sprintSurveyAnswerCoworkers.comment,
     })
     .from(sprintSurvey)
@@ -249,7 +225,7 @@ async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
     .select({
       userId: sprintSurveyAnswerCoworkers.userId,
       coworkerId: sprintSurveyAnswerCoworkers.coworkerId,
-      questionName: sprintSurveyAnswerCoworkers.questionName,
+      questionId: sprintSurveyAnswerCoworkers.questionId,
       answer: sprintSurveyAnswerCoworkers.answer,
     })
     .from(sprintSurvey)
@@ -293,7 +269,7 @@ async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
     if (record.coworkerId !== null && record.coworkerId !== undefined) {
       feedbackRecords[record.userId!]["coworkersFeedback"][
         record.coworkerId
-      ].openFeedback.push([record.questionName!, record.comment!]);
+      ].openFeedback.push([record.questionId!, record.comment!]);
     }
   });
 
@@ -301,7 +277,7 @@ async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
     if (record.coworkerId !== null && record.coworkerId !== undefined) {
       feedbackRecords[record.userId!]["coworkersFeedback"][
         record.coworkerId
-      ].closedFeedback.push([record.questionName!, record.answer!]);
+      ].closedFeedback.push([record.questionId!, record.answer!]);
     }
   });
 
@@ -382,14 +358,15 @@ export async function feedback_analysis(sprintSurveyIds: number[]) {
               .openFeedback.length > 0
           ) {
             const userFeedbackSummary = await process_open_feedback(
-              orderedFeedback[userId],
+              orderedFeedback[userId]["coworkersFeedback"][coworkerId]
+                .openFeedback[0][1],
             );
 
             const negativeFeedbackMap =
               orderedFeedback[userId].feedbackSummary.negative;
 
             // summarize the overall feedback received by the cowoeker
-            for (let feedback of feedbackSummary) {
+            for (let feedback of userFeedbackSummary) {
               if (feedback in negativeFeedbackMap!) {
                 orderedFeedback[userId].feedbackSummary.negative[feedback].push(
                   coworkerId,
