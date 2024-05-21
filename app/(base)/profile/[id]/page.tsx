@@ -5,17 +5,26 @@ import Tooltip from "@/components/Tooltip";
 import Badge from "@/components/Badge";
 import Image from "next/image";
 import JobSVG from "@/public/Job-Profile-Image.svg";
-import { getUserInfoById, getUserTraitsById } from "@/services/user";
+import {
+  getUserId,
+  getUserInfoById,
+  getUserManagedBy,
+  getUserTraitsById,
+} from "@/services/user";
 import NoDataCard from "@/components/NoDataCard";
 import Link from "next/link";
 
 const Profile = async ({ params }: { params: { id: string } }) => {
-  let user;
-  let traits;
+  let user,
+    traits,
+    activeUserId: string = "",
+    isManagedBy;
 
   try {
     user = await getUserInfoById(params.id);
     traits = await getUserTraitsById(params.id);
+    activeUserId = await getUserId();
+    isManagedBy = await getUserManagedBy(activeUserId, params.id);
   } catch (e) {
     return (
       <main>
@@ -46,12 +55,14 @@ const Profile = async ({ params }: { params: { id: string } }) => {
               <p className="font-normal">{user.department}</p>
             </div>
             <p className="font-light">{user.email}</p>
-            <Link
-              className="mt-4 inline-block rounded-xl bg-white px-6 py-4 font-medium text-primary drop-shadow-lg"
-              href={`/dashboard/${user.id}`}
-            >
-              View dashboard
-            </Link>
+            {(activeUserId === params.id || isManagedBy) && (
+              <Link
+                className="mt-4 inline-block rounded-xl bg-white px-6 py-4 font-medium text-primary drop-shadow-lg"
+                href={`/dashboard/${user.id}`}
+              >
+                View dashboard
+              </Link>
+            )}
           </div>
 
           <Image

@@ -50,8 +50,9 @@ const UserIconNavbar = ({
         /> */}
         <UserProfileButton
           size="xs"
+          active={onSite || isClicked}
           color={onSite || isClicked ? "text-white" : "text-primary"}
-          photoUrl={user?.photoUrl}
+          photoUrl={user?.photoUrl || ""}
           className="m-auto bg-transparent"
         />
       </Menu.Button>
