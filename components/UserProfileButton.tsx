@@ -24,7 +24,7 @@ const UserProfileButton = ({
   };
   return (
     <button
-      className={`${className} ${active ? "bg-primary" : "bg-white"} group rounded-full p-1 drop-shadow-lg`}
+      className={`${className} ${active ? "bg-primary" : "bg-white"} group rounded-full p-1 drop-shadow-lg focus-within:outline-primary focus:outline-primary`}
     >
       {photoUrl ? (
         <Image
