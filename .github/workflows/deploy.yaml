@@ -4,9 +4,7 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
+
 env:
   AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
   POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
