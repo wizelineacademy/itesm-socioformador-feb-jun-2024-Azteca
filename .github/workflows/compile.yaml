@@ -8,6 +8,10 @@ on:
     branches:
       - dev
 
+env:
+  AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+  POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
