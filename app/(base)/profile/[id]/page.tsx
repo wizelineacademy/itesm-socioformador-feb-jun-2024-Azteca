@@ -1,4 +1,5 @@
-import React from "react";
+import React, { Suspense } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getUserInfoById, getUserTraitsById } from "@/services/user";
 import ProfileBanner from "@/components/Profile/ProfileBanner";
 import Section from "@/components/Profile/Section";
@@ -77,7 +78,7 @@ const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
       {/*        
       <section className="w-100 mx-auto mb-24 mt-6 flex h-52 rounded-xl bg-primary">
         <UserProfileButton
-          photoUrl={user.photoUrl}
+          photoUrl={user.photoUrl!}
           size="lg"
           className="absolute left-20 top-60 h-fit"
         />
@@ -99,18 +100,11 @@ const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
               </Link>
             )}
           </div>
+        }
+      >
+        <ProfileBanner user={user} />
 
-          <Image
-            src={JobSVG}
-            alt="Banner Image"
-            className="hidden md:block"
-            priority
-          />
-        </div>
-      </section>
-      */}
-
-      {/* Data */}
+        {/* Data */}
       <section className="w-100 mx-auto flex justify-between space-x-10">
         <div className="w-7/12">
           <Section title="Co-workers" showMore={true}>
@@ -182,6 +176,28 @@ const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
               </Tooltip>
             ))}
           </div> */}
+        </div>
+      </section>
+      <section className="w-100 mx-auto flex justify-between space-x-10">
+        <div className="w-7/12">
+          <Section title="Co-workers" showMore={true}>
+            <CoWorkersCarousel userId={params.id} />
+          </Section>
+          <Section title="Projects" showMore={true}>
+            <ProjectsCarousel userId={params.id} />
+          </Section>
+        </div>
+        <div className="w-5/12">
+          <Traits
+            title="Strengths"
+            traits={traits.strengths}
+            emptyMessage="No strengths available yet"
+          />
+          <Traits
+            title="Opportunity Areas"
+            traits={traits.areasOfOportunity}
+            emptyMessage="No areas of opportunity available yet"
+          />
         </div>
       </section>
     </main>

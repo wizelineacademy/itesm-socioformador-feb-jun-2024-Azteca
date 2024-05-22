@@ -21,7 +21,6 @@ const SearchBar = forwardRef<HTMLInputElement, SearchBarInterface>(
     }, [isExpanded]);
 
     useEffect(() => {
-      console.log(value, document.activeElement === inputRef.current);
       if (value === "" && document.activeElement !== inputRef.current) {
         setIsExpanded(false);
       }
