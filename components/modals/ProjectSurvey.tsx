@@ -46,23 +46,23 @@ const ProjectSurvey = ({
       finalSurveyId: projectSurveyId,
       answers: [
         {
-          questionKey: "PS_RF",
+          questionKey: 12,
           answer: parseInt(formData.get("efforts")!.toString()),
         },
         {
-          questionKey: "PS_SP",
+          questionKey: 14,
           answer: parseInt(formData.get("support")!.toString()),
         },
         {
-          questionKey: "PS_LF",
+          questionKey: 13,
           answer: parseInt(formData.get("decisions")!.toString()),
         },
         {
-          questionKey: "PS_OG",
+          questionKey: 15,
           answer: parseInt(formData.get("opportunities")!.toString()),
         },
         {
-          questionKey: "PS_RT",
+          questionKey: 16,
           answer: parseInt(formData.get("respect")!.toString()),
         },
       ],

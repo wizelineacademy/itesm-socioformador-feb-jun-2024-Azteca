@@ -24,22 +24,20 @@ export async function submitProjectAnswer(answers: ProjectAnswer) {
   if (!userId) {
     throw new Error("You most be signed in");
   }
-
   await db.insert(finalSurveyAnswer).values(
     answers.answers.map((item) => ({
       userId: userId,
       finalSurveyId: answers.finalSurveyId,
-      questionName: item.questionKey,
+      questionId: item.questionKey,
       answer: item.answer,
       comment: "",
     })),
   );
-  // TODO: felipe pls fix this
-  // await db.insert(finalSurveyAnswer).values({
-  //   userId: userId,
-  //   finalSurveyId: answers.finalSurveyId,
-  //   questionName: "PS_CT",
-  //   answer: null,
-  //   comment: answers.comment,
-  // });
+  await db.insert(finalSurveyAnswer).values({
+    userId: userId,
+    finalSurveyId: answers.finalSurveyId,
+    questionId: 17,
+    answer: null,
+    comment: answers.comment,
+  });
 }

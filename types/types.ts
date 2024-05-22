@@ -49,7 +49,7 @@ export type SprintSurveyAnswer = {
 export type ProjectAnswer = {
   userId: string | undefined;
   finalSurveyId: number;
-  answers: Array<{ questionKey: string; answer: number }>;
+  answers: Array<{ questionKey: number; answer: number }>;
   comment: string;
 };
 
