@@ -56,12 +56,12 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       <DialogComponent
         isOpen={isDialogOpen}
         onClose={closeDialog}
-        title="Co-Workers"
-        description="Select a person to go to their profile."
+        title={`${type === "coworkers" ? "Co-Workers" : "Projects"}`}
+        description={`${type === "coworkers" ? "Select a person to go to their profile." : "Select a project to go to their dashboard."}`}
       >
-        <ComboboxOpen />
         {isLoading && <p>Loading...</p>}
         {error && <p>Error loading data</p>}
+        <ComboboxOpen data={data} />
         {/* {type === "coworkers" &&
           data?.map((user, index) => (
             <div key={index}>
