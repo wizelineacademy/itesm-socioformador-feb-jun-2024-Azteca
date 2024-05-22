@@ -75,19 +75,18 @@ const Notifications = ({
 
   return (
     <Menu as="div" className="relative inline-block text-left">
-      <button onClick={() => setIsActive(!isActive)}>
-        <MenuButton
-          className={`${isActive ? "bg-primary" : "bg-white transition-all delay-0 hover:scale-[1.175]"} group rounded-full p-2 drop-shadow-lg`}
-        >
-          <NotificationIcon
-            size="h-6 w-6"
-            color={isActive ? "text-white" : "text-primary"}
-          />
-          {notificationsQuery.data.length > 0 && (
-            <span className=" absolute -right-px -top-px flex h-3 w-3 items-center justify-center rounded-full bg-red-700 " />
-          )}
-        </MenuButton>
-      </button>
+      <MenuButton
+        onClick={() => setIsActive(!isActive)}
+        className={`${isActive ? "bg-primary" : "bg-white transition-all delay-0 hover:scale-[1.175]"} group rounded-full p-2 drop-shadow-lg`}
+      >
+        <NotificationIcon
+          size="h-6 w-6"
+          color={isActive ? "text-white" : "text-primary"}
+        />
+        {notificationsQuery.data.length > 0 && (
+          <span className=" absolute -right-px -top-px flex h-3 w-3 items-center justify-center rounded-full bg-red-700 " />
+        )}
+      </MenuButton>
 
       <Transition
         as={Fragment}
