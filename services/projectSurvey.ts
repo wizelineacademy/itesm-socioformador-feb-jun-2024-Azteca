@@ -2,9 +2,20 @@
 
 import { auth } from "@/auth";
 import db from "@/db/drizzle";
-import { finalSurvey, finalSurveyAnswer } from "@/db/schema";
-import { sql } from "drizzle-orm";
+import { finalSurvey, finalSurveyAnswer, question } from "@/db/schema";
+import { eq, or, sql } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { ProjectAnswer } from "@/types/types";
+
+export async function getProjectQuestions() {
+  const res = await db
+    .select()
+    .from(question)
+    .where(eq(question.type, "FINAL_PROJECT_QUESTION"));
+
+  return res;
+}
 
 export async function createProjectSurvey(projectId: number) {
   const res = await db

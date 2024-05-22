@@ -144,7 +144,7 @@ export const questionTypeEnum = pgEnum("type_question", [
 
 export const question = pgTable("question", {
   id: serial("question_id").primaryKey(),
-  description: text("description"),
+  description: text("description").notNull(),
   type: questionTypeEnum("type").notNull(),
 });
 

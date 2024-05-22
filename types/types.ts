@@ -46,6 +46,17 @@ export type SprintSurveyAnswer = {
   coworkersComments: Array<{ coworkerId: string; comment: string }>;
 };
 
+export type QuestionType =
+  | "SPRINT_QUESTION"
+  | "COWORKER_QUESTION"
+  | "FINAL_PROJECT_QUESTION";
+
+export type Questions = {
+  id: number;
+  description: number;
+  type: QuestionType;
+};
+
 export type ProjectAnswer = {
   userId: string | undefined;
   finalSurveyId: number;

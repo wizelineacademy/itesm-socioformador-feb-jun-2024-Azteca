@@ -4,9 +4,14 @@ import { Dialog, Transition, TransitionChild } from "@headlessui/react";
 import { Fragment } from "react";
 import Slider from "../Slider";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { submitProjectAnswer } from "@/services/projectSurvey";
+import {
+  submitProjectAnswer,
+  getProjectQuestions,
+} from "@/services/projectSurvey";
+import { Questions } from "@/types/types";
 import { getUserId } from "@/services/user";
 import toast from "react-hot-toast";
+import { EnumLike } from "zod";
 
 interface ProjectSurveyProps {
   showModal: boolean;
@@ -31,59 +36,41 @@ const ProjectSurvey = ({
       onClose();
     },
   });
+
   const { data: userId } = useQuery({
     queryKey: ["userId"],
     queryFn: async () => await getUserId(),
   });
+
+  const questions = useQuery({
+    queryKey: ["finalProjectquestions"],
+    queryFn: async () => await getProjectQuestions(),
+  });
+
+  if (!questions.data) {
+    return <h1>NO QUESTIONS AVAILABLE</h1>;
+  }
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     // TODO: handle failure cases for this surveys
     const formData = new FormData(event.target as HTMLFormElement);
-    const efforts = formData.get("efforts");
-    const support = formData.get("support");
-    const decisions = formData.get("decisions");
-    const opportunities = formData.get("opportunities");
-    const respect = formData.get("respect");
-    const comments = formData.get("comments");
-
-    if (
-      !efforts ||
-      !support ||
-      !decisions ||
-      !opportunities ||
-      !respect ||
-      !comments
-    ) {
-      throw new Error("Missing form field");
-    }
-
+    const formsAnswers = questions.data.map((question) => ({
+      questionKey: question.id,
+      answer: parseInt(formData.get(`Question ${question.id}`)!.toString()),
+    }));
+    const finalAnswers = formsAnswers.filter(
+      (answerObj) => !isNaN(answerObj.answer),
+    );
+    const commentId = questions.data.length - 1;
     mutate({
       userId: userId,
       finalSurveyId: projectSurveyId,
-      answers: [
-        {
-          questionKey: 12,
-          answer: parseInt(efforts.toString()),
-        },
-        {
-          questionKey: 14,
-          answer: parseInt(support.toString()),
-        },
-        {
-          questionKey: 13,
-          answer: parseInt(decisions.toString()),
-        },
-        {
-          questionKey: 15,
-          answer: parseInt(opportunities.toString()),
-        },
-        {
-          questionKey: 16,
-          answer: parseInt(respect.toString()),
-        },
-      ],
-      comment: comments.toString(),
+      answers: finalAnswers,
+      comment: formData
+        .get(`Question ${questions.data[questions.data.length - 1].id}`)!
+        .toString(),
     });
   };
 
@@ -122,7 +109,32 @@ const ProjectSurvey = ({
                 </Dialog.Title>
                 <form onSubmit={handleSubmit}>
                   <div className="mt-3 grid grid-cols-2 gap-10">
-                    <Slider
+                    {questions.data.map((question, index) =>
+                      question.description === "Final Project Comment" ? (
+                        <div key={index}>
+                          <p className="text-sm font-light text-black">
+                            General comments on the project
+                          </p>
+                          <textarea
+                            name={`Question ${question.id}`}
+                            id="comments"
+                            className="mt-2 h-auto w-full rounded-md border border-black p-2 focus:outline-primary"
+                            placeholder="Optional"
+                          ></textarea>
+                        </div>
+                      ) : (
+                        <Slider
+                          key={index}
+                          name={`Question ${question.id}`}
+                          label={
+                            question.description
+                              ? question.description
+                              : "NO Question"
+                          }
+                        />
+                      ),
+                    )}
+                    {/* <Slider
                       name="efforts"
                       label="Do you feel that your efforts were recognized?"
                     />
@@ -141,18 +153,7 @@ const ProjectSurvey = ({
                     <Slider
                       name="respect"
                       label="Was there an atmosphere of respect and trust?"
-                    />
-                    <div>
-                      <p className="text-sm font-light text-black">
-                        General comments on the project
-                      </p>
-                      <textarea
-                        name="comments"
-                        id="comments"
-                        className="mt-2 h-auto w-full rounded-md border border-black p-2 focus:outline-primary"
-                        placeholder="Optional"
-                      ></textarea>
-                    </div>
+                    /> */}
                   </div>
                   <div className="mt-12 flex w-full justify-center">
                     <button
