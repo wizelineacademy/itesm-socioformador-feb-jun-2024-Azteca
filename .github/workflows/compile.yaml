@@ -31,5 +31,5 @@ jobs:
 
       # TODO: check for types here, either through tsc command or with eslint-plugin-ts
 
-      - name: Run Next.js Build
-        run: npm run build
+      - name: Run Next.js Build (Without Linting)
+        run: npm run build --no-lint

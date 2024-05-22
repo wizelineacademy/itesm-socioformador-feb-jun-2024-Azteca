@@ -64,7 +64,10 @@ const Admin = () => {
                   className="rounded bg-primary/50 px-3 py-1 text-white hover:bg-primary focus:bg-primary"
                   defaultValue={user.role}
                   onChange={(e) => {
-                    mutate({ id: user.id, newRole: e.target.value });
+                    mutate({
+                      id: user.id,
+                      newRole: e.target.value as typeof user.role,
+                    });
                   }}
                 >
                   {rolesQuery.data.map((role, index) => (
