@@ -84,7 +84,7 @@ const SprintDropRowBox = ({
             </Draggable>
           ))}
         {coworkers[index].length > MINIMUM_USERS && (
-          <div
+          <button
             onClick={handleSetExpandedPosition}
             className={`box-content h-10 w-10 rounded-full bg-gradient-radial from-white to-slate-200 p-1`}
           >
@@ -93,7 +93,7 @@ const SprintDropRowBox = ({
                 {coworkers[index].length}
               </p>
             </div>
-          </div>
+          </button>
         )}
         {showExpandedUsers && coworkers[index].length > MINIMUM_USERS && (
           <div

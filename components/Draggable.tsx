@@ -1,11 +1,12 @@
+import { Coworker } from "@/types/types";
 import { useDraggable } from "@dnd-kit/core";
-import { SetStateAction, useEffect } from "react";
+import { useEffect } from "react";
 
 interface DraggableProps {
   id: string;
   children: React.ReactNode;
   className?: string;
-  data: any;
+  data: Coworker;
   setIsDragging?: (isDragging: boolean) => void;
 }
 

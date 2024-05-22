@@ -61,8 +61,8 @@ export type Employee = {
 };
 
 export type Notification = {
-  id: number | null;
-  projectName: string | null;
+  id: number;
+  projectName: string;
   date: Date;
   type: "RULER" | "SPRINT" | "FINAL";
 };

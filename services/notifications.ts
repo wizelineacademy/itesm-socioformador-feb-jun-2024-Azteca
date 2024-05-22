@@ -9,7 +9,7 @@ import {
   rulerSurveyAnswers,
   sprintSurvey,
 } from "@/db/schema";
-import { eq, and, lte, sql, gte } from "drizzle-orm";
+import { eq, and, sql, gte } from "drizzle-orm";
 import { Notification } from "@/types/types";
 
 export async function getNotifications() {
@@ -17,7 +17,7 @@ export async function getNotifications() {
   const userId = session?.user?.id;
   if (!userId) throw new Error("You must be signed in");
 
-  let notifications = [];
+  const notifications = [];
 
   // Get the notifications of the sprint surveys
   const sprintSurveys = await db

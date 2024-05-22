@@ -3,7 +3,7 @@ import UserIcon from "../icons/UserIcon";
 import Draggable from "../Draggable";
 import Tooltip from "../Tooltip";
 import { useState } from "react";
-import { Coworker, SurveyCoworker } from "@/types/types";
+import { Coworker } from "@/types/types";
 import UserProfileButton from "../UserProfileButton";
 
 interface DraggableUserProps {

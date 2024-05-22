@@ -1,14 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { DatePickerInput } from "@mantine/dates";
-import UserProfileButton from "@/components/UserProfileButton";
 import CalendarIcon from "@/components/icons/CalendarIcon";
 import { createProject } from "@/services/project";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { getAllEmployees } from "@/services/user";
 import { useRouter } from "next/navigation";
-import { Coworker } from "@/types/types";
 import {
   MultiSelect,
   MultiSelectProps,

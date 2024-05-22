@@ -1,12 +1,12 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Combobox } from "@headlessui/react";
+import { Combobox, ComboboxOptions } from "@headlessui/react";
 import { useQuery } from "@tanstack/react-query";
 import { searchUsers } from "@/services/user";
 import SearchBar from "./SearchBar";
-import UserIcon from "./icons/UserIcon";
 import UserProfileButton from "./UserProfileButton";
+import { ComboboxOption } from "@mantine/core";
 
 interface Person {
   id: number;
@@ -60,7 +60,7 @@ const ComboBoxSearch = () => {
           className={`h-10 ${isExpanded ? "w-80" : "w-32"} rounded-full border border-gray-300 bg-white px-4 shadow-lg transition-all duration-300 focus:border-blue-500 focus:outline-none`}
         /> */}
         {query !== "" && (
-          <Combobox.Options className="absolute z-10 mt-1 max-h-52 w-full overflow-auto rounded-md border border-gray-300 bg-white p-2 shadow-lg">
+          <ComboboxOptions className="absolute z-10 mt-1 max-h-52 w-full overflow-auto rounded-md border border-gray-300 bg-white p-2 shadow-lg">
             {isLoading ? (
               <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
                 Loading...
@@ -70,10 +70,13 @@ const ComboBoxSearch = () => {
                 No results found.
               </div>
             ) : (
+              <></>
+              /*
+              TODO: jose pls fix this
               people.map((person) => (
-                <Combobox.Option
+                <ComboboxOption
                   key={person.id}
-                  value={person}
+                  value={person.name}
                   className={({ active }) =>
                     `flex cursor-default select-none items-center gap-2 rounded-xl px-2 py-1 text-sm ${
                       active ? "bg-primary-light text-white" : "text-gray-900"
@@ -82,10 +85,10 @@ const ComboBoxSearch = () => {
                 >
                   <UserProfileButton size="2xs" photoUrl={person?.photoUrl} />
                   <span className="truncate">{person.name}</span>
-                </Combobox.Option>
-              ))
+                </ComboboxOption>
+              )) */
             )}
-          </Combobox.Options>
+          </ComboboxOptions>
         )}
       </Combobox>
     </div>

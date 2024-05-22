@@ -3,11 +3,8 @@
 import { auth } from "@/auth";
 import db from "@/db/drizzle";
 import { finalSurvey, finalSurveyAnswer } from "@/db/schema";
-import { eq, or, sql } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { sql } from "drizzle-orm";
 import { ProjectAnswer } from "@/types/types";
-import { comment } from "postcss";
 
 export async function createProjectSurvey(projectId: number) {
   const res = await db

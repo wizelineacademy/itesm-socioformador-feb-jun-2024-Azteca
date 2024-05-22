@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import ProjectSurvey from "./modals/ProjectSurvey";
 import { Notification } from "@/types/types";
 import { parseDate } from "@/utils/utils";
 

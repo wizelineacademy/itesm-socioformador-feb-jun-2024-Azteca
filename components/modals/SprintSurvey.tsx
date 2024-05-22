@@ -4,11 +4,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import SprintStepOne from "./SprintStepOne";
 import SprintStepTwo from "./SprintStepTwo";
-import {
-  Coworker,
-  SprintSurveyAnswer,
-  SurveyStepTwoAnswer,
-} from "@/types/types";
+import { SprintSurveyAnswer, SurveyStepTwoAnswer } from "@/types/types";
 import SprintStepThree from "./SprintStepThree";
 import SprintStepFour from "./SprintStepFour";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -29,11 +25,7 @@ const SprintSurvey = ({
   sprintSurveyId,
 }: SprintSurveyProps) => {
   const [step, setStep] = useState<number>(1);
-  const {
-    data: users,
-    isLoading,
-    isError,
-  } = useQuery({
+  const { data: users, isError } = useQuery({
     queryKey: ["coworkers", 34],
     queryFn: () => getCoworkersInProject(34),
   });

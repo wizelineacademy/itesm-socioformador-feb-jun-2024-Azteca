@@ -1,4 +1,4 @@
-import { DateObject, Emotion } from "@/types/types";
+import { DateObject } from "@/types/types";
 
 const months: { [key: string]: string } = {
   "01": "January",
