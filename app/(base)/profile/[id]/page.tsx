@@ -6,6 +6,7 @@ import Section from "@/components/Profile/Section";
 import CoWorkersCarousel from "@/components/CoWorkersCarousel";
 import ProjectsCarousel from "@/components/ProjectsCarousel";
 import Traits from "@/components/Profile/Traits";
+import Loader from "@/components/Loader";
 
 const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
   const user = await getUserInfoById(params.id);
@@ -73,9 +74,16 @@ const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
 
   return (
     <main>
-      <ProfileBanner user={user} />
-      {/* Banner */}
-      {/*        
+      <Suspense
+        fallback={
+          <div className="h-[80dvh] w-full">
+            <Loader />
+          </div>
+        }
+      >
+        <ProfileBanner user={user} />
+        {/* Banner */}
+        {/*        
       <section className="w-100 mx-auto mb-24 mt-6 flex h-52 rounded-xl bg-primary">
         <UserProfileButton
           photoUrl={user.photoUrl!}
@@ -105,28 +113,28 @@ const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
         <ProfileBanner user={user} />
 
         {/* Data */}
-      <section className="w-100 mx-auto flex justify-between space-x-10">
-        <div className="w-7/12">
-          <Section title="Co-workers" showMore={true}>
-            <CoWorkersCarousel userId={params.id} />
-          </Section>
-          <Section title="Projects" showMore={true}>
-            <ProjectsCarousel userId={params.id} />
-          </Section>
-        </div>
-        <div className="w-5/12">
-          <Traits
-            title="Strengths"
-            traits={traits.strengths}
-            emptyMessage="No strengths available yet"
-          />
-          <Traits
-            title="Opportunity Areas"
-            traits={traits.areasOfOportunity}
-            emptyMessage="No areas of opportunity available yet"
-          />
+        <section className="w-100 mx-auto flex justify-between space-x-10">
+          <div className="w-7/12">
+            <Section title="Co-workers" showMore={true}>
+              <CoWorkersCarousel userId={params.id} />
+            </Section>
+            <Section title="Projects" showMore={true}>
+              <ProjectsCarousel userId={params.id} />
+            </Section>
+          </div>
+          <div className="w-5/12">
+            <Traits
+              title="Strengths"
+              traits={traits.strengths}
+              emptyMessage="No strengths available yet"
+            />
+            <Traits
+              title="Opportunity Areas"
+              traits={traits.areasOfOportunity}
+              emptyMessage="No areas of opportunity available yet"
+            />
 
-          {/*
+            {/*
           TODO: @adrian and @jose are going to fix this
 
           <div className="mx-auto flex justify-between">
@@ -176,30 +184,31 @@ const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
               </Tooltip>
             ))}
           </div> */}
-        </div>
-      </section>
-      <section className="w-100 mx-auto flex justify-between space-x-10">
-        <div className="w-7/12">
-          <Section title="Co-workers" showMore={true}>
-            <CoWorkersCarousel userId={params.id} />
-          </Section>
-          <Section title="Projects" showMore={true}>
-            <ProjectsCarousel userId={params.id} />
-          </Section>
-        </div>
-        <div className="w-5/12">
-          <Traits
-            title="Strengths"
-            traits={traits.strengths}
-            emptyMessage="No strengths available yet"
-          />
-          <Traits
-            title="Opportunity Areas"
-            traits={traits.areasOfOportunity}
-            emptyMessage="No areas of opportunity available yet"
-          />
-        </div>
-      </section>
+          </div>
+        </section>
+        <section className="w-100 mx-auto flex justify-between space-x-10">
+          <div className="w-7/12">
+            <Section title="Co-workers" showMore={true}>
+              <CoWorkersCarousel userId={params.id} />
+            </Section>
+            <Section title="Projects" showMore={true}>
+              <ProjectsCarousel userId={params.id} />
+            </Section>
+          </div>
+          <div className="w-5/12">
+            <Traits
+              title="Strengths"
+              traits={traits.strengths}
+              emptyMessage="No strengths available yet"
+            />
+            <Traits
+              title="Opportunity Areas"
+              traits={traits.areasOfOportunity}
+              emptyMessage="No areas of opportunity available yet"
+            />
+          </div>
+        </section>
+      </Suspense>
     </main>
   );
 };
