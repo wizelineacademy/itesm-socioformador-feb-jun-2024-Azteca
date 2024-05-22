@@ -1,6 +1,6 @@
 "use client";
 import SprintDropRow from "./SprintDropRow";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Coworker, SurveyCoworker } from "@/types/types";
 import { DndContext, DragEndEvent, pointerWithin } from "@dnd-kit/core";
 import SelectableDragUsers from "./SelectableDragUsers";
@@ -275,8 +275,12 @@ const SprintStepTwo = ({
           </DndContext>
         </section>
       </div>
-      <audio id="drop-audio" src="/sounds/dropSound.mp3" />
-      <audio id="invalid-audio" src="/sounds/invalidSound.ogg" />
+      <audio id="drop-audio" src="/sounds/dropSound.mp3">
+        <track kind="captions" />
+      </audio>
+      <audio id="invalid-audio" src="/sounds/invalidSound.ogg">
+        <track kind="captions" />
+      </audio>
     </main>
   );
 };

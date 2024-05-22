@@ -4,6 +4,7 @@ import { AuthError } from "next-auth";
 import { signIn } from "@/auth";
 import { registerUser } from "./services/user";
 import { DatabaseErrorType } from "./types/errorTypes";
+import { DatabaseError } from "pg";
 
 export const loginAction = async (formData: FormData) => {
   try {
@@ -29,7 +30,9 @@ export const registerAction = async (formData: FormData) => {
     const email = formData.get("email")?.toString();
     const password = formData.get("password")?.toString();
     await registerUser(name, email, password, department, jobTitle);
-  } catch (dbError: any) {
+  } catch (e) {
+    const dbError = e as DatabaseError;
+
     let errorType: DatabaseErrorType;
     if (dbError.message === "Email already registered")
       errorType = "UniqueConstraintViolation";

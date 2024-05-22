@@ -6,13 +6,11 @@ import {
   json,
   pgEnum,
   pgTable,
-  primaryKey,
   serial,
   text,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { describe } from "node:test";
 
 export const userRoleEnum = pgEnum("role", ["EMPLOYEE", "MANAGER", "ADMIN"]);
 

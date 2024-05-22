@@ -1,5 +1,5 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { useState, Fragment } from "react";
+import { Fragment } from "react";
 import UserProfileButton from "../UserProfileButton";
 import { Coworker } from "@/types/types";
 import {
@@ -21,10 +21,6 @@ const ProjectSurvey = ({
   onClose,
   selectedMembers,
 }: ProjectSurveyProps) => {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    onClose();
-  };
-
   const members: Record<string, { image: string; email: string }> = {
     "Emily Johnson": {
       image:

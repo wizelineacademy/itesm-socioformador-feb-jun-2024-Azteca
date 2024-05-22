@@ -16,6 +16,9 @@ const nextConfig = {
       },
     ],
   },
+  eslint: {
+    dirs: ["."],
+  },
 };
 
 export default nextConfig;

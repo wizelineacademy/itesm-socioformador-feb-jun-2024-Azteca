@@ -21,7 +21,7 @@ const BannerImagePanel = () => {
       <p className="mb-2 text-grayText">Select an Image</p>
       <div className="flex space-x-4">
         {images.map((src, index) => (
-          <div
+          <button
             key={index}
             className={`rounded border-2 ${selectedImage === index ? "border-primary" : "border-transparent"}`}
             onClick={() => handleImageClick(index)}
@@ -34,7 +34,7 @@ const BannerImagePanel = () => {
               height={200}
               layout="responsive"
             />
-          </div>
+          </button>
         ))}
       </div>
       <div className="mt-2 flex justify-center">

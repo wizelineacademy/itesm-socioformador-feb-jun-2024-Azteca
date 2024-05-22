@@ -49,7 +49,7 @@ export type SprintSurveyAnswer = {
 export type ProjectAnswer = {
   userId: string | undefined;
   finalSurveyId: number;
-  answers: Array<{ questionKey: string; answer: number }>;
+  answers: Array<{ questionKey: number; answer: number }>;
   comment: string;
 };
 
@@ -61,8 +61,8 @@ export type Employee = {
 };
 
 export type Notification = {
-  id: number | null;
-  projectName: string | null;
+  id: number;
+  projectName: string;
   date: Date;
   type: "RULER" | "SPRINT" | "FINAL";
 };

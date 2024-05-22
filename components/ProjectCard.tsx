@@ -22,7 +22,7 @@ export default function ProjectCard({
 }: ProjectProps) {
   const coworkersQuery = useQuery({
     queryKey: ["coworkers-in-project"],
-    queryFn: () => getEmployeesInProjectById(id!),
+    queryFn: () => getEmployeesInProjectById(id),
   });
 
   if (!coworkersQuery.data) {

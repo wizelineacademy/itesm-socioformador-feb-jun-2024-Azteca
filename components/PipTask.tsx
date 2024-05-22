@@ -23,6 +23,7 @@ const PipTask = ({
               className="h-6 w-6 transform cursor-pointer appearance-none rounded-full border border-primary border-primary/80 bg-primary-light/20 outline-primary transition-all duration-200 ease-in-out checked:bg-primary hover:scale-110"
               checked={isDone || false} // default to false if isDone is null
             />
+            <span className="sr-only">Check Pip Task</span>
           </label>
         </div>
       </header>

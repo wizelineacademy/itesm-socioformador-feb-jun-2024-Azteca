@@ -2,7 +2,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import RulerStepOne from "./RulerStepOne";
-import { Emotion, RulerSurveyAnswer } from "@/types/types";
+import { RulerSurveyAnswer } from "@/types/types";
 import RulerStepTwo from "./RulerStepTwo";
 import { getUserId } from "@/services/user";
 import { submitRulerSurveyAnswer } from "@/services/rulerSurvey";

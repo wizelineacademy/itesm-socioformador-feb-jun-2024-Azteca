@@ -1,7 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
 import PIPIcon from "./PIPIconNavbar";
-import SearchBar from "./SearchBar";
 import Notifications from "./Notifications";
 import ProjectNavbarIcon from "./ProjectNavbarIcon";
 import UserIconNavbar from "./UserIconNavbar";
@@ -28,7 +27,6 @@ const NavigationBar = () => {
   const [showRulerModal, setShowRulerModal] = useState<boolean>(false);
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
   const [notificationId, setNotificationId] = useState<number>(0);
-  const [searchExpanded, setSearchExpanded] = useState<boolean>(false);
 
   const isManager = true;
   return (

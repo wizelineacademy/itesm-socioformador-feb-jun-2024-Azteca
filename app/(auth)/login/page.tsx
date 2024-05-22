@@ -1,5 +1,4 @@
 "use client";
-import { useEffect, useState } from "react";
 import { loginAction } from "@/actions";
 import FormTextInput from "@/components/FormTextInput";
 import Link from "next/link";

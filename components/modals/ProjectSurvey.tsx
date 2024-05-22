@@ -1,11 +1,10 @@
 "use client";
 
-import { Dialog, Transition } from "@headlessui/react";
+import { Dialog, Transition, TransitionChild } from "@headlessui/react";
 import { Fragment } from "react";
 import Slider from "../Slider";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { submitProjectAnswer } from "@/services/projectSurvey";
-import { ProjectAnswer } from "@/types/types";
 import { getUserId } from "@/services/user";
 import toast from "react-hot-toast";
 
@@ -41,39 +40,57 @@ const ProjectSurvey = ({
 
     // TODO: handle failure cases for this surveys
     const formData = new FormData(event.target as HTMLFormElement);
+    const efforts = formData.get("efforts");
+    const support = formData.get("support");
+    const decisions = formData.get("decisions");
+    const opportunities = formData.get("opportunities");
+    const respect = formData.get("respect");
+    const comments = formData.get("comments");
+
+    if (
+      !efforts ||
+      !support ||
+      !decisions ||
+      !opportunities ||
+      !respect ||
+      !comments
+    ) {
+      throw new Error("Missing form field");
+    }
+
     mutate({
       userId: userId,
       finalSurveyId: projectSurveyId,
       answers: [
         {
-          questionKey: "PS_RF",
-          answer: parseInt(formData.get("efforts")!.toString()),
+          questionKey: 12,
+          answer: parseInt(efforts.toString()),
         },
         {
-          questionKey: "PS_SP",
-          answer: parseInt(formData.get("support")!.toString()),
+          questionKey: 14,
+          answer: parseInt(support.toString()),
         },
         {
-          questionKey: "PS_LF",
-          answer: parseInt(formData.get("decisions")!.toString()),
+          questionKey: 13,
+          answer: parseInt(decisions.toString()),
         },
         {
-          questionKey: "PS_OG",
-          answer: parseInt(formData.get("opportunities")!.toString()),
+          questionKey: 15,
+          answer: parseInt(opportunities.toString()),
         },
         {
-          questionKey: "PS_RT",
-          answer: parseInt(formData.get("respect")!.toString()),
+          questionKey: 16,
+          answer: parseInt(respect.toString()),
         },
       ],
-      comment: formData.get("comments")!.toString(),
+      comment: comments.toString(),
     });
   };
 
   return (
     <Transition appear show={showModal} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
-        <Transition.Child
+        <TransitionChild
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
@@ -83,11 +100,11 @@ const ProjectSurvey = ({
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-black/25" />
-        </Transition.Child>
+        </TransitionChild>
 
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
-            <Transition.Child
+            <TransitionChild
               as={Fragment}
               enter="ease-out duration-300"
               enterFrom="opacity-0 scale-95"
@@ -147,7 +164,7 @@ const ProjectSurvey = ({
                   </div>
                 </form>
               </Dialog.Panel>
-            </Transition.Child>
+            </TransitionChild>
           </div>
         </div>
       </Dialog>

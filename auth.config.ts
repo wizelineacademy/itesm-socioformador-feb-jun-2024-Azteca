@@ -46,7 +46,7 @@ export const authConfig = {
       if (nextUrl.pathname.startsWith("/dashboard")) {
         const segments = nextUrl.pathname.split("/");
         const userId = segments[2]; // '2' because 'segments' is ['', 'dashboard', '<user_id>']
-        const managerId = auth.user!.id;
+        const managerId = auth.user?.id;
         const res = await fetch(
           new URL(
             `/api/is-managed-by?userId=${userId}&managerId=${managerId}`,
@@ -76,7 +76,7 @@ export const authConfig = {
 
       return true;
     },
-    async jwt({ token, user: jwtUser, account, profile, trigger }) {
+    async jwt({ token, user: jwtUser, trigger }) {
       // Persist the OAuth access_token and or the user id to the token right after signin
       if (trigger === "signIn") {
         token.id = jwtUser.id;
@@ -84,7 +84,7 @@ export const authConfig = {
 
       return token;
     },
-    async session({ session, token, user }) {
+    async session({ session, token }) {
       // Send properties to the client, like an access_token from a provider.
       session.user.id = token.id as string;
       return session;

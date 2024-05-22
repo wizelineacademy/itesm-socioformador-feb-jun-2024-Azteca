@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 let gradientIdCounter = 0; // Contador estático fuera del componente
 
@@ -15,9 +15,7 @@ interface GaugeChartProps {
 }
 
 const GaugeChart = ({ percentage, type, gradient }: GaugeChartProps) => {
-  const [gradientId, setGradientId] = useState(
-    `gradient${gradientIdCounter++}`,
-  );
+  const [gradientId] = useState(`gradient${gradientIdCounter++}`);
 
   const radius = 85;
   const strokeWidth = 20;

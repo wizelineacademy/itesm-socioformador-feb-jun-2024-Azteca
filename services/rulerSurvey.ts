@@ -1,5 +1,4 @@
 "use server";
-import { auth } from "@/auth";
 import db from "@/db/drizzle";
 import { rulerSurveyAnswers } from "@/db/schema";
 import { sql } from "drizzle-orm";

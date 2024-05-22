@@ -1,20 +1,13 @@
 "use server";
 
-import {
-  projectMember,
-  trait,
-  user,
-  userTrait,
-  userRoleEnum,
-  project,
-} from "@/db/schema";
+import { projectMember, user, userRoleEnum, project } from "@/db/schema";
 import db from "@/db/drizzle";
 import * as schema from "@/db/schema";
 import { eq, not, and, or, asc, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { auth } from "@/auth";
 import bcrypt from "bcrypt";
-import { NEXT_URL } from "next/dist/client/components/app-router-headers";
+import { DatabaseError } from "pg";
 
 export async function getUserInfoById(id: string) {
   const res = await db
@@ -99,10 +92,11 @@ export const registerUser = async (
       department: department,
       jobTitle: jobTitle,
     })
-    .catch((dbError: any) => {
+    .catch((e) => {
+      const dbError = e as DatabaseError;
       if (dbError.code === "23505")
-        throw new Error("Email already registered", dbError.code);
-      else throw new Error("Error registering the user", dbError.code);
+        throw new Error(`Email already registered ${dbError.code}`);
+      else throw new Error(`Error registering the user ${dbError.code}`);
     });
 };
 
@@ -122,7 +116,7 @@ export const updateRole = async ({
   newRole,
 }: {
   id: string;
-  newRole: any;
+  newRole: typeof user.$inferInsert.role;
 }) => {
   await db.update(user).set({ role: newRole }).where(eq(user.id, id)).execute();
 };
@@ -140,8 +134,8 @@ export async function getUserTraitsById(id: string) {
     .innerJoin(schema.user, eq(schema.userTrait.userId, schema.user.id))
     .where(eq(schema.user.id, id));
 
-  let strengths_arr = [];
-  let areasOfOportunity_arr = [];
+  const strengths_arr = [];
+  const areasOfOportunity_arr = [];
 
   for (let c = 0; c < res.length; c++) {
     if (res[c].kind == "AREA_OF_OPPORTUNITY") {
@@ -150,7 +144,7 @@ export async function getUserTraitsById(id: string) {
       strengths_arr.push(res[c]);
     }
   }
-  let traits = {
+  const traits = {
     strengths: strengths_arr,
     areasOfOportunity: areasOfOportunity_arr,
   };
@@ -209,8 +203,8 @@ export async function getProjectsProfile(userId: string | null | undefined) {
     )
     .where(
       or(
-        eq(schema.projectMember.userId, userId!),
-        eq(schema.project.managerId, userId!),
+        eq(schema.projectMember.userId, userId),
+        eq(schema.project.managerId, userId),
       ),
     );
   return res;

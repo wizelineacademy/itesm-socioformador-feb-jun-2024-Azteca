@@ -10,8 +10,6 @@ import {
   user,
 } from "@/db/schema";
 import { and, eq, ne, or } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
 export async function getProjects() {
   // get all of the projects in which the user is either a member or a manager
@@ -68,7 +66,7 @@ export async function createProject({
   );
 
   // Create the records for the sprint surveys
-  let currentDate = new Date(newProject.startDate);
+  const currentDate = new Date(newProject.startDate);
 
   const jumpToNextSprint = () => {
     currentDate.setDate(
