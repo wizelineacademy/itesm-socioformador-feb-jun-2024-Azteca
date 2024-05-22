@@ -59,7 +59,6 @@ const ComboBoxSearch = () => {
           onChange={(event) => setQuery(event.target.value)}
           onFocus={handleInputFocus}
           onBlur={handleInputBlur}
-          autoComplete="off"
           placeholder="Search Co-workers ..."
           className={`h-10 ${isExpanded ? "w-80" : "w-32"} rounded-full border border-gray-300 bg-white px-4 shadow-lg transition-all duration-300 focus:border-blue-500 focus:outline-none`}
         />

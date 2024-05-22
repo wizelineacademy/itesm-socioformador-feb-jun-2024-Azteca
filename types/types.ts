@@ -5,16 +5,6 @@ export type Coworker = {
   color?: string;
 };
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: "EMPLOYEE" | "MANAGER" | "ADMIN";
-  department: string | null;
-  photoUrl: string | null;
-  jobTitle: string | null;
-}
-
 export type SurveyCoworker = {
   times: number;
 } & Coworker;
