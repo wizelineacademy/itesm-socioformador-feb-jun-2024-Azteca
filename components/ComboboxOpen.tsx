@@ -50,7 +50,7 @@ const ComboboxOpen = ({ data }: { data: DataItem[] | undefined }) => {
 
   return (
     <Combobox<DataItem | null> value={selectedItem} onChange={setSelectedItem}>
-      {({ open }) => (
+      {({}) => (
         <>
           <Combobox.Input
             onChange={(event) => setQuery(event.target.value)}
@@ -62,7 +62,7 @@ const ComboboxOpen = ({ data }: { data: DataItem[] | undefined }) => {
             <Combobox.Options static>
               {filteredData.map((item) => (
                 <Combobox.Option key={item.id} value={item}>
-                  {({ active, selected }) => (
+                  {({ active }) => (
                     <Link
                       href={
                         isUser(item)
