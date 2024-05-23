@@ -2,7 +2,7 @@
 import dotenv from "dotenv";
 import OpenAI from "openai";
 import db from "@/db/drizzle";
-import { and, eq, gte, lte, isNull, sql } from "drizzle-orm";
+import { and, count, eq, gte, lte, isNull, sql } from "drizzle-orm";
 import { auth } from "@/auth";
 import similarity from "compute-cosine-similarity";
 
@@ -25,7 +25,7 @@ interface FeedbackCategory {
   };
 }
 
-interface FeedbackSummary {
+interface FeedbackClassifications {
   positive: { [sentiment: string]: string[] };
   negative: { [sentiment: string]: string[] };
   biased: { [sentiment: string]: string[] };
@@ -35,12 +35,12 @@ interface FeedbackSummary {
 interface FeedbackRecords {
   [userId: string]: {
     coworkersFeedback: FeedbackCategory;
-    feedbackSummary: FeedbackSummary;
+    feedbackClassifications: FeedbackClassifications;
   };
 }
 
 async function cosine_similarity(feedback: string) {
-  const resourcesSimilarity = [];
+  const resourcesSimilarity: [GLfloat, Number][] = [];
   const allResources = await db.select().from(pipResource);
 
   const openai = new OpenAI({
@@ -57,7 +57,10 @@ async function cosine_similarity(feedback: string) {
 
   // calculate the cosine similarity between the feedback and the resources
   for (let resource of allResources) {
-    var resourceSimilarity = similarity(feedbackEmbedding, resource.embedding!);
+    var resourceSimilarity: GLfloat = similarity(
+      feedbackEmbedding,
+      resource.embedding!,
+    )!;
     resourcesSimilarity.push([resourceSimilarity, resource.id]);
   }
 
@@ -249,7 +252,7 @@ async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
 
     feedbackRecords[userId] = {
       coworkersFeedback: {},
-      feedbackSummary: {
+      feedbackClassifications: {
         positive: {},
         negative: {},
         biased: {},
@@ -327,14 +330,14 @@ export async function ruler_analysis() {
 
 // Main function
 export async function feedback_analysis(sprintSurveyId: number) {
-  const processed = await db
+  const processedSurvey = await db
     .select({ processed: sprintSurvey.processed })
     .from(sprintSurvey)
     .where(eq(sprintSurvey.id, sprintSurveyId));
 
-  const notProcessed = !processed[0].processed;
+  const notProcessedSurvey = !processedSurvey[0].processed;
 
-  if (notProcessed) {
+  if (notProcessedSurvey) {
     const uniqueProjectUsers = await db
       .select({
         userId: projectMember.userId,
@@ -347,55 +350,81 @@ export async function feedback_analysis(sprintSurveyId: number) {
     const ids = uniqueProjectUsers.map((user) => user.userId as string);
     const orderedFeedback = await group_feedback(sprintSurveyId, ids);
 
-    // iterate through each unique user of the project
+    // iterate through each unique user of the project and read the feedback received
     for (let userId of Object.keys(orderedFeedback)) {
-      for (let coworkerId of Object.keys(
-        orderedFeedback[userId]["coworkersFeedback"],
-      )) {
-      }
+      let userTasksCount = await db
+        .select({ count: count() })
+        .from(pipTask)
+        .where(
+          and(
+            eq(pipTask.userId, userId),
+            eq(pipTask.sprintSurveyId, sprintSurveyId),
+          ),
+        );
 
-      // all feedback summarized, now get the classifications of negative feedback with the most suggestions
-      const feedbackSuggestions: [number, string][] = [];
-      Object.keys(orderedFeedback[userId].feedbackSummary.negative).forEach(
-        (key) => {
+      let userResourcesCount = await db
+        .select({ count: count() })
+        .from(userResource)
+        .where(
+          and(
+            eq(userResource.userId, userId),
+            eq(userResource.sprintSurveyId, sprintSurveyId),
+          ),
+        );
+
+      // safety double check if the user has been checked in case of a failure in the middle of the survey analysis
+      if (userTasksCount[0].count == 0 || userResourcesCount[0].count == 0) {
+        for (let coworkerId of Object.keys(
+          orderedFeedback[userId]["coworkersFeedback"],
+        )) {
+        }
+
+        // all feedback summarized, now get the classifications of negative feedback with the most suggestions
+        const feedbackSuggestions: [number, string][] = [];
+        Object.keys(
+          orderedFeedback[userId].feedbackClassifications.negative,
+        ).forEach((key) => {
           feedbackSuggestions.push([
-            orderedFeedback[userId].feedbackSummary.negative[key].length,
+            orderedFeedback[userId].feedbackClassifications.negative[key]
+              .length,
             key,
           ]);
-        },
-      );
-
-      feedbackSuggestions.sort((a, b) => b[0] - a[0]);
-
-      const feedbackToCreate = feedbackSuggestions[0][1];
-
-      const newCoworkerId =
-        orderedFeedback[userId].feedbackSummary.negative[feedbackToCreate][0];
-
-      const feedbackComment =
-        orderedFeedback[userId].coworkersFeedback[newCoworkerId]
-          .openFeedback[0][1];
-
-      // select the best tasks and resource
-      const resources = await cosine_similarity(feedbackComment);
-
-      const tasks = await create_tasks(feedbackComment);
-
-      for (let task of tasks) {
-        const [title, description] = task.split(":");
-        await db.insert(pipTask).values({
-          userId: userId,
-          title: title,
-          description: description,
-          isDone: false,
         });
-      }
 
-      for (let resource of resources) {
-        await db.insert(userResource).values({
-          userId: userId,
-          resourceId: resource,
-        });
+        feedbackSuggestions.sort((a, b) => b[0] - a[0]);
+
+        const feedbackToCreate = feedbackSuggestions[0][1];
+
+        const newCoworkerId =
+          orderedFeedback[userId].feedbackClassifications.negative[
+            feedbackToCreate
+          ][0];
+
+        const feedbackComment =
+          orderedFeedback[userId].coworkersFeedback[newCoworkerId]
+            .openFeedback[0][1];
+
+        // select the best tasks and resource
+        const resources = await cosine_similarity(feedbackComment);
+
+        const tasks = await create_tasks(feedbackComment);
+
+        for (let task of tasks) {
+          const [title, description] = task.split(":");
+          await db.insert(pipTask).values({
+            userId: userId,
+            title: title,
+            description: description,
+            isDone: false,
+          });
+        }
+
+        for (let resource of resources) {
+          await db.insert(userResource).values({
+            userId: userId,
+            resourceId: resource,
+          });
+        }
       }
     }
 
