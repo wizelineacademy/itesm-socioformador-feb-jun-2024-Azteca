@@ -14,7 +14,11 @@ interface TraitsProps {
   emptyMessage: string;
 }
 
-const Traits: React.FC<TraitsProps> = ({ title, traits, emptyMessage }) => (
+const ProfileTraits: React.FC<TraitsProps> = ({
+  title,
+  traits,
+  emptyMessage,
+}) => (
   <div>
     <div className="mx-auto flex justify-between">
       <h3 className="text-2xl font-medium text-black">{title}</h3>
@@ -42,4 +46,4 @@ const Traits: React.FC<TraitsProps> = ({ title, traits, emptyMessage }) => (
   </div>
 );
 
-export default Traits;
+export default ProfileTraits;

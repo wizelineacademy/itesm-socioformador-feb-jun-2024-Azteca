@@ -4,7 +4,7 @@ import ProfileBanner from "@/components/Profile/ProfileBanner";
 import ProfileSection from "@/components/Profile/ProfileSection";
 import CoWorkersCarousel from "@/components/CoWorkersCarousel";
 import ProjectsCarousel from "@/components/ProjectsCarousel";
-import Traits from "@/components/Profile/Traits";
+import ProfileTraits from "@/components/Profile/ProfileTraits";
 import Loader from "@/components/Loader";
 
 const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
@@ -42,12 +42,12 @@ const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
             </ProfileSection>
           </div>
           <div className="w-5/12">
-            <Traits
+            <ProfileTraits
               title="Strengths"
               traits={traits.strengths}
               emptyMessage="No strengths available yet"
             />
-            <Traits
+            <ProfileTraits
               title="Opportunity Areas"
               traits={traits.areasOfOportunity}
               emptyMessage="No areas of opportunity available yet"
