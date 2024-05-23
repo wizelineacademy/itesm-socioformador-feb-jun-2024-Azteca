@@ -52,57 +52,6 @@ const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
               traits={traits.areasOfOportunity}
               emptyMessage="No areas of opportunity available yet"
             />
-
-            {/*
-          TODO: @adrian and @jose are going to fix this
-
-          <div className="mx-auto flex justify-between">
-            <h3 className="text-2xl font-medium text-black">Strengths</h3>
-            <p className="cursor-pointer self-center text-sm text-graySubtitle">
-              Show More
-            </p>
-          </div>
-          <div
-            className={
-              traits.strengths.length === 0
-                ? "mb-6 mt-3 flex flex-wrap items-center justify-center gap-5 rounded-lg bg-slate-300/20 py-4"
-                : "mb-10 mt-5 flex flex-wrap gap-5"
-            }
-          >
-            {traits.strengths.length === 0 && (
-              <NoDataCard text="No strengths available yet" />
-            )}
-            {traits.strengths.map((strength, index) => (
-              <Tooltip message={strength.description || ""} key={index}>
-                <Badge text={strength.name || ""} />
-              </Tooltip>
-            ))}
-          </div>
-
-          <div className="mx-auto flex justify-between">
-            <h3 className="text-2xl font-medium text-black">
-              Opportunity Areas
-            </h3>
-            <p className="cursor-pointer self-center text-sm text-graySubtitle">
-              Show More
-            </p>
-          </div>
-          <div
-            className={
-              traits.areasOfOportunity.length === 0
-                ? "mb-6 mt-3 flex flex-wrap justify-center gap-5 rounded-lg bg-slate-300/20 py-4"
-                : "mb-10 mt-5 flex flex-wrap gap-5"
-            }
-          >
-            {traits.areasOfOportunity.length === 0 && (
-              <NoDataCard text="No areas of opportunity available yet" />
-            )}
-            {traits.areasOfOportunity.map((area, index) => (
-              <Tooltip message={area.description || ""} key={index}>
-                <Badge text={area.name || ""} />
-              </Tooltip>
-            ))}
-          </div> */}
           </div>
         </section>
       </Suspense>
