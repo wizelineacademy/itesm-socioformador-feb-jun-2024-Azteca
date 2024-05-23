@@ -12,7 +12,7 @@ interface ProfileBannerProps {
 const ProfileBanner: React.FC<ProfileBannerProps> = ({ user }) => (
   <section className="w-100 mx-auto mb-24 mt-6 flex h-52 rounded-xl bg-primary">
     <UserProfileButton
-      photoUrl={user.photoUrl!}
+      photoUrl={user.photoUrl || ""}
       size="lg"
       className="absolute left-20 top-60 h-fit"
     />

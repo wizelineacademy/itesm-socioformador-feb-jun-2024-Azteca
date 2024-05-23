@@ -82,15 +82,17 @@ const SprintStepFour = ({
         <section id="users-select" className="col-span-1 mt-2 flex flex-col">
           <p className="text-base font-medium text-black">Coworkers</p>
           {selectableUsers.length !== 0 && (
-            <ul className="mt-2 flex h-44 w-full appearance-none flex-col gap-y-1 overflow-auto pe-2">
+            <div className="mt-2 flex h-44 w-full appearance-none flex-col gap-y-1 overflow-auto pe-2">
               {selectableUsers.map((user, index) => (
-                <li
+                <button
                   className="group flex cursor-pointer flex-row items-center gap-x-2 rounded-xl p-1 hover:bg-primary-light/60"
                   key={index}
                   onClick={() => handleUserSelected(user)}
                 >
                   {user.photoUrl && (
-                    <UserProfileButton photoUrl={user.photoUrl} size="sm" />
+                    <div>
+                      <UserProfileButton photoUrl={user.photoUrl} size="sm" />
+                    </div>
                   )}
                   {!user.photoUrl && (
                     <UserIcon
@@ -101,9 +103,9 @@ const SprintStepFour = ({
                   <p className="font-lg py-w w-[15ch] text-sm text-black group-hover:text-white">
                     {user.name}
                   </p>
-                </li>
+                </button>
               ))}
-            </ul>
+            </div>
           )}
           {selectableUsers.length === 0 && (
             <p className="m-auto text-sm font-medium text-grayText">
