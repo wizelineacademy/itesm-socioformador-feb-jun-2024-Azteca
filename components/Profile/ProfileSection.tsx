@@ -9,8 +9,8 @@ interface ProfileSectionProps {
   title: string;
   showMore: boolean;
   children: React.ReactNode;
-  userId: string;
-  type: string;
+  userId?: string;
+  type?: string;
 }
 
 const ProfileSection: React.FC<ProfileSectionProps> = ({

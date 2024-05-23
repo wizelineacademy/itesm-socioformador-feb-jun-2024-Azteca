@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { getUserInfoById, getUserTraitsById } from "@/services/user";
 import ProfileBanner from "@/components/Profile/ProfileBanner";
-import Section from "@/components/Profile/ProfileSection";
+import ProfileSection from "@/components/Profile/ProfileSection";
 import CoWorkersCarousel from "@/components/CoWorkersCarousel";
 import ProjectsCarousel from "@/components/ProjectsCarousel";
 import Traits from "@/components/Profile/Traits";
@@ -114,12 +114,12 @@ const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
         {/* Data */}
         <section className="w-100 mx-auto flex justify-between space-x-10">
           <div className="w-7/12">
-            <Section title="Co-workers" showMore={true}>
+            <ProfileSection title="Co-workers" showMore={true}>
               <CoWorkersCarousel userId={params.id} />
-            </Section>
-            <Section title="Projects" showMore={true}>
+            </ProfileSection>
+            <ProfileSection title="Projects" showMore={true}>
               <ProjectsCarousel userId={params.id} />
-            </Section>
+            </ProfileSection>
           </div>
           <div className="w-5/12">
             <Traits
@@ -132,8 +132,9 @@ const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
               traits={traits.areasOfOportunity}
               emptyMessage="No areas of opportunity available yet"
             />
-
-            {/*
+          </div>
+        </section>
+        {/*
           TODO: @adrian and @jose are going to fix this
 
           <div className="mx-auto flex justify-between">
@@ -158,41 +159,7 @@ const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
               </Tooltip>
             ))}
           </div>
-
-      {/* Data */}
-      <section className="w-100 mx-auto flex justify-between space-x-10">
-        <div className="w-7/12">
-          <Section
-            title="Co-workers"
-            showMore={true}
-            userId={params.id}
-            type="coworkers"
-          >
-            <CoWorkersCarousel userId={params.id} />
-          </Section>
-          <Section
-            title="Projects"
-            showMore={true}
-            userId={params.id}
-            type="projects"
-          >
-            <ProjectsCarousel userId={params.id} />
-          </Section>
-        </div>
-        <div className="w-5/12">
-          <Traits
-            title="Strengths"
-            traits={traits.strengths}
-            emptyMessage="No strengths available yet"
-          />
-          <Traits
-            title="Opportunity Areas"
-            traits={traits.areasOfOportunity}
-            emptyMessage="No areas of opportunity available yet"
-          />
-        </div>
-      </section>
-
+          */}
       </Suspense>
     </main>
   );
