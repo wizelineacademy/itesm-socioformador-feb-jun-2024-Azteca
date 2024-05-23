@@ -49,7 +49,9 @@ export type SprintSurveyAnswer = {
 export type QuestionType =
   | "SPRINT_QUESTION"
   | "COWORKER_QUESTION"
-  | "FINAL_PROJECT_QUESTION";
+  | "COWORKER_COMMENT"
+  | "FINAL_PROJECT_QUESTION"
+  | "FINAL_PROJECT_COMMENT";
 
 export type Questions = {
   id: number;
@@ -61,7 +63,7 @@ export type ProjectAnswer = {
   userId: string | undefined;
   finalSurveyId: number;
   answers: Array<{ questionKey: number; answer: number }>;
-  comment: string;
+  comment: { questionKey: number; text: string };
 };
 
 export type Employee = {

@@ -3,15 +3,19 @@
 import { auth } from "@/auth";
 import db from "@/db/drizzle";
 import { finalSurvey, finalSurveyAnswer, question } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, or } from "drizzle-orm";
 import { ProjectAnswer } from "@/types/types";
 
 export async function getProjectQuestions() {
   const res = await db
     .select()
     .from(question)
-    .where(eq(question.type, "FINAL_PROJECT_QUESTION"));
-
+    .where(
+      or(
+        eq(question.type, "FINAL_PROJECT_QUESTION"),
+        eq(question.type, "FINAL_PROJECT_COMMENT"),
+      ),
+    );
   return res;
 }
 
