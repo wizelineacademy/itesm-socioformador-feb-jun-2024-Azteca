@@ -22,7 +22,7 @@ const NotificationCard = ({ notification }: NotificationCardProps) => {
   };
 
   return (
-    <button
+    <div
       className={`flex w-full items-center rounded-t-md border-b-2 border-gray-200 p-2 hover:bg-gray-200`}
     >
       <svg
@@ -56,7 +56,7 @@ const NotificationCard = ({ notification }: NotificationCardProps) => {
             survey{" "}
           </p> */}
       </div>
-    </button>
+    </div>
   );
 };
 
