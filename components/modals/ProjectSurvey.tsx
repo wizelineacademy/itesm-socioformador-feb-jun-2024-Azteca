@@ -130,7 +130,7 @@ const ProjectSurvey = ({
                     )}
                     {questions.data &&
                       questions.data.map((question, index) =>
-                        question.type === "FINAL_PROJECT_COMMENT" ? (
+                        question.description === "Final Project Comment" ? (
                           <div key={index}>
                             <p className="text-sm font-light text-black">
                               General comments on the project
