@@ -2,13 +2,22 @@
 import { auth } from "@/auth";
 import db from "@/db/drizzle";
 import {
+  question,
   sprintSurvey,
   sprintSurveyAnswerCoworkers,
   sprintSurveyAnswerProject,
 } from "@/db/schema";
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 import { SprintSurveyAnswer, SurveyStepTwoAnswer } from "@/types/types";
+
+export async function getSprintSurveyQuestions() {
+  const res = await db
+    .select()
+    .from(question)
+    .where(eq(question.type, "SPRINT_QUESTION"));
+  return res;
+}
 
 export async function createSprintSurvey(projectId: number) {
   const res = await db

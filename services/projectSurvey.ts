@@ -3,9 +3,7 @@
 import { auth } from "@/auth";
 import db from "@/db/drizzle";
 import { finalSurvey, finalSurveyAnswer, question } from "@/db/schema";
-import { eq, or, sql } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { eq, sql } from "drizzle-orm";
 import { ProjectAnswer } from "@/types/types";
 
 export async function getProjectQuestions() {

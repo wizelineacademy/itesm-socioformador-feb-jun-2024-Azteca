@@ -15,7 +15,10 @@ import SprintStepThree from "./SprintStepThree";
 import SprintStepFour from "./SprintStepFour";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getCoworkersInProject } from "@/services/project";
-import { submitSprintSurveyAnswers } from "@/services/sprintSurvey";
+import {
+  getSprintSurveyQuestions,
+  submitSprintSurveyAnswers,
+} from "@/services/sprintSurvey";
 import toast from "react-hot-toast";
 import { getUserId } from "@/services/user";
 
@@ -40,6 +43,13 @@ const SprintSurvey = ({
     queryKey: ["userId"],
     queryFn: async () => await getUserId(),
   });
+
+  const { data: sprintQuestions } = useQuery({
+    queryKey: ["sprintQuestions"],
+    queryFn: async () => await getSprintSurveyQuestions(),
+  });
+
+  console.log(sprintQuestions);
 
   const [sprintAnswer, setSprintAnswer] = useState<SprintSurveyAnswer>({
     userId: userId,
