@@ -4,8 +4,9 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/strict",
     "plugin:jsx-a11y/recommended",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
+    "plugin:testing-library/react"
   ],
-  "plugins": ["@typescript-eslint", "jsx-a11y"],
+  "plugins": ["@typescript-eslint", "jsx-a11y", "testing-library"],
   "rules": {}
 }

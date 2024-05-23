@@ -6,7 +6,10 @@ interface BadgeProps {
 
 export default function Badge({ text }: BadgeProps) {
   return (
-    <div className="w-fit rounded-xl bg-white px-3 py-2 text-sm drop-shadow-lg">
+    <div
+      data-testid="badge-component"
+      className="w-fit rounded-xl bg-white px-3 py-2 text-sm drop-shadow-lg"
+    >
       <p>{text}</p>
     </div>
   );

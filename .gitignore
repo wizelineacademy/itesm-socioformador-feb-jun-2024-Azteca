@@ -54,3 +54,7 @@ next-env.d.ts
 .open-next
 #yarn lock
 yarn.lock
+
+#vitest
+coverage
+html
