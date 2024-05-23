@@ -46,8 +46,8 @@ export async function submitProjectAnswer(answers: ProjectAnswer) {
   await db.insert(finalSurveyAnswer).values({
     userId: userId,
     finalSurveyId: answers.finalSurveyId,
-    questionId: 17,
+    questionId: answers.comment.questionKey,
     answer: null,
-    comment: answers.comment,
+    comment: answers.comment.text,
   });
 }
