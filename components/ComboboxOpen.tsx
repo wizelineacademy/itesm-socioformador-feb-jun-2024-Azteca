@@ -49,12 +49,12 @@ const ComboboxOpen = ({ data }: { data: DataItem[] | undefined }) => {
   if (!isMounted) return null;
 
   return (
-    <Combobox value={selectedItem} onChange={setSelectedItem}>
+    <Combobox<DataItem | null> value={selectedItem} onChange={setSelectedItem}>
       {({ open }) => (
         <>
           <Combobox.Input
             onChange={(event) => setQuery(event.target.value)}
-            displayValue={(item: DataItem) => item?.name || ""}
+            displayValue={(item: DataItem | null) => (item ? item.name : "")}
             className="mb-2 w-full rounded-lg border p-2 focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder="Search..."
           />
