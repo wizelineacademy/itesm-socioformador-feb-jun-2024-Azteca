@@ -10,6 +10,9 @@ import {
   user,
 } from "@/db/schema";
 import { and, eq, ne, or } from "drizzle-orm";
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+import { Resource } from "sst";
+import { SQSMessageBody } from "@/types/types";
 
 export async function getProjects() {
   // get all of the projects in which the user is either a member or a manager
@@ -132,4 +135,26 @@ export async function getCoworkersInProject(sprintSurveyId: number) {
         ne(user.id, currentUserId), // Exclude the current user from the results
       ),
     );
+}
+
+export async function updateFeedback(projectId: number) {
+  console.log(projectId);
+
+  const client = new SQSClient();
+
+  for (let i = 0; i < 20; i++) {
+    console.log("SCHEDULED EVENT NO", i);
+
+    const messageBody = {
+      projectId: i,
+      content: "Hello from the subscriber",
+    } as SQSMessageBody;
+
+    await client.send(
+      new SendMessageCommand({
+        QueueUrl: Resource.FeedbackFlowQueue.url,
+        MessageBody: JSON.stringify(messageBody),
+      }),
+    );
+  }
 }

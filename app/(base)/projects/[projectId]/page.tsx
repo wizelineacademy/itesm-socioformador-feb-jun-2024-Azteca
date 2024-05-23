@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { RadarChart, AreaChart } from "@mantine/charts";
 import GaugeChart from "@/components/GaugeChart";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { deleteProjectById } from "@/services/project";
+import { deleteProjectById, updateFeedback } from "@/services/project";
 import { useRouter } from "next/navigation";
 import { getUserRole } from "@/services/user";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon";
@@ -143,7 +143,12 @@ const Project = ({ params }: { params: { projectId: string } }) => {
                   <ChevronDownIcon />
                 </button>
                 {/* update-button */}
-                <button className="rounded-lg bg-primary px-3 py-2 text-white">
+                <button
+                  className="rounded-lg bg-primary px-3 py-2 text-white"
+                  onClick={async () => {
+                    await updateFeedback(parseInt(params.projectId));
+                  }}
+                >
                   Update Feedback
                 </button>
               </div>
