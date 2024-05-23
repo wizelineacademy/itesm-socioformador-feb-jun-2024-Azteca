@@ -1,13 +1,12 @@
-"use server";
-
-import React from "react";
+import React, { Suspense } from "react";
 import { getUserId, getUserManagedBy, getUserInfoById } from "@/services/user";
 import UserProfile from "@/components/Dashboard/DashboardProfileLink";
 import DashboardGaugeSection from "@/components/Dashboard/DashboardGaugeSection";
 import DashboardRadarSection from "@/components/Dashboard/DashboardRadarSection";
 import DashboardEmotionsSection from "@/components/Dashboard/DashboardEmotionsSection";
 import DashboardSurveyCalendar from "@/components/Dashboard/DashboardSurveyCalendar";
-import PIPSection from "@/components/Dashboard/DashboardPCPSection";
+import PCPSection from "@/components/Dashboard/DashboardPCPSection";
+import Loader from "@/components/Loader";
 
 const Dashboard = async ({ params }: { params: { userId: string } }) => {
   const activeUserId = await getUserId();
@@ -83,7 +82,13 @@ const Dashboard = async ({ params }: { params: { userId: string } }) => {
   ];
 
   return (
-    <>
+    <Suspense
+      fallback={
+        <div className="h-[80dvh] w-full">
+          <Loader />
+        </div>
+      }
+    >
       {isManagedBy && (
         <UserProfile userId={params.userId} userName={user.name} />
       )}
@@ -98,10 +103,10 @@ const Dashboard = async ({ params }: { params: { userId: string } }) => {
         </div>
         <div className="mt-4 grid gap-7">
           <DashboardSurveyCalendar completedSurveys={completedSurveys} />
-          <PIPSection PCPData={PCPData} />
+          <PCPSection PCPData={PCPData} />
         </div>
       </div>
-    </>
+    </Suspense>
   );
 };
 
