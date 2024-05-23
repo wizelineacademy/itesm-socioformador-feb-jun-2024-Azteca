@@ -159,40 +159,7 @@ const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
               </Tooltip>
             ))}
           </div>
-
-      {/* Data */}
-        <section className="w-100 mx-auto flex justify-between space-x-10">
-          <div className="w-7/12">
-            <ProfileSection
-              title="Co-workers"
-              showMore={true}
-              userId={params.id}
-              type="coworkers"
-            >
-              <CoWorkersCarousel userId={params.id} />
-            </ProfileSection>
-            <ProfileSection
-              title="Projects"
-              showMore={true}
-              userId={params.id}
-              type="projects"
-            >
-              <ProjectsCarousel userId={params.id} />
-            </ProfileSection>
-          </div>
-          <div className="w-5/12">
-            <Traits
-              title="Strengths"
-              traits={traits.strengths}
-              emptyMessage="No strengths available yet"
-            />
-            <Traits
-              title="Opportunity Areas"
-              traits={traits.areasOfOportunity}
-              emptyMessage="No areas of opportunity available yet"
-            />
-          </div>
-        </section>
+          */}
       </Suspense>
     </main>
   );
