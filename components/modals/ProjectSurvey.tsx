@@ -1,6 +1,12 @@
 "use client";
 
-import { Dialog, Transition, TransitionChild } from "@headlessui/react";
+import {
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  Transition,
+  TransitionChild,
+} from "@headlessui/react";
 import { Fragment } from "react";
 import Slider from "../Slider";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -10,6 +16,7 @@ import {
 } from "@/services/projectSurvey";
 import { getUserId } from "@/services/user";
 import toast from "react-hot-toast";
+import Loader from "../Loader";
 
 interface ProjectSurveyProps {
   showModal: boolean;
@@ -45,13 +52,9 @@ const ProjectSurvey = ({
     queryFn: async () => await getProjectQuestions(),
   });
 
-  if (!questions.data) {
-    return <h1>NO QUESTIONS AVAILABLE</h1>;
-  }
-
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+    if (!userId || !questions.data) return;
     // TODO: handle failure cases for this surveys
     const formData = new FormData(event.target as HTMLFormElement);
     const formsAnswers = questions.data.map((question) => ({
@@ -111,40 +114,46 @@ const ProjectSurvey = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="flex w-full max-w-5xl transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <Dialog.Title
+              <DialogPanel className="flex w-full max-w-5xl transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <DialogTitle
                   as="h3"
                   className="text-2xl font-semibold text-black"
                 >
                   Project Survey
-                </Dialog.Title>
+                </DialogTitle>
                 <form onSubmit={handleSubmit}>
-                  <div className="mt-3 grid grid-cols-2 gap-10">
-                    {questions.data.map((question, index) =>
-                      question.type === "FINAL_PROJECT_COMMENT" ? (
-                        <div key={index}>
-                          <p className="text-sm font-light text-black">
-                            General comments on the project
-                          </p>
-                          <textarea
-                            name={`Question ${question.id}`}
-                            id="comments"
-                            className="mt-2 h-auto w-full rounded-md border border-black p-2 focus:outline-primary"
-                            placeholder="Optional"
-                          ></textarea>
-                        </div>
-                      ) : (
-                        <Slider
-                          key={index}
-                          name={`Question ${question.id}`}
-                          label={
-                            question.description
-                              ? question.description
-                              : "NO Question"
-                          }
-                        />
-                      ),
+                  <div className="mt-3 grid w-full grid-cols-2 gap-10">
+                    {questions.isLoading && (
+                      <div className="col-span-2 pb-4 pt-10">
+                        <Loader />
+                      </div>
                     )}
+                    {questions.data &&
+                      questions.data.map((question, index) =>
+                        question.type === "FINAL_PROJECT_COMMENT" ? (
+                          <div key={index}>
+                            <p className="text-sm font-light text-black">
+                              General comments on the project
+                            </p>
+                            <textarea
+                              name={`Question ${question.id}`}
+                              id="comments"
+                              className="mt-2 h-auto w-full rounded-md border border-black p-2 focus:outline-primary"
+                              placeholder="Optional"
+                            ></textarea>
+                          </div>
+                        ) : (
+                          <Slider
+                            key={index}
+                            name={`Question ${question.id}`}
+                            label={
+                              question.description
+                                ? question.description
+                                : "NO Question"
+                            }
+                          />
+                        ),
+                      )}
                     {/* <Slider
                       name="efforts"
                       label="Do you feel that your efforts were recognized?"
@@ -167,15 +176,17 @@ const ProjectSurvey = ({
                     /> */}
                   </div>
                   <div className="mt-12 flex w-full justify-center">
-                    <button
-                      type="submit"
-                      className="rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
-                    >
-                      Submit
-                    </button>
+                    {!questions.isLoading && (
+                      <button
+                        type="submit"
+                        className="rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
+                      >
+                        Submit
+                      </button>
+                    )}
                   </div>
                 </form>
-              </Dialog.Panel>
+              </DialogPanel>
             </TransitionChild>
           </div>
         </div>
