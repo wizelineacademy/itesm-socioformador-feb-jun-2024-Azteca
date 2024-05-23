@@ -56,7 +56,9 @@ const ProjectSurvey = ({
     const formData = new FormData(event.target as HTMLFormElement);
     const formsAnswers = questions.data.map((question) => ({
       questionKey: question.id,
-      answer: parseInt(formData.get(`Question ${question.id}`).toString()),
+      answer: parseInt(
+        (formData.get(`Question ${question.id}`) || "None").toString(),
+      ),
     }));
     const finalAnswers = formsAnswers.filter(
       (answerObj) => !isNaN(answerObj.answer),
@@ -65,9 +67,12 @@ const ProjectSurvey = ({
       userId: userId,
       finalSurveyId: projectSurveyId,
       answers: finalAnswers,
-      comment: formData
-        .get(`Question ${questions.data[questions.data.length - 1].id}`)
-        .toString(),
+      comment:
+        (
+          formData.get(
+            `Question ${questions.data[questions.data.length - 1].id}`,
+          ) || "None"
+        ).toString() || "None",
     });
   };
 
