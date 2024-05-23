@@ -22,6 +22,8 @@ export default $config({
       fifo: false,
     });
 
+    queue.subscribe("handlers/subscriber.handler");
+
     new sst.aws.Nextjs("FeedbackFlowAppf", {
       link: [bucket, queue, AuthSecret, PostgresURL],
       environment: {
