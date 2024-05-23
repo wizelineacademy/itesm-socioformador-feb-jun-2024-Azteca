@@ -2,12 +2,12 @@
 
 import React from "react";
 import { getUserId, getUserManagedBy, getUserInfoById } from "@/services/user";
-import UserProfile from "@/components/Dashboard/UserProfile";
-import GaugeSection from "@/components/Dashboard/GaugeSection";
-import RadarSection from "@/components/Dashboard/RadarSection";
-import EmotionsSection from "@/components/Dashboard/EmotionsSection";
-import SurveyCalendar from "@/components/Dashboard/SurveyCalendar";
-import PIPSection from "@/components/Dashboard/PIPSection";
+import UserProfile from "@/components/Dashboard/DashboardProfileLink";
+import DashboardGaugeSection from "@/components/Dashboard/DashboardGaugeSection";
+import DashboardRadarSection from "@/components/Dashboard/DashboardRadarSection";
+import DashboardEmotionsSection from "@/components/Dashboard/DashboardEmotionsSection";
+import DashboardSurveyCalendar from "@/components/Dashboard/DashboardSurveyCalendar";
+import PIPSection from "@/components/Dashboard/DashboardPCPSection";
 
 const Dashboard = async ({ params }: { params: { userId: string } }) => {
   const activeUserId = await getUserId();
@@ -43,7 +43,7 @@ const Dashboard = async ({ params }: { params: { userId: string } }) => {
     },
   ];
 
-  const PIPData = {
+  const PCPData = {
     percentage: 63,
     type: "full",
     gradient: { start: "#4598FB", end: "#6640D5" },
@@ -90,15 +90,15 @@ const Dashboard = async ({ params }: { params: { userId: string } }) => {
 
       <div className="mt-2 flex justify-between">
         <div className="grid gap-7">
-          <GaugeSection gaugeData={gaugeData} />
+          <DashboardGaugeSection gaugeData={gaugeData} />
           <div className="flex justify-between">
-            <RadarSection radarData={radarData} />
-            <EmotionsSection emotionsData={emotionsData} />
+            <DashboardRadarSection radarData={radarData} />
+            <DashboardEmotionsSection emotionsData={emotionsData} />
           </div>
         </div>
         <div className="mt-4 grid gap-7">
-          <SurveyCalendar completedSurveys={completedSurveys} />
-          <PIPSection PIPData={PIPData} />
+          <DashboardSurveyCalendar completedSurveys={completedSurveys} />
+          <PIPSection PCPData={PCPData} />
         </div>
       </div>
     </>

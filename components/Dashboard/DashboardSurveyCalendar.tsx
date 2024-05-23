@@ -16,7 +16,7 @@ const dateMatches = (d1: Date, d2: Date): boolean => {
   );
 };
 
-const SurveyCalendar: React.FC<SurveyCalendarProps> = ({
+const DashboardSurveyCalendar: React.FC<SurveyCalendarProps> = ({
   completedSurveys,
 }) => (
   <div className="flex w-fit flex-col rounded-xl bg-white px-10 py-5 drop-shadow-lg">
@@ -62,4 +62,4 @@ const SurveyCalendar: React.FC<SurveyCalendarProps> = ({
   </div>
 );
 
-export default SurveyCalendar;
+export default DashboardSurveyCalendar;

@@ -10,7 +10,7 @@ interface GaugeSectionProps {
   }[];
 }
 
-const GaugeSection: React.FC<GaugeSectionProps> = ({ gaugeData }) => (
+const DashboardGaugeSection: React.FC<GaugeSectionProps> = ({ gaugeData }) => (
   <div className="mt-4 flex justify-between gap-16">
     {gaugeData.map((gauge, index) => (
       <div
@@ -30,4 +30,4 @@ const GaugeSection: React.FC<GaugeSectionProps> = ({ gaugeData }) => (
   </div>
 );
 
-export default GaugeSection;
+export default DashboardGaugeSection;

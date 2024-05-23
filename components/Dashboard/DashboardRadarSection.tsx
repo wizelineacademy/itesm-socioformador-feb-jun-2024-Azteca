@@ -5,7 +5,7 @@ interface RadarSectionProps {
   radarData: { statistic: string; punctuation: number }[];
 }
 
-const RadarSection: React.FC<RadarSectionProps> = ({ radarData }) => (
+const DashboardRadarSection: React.FC<RadarSectionProps> = ({ radarData }) => (
   <div className="flex w-fit flex-col items-center rounded-xl bg-white px-4 pt-10 drop-shadow-lg">
     <h4 className="text-xl font-medium">Overall Statistics</h4>
     <RadarChart
@@ -30,4 +30,4 @@ const RadarSection: React.FC<RadarSectionProps> = ({ radarData }) => (
   </div>
 );
 
-export default RadarSection;
+export default DashboardRadarSection;

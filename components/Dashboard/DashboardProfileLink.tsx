@@ -1,12 +1,15 @@
 import React from "react";
 import Link from "next/link";
 
-interface UserProfileProps {
+interface ProfileLinkProps {
   userId: string;
   userName: string;
 }
 
-const UserProfile: React.FC<UserProfileProps> = ({ userId, userName }) => (
+const DashboardProfileLink: React.FC<ProfileLinkProps> = ({
+  userId,
+  userName,
+}) => (
   <div className="flex items-center gap-2">
     <p className="text-3xl font-medium">{userName}</p>
     <Link
@@ -18,4 +21,4 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, userName }) => (
   </div>
 );
 
-export default UserProfile;
+export default DashboardProfileLink;

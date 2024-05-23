@@ -11,7 +11,9 @@ interface EmotionsSectionProps {
   }[];
 }
 
-const EmotionsSection: React.FC<EmotionsSectionProps> = ({ emotionsData }) => (
+const DashboardEmotionsSection: React.FC<EmotionsSectionProps> = ({
+  emotionsData,
+}) => (
   <div className="flex min-w-96 flex-col items-center rounded-xl bg-white px-10 py-5 drop-shadow-lg">
     <p className="mx-auto mt-2 text-center text-xl font-semibold text-graySubtitle">
       Emotions Summary
@@ -36,4 +38,4 @@ const EmotionsSection: React.FC<EmotionsSectionProps> = ({ emotionsData }) => (
   </div>
 );
 
-export default EmotionsSection;
+export default DashboardEmotionsSection;
