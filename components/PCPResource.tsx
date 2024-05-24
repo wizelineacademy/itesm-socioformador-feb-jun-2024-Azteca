@@ -1,15 +1,15 @@
 import Link from "next/link";
-import ArticleIcon from "../components/icons/ArticleIcon";
-import BookIcon from "../components/icons/BookIcon";
-import VideoIcon from "../components/icons/VideoIcon";
+import ArticleIcon from "./icons/ArticleIcon";
+import BookIcon from "./icons/BookIcon";
+import VideoIcon from "./icons/VideoIcon";
 
-interface InterfacePipResource {
+interface InterfacePCPResource {
   title: string | null;
   description: string | null;
   type: string | null;
 }
 
-const PipResource = ({ title, description, type }: InterfacePipResource) => {
+const PCPResource = ({ title, description, type }: InterfacePCPResource) => {
   const renderIcon = () => {
     switch (type) {
       case "video":
@@ -52,4 +52,4 @@ const PipResource = ({ title, description, type }: InterfacePipResource) => {
   );
 };
 
-export default PipResource;
+export default PCPResource;

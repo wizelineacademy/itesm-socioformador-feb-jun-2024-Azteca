@@ -1,6 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
-import PIPIcon from "./PIPIconNavbar";
+import PCPIcon from "./PCPIconNavbar";
 import Notifications from "./Notifications";
 import ProjectNavbarIcon from "./ProjectNavbarIcon";
 import UserIconNavbar from "./UserIconNavbar";
@@ -73,7 +73,7 @@ const NavigationBar = () => {
               Admin Dashboard
             </Link>
           )}
-          <PIPIcon path="/pcp" currentPath={pathname} />
+          <PCPIcon path="/pcp" currentPath={pathname} />
           <DashboardIconNavbar path="/dashboard" currentPath={pathname} />
           {isManager && (
             <ProjectNavbarIcon path="/projects" currentPath={pathname} />
