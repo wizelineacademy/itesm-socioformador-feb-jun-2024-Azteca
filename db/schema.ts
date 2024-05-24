@@ -111,6 +111,9 @@ export const userResource = pgTable(
     resourceId: serial("resource_id").references(() => pipResource.id, {
       onDelete: "cascade",
     }),
+    sprintSurveyId: integer("sprint_survey_id").references(
+      () => sprintSurvey.id,
+    ),
   },
   // composite primary key on (userId, resourceId)
 );

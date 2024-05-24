@@ -16,6 +16,8 @@ import {
   sprintSurveyAnswerCoworkers,
   sprintSurveyAnswerProject,
   userResource,
+  question,
+  questionPositiveSkill,
 } from "@/db/schema";
 
 interface FeedbackCategory {
@@ -29,7 +31,6 @@ interface FeedbackClassifications {
   positive: { [sentiment: string]: string[] };
   negative: { [sentiment: string]: string[] };
   biased: { [sentiment: string]: string[] };
-  notUseful: { [sentiment: string]: string[] };
 }
 
 interface FeedbackRecords {
@@ -256,7 +257,6 @@ async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
         positive: {},
         negative: {},
         biased: {},
-        notUseful: {},
       },
     };
 
@@ -285,6 +285,36 @@ async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
   });
 
   return feedbackRecords;
+}
+
+async function getFeedbackClassifications(coworkersFeedback: FeedbackCategory) {
+  const feedbackClassifications: FeedbackClassifications = {
+    positive: {},
+    negative: {},
+    biased: {},
+  };
+
+  for (let coworkerId of Object.keys(coworkersFeedback)) {
+    let closedFeedback = coworkersFeedback[coworkerId].closedFeedback;
+    let positivePerformanceCount = 0;
+    let negativePerformanceCount = 0;
+    for (let answer of closedFeedback) {
+      if (answer[1] >= 8) {
+        positivePerformanceCount++;
+        // get the positive skills of the question
+        let questionPositiveSkills = await db
+          .select({
+            skill: questionPositiveSkill.skill,
+          })
+          .from();
+      } else {
+        negativePerformanceCount++;
+        // get the positive skills of the question
+      }
+    }
+  }
+
+  return feedbackClassifications;
 }
 
 async function set_resources_embeddings() {
@@ -374,10 +404,10 @@ export async function feedback_analysis(sprintSurveyId: number) {
 
       // safety double check if the user has been checked in case of a failure in the middle of the survey analysis
       if (userTasksCount[0].count == 0 || userResourcesCount[0].count == 0) {
-        for (let coworkerId of Object.keys(
-          orderedFeedback[userId]["coworkersFeedback"],
-        )) {
-        }
+        orderedFeedback[userId]["feedbackClassifications"] =
+          await getFeedbackClassifications(
+            orderedFeedback[userId].coworkersFeedback,
+          );
 
         // all feedback summarized, now get the classifications of negative feedback with the most suggestions
         const feedbackSuggestions: [number, string][] = [];
