@@ -6,7 +6,7 @@ interface SprintDropRowProps {
   colors: string[];
   className?: string;
   titlePadding?: string;
-  name: string;
+  name: number;
   people: Coworker[][];
 }
 
@@ -19,13 +19,12 @@ const SprintDropRow = ({
   people,
 }: SprintDropRowProps) => {
   return (
-    <div className={`${className} flex w-full flex-row`}>
+    <div className={`${className} flex min-h-20 w-full flex-row`}>
       <div
-        className={`w-1/4 rounded-l-lg ${colors[0]} ${titlePadding} text-end text-sm`}
+        className={`w-1/4 rounded-l-lg ${colors[0]} ${titlePadding} flex text-end text-sm`}
       >
-        <p className="text-black">{title}</p>
+        <p className="my-auto me-2 text-black">{title}</p>
       </div>
-
       {colors.map((color, index) => {
         return (
           <SprintDropRowBox

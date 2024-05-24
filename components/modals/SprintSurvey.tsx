@@ -7,10 +7,14 @@ import {
   Transition,
   TransitionChild,
 } from "@headlessui/react";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import SprintStepOne from "./SprintStepOne";
 import SprintStepTwo from "./SprintStepTwo";
-import { SprintSurveyAnswer, SurveyStepTwoAnswer } from "@/types/types";
+import {
+  Questions,
+  SprintSurveyAnswer,
+  SurveyStepTwoAnswer,
+} from "@/types/types";
 import SprintStepThree from "./SprintStepThree";
 import SprintStepFour from "./SprintStepFour";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -21,6 +25,7 @@ import {
 } from "@/services/sprintSurvey";
 import toast from "react-hot-toast";
 import { getUserId } from "@/services/user";
+import Loader from "../Loader";
 
 interface SprintSurveyProps {
   showModal: boolean;
@@ -44,53 +49,54 @@ const SprintSurvey = ({
     queryFn: async () => await getUserId(),
   });
 
-  const { data: sprintQuestions } = useQuery({
+  const { data: allSprintQuestions, isLoading: isLoadingQuestions } = useQuery({
     queryKey: ["sprintQuestions"],
     queryFn: async () => await getSprintSurveyQuestions(),
   });
 
-  console.log(sprintQuestions);
+  const sprintQuestions: Questions[] | undefined = useMemo(() => {
+    return allSprintQuestions?.filter(
+      (question) => question.type === "SPRINT_QUESTION",
+    );
+  }, [allSprintQuestions]);
+
+  const coworkerQuestions: Questions[] | undefined = useMemo(() => {
+    return allSprintQuestions?.filter(
+      (question) => question.type === "COWORKER_QUESTION",
+    );
+  }, [allSprintQuestions]);
+
+  /*   const coworkerCommentQuestions: Questions[] | undefined = useMemo(() => {
+    return allSprintQuestions?.filter(
+      (question) => question.type === "COWORKER_COMMENT",
+    );
+  }, [allSprintQuestions]); */
 
   const [sprintAnswer, setSprintAnswer] = useState<SprintSurveyAnswer>({
     userId: userId,
     sprintSurveyId: sprintSurveyId,
-    projectAnswers: [
-      {
-        questionKey: "MS_RF",
-        answer: 1,
-      },
-      {
-        questionKey: "MS_RA",
-        answer: 1,
-      },
-      {
-        questionKey: "MS_LS",
-        answer: 1,
-      },
-      {
-        questionKey: "MS_WE",
-        answer: 1,
-      },
-    ],
+    projectAnswers: [],
     coworkersAnswers: [],
     coworkersComments: [],
   });
+  const sprintSurveyStepTwoAnswerBase: SurveyStepTwoAnswer = useMemo(() => {
+    const questions = coworkerQuestions
+      ? coworkerQuestions.reduce((acc, question) => {
+          acc[question.id] = Array(10)
+            .fill([])
+            .map(() => []);
+          return acc;
+        }, {} as SurveyStepTwoAnswer)
+      : {};
+    return questions;
+  }, [coworkerQuestions]);
 
   const [sprintSurveyStepTwoAnswer, setSprintSurveyStepTwoAnswer] =
-    useState<SurveyStepTwoAnswer>({
-      SS_CWPN: Array(10)
-        .fill([])
-        .map(() => []),
-      SS_CWCM: Array(10)
-        .fill([])
-        .map(() => []),
-      SS_CWSP: Array(10)
-        .fill([])
-        .map(() => []),
-      SS_CWMT: Array(10)
-        .fill([])
-        .map(() => []),
-    });
+    useState<SurveyStepTwoAnswer>({});
+
+  useEffect(() => {
+    setSprintSurveyStepTwoAnswer(sprintSurveyStepTwoAnswerBase);
+  }, [sprintSurveyStepTwoAnswerBase]);
 
   const handleNavigation = (step: number) => {
     setStep(step);
@@ -100,7 +106,7 @@ const SprintSurvey = ({
     const isStepTwoCompleted = Object.keys(sprintSurveyStepTwoAnswer).every(
       (key) => {
         const subArray =
-          sprintSurveyStepTwoAnswer[key as keyof SurveyStepTwoAnswer];
+          sprintSurveyStepTwoAnswer[parseInt(key) as keyof SurveyStepTwoAnswer];
         let usersInSubarray = 0;
         subArray.forEach((subArrayElement) => {
           usersInSubarray += subArrayElement.length;
@@ -114,12 +120,12 @@ const SprintSurvey = ({
   const parseStepTwoAnswer = () => {
     Object.keys(sprintSurveyStepTwoAnswer).forEach((key) => {
       const answersArray =
-        sprintSurveyStepTwoAnswer[key as keyof SurveyStepTwoAnswer];
+        sprintSurveyStepTwoAnswer[parseInt(key) as keyof SurveyStepTwoAnswer];
       const questionObject: {
-        questionKey: keyof SurveyStepTwoAnswer;
+        questionId: keyof SurveyStepTwoAnswer;
         answers: { coworkerId: string; answer: number }[];
       } = {
-        questionKey: key as keyof SurveyStepTwoAnswer,
+        questionId: parseInt(key) as keyof SurveyStepTwoAnswer,
         answers: [],
       };
       for (let i = 0; i < answersArray.length; i++) {
@@ -203,26 +209,35 @@ const SprintSurvey = ({
                 >
                   Sprint Survey
                 </DialogTitle>
-                {step === 1 && (
-                  <SprintStepOne
-                    sprintSurveyAnswer={sprintAnswer}
-                    setSprintSurveyAnswer={setSprintAnswer}
-                  />
-                )}
-                {step === 2 && (
-                  <SprintStepTwo
-                    users={users}
-                    sprintSurveyStepTwoAnswer={sprintSurveyStepTwoAnswer}
-                    setSprintSurveyStepTwoAnswer={setSprintSurveyStepTwoAnswer}
-                  />
-                )}
-                {step === 3 && <SprintStepThree />}
-                {step === 4 && (
-                  <SprintStepFour
-                    users={users}
-                    sprintSurveyAnswer={sprintAnswer}
-                    setSprintSurveyAnswer={setSprintAnswer}
-                  />
+                {isLoadingQuestions && <Loader />}
+                {allSprintQuestions && (
+                  <>
+                    {step === 1 && (
+                      <SprintStepOne
+                        questions={sprintQuestions}
+                        sprintSurveyAnswer={sprintAnswer}
+                        setSprintSurveyAnswer={setSprintAnswer}
+                      />
+                    )}
+                    {step === 2 && (
+                      <SprintStepTwo
+                        users={users}
+                        questions={coworkerQuestions}
+                        sprintSurveyStepTwoAnswer={sprintSurveyStepTwoAnswer}
+                        setSprintSurveyStepTwoAnswer={
+                          setSprintSurveyStepTwoAnswer
+                        }
+                      />
+                    )}
+                    {step === 3 && <SprintStepThree />}
+                    {step === 4 && (
+                      <SprintStepFour
+                        users={users}
+                        sprintSurveyAnswer={sprintAnswer}
+                        setSprintSurveyAnswer={setSprintAnswer}
+                      />
+                    )}
+                  </>
                 )}
                 <footer className="mt-8 flex justify-center">
                   {step === 1 && (

@@ -1,7 +1,7 @@
 "use client";
 import SprintDropRow from "./SprintDropRow";
 import { useState } from "react";
-import { Coworker, SurveyCoworker } from "@/types/types";
+import { Coworker, Questions, SurveyCoworker } from "@/types/types";
 import { DndContext, DragEndEvent, pointerWithin } from "@dnd-kit/core";
 import SelectableDragUsers from "./SelectableDragUsers";
 import { SurveyStepTwoAnswer } from "@/types/types";
@@ -13,12 +13,14 @@ interface SprintStepTwoProps {
     sprintSurveyStepTwoAnswer: SurveyStepTwoAnswer,
   ) => void;
   users: Coworker[];
+  questions: Questions[] | undefined;
 }
 
 const SprintStepTwo = ({
   sprintSurveyStepTwoAnswer,
   setSprintSurveyStepTwoAnswer,
   users,
+  questions,
 }: SprintStepTwoProps) => {
   const yellowOpacities = [
     "bg-yellowSurvey/10",
@@ -82,7 +84,7 @@ const SprintStepTwo = ({
     sprintSurveyStepTwoAnswer &&
       Object.keys(sprintSurveyStepTwoAnswer).forEach((key) => {
         const subArray =
-          sprintSurveyStepTwoAnswer[key as keyof SurveyStepTwoAnswer];
+          sprintSurveyStepTwoAnswer[parseInt(key) as keyof SurveyStepTwoAnswer];
         subArray.forEach((subArrayElement) => {
           if (subArrayElement.some((coworker) => coworker.userId === userId)) {
             remainingTimes -= 1;
@@ -97,7 +99,10 @@ const SprintStepTwo = ({
     users.map((user) => {
       return {
         ...user,
-        times: getRemainingTimes(user.userId, 4),
+        times: getRemainingTimes(
+          user.userId,
+          Object.keys(sprintSurveyStepTwoAnswer).length,
+        ),
       };
     }),
   );
@@ -116,7 +121,8 @@ const SprintStepTwo = ({
         handleRemoveUserTimes(coworker.userId);
       }
       return;
-    } else if (newPositionName === prevPositionName) {
+      //to compare strings with numbers dont ask why
+    } else if (newPositionName == prevPositionName) {
       const scopeItems = sprintSurveyStepTwoAnswer[newPositionName];
       scopeItems[prevPositionNumber] = scopeItems[prevPositionNumber].filter(
         (user) => user.userId != coworker.userId,
@@ -202,7 +208,9 @@ const SprintStepTwo = ({
     if (!event.over) return;
     const destination = event.over.id as string;
     const destinationData = destination.split("-");
-    const destinationPlace = destinationData[0] as keyof SurveyStepTwoAnswer;
+    const destinationPlace = parseInt(
+      destinationData[0],
+    ) as keyof SurveyStepTwoAnswer;
     const destinationPosition = Number(destinationData[1]);
 
     const coworker = event.active.data.current as Coworker;
@@ -221,6 +229,21 @@ const SprintStepTwo = ({
     );
   };
 
+  const getColors = (index: number) => {
+    const number = index % Object.keys(sprintSurveyStepTwoAnswer).length;
+    switch (number) {
+      case 0:
+        return yellowOpacities;
+      case 1:
+        return purpleOpacities;
+      case 2:
+        return blueOpacities;
+      case 3:
+        return redOpacities;
+      default:
+        return yellowOpacities;
+    }
+  };
   return (
     <main className="flex h-full w-full flex-col items-center justify-center">
       <p className="mt-6 self-start text-sm">
@@ -239,7 +262,18 @@ const SprintStepTwo = ({
             onDragEnd={handleDragEnd}
             collisionDetection={pointerWithin}
           >
-            <SprintDropRow
+            {questions &&
+              questions.map((question, index) => (
+                <SprintDropRow
+                  key={index}
+                  name={question.id}
+                  people={sprintSurveyStepTwoAnswer[question.id]}
+                  title={question.description}
+                  colors={getColors(index)}
+                  titlePadding="p-2"
+                />
+              ))}
+            {/*             <SprintDropRow
               name="SS_CWPN"
               people={sprintSurveyStepTwoAnswer.SS_CWPN}
               title="Is puntual in sessions and meetings?"
@@ -270,7 +304,7 @@ const SprintStepTwo = ({
               colors={redOpacities}
               className="mt-6"
               titlePadding="p-[18px] pe-2"
-            />
+            /> */}
             <SelectableDragUsers users={selectableUsers} />
           </DndContext>
         </section>
