@@ -1,6 +1,6 @@
 "use client";
-import PipResource from "@/components/PipResource";
-import PipTask from "@/components/PipTask";
+import PCPResource from "@/components/PCPResource";
+import PCPTask from "@/components/PCPTask";
 import ProgressBar from "@/components/ProgressBar";
 import {
   getUserTasks,
@@ -11,7 +11,7 @@ import { Resource, Task } from "@/types/types";
 import { useState, useEffect } from "react";
 import NoDataCard from "@/components/NoDataCard";
 
-const PIP = () => {
+const PCP = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
 
@@ -67,7 +67,7 @@ const PIP = () => {
             </div>
           )}
           {tasks.map((task, index) => (
-            <PipTask
+            <PCPTask
               title={task.title}
               description={task.description}
               isDone={task.isDone}
@@ -86,7 +86,7 @@ const PIP = () => {
             </div>
           )}
           {resources.map((task, index) => (
-            <PipResource
+            <PCPResource
               title={task.title}
               description={task.description}
               key={index}
@@ -99,4 +99,4 @@ const PIP = () => {
   );
 };
 
-export default PIP;
+export default PCP;

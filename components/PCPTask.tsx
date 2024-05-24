@@ -1,16 +1,16 @@
-interface InterfacePipTask {
+interface InterfacePCPTask {
   title: string | null;
   description: string | null;
   isDone: boolean | null;
   handleCheck: () => void;
 }
 
-const PipTask = ({
+const PCPTask = ({
   title,
   description,
   isDone,
   handleCheck,
-}: InterfacePipTask) => {
+}: InterfacePCPTask) => {
   return (
     <div className="box-border h-48 w-52 shrink-0 rounded-xl bg-white px-2 py-9 shadow-lg">
       <header className="flex items-center">
@@ -23,7 +23,7 @@ const PipTask = ({
               className="h-6 w-6 transform cursor-pointer appearance-none rounded-full border border-primary border-primary/80 bg-primary-light/20 outline-primary transition-all duration-200 ease-in-out checked:bg-primary hover:scale-110"
               checked={isDone || false} // default to false if isDone is null
             />
-            <span className="sr-only">Check Pip Task</span>
+            <span className="sr-only">Check PCP Task</span>
           </label>
         </div>
       </header>
@@ -34,4 +34,4 @@ const PipTask = ({
   );
 };
 
-export default PipTask;
+export default PCPTask;
