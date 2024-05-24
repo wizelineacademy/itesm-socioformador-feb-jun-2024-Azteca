@@ -63,6 +63,12 @@ const ProjectSurvey = ({
         (formData.get(`Question ${question.id}`) || "None").toString(),
       ),
     }));
+    let commentId = 1;
+    for (let c = 0; c < questions.data.length; c++) {
+      if (questions.data[c].type == "FINAL_PROJECT_COMMENT") {
+        commentId = questions.data[c].id;
+      }
+    }
     const finalAnswers = formsAnswers.filter(
       (answerObj) => !isNaN(answerObj.answer),
     );
@@ -70,12 +76,15 @@ const ProjectSurvey = ({
       userId: userId,
       finalSurveyId: projectSurveyId,
       answers: finalAnswers,
-      comment:
-        (
-          formData.get(
-            `Question ${questions.data[questions.data.length - 1].id}`,
-          ) || "None"
-        ).toString() || "None",
+      comment: {
+        questionKey: commentId,
+        text:
+          (
+            formData.get(
+              `Question ${questions.data[questions.data.length - 1].id}`,
+            ) || "None"
+          ).toString() || "None",
+      },
     });
   };
 
@@ -121,7 +130,7 @@ const ProjectSurvey = ({
                     )}
                     {questions.data &&
                       questions.data.map((question, index) =>
-                        question.description === "Final Project Comment" ? (
+                        question.type === "FINAL_PROJECT_COMMENT" ? (
                           <div key={index}>
                             <p className="text-sm font-light text-black">
                               General comments on the project
