@@ -23,8 +23,8 @@ const UserProfileButton = ({
     lg: "h-32 w-32",
   };
   return (
-    <button
-      className={`${className} ${active ? "bg-primary" : "bg-white"} group rounded-full p-1 drop-shadow-lg focus-within:outline-primary focus:outline-primary`}
+    <div
+      className={`${className} ${active ? "bg-primary" : "bg-white"} group h-fit w-fit rounded-full p-1 drop-shadow-lg focus-within:outline-primary focus:outline-primary`}
     >
       {photoUrl ? (
         <Image
@@ -51,7 +51,7 @@ const UserProfileButton = ({
           />
         </svg>
       )}
-    </button>
+    </div>
   );
 };
 export default UserProfileButton;

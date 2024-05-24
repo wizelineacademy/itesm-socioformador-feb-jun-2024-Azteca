@@ -7,7 +7,7 @@ import {
   sprintSurveyAnswerCoworkers,
   sprintSurveyAnswerProject,
 } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { eq, or, sql } from "drizzle-orm";
 
 import { SprintSurveyAnswer, SurveyStepTwoAnswer } from "@/types/types";
 
@@ -15,7 +15,13 @@ export async function getSprintSurveyQuestions() {
   const res = await db
     .select()
     .from(question)
-    .where(eq(question.type, "SPRINT_QUESTION"));
+    .where(
+      or(
+        eq(question.type, "SPRINT_QUESTION"),
+        eq(question.type, "COWORKER_QUESTION"),
+        eq(question.type, "COWORKER_COMMENT"),
+      ),
+    );
   return res;
 }
 

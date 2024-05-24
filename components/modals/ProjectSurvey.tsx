@@ -140,7 +140,7 @@ const ProjectSurvey = ({
                               id="comments"
                               className="mt-2 h-auto w-full rounded-md border border-black p-2 focus:outline-primary"
                               placeholder="Optional"
-                            ></textarea>
+                            />
                           </div>
                         ) : (
                           <Slider
