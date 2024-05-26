@@ -45,7 +45,7 @@ interface FeedbackRecords {
   };
 }
 
-// =============== QUESTIONS SKILLS INTERFACES ===============
+// =============== OTHER INTERFACES ===============
 
 interface QuestionSkills {
   [questionId: number]: {
@@ -54,9 +54,16 @@ interface QuestionSkills {
   };
 }
 
-async function cosineSimilarity(feedback: string) {
-  const resourcesSimilarity: [GLfloat, Number][] = [];
-  const allResources = await db.select().from(pipResource);
+interface EmbeddingRecord {
+  id: number;
+  embedding: GLfloat[] | null;
+}
+
+async function cosineSimilarity(
+  baseMessage: string,
+  embeddingRecords: EmbeddingRecord[],
+) {
+  const recordsSimilarity: [GLfloat, Number][] = [];
 
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_KEY,
@@ -64,31 +71,26 @@ async function cosineSimilarity(feedback: string) {
 
   const response = await openai.embeddings.create({
     model: "text-embedding-3-small",
-    input: feedback,
+    input: baseMessage,
     encoding_format: "float",
   });
 
-  const feedbackEmbedding = response.data[0].embedding;
+  const baseEmbedding = response.data[0].embedding;
 
-  // calculate the cosine similarity between the feedback and the resources
-  for (let resource of allResources) {
-    var resourceSimilarity: GLfloat = similarity(
-      feedbackEmbedding,
-      resource.embedding!,
+  // calculate the cosine similarity between the base string and all the records
+  for (let record of embeddingRecords) {
+    var recordSimilarity: GLfloat = similarity(
+      baseEmbedding,
+      record.embedding!,
     )!;
-    resourcesSimilarity.push([resourceSimilarity, resource.id]);
+    recordsSimilarity.push([recordSimilarity, record.id]);
   }
 
-  // sort the resources by similarity in descending order
-  resourcesSimilarity.sort((a, b) => b[0]! - a[0]!);
-
-  resourcesSimilarity.splice(5);
-
-  // return only the resources ids
-  const resourcesId: number[] = resourcesSimilarity
+  // return only the IDs of the records
+  const recordsId: number[] = recordsSimilarity
     .map(([_, second]) => second)
     .filter((value): value is number => value !== null);
-  return resourcesId;
+  return recordsId;
 }
 
 async function createTasks(feedback: string) {
@@ -503,7 +505,10 @@ export async function feedback_analysis(sprintSurveyId: number) {
             .openFeedback[0][1];
 
         // select the best tasks and resources
-        const resources = await cosineSimilarity(feedbackComment);
+        const allResources: EmbeddingRecord[] = await db
+          .select({ id: pipResource.id, embedding: pipResource.embedding })
+          .from(pipResource);
+        const resources = await cosineSimilarity(feedbackComment, allResources);
 
         const tasks = await createTasks(feedbackComment);
 
