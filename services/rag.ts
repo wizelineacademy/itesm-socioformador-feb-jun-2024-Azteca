@@ -9,16 +9,21 @@ import similarity from "compute-cosine-similarity";
 import {
   pipTask,
   pipResource,
+  positiveSkill,
   project,
   projectMember,
   rulerEmotion,
   sprintSurvey,
   sprintSurveyAnswerCoworkers,
   sprintSurveyAnswerProject,
+  sprintSurveyQuestion,
   userResource,
   question,
+  questionNegativeSkill,
   questionPositiveSkill,
 } from "@/db/schema";
+
+// =============== FEEDBACK INTERFACES ===============
 
 interface FeedbackCategory {
   [coworkerId: string]: {
@@ -40,7 +45,16 @@ interface FeedbackRecords {
   };
 }
 
-async function cosine_similarity(feedback: string) {
+// =============== QUESTIONS SKILLS INTERFACES ===============
+
+interface QuestionSkills {
+  [questionId: number]: {
+    positive: number[];
+    negative: number[];
+  };
+}
+
+async function cosineSimilarity(feedback: string) {
   const resourcesSimilarity: [GLfloat, Number][] = [];
   const allResources = await db.select().from(pipResource);
 
@@ -77,7 +91,7 @@ async function cosine_similarity(feedback: string) {
   return resourcesId;
 }
 
-async function create_tasks(feedback: string) {
+async function createTasks(feedback: string) {
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_KEY,
   });
@@ -115,7 +129,7 @@ async function create_tasks(feedback: string) {
   return cleanedTasks;
 }
 
-async function process_open_feedback(userFeedback: string) {
+async function processOpenFeedback(userFeedback: string) {
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_KEY,
   });
@@ -144,9 +158,6 @@ async function process_open_feedback(userFeedback: string) {
   notUseful: Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
   """`;
 
-  const summarizationInstructions: string =
-    "El siguiente es un párrafo con comentarios negativos o críticas constructivas hacia una persona, no son ataques personales. Quiero que resumas todo el párrafo en algunas categorías, pero solo puedes usar las que yo te diga sin usar opciones afuera de esa lista y debes regresar las categorías separadas por comas y sin espacios entre cada separador, solo regresa las categorías identificadas, no todas las mencionadas, no respondas ni expliques tu procedimiento, limítate a cumplir con las instrucciones especificadas. Las clasificaciones son: Mala gestión de tiempo, Sin inteligencia emocional, Prepotencia, Soberbia, Poca creatividad, Sin iniciativa, Mala comunicación, Mal trabajo en equipo, Falta de ética, y Sin razonamiento crítico. Un ejemplo del resultado que debes regresar es `Sin iniciativa,Mala gestión de tiempo,Mal trabajo en equipo,Mala comunicación`";
-
   // classify the feedback into 4 categories: positive, negative, biased, not useful
   const classifiedFeedback = await openai.chat.completions.create({
     model: "gpt-4",
@@ -173,28 +184,10 @@ async function process_open_feedback(userFeedback: string) {
     }
   }
 
-  // summarize the negative feedback to be compared with all the feedback given to the same user
-  const summarizedFeedback = await openai.chat.completions.create({
-    model: "gpt-4",
-    messages: [
-      {
-        role: "system",
-        content: summarizationInstructions,
-      },
-      {
-        role: "user",
-        content: negativeFeedback,
-      },
-    ],
-  });
-
-  const summarizedFeedbackCategories =
-    summarizedFeedback.choices[0].message.content!.split(",");
-
   return summarizedFeedbackCategories;
 }
 
-async function process_closed_feedback(answers: [number, number][]) {
+async function processClosedFeedback(answers: [number, number][]) {
   const ordinaryPerformance = 7;
   const userCategories = { goodCategories: [], badCategories: [] };
 
@@ -203,7 +196,7 @@ async function process_closed_feedback(answers: [number, number][]) {
   return userCategories;
 }
 
-async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
+async function orderFeedback(sprintSurveyId: number, uniqueWorkers: string[]) {
   const feedbackRecords: FeedbackRecords = {};
 
   const coworkersOpenFeedback = await db
@@ -287,37 +280,110 @@ async function group_feedback(sprintSurveyId: number, uniqueWorkers: string[]) {
   return feedbackRecords;
 }
 
-async function getFeedbackClassifications(coworkersFeedback: FeedbackCategory) {
+async function getFeedbackClassifications(
+  coworkersFeedback: FeedbackCategory,
+  questionsSkills: QuestionSkills,
+) {
   const feedbackClassifications: FeedbackClassifications = {
     positive: {},
     negative: {},
     biased: {},
   };
 
+  // read the feedback of each coworker and classify it
   for (let coworkerId of Object.keys(coworkersFeedback)) {
     let closedFeedback = coworkersFeedback[coworkerId].closedFeedback;
     let positivePerformanceCount = 0;
     let negativePerformanceCount = 0;
+    // read all the closed feedback of the coworker
     for (let answer of closedFeedback) {
       if (answer[1] >= 8) {
+        // add the positive skills of the question
         positivePerformanceCount++;
-        // get the positive skills of the question
-        let questionPositiveSkills = await db
-          .select({
-            skill: questionPositiveSkill.skill,
-          })
-          .from();
+        let questionPositiveSkills = questionsSkills[answer[0]].positive;
+        for (let positiveSkillId of questionPositiveSkills) {
+          if (positiveSkillId in feedbackClassifications.positive) {
+            // the skill already exists in the classification, check if the coworker is already there
+            if (
+              !feedbackClassifications.positive[positiveSkillId].includes(
+                coworkerId,
+              )
+            ) {
+              feedbackClassifications.positive[positiveSkillId].push(
+                coworkerId,
+              );
+            }
+          } else {
+            // the skill does not exist in the classification, add the coworker
+            feedbackClassifications.positive[positiveSkillId] = [coworkerId];
+          }
+        }
       } else {
+        // add the negative skills of the question
         negativePerformanceCount++;
-        // get the positive skills of the question
+        let questionNegativeSkills = questionsSkills[answer[0]].negative;
+        for (let negativeSkillId of questionNegativeSkills) {
+          if (negativeSkillId in feedbackClassifications.negative) {
+            // the skill already exists in the classification, check if the coworker is already there
+            if (
+              !feedbackClassifications.negative[negativeSkillId].includes(
+                coworkerId,
+              )
+            ) {
+              feedbackClassifications.negative[negativeSkillId].push(
+                coworkerId,
+              );
+            }
+          } else {
+            // the skill does not exist in the classification, add the coworker
+            feedbackClassifications.negative[negativeSkillId] = [coworkerId];
+          }
+        }
       }
+    }
+
+    // the user has negative performance, an analysis of the comment is needed
+    if (negativePerformanceCount > 1) {
     }
   }
 
   return feedbackClassifications;
 }
 
-async function set_resources_embeddings() {
+async function getQuestionsSkills(sprintSurveyId: number) {
+  const questionsSkills: QuestionSkills = {};
+  const questions = await db
+    .select({
+      questionId: sprintSurveyQuestion.questionId,
+    })
+    .from(sprintSurveyQuestion)
+    .where(eq(sprintSurveyQuestion.sprintSurveyId, sprintSurveyId));
+
+  for (let question of questions) {
+    const positiveSkills = await db
+      .select({
+        skill: questionPositiveSkill.positiveSkillId,
+      })
+      .from(questionPositiveSkill)
+      .where(eq(questionPositiveSkill.questionId, question.questionId!));
+
+    const negativeSkills = await db
+      .select({
+        skill: questionNegativeSkill.negativeSkillId,
+      })
+      .from(questionNegativeSkill)
+      .where(eq(questionNegativeSkill.questionId, question.questionId!));
+
+    questionsSkills[question.questionId!] = {
+      positive: positiveSkills.map((skill) => skill.skill as number),
+      negative: negativeSkills.map((skill) => skill.skill as number),
+    };
+  }
+
+  return questionsSkills;
+}
+
+async function setResourcesEmbeddings() {
   try {
     const noEmbeddingResources = await db
       .select()
@@ -350,7 +416,7 @@ async function set_resources_embeddings() {
   }
 }
 
-export async function ruler_analysis() {
+export async function rulerAnalysis() {
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) throw new Error("You must be signed in");
@@ -378,7 +444,8 @@ export async function feedback_analysis(sprintSurveyId: number) {
       .where(eq(sprintSurvey.id, sprintSurveyId));
 
     const ids = uniqueProjectUsers.map((user) => user.userId as string);
-    const orderedFeedback = await group_feedback(sprintSurveyId, ids);
+    const orderedFeedback = await orderFeedback(sprintSurveyId, ids);
+    const questionsSkills = await getQuestionsSkills(sprintSurveyId);
 
     // iterate through each unique user of the project and read the feedback received
     for (let userId of Object.keys(orderedFeedback)) {
@@ -402,11 +469,12 @@ export async function feedback_analysis(sprintSurveyId: number) {
           ),
         );
 
-      // safety double check if the user has been checked in case of a failure in the middle of the survey analysis
+      // safety double check if the user has been checked in case of a failure in the middle of a previous survey analysis
       if (userTasksCount[0].count == 0 || userResourcesCount[0].count == 0) {
         orderedFeedback[userId]["feedbackClassifications"] =
           await getFeedbackClassifications(
             orderedFeedback[userId].coworkersFeedback,
+            questionsSkills,
           );
 
         // all feedback summarized, now get the classifications of negative feedback with the most suggestions
@@ -434,10 +502,10 @@ export async function feedback_analysis(sprintSurveyId: number) {
           orderedFeedback[userId].coworkersFeedback[newCoworkerId]
             .openFeedback[0][1];
 
-        // select the best tasks and resource
-        const resources = await cosine_similarity(feedbackComment);
+        // select the best tasks and resources
+        const resources = await cosineSimilarity(feedbackComment);
 
-        const tasks = await create_tasks(feedbackComment);
+        const tasks = await createTasks(feedbackComment);
 
         for (let task of tasks) {
           const [title, description] = task.split(":");
@@ -455,6 +523,8 @@ export async function feedback_analysis(sprintSurveyId: number) {
             resourceId: resource,
           });
         }
+
+        // set the strengths and weaknesses of the user
       }
     }
 
