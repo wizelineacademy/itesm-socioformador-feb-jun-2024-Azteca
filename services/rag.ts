@@ -1,24 +1,19 @@
 "use server";
-import dotenv from "dotenv";
 import OpenAI from "openai";
 import db from "@/db/drizzle";
-import { and, count, eq, gte, lte, isNull, sql } from "drizzle-orm";
+import { and, count, eq, isNull, sql } from "drizzle-orm";
 import { auth } from "@/auth";
 import similarity from "compute-cosine-similarity";
 
 import {
   pipTask,
   pipResource,
-  positiveSkill,
   project,
   projectMember,
-  rulerEmotion,
   sprintSurvey,
   sprintSurveyAnswerCoworkers,
-  sprintSurveyAnswerProject,
   sprintSurveyQuestion,
   userResource,
-  question,
   questionNegativeSkill,
   questionPositiveSkill,
 } from "@/db/schema";
@@ -63,7 +58,7 @@ async function cosineSimilarity(
   baseMessage: string,
   embeddingRecords: EmbeddingRecord[],
 ) {
-  const recordsSimilarity: [GLfloat, Number][] = [];
+  const recordsSimilarity: [GLfloat, number][] = [];
 
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_KEY,
@@ -78,11 +73,11 @@ async function cosineSimilarity(
   const baseEmbedding = response.data[0].embedding;
 
   // calculate the cosine similarity between the base string and all the records
-  for (let record of embeddingRecords) {
-    var recordSimilarity: GLfloat = similarity(
+  for (const record of embeddingRecords) {
+    const recordSimilarity: GLfloat = similarity(
       baseEmbedding,
-      record.embedding!,
-    )!;
+      record.embedding as GLfloat[],
+    ) as GLfloat;
     recordsSimilarity.push([recordSimilarity, record.id]);
   }
 
@@ -129,7 +124,7 @@ async function createTasks(feedback: string) {
   });
 
   // clean the results of the generated tasks
-  const tasks = rawTasks.choices[0].message.content!.split("\n");
+  const tasks = (rawTasks.choices[0].message.content as string).split("\n");
   const cleanedTasks = tasks.filter((element) => element !== "");
   return cleanedTasks;
 }
@@ -182,8 +177,9 @@ async function processOpenFeedback(userFeedback: string) {
   });
 
   // clean the results of the classification
-  const sentiments =
-    classifiedFeedback.choices[0].message.content!.split("\n\n");
+  const sentiments = (
+    classifiedFeedback.choices[0].message.content as string
+  ).split("\n\n");
   const cleanedSentiments = sentiments.filter((element) => element !== "");
 
   const commentClassifications = {
@@ -192,7 +188,7 @@ async function processOpenFeedback(userFeedback: string) {
     biased: "",
   };
 
-  for (let sentiment of cleanedSentiments) {
+  for (const sentiment of cleanedSentiments) {
     if (sentiment.includes("positive:")) {
       commentClassifications.positive = sentiment.substring(10);
     } else if (sentiment.includes("negative:")) {
@@ -247,8 +243,8 @@ async function orderFeedback(sprintSurveyId: number, uniqueWorkers: string[]) {
     );
 
   // initialize the empty structure with the keys
-  for (let userId of uniqueWorkers) {
-    var filteredCoworkers = uniqueWorkers.filter(
+  for (const userId of uniqueWorkers) {
+    const filteredCoworkers = uniqueWorkers.filter(
       (element): element is string =>
         typeof element === "string" && element !== userId,
     );
@@ -262,7 +258,7 @@ async function orderFeedback(sprintSurveyId: number, uniqueWorkers: string[]) {
       },
     };
 
-    for (let coworkerId of filteredCoworkers) {
+    for (const coworkerId of filteredCoworkers) {
       feedbackRecords[userId]["coworkersFeedback"][coworkerId] = {
         openFeedback: "",
         closedFeedback: [],
@@ -272,17 +268,20 @@ async function orderFeedback(sprintSurveyId: number, uniqueWorkers: string[]) {
 
   coworkersOpenFeedback.forEach((record) => {
     if (record.coworkerId !== null && record.coworkerId !== undefined) {
-      feedbackRecords[record.userId!]["coworkersFeedback"][
+      feedbackRecords[record.userId as string]["coworkersFeedback"][
         record.coworkerId
-      ].openFeedback = record.comment!;
+      ].openFeedback = record.comment as string;
     }
   });
 
   coworkersClosedFeedback.forEach((record) => {
     if (record.coworkerId !== null && record.coworkerId !== undefined) {
-      feedbackRecords[record.userId!]["coworkersFeedback"][
+      feedbackRecords[record.userId as string]["coworkersFeedback"][
         record.coworkerId
-      ].closedFeedback.push([record.questionId!, record.answer!]);
+      ].closedFeedback.push([
+        record.questionId as number,
+        record.answer as number,
+      ]);
     }
   });
 
@@ -292,26 +291,25 @@ async function orderFeedback(sprintSurveyId: number, uniqueWorkers: string[]) {
 async function getFeedbackClassifications(
   coworkersFeedback: FeedbackCategory,
   questionsSkills: QuestionSkills,
-) {
+): Promise<[FeedbackClassifications, Set<number>]> {
   const feedbackClassifications: FeedbackClassifications = {
     positive: {},
     negative: {},
     biased: {},
   };
 
+  const coworkersRecommendations = new Set<number>([]);
+
   // read the feedback of each coworker and classify it
-  for (let coworkerId of Object.keys(coworkersFeedback)) {
-    let closedFeedback = coworkersFeedback[coworkerId].closedFeedback;
-    let coworkerRecommendations = new Set<number>([]);
-    let positivePerformanceCount = 0;
+  for (const coworkerId of Object.keys(coworkersFeedback)) {
+    const closedFeedback = coworkersFeedback[coworkerId].closedFeedback;
     let negativePerformanceCount = 0;
     // read all the closed feedback of the coworker
-    for (let answer of closedFeedback) {
+    for (const answer of closedFeedback) {
       if (answer[1] >= 8) {
         // add the positive skills of the question
-        positivePerformanceCount++;
-        let questionPositiveSkills = questionsSkills[answer[0]].positive;
-        for (let positiveSkillId of questionPositiveSkills) {
+        const questionPositiveSkills = questionsSkills[answer[0]].positive;
+        for (const positiveSkillId of questionPositiveSkills) {
           if (positiveSkillId in feedbackClassifications.positive) {
             // the skill already exists in the classification, check if the coworker is already there
             if (
@@ -331,8 +329,8 @@ async function getFeedbackClassifications(
       } else {
         // add the negative skills of the question
         negativePerformanceCount++;
-        let questionNegativeSkills = questionsSkills[answer[0]].negative;
-        for (let negativeSkillId of questionNegativeSkills) {
+        const questionNegativeSkills = questionsSkills[answer[0]].negative;
+        for (const negativeSkillId of questionNegativeSkills) {
           if (negativeSkillId in feedbackClassifications.negative) {
             // the skill already exists in the classification, check if the coworker is already there
             if (
@@ -354,9 +352,10 @@ async function getFeedbackClassifications(
 
     // the user has negative performance, an analysis of the comment is needed
     if (negativePerformanceCount > 1) {
-      let coworkerFeedback = coworkersFeedback[coworkerId].openFeedback;
+      const coworkerFeedback = coworkersFeedback[coworkerId].openFeedback;
       if (coworkerFeedback !== "") {
-        let sentimentsClassified = await processOpenFeedback(coworkerFeedback);
+        const sentimentsClassified =
+          await processOpenFeedback(coworkerFeedback);
         if (sentimentsClassified.negative !== "") {
           const allResources: EmbeddingRecord[] = await db
             .select({ id: pipResource.id, embedding: pipResource.embedding })
@@ -366,14 +365,18 @@ async function getFeedbackClassifications(
             allResources,
           );
           // limit to the 5 most similar resources
-
           recommendedResourcesIds.splice(5);
+
+          // add the recommended resources taken from the comment
+          recommendedResourcesIds.forEach((resourceId) =>
+            coworkersRecommendations.add(resourceId),
+          );
         }
       }
     }
   }
 
-  return [feedbackClassifications, ragRecomendations];
+  return [feedbackClassifications, coworkersRecommendations];
 }
 
 async function getQuestionsSkills(sprintSurveyId: number) {
@@ -385,22 +388,26 @@ async function getQuestionsSkills(sprintSurveyId: number) {
     .from(sprintSurveyQuestion)
     .where(eq(sprintSurveyQuestion.sprintSurveyId, sprintSurveyId));
 
-  for (let question of questions) {
+  for (const question of questions) {
     const positiveSkills = await db
       .select({
         skill: questionPositiveSkill.positiveSkillId,
       })
       .from(questionPositiveSkill)
-      .where(eq(questionPositiveSkill.questionId, question.questionId!));
+      .where(
+        eq(questionPositiveSkill.questionId, question.questionId as number),
+      );
 
     const negativeSkills = await db
       .select({
         skill: questionNegativeSkill.negativeSkillId,
       })
       .from(questionNegativeSkill)
-      .where(eq(questionNegativeSkill.questionId, question.questionId!));
+      .where(
+        eq(questionNegativeSkill.questionId, question.questionId as number),
+      );
 
-    questionsSkills[question.questionId!] = {
+    questionsSkills[question.questionId as number] = {
       positive: positiveSkills.map((skill) => skill.skill as number),
       negative: negativeSkills.map((skill) => skill.skill as number),
     };
@@ -420,7 +427,7 @@ async function setResourcesEmbeddings() {
       apiKey: process.env.OPENAI_KEY,
     });
 
-    for (let resource of noEmbeddingResources) {
+    for (const resource of noEmbeddingResources) {
       const description = resource.description as string;
 
       const response = await openai.embeddings.create({
@@ -474,8 +481,8 @@ export async function feedback_analysis(sprintSurveyId: number) {
     const questionsSkills = await getQuestionsSkills(sprintSurveyId);
 
     // iterate through each unique user of the project and read the feedback received
-    for (let userId of Object.keys(orderedFeedback)) {
-      let userTasksCount = await db
+    for (const userId of Object.keys(orderedFeedback)) {
+      const userTasksCount = await db
         .select({ count: count() })
         .from(pipTask)
         .where(
@@ -485,7 +492,7 @@ export async function feedback_analysis(sprintSurveyId: number) {
           ),
         );
 
-      let userResourcesCount = await db
+      const userResourcesCount = await db
         .select({ count: count() })
         .from(userResource)
         .where(
@@ -497,10 +504,10 @@ export async function feedback_analysis(sprintSurveyId: number) {
 
       // safety double check if the user has been checked in case of a failure in the middle of a previous survey analysis
       if (userTasksCount[0].count == 0 || userResourcesCount[0].count == 0) {
-        let coworkerRecommendations = new Set<number>([]);
+        let coworkersRecommendations: Set<number> = new Set<number>();
         [
           orderedFeedback[userId]["feedbackClassifications"],
-          coworkerRecommendations,
+          coworkersRecommendations,
         ] = await getFeedbackClassifications(
           orderedFeedback[userId].coworkersFeedback,
           questionsSkills,
@@ -529,7 +536,7 @@ export async function feedback_analysis(sprintSurveyId: number) {
 
         const tasks = await createTasks(feedbackComment);
 
-        for (let task of tasks) {
+        for (const task of tasks) {
           const [title, description] = task.split(":");
           await db.insert(pipTask).values({
             userId: userId,
@@ -539,7 +546,7 @@ export async function feedback_analysis(sprintSurveyId: number) {
           });
         }
 
-        for (let resource of resources) {
+        for (const resource of resources) {
           await db.insert(userResource).values({
             userId: userId,
             resourceId: resource,
