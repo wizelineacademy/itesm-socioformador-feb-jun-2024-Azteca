@@ -132,35 +132,38 @@ async function createTasks(feedback: string) {
 }
 
 async function processOpenFeedback(userFeedback: string) {
+  // string cleaning
+  userFeedback = userFeedback.replaceAll("positive:", "");
+  userFeedback = userFeedback.replaceAll("negative:", "");
+  userFeedback = userFeedback.replaceAll("biased:", "");
+  userFeedback = userFeedback.replaceAll("  ", " ");
+
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_KEY,
   });
 
   const classificationInstructions: string = `El siguiente query es un párrafo que contiene feedback de un usuario a otro. Realiza las siguientes instrucciones:
   1. Identifica las ideas claves de todo el párrafo, sepáralo por cada idea tomando en cuenta la coherencia entre las oraciones y las ideas que expresan guardando la conexión del asunto, puedes ignorar signos de puntuación si una misma oración une ideas diferentes, pero tu prioridad es separar las oraciones con ideas atómicas.
-  2. De las oraciones agrupadas por ideas, sepáralas en las siguientes 4 clasificaciones de sentimientos, tomando en cuenta la descripción de cada una:
+  2. De las oraciones agrupadas por ideas, sepáralas en las siguientes 3 clasificaciones de sentimientos, tomando en cuenta la descripción de cada una:
     * positive: cualquier cumplido, elogio o felicitación a la persona que recibe el comentario o a su desempeño en el trabajo. Las críticas constructivas si bien son una forma saludable de dar retroalimentación no cuentan como comentario positivo porque destacan una necesidad de la persona evaluada.
     * negative: cualquier comentario relacionado con críticas constructivas o áreas de mejora en las habilidades de la persona y en su desempeño laboral. Si hay un comentario relacionado con la inteligencia emocional o una crítica a al carácter de la persona sé muy cauteloso y presta atención si el comentario es objetivo y si habla con hechos, ya que es posible que pueda involucrar un ataque personal, tómalo como un comentario constructivo si brinda hechos e información de forma objetiva.
     * biased: cualquier comentario o crítica relacionada con la raza, color de piel, creencias, sexo, preferencias sexuales de la persona evaluada o comentarios con insultos y ataques personales. No es lo mismo que un comentario negativo porque no es imparcial.
-    * notUseful: cualquier comentario que no sea positivo, ni negativo, ni sesgado, ni aporte ningún tipo de valor a las clasificaciones previas.
-  3. En cada una de las 4 clasificaciones de sentimiento une todas las oraciones en un párrafo. Al unir las oraciones de cada clasificación debe haber una conexión clara entre las ideas, pero es posible que en la unión no haya coherencia gramatical o por signos de puntuación, si ese es el caso puedes modificar ligeramente las palabras o signos para unir todas las oraciones en un párrafo de la clasificación en cuestión, pero no alteres el contenido del mensaje que expresan.
-  4. Separa las 4 clasificaciones con el separador "\n\n" que solo puede aparecer entre la clasificación de cada sentimiento, no en el párrafo formado de oraciones de cada clasificación.
+  3. En cada una de las 3 clasificaciones de sentimiento une todas las oraciones en un párrafo. Al unir las oraciones de cada clasificación debe haber una conexión clara entre las ideas, pero es posible que en la unión no haya coherencia gramatical o por signos de puntuación, si ese es el caso puedes modificar ligeramente las palabras o signos para unir todas las oraciones en un párrafo de la clasificación en cuestión, pero no alteres el contenido del mensaje que expresan.
+  4. Separa las 3 clasificaciones con el separador "\n\n" que solo puede aparecer entre la clasificación de cada sentimiento, no en el párrafo formado de oraciones de cada clasificación.
   5. Si hay clasificaciones de sentimientos que no cuentan con ninguna oración porque ninguna cayó en esa categoría, aun así incluye el nombre del sentimiento con el separador definido en el paso anterior.
   6. Es importante que en tu respuesta el orden de las clasificaciones de sentimientos sea el mismo en que los presenté en el paso 2.
   7. No respondas ni expliques tu procedimiento, limítate a cumplir con las instrucciones especificadas con la estructura especificada, haz el análisis de todo el contenido del texto sin dejar oraciones sin procesar.
   
-  Este es un ejemplo del resultado esperado, la categoría 'Sesgado' se encuentra vacía porque ningún comentario encajó en las instrucciones proporcionadas de ese sentimiento y así se deben representar las categorías cuando ningún comentario pertenezca a ella, recuerda que es solo un ejemplo, pon atención en la estructura, no tanto en el contenido:
+  Este es un ejemplo del resultado esperado, la categoría 'biased' se encuentra vacía porque ningún comentario encajó en las instrucciones proporcionadas de ese sentimiento y así se deben representar las categorías cuando ningún comentario pertenezca a ella, recuerda que es solo un ejemplo, pon atención en la estructura, no tanto en el contenido:
   """
   positive: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
   \n\n
   negative: Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat
   \n\n
   biased:
-  \n\n
-  notUseful: Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
   """`;
 
-  // classify the feedback into 4 categories: positive, negative, biased, not useful
+  // classify the feedback into 3 categories: positive, negative, biased
   const classifiedFeedback = await openai.chat.completions.create({
     model: "gpt-4",
     messages: [
@@ -179,23 +182,32 @@ async function processOpenFeedback(userFeedback: string) {
   const sentiments =
     classifiedFeedback.choices[0].message.content!.split("\n\n");
   const cleanedSentiments = sentiments.filter((element) => element !== "");
+
+  const feedbackClassifications: FeedbackClassifications = {
+    positive: {},
+    negative: {},
+    biased: {},
+  };
+
+  var positiveFeedback: string = "";
   var negativeFeedback: string = "";
+  var biasedFeedback: string = "";
+
   for (let sentiment of cleanedSentiments) {
-    if (sentiment.includes("negative:")) {
+    if (sentiment.includes("positive:")) {
+      positiveFeedback = sentiment.substring(10);
+    } else if (sentiment.includes("negative:")) {
       negativeFeedback = sentiment.substring(10);
+    } else if (sentiment.includes("biased:")) {
+      biasedFeedback = sentiment.substring(8);
     }
   }
 
-  return summarizedFeedbackCategories;
-}
+  // analyze the skills in all the classifications
 
-async function processClosedFeedback(answers: [number, number][]) {
-  const ordinaryPerformance = 7;
-  const userCategories = { goodCategories: [], badCategories: [] };
+  // add the skills, the coworker is not needed at this stage
 
-  // get the classifications of each closed question
-
-  return userCategories;
+  return feedbackClassifications;
 }
 
 async function orderFeedback(sprintSurveyId: number, uniqueWorkers: string[]) {
@@ -346,6 +358,31 @@ async function getFeedbackClassifications(
 
     // the user has negative performance, an analysis of the comment is needed
     if (negativePerformanceCount > 1) {
+      let coworkerFeedback = coworkersFeedback[coworkerId].openFeedback;
+      if (coworkerFeedback !== "") {
+        let openFeedbackClassifications =
+          await processOpenFeedback(coworkerFeedback);
+        for (let sentiment of Object.keys(
+          openFeedbackClassifications,
+        ) as (keyof FeedbackClassifications)[]) {
+          for (let skill of Object.keys(
+            openFeedbackClassifications[sentiment],
+          )) {
+            // check if the skill already exists in the classification
+            if (skill in feedbackClassifications[sentiment]) {
+              // the skill already exists in the classification, check if the coworker is already there
+              if (
+                !feedbackClassifications[sentiment][skill].includes(coworkerId)
+              ) {
+                feedbackClassifications[sentiment][skill].push(coworkerId);
+              }
+            } else {
+              // the skill does not exist in the classification, add the coworker
+              feedbackClassifications[sentiment][skill] = [coworkerId];
+            }
+          }
+        }
+      }
     }
   }
 
@@ -480,35 +517,30 @@ export async function feedback_analysis(sprintSurveyId: number) {
           );
 
         // all feedback summarized, now get the classifications of negative feedback with the most suggestions
-        const feedbackSuggestions: [number, string][] = [];
+        const userNegativeSkills: [number, number][] = []; // [coworkersCount, negativeSkillId]
+
+        // get the negative skills associated
         Object.keys(
           orderedFeedback[userId].feedbackClassifications.negative,
-        ).forEach((key) => {
-          feedbackSuggestions.push([
-            orderedFeedback[userId].feedbackClassifications.negative[key]
-              .length,
-            key,
+        ).forEach((negativeSkill) => {
+          userNegativeSkills.push([
+            orderedFeedback[userId].feedbackClassifications.negative
+              .negativeSkill.length,
+            Number(negativeSkill),
           ]);
         });
 
-        feedbackSuggestions.sort((a, b) => b[0] - a[0]);
+        // sort the negative skills by the number of coworkers that suggested them in descending order
+        userNegativeSkills.sort((a, b) => b[0] - a[0]);
 
-        const feedbackToCreate = feedbackSuggestions[0][1];
-
-        const newCoworkerId =
-          orderedFeedback[userId].feedbackClassifications.negative[
-            feedbackToCreate
-          ][0];
-
-        const feedbackComment =
-          orderedFeedback[userId].coworkersFeedback[newCoworkerId]
-            .openFeedback[0][1];
+        // get the strings of the negative skills
 
         // select the best tasks and resources
         const allResources: EmbeddingRecord[] = await db
           .select({ id: pipResource.id, embedding: pipResource.embedding })
           .from(pipResource);
-        const resources = await cosineSimilarity(feedbackComment, allResources);
+
+        const resources = await selectTasks();
 
         const tasks = await createTasks(feedbackComment);
 
