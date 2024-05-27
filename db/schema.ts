@@ -25,6 +25,13 @@ export const user = pgTable(
     department: varchar("department", { length: 64 }),
     photoUrl: varchar("photo_url", { length: 1024 }),
     role: userRoleEnum("role").notNull(),
+    bannerId: varchar("banner_id", { length: 24 })
+      .notNull()
+      .default("Banner1.svg"),
+    primaryColor: varchar("primary_color", { length: 7 })
+      .notNull()
+      .default("#6640D5"),
+    lightMode: boolean("light_mode").default(true),
   },
 );
 

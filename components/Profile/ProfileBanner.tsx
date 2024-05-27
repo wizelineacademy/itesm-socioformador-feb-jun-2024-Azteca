@@ -2,7 +2,6 @@ import React from "react";
 import UserProfileButton from "@/components/UserProfileButton";
 import Image from "next/image";
 import Link from "next/link";
-import JobSVG from "@/public/Job-Profile-Image.svg";
 import { User } from "@/types/types";
 import { getUserId, getUserManagedBy } from "@/services/user";
 interface ProfileBannerProps {
@@ -39,9 +38,11 @@ const ProfileBanner: React.FC<ProfileBannerProps> = async ({ user }) => {
           )}
         </div>
         <Image
-          src={JobSVG}
+          src={`/${user.bannerId}` || "/Banner1.svg"}
           alt="Banner Image"
-          className="hidden md:block"
+          width={100}
+          height={100}
+          className="hidden h-auto w-56 md:block"
           priority
         />
       </div>
