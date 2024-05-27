@@ -19,6 +19,9 @@ export async function getUserInfoById(id: string) {
       department: schema.user.department,
       photoUrl: schema.user.photoUrl,
       role: schema.user.role,
+      bannerId: schema.user.bannerId,
+      primaryColor: schema.user.primaryColor,
+      lightMode: schema.user.lightMode,
     })
     .from(schema.user)
     .where(eq(schema.user.id, id));
@@ -41,6 +44,9 @@ export async function getUserInfo() {
       department: schema.user.department,
       photoUrl: schema.user.photoUrl,
       role: schema.user.role,
+      bannerId: schema.user.bannerId,
+      primaryColor: schema.user.primaryColor,
+      lightMode: schema.user.lightMode,
     })
     .from(schema.user)
     .where(eq(schema.user.id, id));
@@ -91,6 +97,9 @@ export const registerUser = async (
       role: "EMPLOYEE",
       department: department,
       jobTitle: jobTitle,
+      bannerId: "Banner1.svg",
+      primaryColor: "#6640D5",
+      lightMode: true,
     })
     .catch((e) => {
       const dbError = e as DatabaseError;
@@ -119,6 +128,45 @@ export const updateRole = async ({
   newRole: typeof user.$inferInsert.role;
 }) => {
   await db.update(user).set({ role: newRole }).where(eq(user.id, id)).execute();
+};
+
+export const updateBannerId = async ({ bannerId }: { bannerId: string }) => {
+  const session = await auth();
+  const id = session?.user?.id as string;
+
+  await db
+    .update(user)
+    .set({ bannerId: bannerId })
+    .where(eq(user.id, id))
+    .execute();
+};
+
+export const updatePrimaryColor = async ({
+  id,
+  primaryColor,
+}: {
+  id: string;
+  primaryColor: string;
+}) => {
+  await db
+    .update(user)
+    .set({ primaryColor: primaryColor })
+    .where(eq(user.id, id))
+    .execute();
+};
+
+export const updateLightMode = async ({
+  id,
+  lightMode,
+}: {
+  id: string;
+  lightMode: boolean;
+}) => {
+  await db
+    .update(user)
+    .set({ lightMode: lightMode })
+    .where(eq(user.id, id))
+    .execute();
 };
 
 export async function getUserTraitsById(id: string) {

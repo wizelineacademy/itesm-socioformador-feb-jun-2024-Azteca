@@ -1,6 +1,12 @@
 "use client";
-import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import {
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  Transition,
+  TransitionChild,
+} from "@headlessui/react";
+import { Fragment, useEffect, useState } from "react";
 import RulerStepOne from "./RulerStepOne";
 import { RulerSurveyAnswer } from "@/types/types";
 import RulerStepTwo from "./RulerStepTwo";
@@ -28,7 +34,19 @@ const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
       comment: null,
     },
   );
-  const modalWidth = step === 1 ? "max-w-4xl" : "max-w-lg";
+  let modalWidth = step === 1 ? "max-w-4xl" : "max-w-lg";
+
+  useEffect(() => {
+    const modal = document.getElementById("ruler-modal");
+    if (step === 1) {
+      modal?.classList.remove("max-w-lg");
+      modalWidth = "max-w-4xl";
+    } else {
+      modal?.classList.remove("max-w-4xl");
+      modalWidth = "max-w-lg";
+    }
+  }, [step]);
+
   const getEmotionTextColor = () => {
     if (!rulerSurveyAnswer.emotion) return "";
     if (
@@ -67,7 +85,7 @@ const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
   return (
     <Transition appear show={showModal} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
-        <Transition.Child
+        <TransitionChild
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
@@ -77,11 +95,11 @@ const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-black/25" />
-        </Transition.Child>
+        </TransitionChild>
 
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full w-auto items-center justify-center p-4 text-center transition-all duration-300">
-            <Transition.Child
+            <TransitionChild
               as={Fragment}
               enter="ease-out duration-300"
               enterFrom="opacity-0 scale-95"
@@ -90,10 +108,11 @@ const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel
+              <DialogPanel
+                id="ruler-modal"
                 className={`flex ${modalWidth} w-full transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all duration-500`}
               >
-                <Dialog.Title
+                <DialogTitle
                   as="h3"
                   className="flex flex-row items-center justify-between text-black"
                 >
@@ -110,7 +129,7 @@ const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
                       <span>{rulerSurveyAnswer.emotion?.description}</span>
                     )}
                   </div>
-                </Dialog.Title>
+                </DialogTitle>
                 {step === 1 && (
                   <RulerStepOne
                     setEmotion={setRulerSurveyAnswer}
@@ -126,8 +145,8 @@ const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
                     onClose={handleSubmit}
                   />
                 )}
-              </Dialog.Panel>
-            </Transition.Child>
+              </DialogPanel>
+            </TransitionChild>
           </div>
         </div>
       </Dialog>

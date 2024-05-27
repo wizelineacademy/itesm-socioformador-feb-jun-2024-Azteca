@@ -13,6 +13,9 @@ export interface User {
   department: string | null;
   photoUrl: string | null;
   jobTitle: string | null;
+  bannerId: string | null;
+  primaryColor: string | null;
+  lightMode: boolean | null;
 }
 
 export type SurveyCoworker = {
