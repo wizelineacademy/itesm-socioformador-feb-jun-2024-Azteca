@@ -95,7 +95,7 @@ export type Task = {
   userId: string | null;
   title: string | null;
   description: string | null;
-  isDone: boolean | null;
+  status: string | null;
 };
 
 export type Resource = {
