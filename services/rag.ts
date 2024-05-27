@@ -86,6 +86,9 @@ async function cosineSimilarity(
     recordsSimilarity.push([recordSimilarity, record.id]);
   }
 
+  // sort the elements by similarity
+  recordsSimilarity.sort((a, b) => b[0] - a[0]);
+
   // return only the IDs of the records
   const recordsId: number[] = recordsSimilarity
     .map(([_, second]) => second)
@@ -358,10 +361,13 @@ async function getFeedbackClassifications(
           const allResources: EmbeddingRecord[] = await db
             .select({ id: pipResource.id, embedding: pipResource.embedding })
             .from(pipResource);
-          const recommendedResources = await cosineSimilarity(
+          const recommendedResourcesIds = await cosineSimilarity(
             sentimentsClassified.negative,
             allResources,
           );
+          // limit to the 5 most similar resources
+
+          recommendedResourcesIds.splice(5);
         }
       }
     }
