@@ -3,12 +3,11 @@
 import { projectMember, user, userRoleEnum, project } from "@/db/schema";
 import db from "@/db/drizzle";
 import * as schema from "@/db/schema";
-import { eq, not, and, or, asc, sql, ne, gt } from "drizzle-orm";
+import { eq, not, and, or, asc, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { auth } from "@/auth";
 import bcrypt from "bcrypt";
 import { DatabaseError } from "pg";
-import { deprecate } from "util";
 
 export async function getUserInfoById(id: string) {
   const res = await db
@@ -92,9 +91,6 @@ export const registerUser = async (
       role: "EMPLOYEE",
       department: department,
       jobTitle: jobTitle,
-      bannerId: "Banner1.svg",
-      primaryColor: "#6640D5",
-      lightMode: true,
     })
     .catch((e) => {
       const dbError = e as DatabaseError;
@@ -123,48 +119,6 @@ export const updateRole = async ({
   newRole: typeof user.$inferInsert.role;
 }) => {
   await db.update(user).set({ role: newRole }).where(eq(user.id, id)).execute();
-};
-
-export const updateBanner = async ({
-  id,
-  bannerId,
-}: {
-  id: string;
-  bannerId: number;
-}) => {
-  await db
-    .update(user)
-    .set({ bannerId: bannerId })
-    .where(eq(user.id, id))
-    .execute();
-};
-
-export const updatePrimaryColor = async ({
-  id,
-  primaryColor,
-}: {
-  id: string;
-  primaryColor: string;
-}) => {
-  await db
-    .update(user)
-    .set({ primaryColor: primaryColor })
-    .where(eq(user.id, id))
-    .execute();
-};
-
-export const updateLightMode = async ({
-  id,
-  lightMode,
-}: {
-  id: string;
-  lightMode: boolean;
-}) => {
-  await db
-    .update(user)
-    .set({ lightMode: lightMode })
-    .where(eq(user.id, id))
-    .execute();
 };
 
 export async function getUserTraitsById(id: string) {
@@ -225,42 +179,6 @@ export async function getCoWorkers(userId: string | null | undefined) {
   return coworkers;
 }
 
-const coworker = alias(schema.user, "coworker");
-const pmUser = alias(schema.projectMember, "pmUser");
-const pmCoworker = alias(schema.projectMember, "pmCoworker");
-export async function getCurrentCoworkers(userId: string | null | undefined) {
-  if (!userId || userId === undefined) {
-    const session = await auth();
-    userId = session?.user?.id;
-    if (!userId) {
-      throw new Error("You most be signed in");
-    }
-  }
-
-  const res = await db
-    .selectDistinct({
-      id: coworker.id,
-      name: coworker.name,
-      email: coworker.email,
-      jobTitle: coworker.jobTitle,
-      department: coworker.department,
-      photoUrl: coworker.photoUrl,
-    })
-    .from(pmUser)
-    .leftJoin(pmCoworker, eq(pmUser.projectId, pmCoworker.projectId))
-    .leftJoin(coworker, eq(pmCoworker.userId, coworker.id))
-    .leftJoin(project, eq(pmUser.projectId, project.id))
-    .where(
-      and(
-        eq(pmUser.userId, userId),
-        ne(pmUser.userId, pmCoworker.userId),
-        gt(project.endDate, sql`CURRENT_TIMESTAMP`),
-      ),
-    );
-
-  return res;
-}
-
 export async function getProjectsProfile(userId: string | null | undefined) {
   if (!userId || userId === undefined) {
     const session = await auth();
@@ -287,42 +205,6 @@ export async function getProjectsProfile(userId: string | null | undefined) {
       or(
         eq(schema.projectMember.userId, userId),
         eq(schema.project.managerId, userId),
-      ),
-    );
-  return res;
-}
-
-export async function getCurrentProjectsProfile(
-  userId: string | null | undefined,
-) {
-  if (!userId || userId === undefined) {
-    const session = await auth();
-    userId = session?.user?.id;
-    if (!userId) {
-      throw new Error("You most be signed in");
-    }
-  }
-
-  const res = await db
-    .selectDistinctOn([schema.project.id], {
-      id: schema.project.id,
-      name: schema.project.name,
-      description: schema.project.description,
-      startDate: schema.project.startDate,
-      endDate: schema.project.endDate,
-    })
-    .from(schema.projectMember)
-    .innerJoin(
-      schema.project,
-      eq(schema.projectMember.projectId, schema.project.id),
-    )
-    .where(
-      and(
-        or(
-          eq(schema.projectMember.userId, userId),
-          eq(schema.project.managerId, userId),
-        ),
-        gt(project.endDate, sql`CURRENT_TIMESTAMP`),
       ),
     );
   return res;
