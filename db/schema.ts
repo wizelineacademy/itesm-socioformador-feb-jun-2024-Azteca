@@ -182,7 +182,7 @@ export const sprintSurveyQuestion = pgTable("sprint_survey_question", {
   questionId: integer("question_id").references(() => question.id),
 });
 
-export const resourcePositiveSkill = pgTable("resource_positive_skill", {
+export const pipResourcePositiveSkill = pgTable("pip_resource_positive_skill", {
   pipResourceId: integer("pip_resource_id").references(() => pipResource.id),
   positiveSkillId: integer("positive_skill_id").references(
     () => positiveSkill.id,
