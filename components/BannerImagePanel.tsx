@@ -17,7 +17,7 @@ const BannerImagePanel = () => {
   };
 
   return (
-    <div className="container mx-auto pb-2 pt-4">
+    <div className="mx-auto flex flex-col pb-2 pt-4">
       <p className="mb-2 text-grayText">Select an Image</p>
       <div className="flex space-x-4">
         {images.map((src, index) => (
