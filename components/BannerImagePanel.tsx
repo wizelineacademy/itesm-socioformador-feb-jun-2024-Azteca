@@ -10,11 +10,13 @@ import Banner4 from "@/public/Banner4.svg";
 import { updateBannerId } from "@/services/user";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const images = [Banner0, Banner1, Banner2, Banner3, Banner4];
 
 const BannerImagePanel = ({ closeModal }: { closeModal: () => void }) => {
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
+  const router = useRouter();
 
   const handleImageClick = (index: number) => {
     setSelectedImage(index);
@@ -25,6 +27,7 @@ const BannerImagePanel = ({ closeModal }: { closeModal: () => void }) => {
       await updateBannerId({
         bannerId: `Banner${selectedImage}.svg`,
       }).then(() => {
+        router.refresh();
         closeModal();
         toast.success("Banner updated successfully");
       });
