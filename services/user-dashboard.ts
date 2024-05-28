@@ -69,3 +69,7 @@ export async function getRulerGraphInfo(id: string) {
 
   return emotionsData;
 }
+
+// export async function getOverallStatistics(id: string) {
+
+// }

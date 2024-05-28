@@ -37,18 +37,23 @@ export async function createSprintSurvey(projectId: number) {
 export async function submitSprintSurveyAnswers(
   surveyAnswer: SprintSurveyAnswer,
 ) {
+  console.log(surveyAnswer);
   // Get the User ID of the user logged
   const session = await auth();
   const userId = session?.user?.id as string;
   // Insert Project Answers
-  await db.insert(sprintSurveyAnswerProject).values(
-    surveyAnswer.projectAnswers.map((projAns) => ({
-      userId: userId,
-      sprintSurveyId: surveyAnswer.sprintSurveyId,
-      questionName: projAns.questionKey,
-      answer: projAns.answer,
-    })),
-  );
+  await db
+    .insert(sprintSurveyAnswerProject)
+    .values(
+      surveyAnswer.projectAnswers.map((projAns) => ({
+        userId: userId,
+        sprintSurveyId: surveyAnswer.sprintSurveyId,
+        questionId: projAns.questionId,
+        answer: projAns.answer,
+      })),
+    )
+    .catch((error) => console.log(error));
+
   // Insert Cokorkers Answers
   surveyAnswer.coworkersAnswers.forEach((answer) => {
     submitSprintCoworkersAns(userId, surveyAnswer.sprintSurveyId, answer);
@@ -58,7 +63,7 @@ export async function submitSprintSurveyAnswers(
     surveyAnswer.coworkersComments.map((comments) => ({
       userId: userId,
       sprintSurveyId: surveyAnswer.sprintSurveyId,
-      questionName: "SS_CWCT",
+      questionId: surveyAnswer.commentId,
       coworkerId: comments.coworkerId,
       comment: comments.comment,
     })),
@@ -69,7 +74,7 @@ async function submitSprintCoworkersAns(
   userId: string,
   surveyId: number,
   questions: {
-    questionKey: keyof SurveyStepTwoAnswer;
+    questionId: keyof SurveyStepTwoAnswer;
     answers: Array<{ coworkerId: string; answer: number }>;
   },
 ) {
@@ -77,7 +82,7 @@ async function submitSprintCoworkersAns(
     questions.answers.map((coworkerAns) => ({
       userId: userId,
       sprintSurveyId: surveyId,
-      questionName: questions.questionKey,
+      questionId: questions.questionId,
       coworkerId: coworkerAns.coworkerId,
       answer: coworkerAns.answer,
     })),

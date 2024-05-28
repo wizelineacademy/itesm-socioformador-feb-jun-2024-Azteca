@@ -11,6 +11,7 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import SprintStepOne from "./SprintStepOne";
 import SprintStepTwo from "./SprintStepTwo";
 import {
+  QuestionType,
   Questions,
   SprintSurveyAnswer,
   SurveyStepTwoAnswer,
@@ -56,14 +57,14 @@ const SprintSurvey = ({
 
   const sprintQuestions: Questions[] | undefined = useMemo(() => {
     return allSprintQuestions?.filter(
-      (question) => question.type === "SPRINT_QUESTION",
-    );
+      (question) => question.type === ("SPRINT_QUESTION" as QuestionType),
+    ) as Questions[];
   }, [allSprintQuestions]);
 
   const coworkerQuestions: Questions[] | undefined = useMemo(() => {
     return allSprintQuestions?.filter(
-      (question) => question.type === "COWORKER_QUESTION",
-    );
+      (question) => question.type === ("COWORKER_QUESTION" as QuestionType),
+    ) as Questions[];
   }, [allSprintQuestions]);
 
   /*   const coworkerCommentQuestions: Questions[] | undefined = useMemo(() => {
@@ -77,6 +78,7 @@ const SprintSurvey = ({
     sprintSurveyId: sprintSurveyId,
     projectAnswers: [],
     coworkersAnswers: [],
+    commentId: 0,
     coworkersComments: [],
   });
   const sprintSurveyStepTwoAnswerBase: SurveyStepTwoAnswer = useMemo(() => {
@@ -136,6 +138,9 @@ const SprintSurvey = ({
           });
         });
       }
+      sprintAnswer.commentId = allSprintQuestions?.find(
+        (type) => type.type === "COWORKER_COMMENT",
+      )?.id as number;
       sprintAnswer.coworkersAnswers.push(questionObject);
     });
   };
