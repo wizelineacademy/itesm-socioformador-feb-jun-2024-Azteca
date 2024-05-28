@@ -11,6 +11,7 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import SprintStepOne from "./SprintStepOne";
 import SprintStepTwo from "./SprintStepTwo";
 import {
+  QuestionType,
   Questions,
   SprintSurveyAnswer,
   SurveyStepTwoAnswer,
@@ -172,7 +173,6 @@ const SprintSurvey = ({
     else modal.classList.remove("max-w-xl");
   }, [step]);
 
-  //TODO: Render the loading state into the modal
   if (!users) return <div></div>;
   if (isError) return <div>Error loading data</div>;
   return (

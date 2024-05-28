@@ -9,9 +9,13 @@ import {
 } from "@/db/schema";
 import { eq, or, sql } from "drizzle-orm";
 
-import { SprintSurveyAnswer, SurveyStepTwoAnswer } from "@/types/types";
+import {
+  Questions,
+  SprintSurveyAnswer,
+  SurveyStepTwoAnswer,
+} from "@/types/types";
 
-export async function getSprintSurveyQuestions() {
+export async function getSprintSurveyQuestions(): Promise<Questions[]> {
   const res = await db
     .select()
     .from(question)
