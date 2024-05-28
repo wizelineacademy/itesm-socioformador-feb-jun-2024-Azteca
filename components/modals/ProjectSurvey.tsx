@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-  Transition,
-  TransitionChild,
-} from "@headlessui/react";
+import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import Slider from "../Slider";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -91,7 +85,7 @@ const ProjectSurvey = ({
   return (
     <Transition appear show={showModal} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
-        <TransitionChild
+        <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
@@ -101,11 +95,11 @@ const ProjectSurvey = ({
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-black/25" />
-        </TransitionChild>
+        </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
-            <TransitionChild
+            <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
               enterFrom="opacity-0 scale-95"
@@ -114,13 +108,13 @@ const ProjectSurvey = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <DialogPanel className="flex w-full max-w-5xl transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <DialogTitle
+              <Dialog.Panel className="flex w-full max-w-5xl transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <Dialog.Title
                   as="h3"
                   className="text-2xl font-semibold text-black"
                 >
                   Project Survey
-                </DialogTitle>
+                </Dialog.Title>
                 <form onSubmit={handleSubmit}>
                   <div className="mt-3 grid w-full grid-cols-2 gap-10">
                     {questions.isLoading && (
@@ -140,7 +134,7 @@ const ProjectSurvey = ({
                               id="comments"
                               className="mt-2 h-auto w-full rounded-md border border-black p-2 focus:outline-primary"
                               placeholder="Optional"
-                            ></textarea>
+                            />
                           </div>
                         ) : (
                           <Slider
@@ -186,8 +180,8 @@ const ProjectSurvey = ({
                     )}
                   </div>
                 </form>
-              </DialogPanel>
-            </TransitionChild>
+              </Dialog.Panel>
+            </Transition.Child>
           </div>
         </div>
       </Dialog>

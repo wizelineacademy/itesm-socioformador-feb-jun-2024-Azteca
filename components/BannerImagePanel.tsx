@@ -1,23 +1,42 @@
 "use client";
 
 import { useState } from "react";
-import NextImage from "next/image";
-import Banner1 from "@/public/Banner1.svg";
-import Banner2 from "@/public/Banner2.svg";
-import Banner3 from "@/public/Banner3.svg";
-import Banner4 from "@/public/Banner4.svg";
+import { updateBannerId } from "@/services/user";
+import Image from "next/image";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
-const images = [Banner1, Banner2, Banner3, Banner4];
-
-const BannerImagePanel = () => {
+const BannerImagePanel = ({ closeModal }: { closeModal: () => void }) => {
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
+  const router = useRouter();
+  const images = [
+    "/Banner0.svg",
+    "/Banner1.svg",
+    "/Banner2.svg",
+    "/Banner3.svg",
+    "/Banner4.svg",
+  ];
 
   const handleImageClick = (index: number) => {
     setSelectedImage(index);
   };
 
+  const handleBannerSubmit = async () => {
+    try {
+      await updateBannerId({
+        bannerId: `Banner${selectedImage}.svg`,
+      }).then(() => {
+        router.refresh();
+        closeModal();
+        toast.success("Banner updated successfully");
+      });
+    } catch (error) {
+      alert("Error updating banner");
+    }
+  };
+
   return (
-    <div className="container mx-auto pb-2 pt-4">
+    <div className="mx-auto flex flex-col pb-2 pt-4">
       <p className="mb-2 text-grayText">Select an Image</p>
       <div className="flex space-x-4">
         {images.map((src, index) => (
@@ -26,7 +45,7 @@ const BannerImagePanel = () => {
             className={`rounded border-2 ${selectedImage === index ? "border-primary" : "border-transparent"}`}
             onClick={() => handleImageClick(index)}
           >
-            <NextImage
+            <Image
               src={src}
               alt={`Banner ${index + 1}`}
               className="cursor-pointer"
@@ -45,8 +64,9 @@ const BannerImagePanel = () => {
               ? "bg-gray-300"
               : "bg-primary hover:bg-primary-dark"
           } mt-4 rounded-lg px-10 py-2 font-medium text-white drop-shadow-lg`}
+          onClick={handleBannerSubmit}
         >
-          Upload
+          Done
         </button>
       </div>
     </div>

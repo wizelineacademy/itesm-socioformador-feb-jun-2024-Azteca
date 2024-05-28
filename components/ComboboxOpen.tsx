@@ -50,7 +50,7 @@ const ComboboxOpen = ({ data }: { data: DataItem[] | undefined }) => {
 
   return (
     <Combobox<DataItem | null> value={selectedItem} onChange={setSelectedItem}>
-      {({}) => (
+      {() => (
         <>
           <Combobox.Input
             onChange={(event) => setQuery(event.target.value)}

@@ -85,14 +85,12 @@ const SprintStepFour = ({
             <div className="mt-2 flex h-44 w-full appearance-none flex-col gap-y-1 overflow-auto pe-2">
               {selectableUsers.map((user, index) => (
                 <button
-                  className="group flex cursor-pointer flex-row items-center gap-x-2 rounded-xl p-1 hover:bg-primary-light/60"
+                  className="group flex cursor-pointer flex-row items-center gap-x-2 rounded-xl p-1 hover:bg-primary/80"
                   key={index}
                   onClick={() => handleUserSelected(user)}
                 >
                   {user.photoUrl && (
-                    <div>
-                      <UserProfileButton photoUrl={user.photoUrl} size="sm" />
-                    </div>
+                    <UserProfileButton photoUrl={user.photoUrl} size="sm" />
                   )}
                   {!user.photoUrl && (
                     <UserIcon

@@ -13,19 +13,16 @@ export interface User {
   department: string | null;
   photoUrl: string | null;
   jobTitle: string | null;
+  bannerId: string | null;
+  primaryColor: string | null;
+  lightMode: boolean | null;
 }
 
 export type SurveyCoworker = {
   times: number;
 } & Coworker;
 
-export type SurveyStepTwoAnswer = {
-  //Sprint Survey Coworker Punctuality, Communication, Support, Motivation
-  SS_CWPN: Array<Array<Coworker>>;
-  SS_CWCM: Array<Array<Coworker>>;
-  SS_CWSP: Array<Array<Coworker>>;
-  SS_CWMT: Array<Array<Coworker>>;
-};
+export type SurveyStepTwoAnswer = { [key: number]: Array<Array<Coworker>> };
 
 export type DateObject = {
   date: string;
@@ -33,16 +30,15 @@ export type DateObject = {
   dateAsText: string;
 };
 
-export type ProjectSprint = "MS_RF" | "MS_LS" | "MS_RA" | "MS_WE";
-
 export type SprintSurveyAnswer = {
   userId: string | undefined;
   sprintSurveyId: number;
-  projectAnswers: Array<{ questionKey: ProjectSprint; answer: number }>;
+  projectAnswers: Array<{ questionId: number; answer: number }>;
   coworkersAnswers: Array<{
-    questionKey: keyof SurveyStepTwoAnswer;
+    questionId: number;
     answers: Array<{ coworkerId: string; answer: number }>;
   }>;
+  commentId: number;
   coworkersComments: Array<{ coworkerId: string; comment: string }>;
 };
 
@@ -55,7 +51,7 @@ export type QuestionType =
 
 export type Questions = {
   id: number;
-  description: number;
+  description: string;
   type: QuestionType;
 };
 

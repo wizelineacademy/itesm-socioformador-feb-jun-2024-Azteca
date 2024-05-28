@@ -1,16 +1,15 @@
 "use client";
 
-import {
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-  Transition,
-  TransitionChild,
-} from "@headlessui/react";
-import { Fragment, useEffect, useState } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import SprintStepOne from "./SprintStepOne";
 import SprintStepTwo from "./SprintStepTwo";
-import { SprintSurveyAnswer, SurveyStepTwoAnswer } from "@/types/types";
+import {
+  QuestionType,
+  Questions,
+  SprintSurveyAnswer,
+  SurveyStepTwoAnswer,
+} from "@/types/types";
 import SprintStepThree from "./SprintStepThree";
 import SprintStepFour from "./SprintStepFour";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -21,6 +20,7 @@ import {
 } from "@/services/sprintSurvey";
 import toast from "react-hot-toast";
 import { getUserId } from "@/services/user";
+import Loader from "../Loader";
 
 interface SprintSurveyProps {
   showModal: boolean;
@@ -44,53 +44,55 @@ const SprintSurvey = ({
     queryFn: async () => await getUserId(),
   });
 
-  const { data: sprintQuestions } = useQuery({
+  const { data: allSprintQuestions, isLoading: isLoadingQuestions } = useQuery({
     queryKey: ["sprintQuestions"],
     queryFn: async () => await getSprintSurveyQuestions(),
   });
 
-  console.log(sprintQuestions);
+  const sprintQuestions: Questions[] | undefined = useMemo(() => {
+    return allSprintQuestions?.filter(
+      (question) => question.type === ("SPRINT_QUESTION" as QuestionType),
+    ) as Questions[];
+  }, [allSprintQuestions]);
+
+  const coworkerQuestions: Questions[] | undefined = useMemo(() => {
+    return allSprintQuestions?.filter(
+      (question) => question.type === ("COWORKER_QUESTION" as QuestionType),
+    ) as Questions[];
+  }, [allSprintQuestions]);
+
+  /*   const coworkerCommentQuestions: Questions[] | undefined = useMemo(() => {
+    return allSprintQuestions?.filter(
+      (question) => question.type === "COWORKER_COMMENT",
+    );
+  }, [allSprintQuestions]); */
 
   const [sprintAnswer, setSprintAnswer] = useState<SprintSurveyAnswer>({
     userId: userId,
     sprintSurveyId: sprintSurveyId,
-    projectAnswers: [
-      {
-        questionKey: "MS_RF",
-        answer: 1,
-      },
-      {
-        questionKey: "MS_RA",
-        answer: 1,
-      },
-      {
-        questionKey: "MS_LS",
-        answer: 1,
-      },
-      {
-        questionKey: "MS_WE",
-        answer: 1,
-      },
-    ],
+    projectAnswers: [],
     coworkersAnswers: [],
+    commentId: 0,
     coworkersComments: [],
   });
+  const sprintSurveyStepTwoAnswerBase: SurveyStepTwoAnswer = useMemo(() => {
+    const questions = coworkerQuestions
+      ? coworkerQuestions.reduce((acc, question) => {
+          acc[question.id] = Array(10)
+            .fill([])
+            .map(() => []);
+          return acc;
+        }, {} as SurveyStepTwoAnswer)
+      : {};
+    return questions;
+  }, [coworkerQuestions]);
 
   const [sprintSurveyStepTwoAnswer, setSprintSurveyStepTwoAnswer] =
-    useState<SurveyStepTwoAnswer>({
-      SS_CWPN: Array(10)
-        .fill([])
-        .map(() => []),
-      SS_CWCM: Array(10)
-        .fill([])
-        .map(() => []),
-      SS_CWSP: Array(10)
-        .fill([])
-        .map(() => []),
-      SS_CWMT: Array(10)
-        .fill([])
-        .map(() => []),
-    });
+    useState<SurveyStepTwoAnswer>({});
+
+  useEffect(() => {
+    setSprintSurveyStepTwoAnswer(sprintSurveyStepTwoAnswerBase);
+  }, [sprintSurveyStepTwoAnswerBase]);
 
   const handleNavigation = (step: number) => {
     setStep(step);
@@ -100,7 +102,7 @@ const SprintSurvey = ({
     const isStepTwoCompleted = Object.keys(sprintSurveyStepTwoAnswer).every(
       (key) => {
         const subArray =
-          sprintSurveyStepTwoAnswer[key as keyof SurveyStepTwoAnswer];
+          sprintSurveyStepTwoAnswer[parseInt(key) as keyof SurveyStepTwoAnswer];
         let usersInSubarray = 0;
         subArray.forEach((subArrayElement) => {
           usersInSubarray += subArrayElement.length;
@@ -114,12 +116,12 @@ const SprintSurvey = ({
   const parseStepTwoAnswer = () => {
     Object.keys(sprintSurveyStepTwoAnswer).forEach((key) => {
       const answersArray =
-        sprintSurveyStepTwoAnswer[key as keyof SurveyStepTwoAnswer];
+        sprintSurveyStepTwoAnswer[parseInt(key) as keyof SurveyStepTwoAnswer];
       const questionObject: {
-        questionKey: keyof SurveyStepTwoAnswer;
+        questionId: keyof SurveyStepTwoAnswer;
         answers: { coworkerId: string; answer: number }[];
       } = {
-        questionKey: key as keyof SurveyStepTwoAnswer,
+        questionId: parseInt(key) as keyof SurveyStepTwoAnswer,
         answers: [],
       };
       for (let i = 0; i < answersArray.length; i++) {
@@ -130,6 +132,9 @@ const SprintSurvey = ({
           });
         });
       }
+      sprintAnswer.commentId = allSprintQuestions?.find(
+        (type) => type.type === "COWORKER_COMMENT",
+      )?.id as number;
       sprintAnswer.coworkersAnswers.push(questionObject);
     });
   };
@@ -159,20 +164,12 @@ const SprintSurvey = ({
   };
 
   const modalWidth = step === 3 ? "max-w-xl" : "max-w-5xl";
-  useEffect(() => {
-    const modal = document.querySelector(".sprint-survey");
-    if (!modal) return;
-    if (step === 3) modal.classList.remove("max-w-5xl");
-    else modal.classList.remove("max-w-xl");
-  }, [step]);
-
-  //TODO: Render the loading state into the modal
   if (!users) return <div></div>;
   if (isError) return <div>Error loading data</div>;
   return (
     <Transition appear show={showModal} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
-        <TransitionChild
+        <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
@@ -182,10 +179,10 @@ const SprintSurvey = ({
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-black/25" />
-        </TransitionChild>
+        </Transition.Child>
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
-            <TransitionChild
+            <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
               enterFrom="opacity-0"
@@ -194,35 +191,44 @@ const SprintSurvey = ({
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <DialogPanel
+              <Dialog.Panel
                 className={`sprint-survey flex h-auto transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all duration-500 ${modalWidth}`}
               >
-                <DialogTitle
+                <Dialog.Title
                   as="h3"
                   className="text-2xl font-semibold text-black"
                 >
                   Sprint Survey
-                </DialogTitle>
-                {step === 1 && (
-                  <SprintStepOne
-                    sprintSurveyAnswer={sprintAnswer}
-                    setSprintSurveyAnswer={setSprintAnswer}
-                  />
-                )}
-                {step === 2 && (
-                  <SprintStepTwo
-                    users={users}
-                    sprintSurveyStepTwoAnswer={sprintSurveyStepTwoAnswer}
-                    setSprintSurveyStepTwoAnswer={setSprintSurveyStepTwoAnswer}
-                  />
-                )}
-                {step === 3 && <SprintStepThree />}
-                {step === 4 && (
-                  <SprintStepFour
-                    users={users}
-                    sprintSurveyAnswer={sprintAnswer}
-                    setSprintSurveyAnswer={setSprintAnswer}
-                  />
+                </Dialog.Title>
+                {isLoadingQuestions && <Loader />}
+                {allSprintQuestions && (
+                  <>
+                    {step === 1 && (
+                      <SprintStepOne
+                        questions={sprintQuestions}
+                        sprintSurveyAnswer={sprintAnswer}
+                        setSprintSurveyAnswer={setSprintAnswer}
+                      />
+                    )}
+                    {step === 2 && (
+                      <SprintStepTwo
+                        users={users}
+                        questions={coworkerQuestions}
+                        sprintSurveyStepTwoAnswer={sprintSurveyStepTwoAnswer}
+                        setSprintSurveyStepTwoAnswer={
+                          setSprintSurveyStepTwoAnswer
+                        }
+                      />
+                    )}
+                    {step === 3 && <SprintStepThree />}
+                    {step === 4 && (
+                      <SprintStepFour
+                        users={users}
+                        sprintSurveyAnswer={sprintAnswer}
+                        setSprintSurveyAnswer={setSprintAnswer}
+                      />
+                    )}
+                  </>
                 )}
                 <footer className="mt-8 flex justify-center">
                   {step === 1 && (
@@ -280,8 +286,8 @@ const SprintSurvey = ({
                     </button>
                   )}
                 </footer>
-              </DialogPanel>
-            </TransitionChild>
+              </Dialog.Panel>
+            </Transition.Child>
           </div>
         </div>
       </Dialog>

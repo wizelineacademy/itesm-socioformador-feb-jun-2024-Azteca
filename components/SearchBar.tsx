@@ -1,6 +1,6 @@
 "use client";
 
-import { ComboboxInput } from "@headlessui/react";
+import { Combobox } from "@headlessui/react";
 import { useEffect, useState, useRef } from "react";
 
 interface SearchBarInterface {
@@ -56,7 +56,7 @@ const SearchBar = ({
           <div
             className={`transform transition-transform duration-700 ${isExpanded ? "-translate-x-0" : "hidden -translate-x-full"}`}
           >
-            <ComboboxInput
+            <Combobox.Input
               ref={inputRef}
               name="search"
               autoComplete="off"

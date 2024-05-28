@@ -25,6 +25,13 @@ export const user = pgTable(
     department: varchar("department", { length: 64 }),
     photoUrl: varchar("photo_url", { length: 1024 }),
     role: userRoleEnum("role").notNull(),
+    bannerId: varchar("banner_id", { length: 24 })
+      .notNull()
+      .default("Banner1.svg"),
+    primaryColor: varchar("primary_color", { length: 7 })
+      .notNull()
+      .default("#6640D5"),
+    lightMode: boolean("light_mode").default(true),
   },
 );
 
@@ -182,10 +189,10 @@ export const sprintSurveyQuestion = pgTable("sprint_survey_question", {
   questionId: integer("question_id").references(() => question.id),
 });
 
-export const resourcePositiveSkill = pgTable("resource_positive_skill", {
+export const pipResourceNegativeSkill = pgTable("pip_resource_negative_skill", {
   pipResourceId: integer("pip_resource_id").references(() => pipResource.id),
-  positiveSkillId: integer("positive_skill_id").references(
-    () => positiveSkill.id,
+  negativeSkillId: integer("negative_skill_id").references(
+    () => negativeSkill.id,
   ),
 });
 

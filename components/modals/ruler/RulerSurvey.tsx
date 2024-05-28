@@ -29,6 +29,7 @@ const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
     },
   );
   const modalWidth = step === 1 ? "max-w-4xl" : "max-w-lg";
+
   const getEmotionTextColor = () => {
     if (!rulerSurveyAnswer.emotion) return "";
     if (
@@ -91,6 +92,7 @@ const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel
+                id="ruler-modal"
                 className={`flex ${modalWidth} w-full transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all duration-500`}
               >
                 <Dialog.Title

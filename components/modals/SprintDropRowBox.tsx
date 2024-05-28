@@ -7,7 +7,7 @@ import { useState } from "react";
 
 interface SprintDropRowBoxProps {
   index: number;
-  name: string;
+  name: number;
   color: string;
   coworkers: Coworker[][];
 }
