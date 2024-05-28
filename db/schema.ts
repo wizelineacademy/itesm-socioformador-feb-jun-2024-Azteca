@@ -147,11 +147,13 @@ export const rulerSurveyAnswers = pgTable(
 );
 
 export const questionTypeEnum = pgEnum("type_question", [
+  /*
   "SPRINT_QUESTION",
   "COWORKER_QUESTION",
   "COWORKER_COMMENT",
   "FINAL_PROJECT_QUESTION",
   "FINAL_PROJECT_COMMENT",
+  */
 ]);
 
 export const question = pgTable("question", {
@@ -189,10 +191,10 @@ export const sprintSurveyQuestion = pgTable("sprint_survey_question", {
   questionId: integer("question_id").references(() => question.id),
 });
 
-export const pipResourcePositiveSkill = pgTable("pip_resource_positive_skill", {
+export const pipResourceNegativeSkill = pgTable("pip_resource_negative_skill", {
   pipResourceId: integer("pip_resource_id").references(() => pipResource.id),
-  positiveSkillId: integer("positive_skill_id").references(
-    () => positiveSkill.id,
+  negativeSkillId: integer("negative_skill_id").references(
+    () => negativeSkill.id,
   ),
 });
 
