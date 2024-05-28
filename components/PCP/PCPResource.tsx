@@ -1,7 +1,7 @@
 import Link from "next/link";
-import ArticleIcon from "./icons/ArticleIcon";
-import BookIcon from "./icons/BookIcon";
-import VideoIcon from "./icons/VideoIcon";
+import ArticleIcon from "../icons/ArticleIcon";
+import BookIcon from "../icons/BookIcon";
+import VideoIcon from "../icons/VideoIcon";
 
 interface InterfacePCPResource {
   title: string | null;
