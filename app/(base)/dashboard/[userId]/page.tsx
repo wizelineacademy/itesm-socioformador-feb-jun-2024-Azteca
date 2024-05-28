@@ -49,30 +49,7 @@ const Dashboard = async ({ params }: { params: { userId: string } }) => {
     gradient: { start: "#4598FB", end: "#6640D5" },
   };
 
-  const emotions = await getRulerGraphInfo(params.userId);
-
-  const emotionsData = [
-    {
-      title: "High Energy - Unpleasant",
-      percentage: emotions.quadrant2,
-      gradient: { start: "#ee824e", end: "#e14a5f" },
-    },
-    {
-      title: "High Energy - Pleasant",
-      percentage: emotions.quadrant1,
-      gradient: { start: "#f4e37c", end: "#f4b745" },
-    },
-    {
-      title: "Low Energy - Unpleasant",
-      percentage: emotions.quadrant3,
-      gradient: { start: "#92bef6", end: "#7481f7" },
-    },
-    {
-      title: "Low Energy - Pleasant",
-      percentage: emotions.quadrant4,
-      gradient: { start: "#9feba8", end: "#6bc68c" },
-    },
-  ];
+  const emotionsData = await getRulerGraphInfo(params.userId);
 
   const completedSurveys = [
     { date: new Date(2024, 0, 5), color: "red" },

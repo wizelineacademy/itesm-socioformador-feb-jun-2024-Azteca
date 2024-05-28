@@ -44,14 +44,28 @@ export async function getRulerGraphInfo(id: string) {
 
   // Calculate the total number of emotions
   const totalEmotions = res.length;
+  const emotionsData = [
+    {
+      title: "High Energy - Unpleasant",
+      percentage: Math.round((quadrant2 / totalEmotions) * 100 * 100) / 100,
+      gradient: { start: "#ee824e", end: "#e14a5f" },
+    },
+    {
+      title: "High Energy - Pleasant",
+      percentage: Math.round((quadrant1 / totalEmotions) * 100 * 100) / 100,
+      gradient: { start: "#f4e37c", end: "#f4b745" },
+    },
+    {
+      title: "Low Energy - Unpleasant",
+      percentage: Math.round((quadrant3 / totalEmotions) * 100 * 100) / 100,
+      gradient: { start: "#92bef6", end: "#7481f7" },
+    },
+    {
+      title: "Low Energy - Pleasant",
+      percentage: Math.round((quadrant4 / totalEmotions) * 100 * 100) / 100,
+      gradient: { start: "#9feba8", end: "#6bc68c" },
+    },
+  ];
 
-  // Calculate the percentage of emotions in each quadrant
-  const percentages = {
-    quadrant1: Math.round((quadrant1 / totalEmotions) * 100 * 100) / 100,
-    quadrant2: Math.round((quadrant2 / totalEmotions) * 100 * 100) / 100,
-    quadrant3: Math.round((quadrant3 / totalEmotions) * 100 * 100) / 100,
-    quadrant4: Math.round((quadrant4 / totalEmotions) * 100 * 100) / 100,
-  };
-
-  return percentages;
+  return emotionsData;
 }
