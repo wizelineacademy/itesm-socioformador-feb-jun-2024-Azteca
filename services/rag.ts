@@ -1,21 +1,22 @@
 "use server";
 import OpenAI from "openai";
 import db from "@/db/drizzle";
-import { and, count, eq, isNull, sql } from "drizzle-orm";
+import { and, count, eq, inArray, isNull, sql } from "drizzle-orm";
 import { auth } from "@/auth";
 import similarity from "compute-cosine-similarity";
 
 import {
   pipTask,
   pipResource,
+  pipResourceNegativeSkill,
   project,
   projectMember,
+  questionNegativeSkill,
+  questionPositiveSkill,
   sprintSurvey,
   sprintSurveyAnswerCoworkers,
   sprintSurveyQuestion,
   userResource,
-  questionNegativeSkill,
-  questionPositiveSkill,
 } from "@/db/schema";
 
 // =============== FEEDBACK INTERFACES ===============
@@ -529,10 +530,31 @@ export async function feedback_analysis(sprintSurveyId: number) {
 
         // sort the negative skills by the number of coworkers that suggested them in descending order
         userNegativeSkills.sort((a, b) => b[0] - a[0]);
-
-        // newArray.forEach(element => existingSet.add(element));
+        const userNegativeSkillsIds = userNegativeSkills.map(
+          (element) => element[1],
+        );
 
         // get the resources associated with the negative skills
+        const recommendedResources = await db
+          .select({
+            resourceId: pipResource.id,
+          })
+          .from(pipResourceNegativeSkill)
+          .where(
+            inArray(
+              pipResourceNegativeSkill.negativeSkillId,
+              userNegativeSkillsIds,
+            ),
+          );
+
+        const resourcesArrayIds = recommendedResources.map(
+          (element) => element.resourceId,
+        );
+
+        // add the resources to the recommendations of the user
+        resourcesArrayIds.forEach((resourceId) =>
+          coworkersRecommendations.add(resourceId),
+        );
 
         const tasks = await createTasks(feedbackComment);
 
