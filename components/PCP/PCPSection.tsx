@@ -1,8 +1,10 @@
 "use client";
 import React, { useState } from "react";
+import { Menu } from "@headlessui/react";
 import DialogComponent from "../DialogComponent";
+import InfoIcon from "../icons/InfoIcon";
 
-interface ProfileSectionProps {
+interface PCPSectionProps {
   title: string;
   showMore: boolean;
   children: React.ReactNode;
@@ -10,7 +12,13 @@ interface ProfileSectionProps {
   type?: string;
 }
 
-const ProfileSection: React.FC<ProfileSectionProps> = ({
+const statusOptions = [
+  { label: "Pending", color: "bg-red-500", value: "pending" },
+  { label: "In Progress", color: "bg-yellow-500", value: "in-progress" },
+  { label: "Done", color: "bg-blue-500", value: "done" },
+];
+
+const PCPSection: React.FC<PCPSectionProps> = ({
   title,
   showMore,
   children,
@@ -18,11 +26,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   type,
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const openDialog = () => setIsDialogOpen(true);
-  const closeDialog = () => setIsDialogOpen(false);
-
-  const dummyTasks = [
+  const [tasks, setTasks] = useState([
     {
       sprintId: 1,
       date: "27-05-2024",
@@ -39,7 +43,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           userId: "userid2",
           title: "title2",
           description: "description2",
-          status: "in progress",
+          status: "in-progress",
         },
         {
           id: 3,
@@ -60,7 +64,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           userId: "userid5",
           title: "title5",
           description: "description5",
-          status: "in progress",
+          status: "in-progress",
         },
       ],
     },
@@ -87,7 +91,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           userId: "userid8",
           title: "title8",
           description: "description8",
-          status: "in progress",
+          status: "in-progress",
         },
         {
           id: 9,
@@ -114,7 +118,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           userId: "userid11",
           title: "title11",
           description: "description11",
-          status: "in progress",
+          status: "in-progress",
         },
         {
           id: 12,
@@ -135,7 +139,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           userId: "userid14",
           title: "title14",
           description: "description14",
-          status: "in progress",
+          status: "in-progress",
         },
         {
           id: 15,
@@ -146,7 +150,21 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         },
       ],
     },
-  ];
+  ]);
+
+  const openDialog = () => setIsDialogOpen(true);
+  const closeDialog = () => setIsDialogOpen(false);
+
+  const handleStatusChange = (taskId, newStatus) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((sprint) => ({
+        ...sprint,
+        tasks: sprint.tasks.map((task) =>
+          task.id === taskId ? { ...task, status: newStatus } : task,
+        ),
+      })),
+    );
+  };
 
   return (
     <div className="mb-6">
@@ -169,28 +187,84 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
         title={title}
       >
         <div>
-          {dummyTasks.map((sprint) => (
+          {tasks.map((sprint) => (
             <div key={sprint.sprintId}>
-              <p className="text-lg font-medium">{`Sprint ${sprint.date}`}</p>
-              {sprint.tasks.map((task) => (
-                <div key={task.id} className="flex justify-between">
-                  <p className="text-graySubtitle">{task.title}</p>
-                  <p>{task.description}</p>
-                  <p>{task.status}</p>
-                </div>
-              ))}
+              <p className="py-1 text-lg font-medium">{`Sprint ${sprint.date}`}</p>
+              {sprint.tasks.map((task) => {
+                const currentStatusOption = statusOptions.find(
+                  (option) => option.value === task.status,
+                );
+
+                return (
+                  <div
+                    key={task.id}
+                    className="flex items-center justify-between py-1"
+                  >
+                    <p className="text-graySubtitle">{task.title}</p>
+                    <div className="flex items-center space-x-4">
+                      {/* Description Dropdown */}
+                      <Menu
+                        as="div"
+                        className="relative inline-block text-left"
+                      >
+                        <div>
+                          <Menu.Button className="flex items-center text-sm text-blue-500 underline">
+                            <InfoIcon color="text-black" size="h-6 w-6" />
+                          </Menu.Button>
+                        </div>
+                        <Menu.Items className="absolute right-0 z-50 mt-2 w-fit origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                          <div className="px-4 py-1 text-sm text-gray-700">
+                            {task.description}
+                          </div>
+                        </Menu.Items>
+                      </Menu>
+
+                      {/* Status Change Button */}
+                      <Menu
+                        as="div"
+                        className="relative inline-block text-left"
+                      >
+                        <div className="flex items-center">
+                          <Menu.Button
+                            className={`h-6 w-6 transform cursor-pointer rounded-full border ${currentStatusOption.color} outline-${currentStatusOption.color} transition-all duration-200 ease-in-out hover:scale-110`}
+                          >
+                            <span className="sr-only">Change status</span>
+                          </Menu.Button>
+                        </div>
+                        <Menu.Items className="absolute right-0 z-50 mt-2 w-44 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                          <div className="py-1">
+                            {statusOptions.map((option) => (
+                              <Menu.Item key={option.value}>
+                                {({ active }) => (
+                                  <button
+                                    className={`${
+                                      active ? "bg-gray-100" : ""
+                                    } group flex w-full items-center px-4 py-2 text-sm text-gray-700`}
+                                    onClick={() =>
+                                      handleStatusChange(task.id, option.value)
+                                    }
+                                  >
+                                    <span
+                                      className={`mr-3 inline-block h-4 w-4 rounded-full ${option.color}`}
+                                    ></span>
+                                    {option.label}
+                                  </button>
+                                )}
+                              </Menu.Item>
+                            ))}
+                          </div>
+                        </Menu.Items>
+                      </Menu>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           ))}
         </div>
-        {/* {type === "tasks" && (
-          <div>
-            <p>Tasks History</p>
-          </div>
-        )}
-        {type === "resources" && <p>Resources History</p>} */}
       </DialogComponent>
     </div>
   );
 };
 
-export default ProfileSection;
+export default PCPSection;
