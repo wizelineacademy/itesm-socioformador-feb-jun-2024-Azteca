@@ -112,7 +112,7 @@ const PCP = () => {
       </section>
       <section id="pip-tasks" className="mt-9 w-full">
         <PCPSection
-          title="Tasks"
+          title="Tasks History"
           showMore={true}
           // userId={params.id}
           type="tasks"
@@ -138,7 +138,7 @@ const PCP = () => {
 
       <section id="pip-resources" className="mt-9 w-full">
         <PCPSection
-          title="Resources"
+          title="Resources History"
           showMore={true}
           // userId={params.id}
           type="resources"
