@@ -104,6 +104,7 @@ export type Resource = {
   title: string | null;
   description: string | null;
   kind: string | null;
+  url: string | null;
 };
 
 export type SQSMessageBody = {
