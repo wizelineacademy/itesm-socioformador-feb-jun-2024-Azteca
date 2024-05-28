@@ -506,7 +506,7 @@ export async function feedback_analysis(sprintSurveyId: number) {
       if (userTasksCount[0].count == 0 || userResourcesCount[0].count == 0) {
         let coworkersRecommendations: Set<number> = new Set<number>();
         [
-          orderedFeedback[userId]["feedbackClassifications"],
+          orderedFeedback[userId].feedbackClassifications,
           coworkersRecommendations,
         ] = await getFeedbackClassifications(
           orderedFeedback[userId].coworkersFeedback,
@@ -516,7 +516,7 @@ export async function feedback_analysis(sprintSurveyId: number) {
         // all feedback summarized, now get the classifications of negative feedback with the most suggestions
         const userNegativeSkills: [number, number][] = []; // [coworkersCount, negativeSkillId]
 
-        // get the negative skills associated
+        // get the negative skills detected
         Object.keys(
           orderedFeedback[userId].feedbackClassifications.negative,
         ).forEach((negativeSkill) => {
@@ -530,11 +530,13 @@ export async function feedback_analysis(sprintSurveyId: number) {
         // sort the negative skills by the number of coworkers that suggested them in descending order
         userNegativeSkills.sort((a, b) => b[0] - a[0]);
 
-        // get the strings of the negative skills
+        // newArray.forEach(element => existingSet.add(element));
 
-        const resources = await selectTasks();
+        // get the resources associated with the negative skills
 
         const tasks = await createTasks(feedbackComment);
+
+        // store the tasks and resources selected for the user
 
         for (const task of tasks) {
           const [title, description] = task.split(":");
@@ -543,13 +545,15 @@ export async function feedback_analysis(sprintSurveyId: number) {
             title: title,
             description: description,
             isDone: false,
+            sprintSurveyId: sprintSurveyId,
           });
         }
 
-        for (const resource of resources) {
+        for (const resourceId of Array.from(coworkersRecommendations)) {
           await db.insert(userResource).values({
             userId: userId,
-            resourceId: resource,
+            resourceId: resourceId,
+            sprintSurveyId: sprintSurveyId,
           });
         }
 
