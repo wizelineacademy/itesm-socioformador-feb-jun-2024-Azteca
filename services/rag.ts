@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import similarity from "compute-cosine-similarity";
 
 import {
+  negativeSkill,
   pipTask,
   pipResource,
   pipResourceNegativeSkill,
@@ -91,12 +92,30 @@ async function cosineSimilarity(
   return recordsId;
 }
 
-async function createTasks(feedback: string) {
+async function createTasks(weaknessesIds: Set<number>) {
+  // get the name of the weaknesses
+  const weaknessesRecords = await db
+    .select({ negativeSkill: negativeSkill.skill })
+    .from(negativeSkill)
+    .where(
+      inArray(
+        pipResourceNegativeSkill.negativeSkillId,
+        Array.from(weaknessesIds),
+      ),
+    );
+
+  const weaknesses: string[] = weaknessesRecords.map(
+    (element) => element.negativeSkill as string,
+  );
+
+  // join all the weaknesses in a string for a direct query
+  const stringWeaknesses: string = weaknesses.join(", ");
+
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_KEY,
   });
 
-  const tasksInstructions: string = `Dado el siguiente párrafo con comentarios que evalúan una persona, crea tareas simples para la persona evaluada para mejorar su rendimiento o bienestar. Las tareas deben ser claras y concisas, deben estar relacionadas al comentario recibido, deben ser tareas simples que no tomen mucho tiempo al usuario pero que le permiten mejorar en su rendimiento o bienestar. Algunos ejemplos de tareas pueden ser "Hacer ejercicio", "Ir con el psicólogo", "Meditar", "Dormir 8 horas diarias", "Comer frutas y verduras", "Visitar a mi familia", etc., pero cuida que sean relacionadas al feedback recibido, que sean sencilas y que sean diferentes.
+  const tasksInstructions: string = `El siguiente query contiene todas las áreas de mejora de un usuario, debes crear tareas simples para la persona evaluada para mejorar su rendimiento o bienestar. Las tareas deben ser claras y concisas, deben estar relacionadas al query recibido, deben ser tareas simples que no tomen mucho tiempo al usuario pero que le permiten mejorar en su rendimiento o bienestar. Algunos ejemplos de tareas pueden ser "Hacer ejercicio", "Ir con el psicólogo", "Meditar", "Dormir 8 horas diarias", "Comer frutas y verduras", "Visitar a mi familia", etc., pero cuida que sean relacionadas a las áreas de mejora indicadas, que sean sencilas y que todas sean diferentes.
 
   Hay otras indicaciones muy importantes que debes seguir por cada tarea:
   1. Cada tarea debe llevar un título y una descripción.
@@ -104,9 +123,10 @@ async function createTasks(feedback: string) {
   3. Al crear ya sea el título o la descripción de cada tarea no debes usar nunca los caracteres "\n" ni ":" porque esos son caracteres especiales que yo te indicaré donde usar.
   4. Vas a juntar el título de cada tarea con la descripción donde el separador de en medio es el caracter ":" sin espacios en blanco entre todos los caracteres, solo en el mensaje del título y de la descripción.
   5. Vas a unir las estructuras de todas las tareas con el caracter "\n" como separador sin espacios en blanco entre la estructura de cada tarea y ese separador.
-  6. La siguiente estructura es ilustrativa de cómo debes regresar el resultado con las 5 tareas, fíjate en estructura no tanto en el contenido:
+  6. El query puede o no llegar a tener más de 10 áreas de oportunidad, si ese es el caso debes crear tareas que involucren 2 o más áreas de oportunidad en una misma, puedes tomarte la libertad de crear la cantidad de tareas que consideres pero que nunca exceda la cantidad de 10 tareas. Si son menos de 10 áreas de oportunidad crea una tarea por cada área de oportunidad.
+  7. La siguiente estructura es ilustrativa de cómo debes regresar el resultado con todas las tareas, fíjate en estructura no tanto en el contenido:
   """
-  titulo_1:descripción_1\ntitulo_2:descripcion_2
+  titulo_1:descripcion_1\ntitulo_2:descripcion_2\ntitulo_3:descripcion_3
   """`;
 
   const rawTasks = await openai.chat.completions.create({
@@ -118,7 +138,7 @@ async function createTasks(feedback: string) {
       },
       {
         role: "user",
-        content: feedback,
+        content: stringWeaknesses,
       },
     ],
   });
@@ -605,19 +625,20 @@ export async function feedback_analysis(sprintSurveyId: number) {
             uniqueResources,
           );
 
-        const tasks = await createTasks(feedbackComment);
-
         // =========== STORE SELECTED TASKS AND RESOURCES ===========
 
-        for (const task of tasks) {
-          const [title, description] = task.split(":");
-          await db.insert(pipTask).values({
-            userId: userId,
-            title: title,
-            description: description,
-            isDone: false,
-            sprintSurveyId: sprintSurveyId,
-          });
+        if (weaknessesIds.size > 0) {
+          const tasks = await createTasks(weaknessesIds);
+          for (const task of tasks) {
+            const [title, description] = task.split(":");
+            await db.insert(pipTask).values({
+              userId: userId,
+              title: title,
+              description: description,
+              isDone: false,
+              sprintSurveyId: sprintSurveyId,
+            });
+          }
         }
 
         for (const resourceId of Array.from(uniqueResources)) {
