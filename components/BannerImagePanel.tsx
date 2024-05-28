@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import NextImage from "next/image";
 import Banner0 from "@/public/Banner0.svg";
 import Banner1 from "@/public/Banner1.svg";
 import Banner2 from "@/public/Banner2.svg";
@@ -67,7 +66,7 @@ const BannerImagePanel = ({ closeModal }: { closeModal: () => void }) => {
           } mt-4 rounded-lg px-10 py-2 font-medium text-white drop-shadow-lg`}
           onClick={handleBannerSubmit}
         >
-          Upload
+          Done
         </button>
       </div>
     </div>

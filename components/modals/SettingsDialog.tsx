@@ -75,7 +75,7 @@ const SettingsDialog = ({ showModal, onClose }: SettingsDialogProps) => {
                   </Tabs.List>
 
                   <Tabs.Panel value="profileImage">
-                    <ProfileImagePanel />
+                    <ProfileImagePanel closeModal={onClose} />
                   </Tabs.Panel>
 
                   <Tabs.Panel value="bannerImage">
