@@ -102,7 +102,12 @@ const PCP = () => {
   return (
     <div>
       <section id="pip-progressbar" className="mt-4">
-        <p className=" mb-2 text-3xl font-semibold">Personal Career Plan</p>
+        <div className="flex items-center justify-between">
+          <p className=" mb-2 text-3xl font-semibold">Personal Career Plan</p>
+          <p className=" mb-2 text-xl font-medium text-graySubtitle">
+            Sprint 28/05/2024
+          </p>
+        </div>
         <ProgressBar width={progressPercentage} height={6} />
       </section>
       <section id="pip-tasks" className="mt-9 w-full">
