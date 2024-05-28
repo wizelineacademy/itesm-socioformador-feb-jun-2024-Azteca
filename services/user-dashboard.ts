@@ -47,10 +47,10 @@ export async function getRulerGraphInfo(id: string) {
 
   // Calculate the percentage of emotions in each quadrant
   const percentages = {
-    quadrant1: (quadrant1 / totalEmotions) * 100,
-    quadrant2: (quadrant2 / totalEmotions) * 100,
-    quadrant3: (quadrant3 / totalEmotions) * 100,
-    quadrant4: (quadrant4 / totalEmotions) * 100,
+    quadrant1: Math.round((quadrant1 / totalEmotions) * 100 * 100) / 100,
+    quadrant2: Math.round((quadrant2 / totalEmotions) * 100 * 100) / 100,
+    quadrant3: Math.round((quadrant3 / totalEmotions) * 100 * 100) / 100,
+    quadrant4: Math.round((quadrant4 / totalEmotions) * 100 * 100) / 100,
   };
 
   return percentages;
