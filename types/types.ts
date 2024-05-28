@@ -38,6 +38,7 @@ export type SprintSurveyAnswer = {
     questionId: number;
     answers: Array<{ coworkerId: string; answer: number }>;
   }>;
+  commentId: number;
   coworkersComments: Array<{ coworkerId: string; comment: string }>;
 };
 

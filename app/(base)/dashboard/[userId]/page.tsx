@@ -7,6 +7,7 @@ import DashboardEmotionsSection from "@/components/Dashboard/DashboardEmotionsSe
 import DashboardSurveyCalendar from "@/components/Dashboard/DashboardSurveyCalendar";
 import PCPSection from "@/components/Dashboard/DashboardPCPSection";
 import Loader from "@/components/Loader";
+import { getRulerGraphInfo } from "@/services/user-dashboard";
 
 const Dashboard = async ({ params }: { params: { userId: string } }) => {
   const activeUserId = await getUserId();
@@ -48,28 +49,7 @@ const Dashboard = async ({ params }: { params: { userId: string } }) => {
     gradient: { start: "#4598FB", end: "#6640D5" },
   };
 
-  const emotionsData = [
-    {
-      title: "High Energy - Unpleasant",
-      percentage: 16,
-      gradient: { start: "#ee824e", end: "#e14a5f" },
-    },
-    {
-      title: "High Energy - Pleasant",
-      percentage: 22,
-      gradient: { start: "#f4e37c", end: "#f4b745" },
-    },
-    {
-      title: "Low Energy - Unpleasant",
-      percentage: 37,
-      gradient: { start: "#92bef6", end: "#7481f7" },
-    },
-    {
-      title: "Low Energy - Pleasant",
-      percentage: 25,
-      gradient: { start: "#9feba8", end: "#6bc68c" },
-    },
-  ];
+  const emotionsData = await getRulerGraphInfo(params.userId);
 
   const completedSurveys = [
     { date: new Date(2024, 0, 5), color: "red" },
