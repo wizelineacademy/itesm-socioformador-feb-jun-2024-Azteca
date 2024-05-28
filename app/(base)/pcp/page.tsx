@@ -1,10 +1,11 @@
 "use client";
-import PCPResource from "@/components/PCPResource";
-import PCPTask from "@/components/PCPTask";
+import PCPResource from "@/components/PCP/PCPResource";
+import PCPTask from "@/components/PCP/PCPTask";
 import ProgressBar from "@/components/ProgressBar";
 import { useState, useEffect } from "react";
 import NoDataCard from "@/components/NoDataCard";
 import { Task, Resource } from "@/types/types";
+import PCPSection from "@/components/PCP/PCPSection";
 
 // Datos dummy para las tareas
 const dummyTasks: Task[] = [
@@ -92,7 +93,9 @@ const PCP = () => {
   };
 
   const progressPercentage = Math.round(
-    (tasks.filter((task) => task.status === "done").length / tasks.length) *
+    ((tasks.filter((task) => task.status === "done").length +
+      tasks.filter((task) => task.status === "in-progress").length / 2) /
+      tasks.length) *
       100,
   );
 
@@ -103,41 +106,54 @@ const PCP = () => {
         <ProgressBar width={progressPercentage} height={6} />
       </section>
       <section id="pip-tasks" className="mt-9 w-full">
-        <p className="text-3xl font-medium">Tasks</p>
-        <div className="mb-10 mt-2 flex w-full flex-row flex-wrap gap-12 overflow-x-auto pb-3">
-          {tasks.length === 0 && (
-            <div className="mx-auto flex justify-center">
-              <NoDataCard text="No tasks available. Ask your manager for an update." />
-            </div>
-          )}
-          {tasks.map((task, index) => (
-            <PCPTask
-              key={task.id}
-              title={task.title}
-              description={task.description}
-              status={task.status}
-              onStatusChange={(status) => handleStatusChange(index, status)}
-            />
-          ))}
-        </div>
+        <PCPSection
+          title="Tasks"
+          showMore={true}
+          // userId={params.id}
+          type="tasks"
+        >
+          <div className="mb-10 mt-2 flex w-full flex-row flex-wrap gap-12 overflow-x-auto pb-3">
+            {tasks.length === 0 && (
+              <div className="mx-auto flex justify-center">
+                <NoDataCard text="No tasks available. Ask your manager for an update." />
+              </div>
+            )}
+            {tasks.map((task, index) => (
+              <PCPTask
+                key={task.id}
+                title={task.title}
+                description={task.description}
+                status={task.status}
+                onStatusChange={(status) => handleStatusChange(index, status)}
+              />
+            ))}
+          </div>
+        </PCPSection>
       </section>
+
       <section id="pip-resources" className="mt-9 w-full">
-        <p className="text-3xl font-medium">Resources</p>
-        <div className="mb-10 mt-2 flex w-full flex-row flex-wrap gap-12 overflow-x-auto pb-3">
-          {resources.length === 0 && (
-            <div className="mx-auto flex justify-center">
-              <NoDataCard text="No resources available. Ask your manager for an update." />
-            </div>
-          )}
-          {resources.map((resource) => (
-            <PCPResource
-              title={resource.title}
-              description={resource.description}
-              key={resource.id}
-              type={resource.kind}
-            />
-          ))}
-        </div>
+        <PCPSection
+          title="Resources"
+          showMore={true}
+          // userId={params.id}
+          type="resources"
+        >
+          <div className="mb-10 mt-2 flex w-full flex-row flex-wrap gap-12 overflow-x-auto pb-3">
+            {resources.length === 0 && (
+              <div className="mx-auto flex justify-center">
+                <NoDataCard text="No resources available. Ask your manager for an update." />
+              </div>
+            )}
+            {resources.map((resource) => (
+              <PCPResource
+                title={resource.title}
+                description={resource.description}
+                key={resource.id}
+                type={resource.kind}
+              />
+            ))}
+          </div>
+        </PCPSection>
       </section>
     </div>
   );
