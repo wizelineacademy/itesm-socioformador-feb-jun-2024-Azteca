@@ -1,7 +1,7 @@
 "use server";
 import OpenAI from "openai";
 import db from "@/db/drizzle";
-import { and, count, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, count, eq, inArray, isNull } from "drizzle-orm";
 import { auth } from "@/auth";
 import similarity from "compute-cosine-similarity";
 
@@ -86,7 +86,7 @@ async function cosineSimilarity(
   // sort the elements by descending similarity, return only the IDs of the records
   const recordsId: number[] = recordsSimilarity
     .sort((a, b) => b[0] - a[0])
-    .map(([_, resourceId]) => resourceId)
+    .map((resource) => resource[1] as number)
     .filter((value): value is number => value !== null);
 
   return recordsId;
@@ -464,7 +464,7 @@ async function getQuestionsSkills(sprintSurveyId: number) {
   return questionsSkills;
 }
 
-async function setResourcesEmbeddings() {
+/* async function setResourcesEmbeddings() {
   try {
     const noEmbeddingResources = await db
       .select()
@@ -495,7 +495,7 @@ async function setResourcesEmbeddings() {
   } catch (err) {
     console.error("Error retrieving resources:", err);
   }
-}
+} */
 
 export async function rulerAnalysis() {
   const session = await auth();

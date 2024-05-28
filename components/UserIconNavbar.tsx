@@ -1,11 +1,5 @@
 "use client";
-import {
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  Transition,
-} from "@headlessui/react";
+import { Menu, Transition } from "@headlessui/react";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { signOut } from "next-auth/react";
@@ -45,7 +39,7 @@ const UserIconNavbar = ({
 
   return (
     <Menu as="div" className="relative inline-block text-left">
-      <MenuButton
+      <Menu.Button
         as="div"
         onClick={() => setIsClicked(!isClicked)}
         className={`${onSite || isClicked ? "bg-primary" : "bg-white transition-all delay-0 hover:scale-[1.175]"} flex rounded-full drop-shadow-lg`}
@@ -61,7 +55,7 @@ const UserIconNavbar = ({
           photoUrl={user?.photoUrl || ""}
           className="m-auto bg-transparent"
         />
-      </MenuButton>
+      </Menu.Button>
       <Transition
         as={Fragment}
         enter="transition ease-out duration-100"
@@ -71,21 +65,21 @@ const UserIconNavbar = ({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <MenuItems className="absolute right-0 z-50 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
+        <Menu.Items className="absolute right-0 z-50 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
           <div className="px-1 py-1 ">
-            <MenuItem>
+            <Menu.Item>
               <p className="mx-auto items-center px-2 py-2 text-sm">
                 Hello {user?.name.split(" ")[0]}!
               </p>
-            </MenuItem>
+            </Menu.Item>
           </div>
           <div className="flex flex-col gap-1 px-1 py-1">
-            <MenuItem disabled={onSite}>
-              {({ focus }) => (
+            <Menu.Item disabled={onSite}>
+              {({ active }) => (
                 <Link
                   href="/profile"
                   className={`${
-                    focus
+                    active
                       ? "bg-primary/75 text-white"
                       : onSite
                         ? "bg-primary text-white"
@@ -95,40 +89,39 @@ const UserIconNavbar = ({
                   Go Profile
                 </Link>
               )}
-            </MenuItem>
+            </Menu.Item>
             <button
               onClick={() => {
                 showSettingsModal();
               }}
             >
-              <MenuItem>
-                {({ focus }) => (
+              <Menu.Item>
+                {({ active }) => (
                   <button
                     className={`${
-                      focus ? "bg-primary/75 text-white" : "text-gray-900"
+                      active ? "bg-primary/75 text-white" : "text-gray-900"
                     } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                   >
                     Settings
                   </button>
                 )}
-              </MenuItem>
+              </Menu.Item>
             </button>
           </div>
           <button className="w-full px-1 py-1" onClick={handleSignOut}>
-            {" "}
-            <MenuItem>
-              {({ focus }) => (
+            <Menu.Item>
+              {({ active }) => (
                 <button
                   className={`${
-                    focus ? "bg-red-700 text-white" : "text-gray-900"
+                    active ? "bg-red-700 text-white" : "text-gray-900"
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                 >
                   Sign Out
                 </button>
               )}
-            </MenuItem>
+            </Menu.Item>
           </button>
-        </MenuItems>
+        </Menu.Items>
       </Transition>
     </Menu>
   );

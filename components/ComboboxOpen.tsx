@@ -1,10 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Combobox,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
-} from "@headlessui/react";
+import { Combobox } from "@headlessui/react";
 import Link from "next/link";
 import UserProfileButton from "./UserProfileButton";
 
@@ -55,18 +50,18 @@ const ComboboxOpen = ({ data }: { data: DataItem[] | undefined }) => {
 
   return (
     <Combobox<DataItem | null> value={selectedItem} onChange={setSelectedItem}>
-      {({ open }) => (
+      {() => (
         <>
-          <ComboboxInput
+          <Combobox.Input
             onChange={(event) => setQuery(event.target.value)}
             displayValue={(item: DataItem | null) => (item ? item.name : "")}
             className="mb-2 w-full rounded-lg border p-2 focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder="Search..."
           />
           <div>
-            <ComboboxOptions static>
+            <Combobox.Options static>
               {filteredData.map((item) => (
-                <ComboboxOption key={item.id} value={item}>
+                <Combobox.Option key={item.id} value={item}>
                   {({ active }) => (
                     <Link
                       href={
@@ -88,9 +83,9 @@ const ComboboxOpen = ({ data }: { data: DataItem[] | undefined }) => {
                       </div>
                     </Link>
                   )}
-                </ComboboxOption>
+                </Combobox.Option>
               ))}
-            </ComboboxOptions>
+            </Combobox.Options>
           </div>
         </>
       )}
