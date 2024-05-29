@@ -18,7 +18,7 @@ const DashboardEmotionsSection: React.FC<EmotionsSectionProps> = ({
     <p className="mx-auto mt-2 text-center text-xl font-semibold text-graySubtitle">
       Emotions Summary
     </p>
-    <div className="grid grid-cols-2 gap-5 pt-10">
+    <div className="grid grid-cols-2 gap-10 pt-10">
       {emotionsData.map((circle, index) => (
         <div
           key={index}
