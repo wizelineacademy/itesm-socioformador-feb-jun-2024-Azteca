@@ -6,14 +6,13 @@ import { auth } from "@/auth";
 import similarity from "compute-cosine-similarity";
 
 import {
-  negativeSkill,
   pipTask,
   pipResource,
-  pipResourceNegativeSkill,
+  pipResourceSkill,
   project,
   projectMember,
-  questionNegativeSkill,
-  questionPositiveSkill,
+  questionSkill,
+  skill,
   sprintSurvey,
   sprintSurveyAnswerCoworkers,
   sprintSurveyQuestion,
@@ -45,10 +44,7 @@ interface FeedbackRecords {
 // =============== OTHER INTERFACES ===============
 
 interface QuestionSkills {
-  [questionId: number]: {
-    positive: number[];
-    negative: number[];
-  };
+  [questionId: number]: number[]; // array of skills of the question
 }
 
 interface EmbeddingRecord {
@@ -95,14 +91,9 @@ async function cosineSimilarity(
 async function createTasks(weaknessesIds: Set<number>) {
   // get the name of the weaknesses
   const weaknessesRecords = await db
-    .select({ negativeSkill: negativeSkill.skill })
-    .from(negativeSkill)
-    .where(
-      inArray(
-        pipResourceNegativeSkill.negativeSkillId,
-        Array.from(weaknessesIds),
-      ),
-    );
+    .select({ negativeSkill: skill.negativeSkill })
+    .from(skill)
+    .where(inArray(skill.id, Array.from(weaknessesIds)));
 
   const weaknesses: string[] = weaknessesRecords.map(
     (element) => element.negativeSkill as string,
@@ -256,15 +247,10 @@ async function processOpenFeedback(
     // get the negative skills solved by the selected resources, set them as weaknesses of the user
     const newResourcesNegativeSkills = await db
       .select({
-        negativeSkillId: pipResourceNegativeSkill.negativeSkillId,
+        negativeSkillId: pipResourceSkill.skillId,
       })
-      .from(pipResourceNegativeSkill)
-      .where(
-        inArray(
-          pipResourceNegativeSkill.pipResourceId,
-          recommendedResourcesIds,
-        ),
-      );
+      .from(pipResourceSkill)
+      .where(inArray(pipResourceSkill.skillId, recommendedResourcesIds));
 
     newResourcesNegativeSkills.forEach((element) => {
       weaknessesIds.add(element.negativeSkillId as number);
@@ -379,10 +365,12 @@ async function getFeedbackClassifications(
   for (const coworkerId of Object.keys(coworkersFeedback)) {
     const closedFeedback = coworkersFeedback[coworkerId].closedFeedback;
     // read all the closed feedback of the coworker
-    for (const answer of closedFeedback) {
-      if (answer[1] >= 8) {
+    for (const feedback of closedFeedback) {
+      if (feedback[1] >= 8) {
         // add the positive skills of the question
-        const questionPositiveSkills = questionsSkills[answer[0]].positive;
+        const questionPositiveSkills = questionsSkills[feedback[0]].map(
+          (skillId) => skillId as number,
+        );
         for (const positiveSkillId of questionPositiveSkills) {
           if (positiveSkillId in feedbackClassifications.positive) {
             // the skill already exists in the classification, check if the coworker is already there
@@ -402,7 +390,9 @@ async function getFeedbackClassifications(
         }
       } else {
         // add the negative skills of the question
-        const questionNegativeSkills = questionsSkills[answer[0]].negative;
+        const questionNegativeSkills = questionsSkills[feedback[0]].map(
+          (skillId) => skillId as number,
+        );
         for (const negativeSkillId of questionNegativeSkills) {
           if (negativeSkillId in feedbackClassifications.negative) {
             // the skill already exists in the classification, check if the coworker is already there
@@ -436,30 +426,17 @@ async function getQuestionsSkills(sprintSurveyId: number) {
     .from(sprintSurveyQuestion)
     .where(eq(sprintSurveyQuestion.sprintSurveyId, sprintSurveyId));
 
-  for (const question of questions) {
-    const positiveSkills = await db
-      .select({
-        skill: questionPositiveSkill.positiveSkillId,
-      })
-      .from(questionPositiveSkill)
-      .where(
-        eq(questionPositiveSkill.questionId, question.questionId as number),
-      );
+  const questionSkills: QuestionSkills = {};
 
-    const negativeSkills = await db
-      .select({
-        skill: questionNegativeSkill.negativeSkillId,
-      })
-      .from(questionNegativeSkill)
-      .where(
-        eq(questionNegativeSkill.questionId, question.questionId as number),
-      );
-
-    questionsSkills[question.questionId as number] = {
-      positive: positiveSkills.map((skill) => skill.skill as number),
-      negative: negativeSkills.map((skill) => skill.skill as number),
-    };
-  }
+  questions.forEach(async (question) => {
+    const associatedSkills = await db
+      .select({ skillId: questionSkill.skillId })
+      .from(questionSkill)
+      .where(eq(questionSkill.questionId, question.questionId as number));
+    questionSkills[question.questionId as number] = associatedSkills.map(
+      (element) => element.skillId as number,
+    );
+  });
 
   return questionsSkills;
 }
@@ -583,15 +560,10 @@ export async function feedback_analysis(sprintSurveyId: number) {
         // get the associated resources with the negative skills
         const closedFeedbackRecommendedResources = await db
           .select({
-            resourceId: pipResource.id,
+            resourceId: pipResourceSkill.pipResourceId,
           })
-          .from(pipResourceNegativeSkill)
-          .where(
-            inArray(
-              pipResourceNegativeSkill.negativeSkillId,
-              negativeSkillsIds,
-            ),
-          );
+          .from(pipResourceSkill)
+          .where(inArray(pipResourceSkill.skillId, negativeSkillsIds));
 
         const resourcesArrayIds = closedFeedbackRecommendedResources.map(
           (element) => element.resourceId,
@@ -599,7 +571,7 @@ export async function feedback_analysis(sprintSurveyId: number) {
 
         // add the resources to the recommendations of the user
         resourcesArrayIds.forEach((resourceId) =>
-          uniqueResources.add(resourceId),
+          uniqueResources.add(resourceId as number),
         );
 
         let weaknessesIds: Set<number> = new Set(negativeSkillsIds);

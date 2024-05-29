@@ -25,6 +25,13 @@ export const user = pgTable(
     department: varchar("department", { length: 64 }),
     photoUrl: varchar("photo_url", { length: 1024 }),
     role: userRoleEnum("role").notNull(),
+    bannerId: varchar("banner_id", { length: 24 })
+      .notNull()
+      .default("Banner1.svg"),
+    primaryColor: varchar("primary_color", { length: 7 })
+      .notNull()
+      .default("#6640D5"),
+    lightMode: boolean("light_mode").default(true),
   },
 );
 
@@ -153,40 +160,25 @@ export const question = pgTable("question", {
   type: questionTypeEnum("type").notNull(),
 });
 
-export const positiveSkill = pgTable("positive_skill", {
-  id: serial("positive_skill_id").primaryKey(),
-  skill: varchar("skill", { length: 30 }),
+export const skill = pgTable("skill", {
+  id: serial("skill_id").primaryKey(),
+  positiveSkill: varchar("positive_skill", { length: 30 }),
+  negativeSkill: varchar("negative_skill", { length: 30 }),
 });
 
-export const negativeSkill = pgTable("negative_skill", {
-  id: serial("negative_skill_id").primaryKey(),
-  skill: varchar("skill", { length: 30 }),
-});
-
-export const questionPositiveSkill = pgTable("question_positive_skill", {
+export const questionSkill = pgTable("question_skill", {
   questionId: integer("question_id").references(() => question.id),
-  positiveSkillId: integer("positive_skill_id").references(
-    () => positiveSkill.id,
-  ),
+  skillId: integer("skill_id").references(() => skill.id),
 });
 
-export const questionNegativeSkill = pgTable("question_negative_skill", {
-  questionId: integer("question_id").references(() => question.id),
-  negativeSkillId: integer("negative_skill_id").references(
-    () => negativeSkill.id,
-  ),
+export const pipResourceSkill = pgTable("pip_resource_skill", {
+  pipResourceId: integer("pip_resource_id").references(() => pipResource.id),
+  skillId: integer("skill_id").references(() => skill.id),
 });
 
 export const sprintSurveyQuestion = pgTable("sprint_survey_question", {
   sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
   questionId: integer("question_id").references(() => question.id),
-});
-
-export const pipResourceNegativeSkill = pgTable("pip_resource_negative_skill", {
-  pipResourceId: integer("pip_resource_id").references(() => pipResource.id),
-  negativeSkillId: integer("negative_skill_id").references(
-    () => negativeSkill.id,
-  ),
 });
 
 export const sprintSurvey = pgTable("sprint_survey", {
