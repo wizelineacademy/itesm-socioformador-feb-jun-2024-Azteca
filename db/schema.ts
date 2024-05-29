@@ -171,6 +171,11 @@ export const questionSkill = pgTable("question_skill", {
   skillId: integer("skill_id").references(() => skill.id),
 });
 
+export const pipResourceSkill = pgTable("pip_resource_skill", {
+  pipResourceId: integer("pip_resource_id").references(() => pipResource.id),
+  skillId: integer("skill_id").references(() => skill.id),
+});
+
 export const sprintSurveyQuestion = pgTable("sprint_survey_question", {
   sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
   questionId: integer("question_id").references(() => question.id),
