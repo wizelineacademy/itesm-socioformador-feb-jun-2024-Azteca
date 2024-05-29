@@ -79,10 +79,15 @@ export async function getUserResourcesForCurrentSprint() {
 
 export async function getUserResourcesHistory() {}
 
-export async function updateTask(taskId: number, isDone: boolean | null) {
+export async function updateTask({
+  taskId,
+  newStatus,
+}: {
+  taskId: number;
+  newStatus: typeof pipTask.$inferSelect.status;
+}) {
   await db
     .update(pipTask)
-    .set({ isDone: isDone })
-    .where(eq(pipTask.id, taskId))
-    .execute();
+    .set({ status: newStatus })
+    .where(eq(pipTask.id, taskId));
 }
