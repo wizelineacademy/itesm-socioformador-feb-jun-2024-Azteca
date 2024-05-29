@@ -28,7 +28,6 @@ const UserProfileButton = ({
     >
       {photoUrl ? (
         <Image
-          priority
           src={photoUrl}
           alt={"User profile photo"}
           className={`rounded-full ${sizes[size]}`}

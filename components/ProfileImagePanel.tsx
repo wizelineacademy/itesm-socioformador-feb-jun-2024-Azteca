@@ -3,9 +3,37 @@
 import { useState } from "react";
 import { Image } from "@mantine/core";
 import { Dropzone, IMAGE_MIME_TYPE, FileWithPath } from "@mantine/dropzone";
+import { changeProfileImage, getPreSignedURL } from "@/services/images";
+import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
-const ProfileImagePanel = () => {
+const ProfileImagePanel = ({ closeModal }: { closeModal: () => void }) => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
   const [file, setFile] = useState<FileWithPath[]>([]);
+
+  const handleSubmitImage = async () => {
+    if (!file[0]) {
+      throw new Error("Image was not selected by the user");
+    }
+
+    const url = await getPreSignedURL();
+
+    const image = await fetch(url, {
+      body: file[0],
+      method: "PUT",
+      headers: {
+        "Content-Type": file[0].type,
+        "Content-Disposition": `attachment; filename="${file[0].name}"`,
+      },
+    });
+
+    const uploadedURL = image.url.split("?")[0];
+    await changeProfileImage(uploadedURL);
+    closeModal();
+    await queryClient.invalidateQueries({ queryKey: ["user"] });
+    router.refresh();
+  };
 
   const preview = file.map((image, index) => {
     const imageUrl = URL.createObjectURL(image);
@@ -56,6 +84,7 @@ const ProfileImagePanel = () => {
           Reset
         </button>
         <button
+          onClick={handleSubmitImage}
           disabled={file.length === 0}
           className={`${
             file.length === 0

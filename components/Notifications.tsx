@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  Transition,
-} from "@headlessui/react";
+import { Menu, Transition } from "@headlessui/react";
 import { Dispatch, Fragment, SetStateAction, useState } from "react";
 import CloseIcon from "./icons/CloseIcon";
 import NotificationIcon from "./icons/NotificationIcon";
@@ -75,7 +69,7 @@ const Notifications = ({
 
   return (
     <Menu as="div" className="relative inline-block text-left">
-      <MenuButton
+      <Menu.Button
         onClick={() => setIsActive(!isActive)}
         className={`${isActive ? "bg-primary" : "bg-white transition-all delay-0 hover:scale-[1.175]"} group rounded-full p-2 drop-shadow-lg`}
       >
@@ -86,7 +80,7 @@ const Notifications = ({
         {notificationsQuery.data.length > 0 && (
           <span className=" absolute -right-px -top-px flex h-3 w-3 items-center justify-center rounded-full bg-red-700 " />
         )}
-      </MenuButton>
+      </Menu.Button>
 
       <Transition
         as={Fragment}
@@ -97,8 +91,8 @@ const Notifications = ({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <MenuItems className=" absolute right-0 z-50 mt-2 box-content max-h-72 min-h-fit w-96 origin-top-right overflow-auto rounded-md bg-white px-4 shadow-lg ring-1 ring-black/5 focus:outline-none">
-          <MenuItem>
+        <Menu.Items className=" absolute right-0 z-50 mt-2 box-content max-h-72 min-h-fit w-96 origin-top-right overflow-auto rounded-md bg-white px-4 shadow-lg ring-1 ring-black/5 focus:outline-none">
+          <Menu.Item>
             {({ close }) => (
               <div className="sticky top-0 z-50 flex flex-row items-center justify-between bg-white pt-3">
                 <div className="flex flex-row gap-1">
@@ -112,11 +106,11 @@ const Notifications = ({
                 />
               </div>
             )}
-          </MenuItem>
+          </Menu.Item>
           {notificationsQuery.data.length > 0 &&
             notificationsQuery.data.map((notification, index) => {
               return (
-                <MenuItem key={index}>
+                <Menu.Item key={index}>
                   {({ close }) => (
                     <button
                       onClick={() => {
@@ -128,19 +122,19 @@ const Notifications = ({
                       <NotificationCard notification={notification} />
                     </button>
                   )}
-                </MenuItem>
+                </Menu.Item>
               );
             })}
           {notificationsQuery.data.length === 0 && (
             <div className="flex h-5/6 w-full items-center justify-center py-1">
-              <MenuItem>
+              <Menu.Item>
                 <p className="items-center py-2 text-sm">
                   No tienes ninguna notificación
                 </p>
-              </MenuItem>
+              </Menu.Item>
             </div>
           )}
-        </MenuItems>
+        </Menu.Items>
       </Transition>
     </Menu>
   );

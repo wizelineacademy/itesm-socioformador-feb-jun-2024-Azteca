@@ -1,13 +1,7 @@
 "use client";
 
 import { Fragment } from "react";
-import {
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-  Transition,
-  TransitionChild,
-} from "@headlessui/react";
+import { Dialog, Transition } from "@headlessui/react";
 import { Tabs } from "@mantine/core";
 import ProfileImagePanel from "../ProfileImagePanel";
 import BannerImagePanel from "../BannerImagePanel";
@@ -22,7 +16,7 @@ const SettingsDialog = ({ showModal, onClose }: SettingsDialogProps) => {
   return (
     <Transition appear show={showModal} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
-        <TransitionChild
+        <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
@@ -32,11 +26,11 @@ const SettingsDialog = ({ showModal, onClose }: SettingsDialogProps) => {
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-black/25" />
-        </TransitionChild>
+        </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
-            <TransitionChild
+            <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
               enterFrom="opacity-0 scale-95"
@@ -45,13 +39,13 @@ const SettingsDialog = ({ showModal, onClose }: SettingsDialogProps) => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <DialogPanel className="flex w-full max-w-5xl transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <DialogTitle
+              <Dialog.Panel className="flex w-full max-w-5xl transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <Dialog.Title
                   as="h3"
                   className="text-2xl font-semibold text-black"
                 >
                   Settings
-                </DialogTitle>
+                </Dialog.Title>
                 <Tabs color="violet" defaultValue="profileImage">
                   <Tabs.List grow justify="space-between">
                     <Tabs.Tab
@@ -75,7 +69,7 @@ const SettingsDialog = ({ showModal, onClose }: SettingsDialogProps) => {
                   </Tabs.List>
 
                   <Tabs.Panel value="profileImage">
-                    <ProfileImagePanel />
+                    <ProfileImagePanel closeModal={onClose} />
                   </Tabs.Panel>
 
                   <Tabs.Panel value="bannerImage">
@@ -86,8 +80,8 @@ const SettingsDialog = ({ showModal, onClose }: SettingsDialogProps) => {
                     <ColorThemePanel />
                   </Tabs.Panel>
                 </Tabs>
-              </DialogPanel>
-            </TransitionChild>
+              </Dialog.Panel>
+            </Transition.Child>
           </div>
         </div>
       </Dialog>

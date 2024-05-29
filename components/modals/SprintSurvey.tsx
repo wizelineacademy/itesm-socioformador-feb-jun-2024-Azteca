@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-  Transition,
-  TransitionChild,
-} from "@headlessui/react";
+import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import SprintStepOne from "./SprintStepOne";
 import SprintStepTwo from "./SprintStepTwo";
@@ -170,20 +164,12 @@ const SprintSurvey = ({
   };
 
   const modalWidth = step === 3 ? "max-w-xl" : "max-w-5xl";
-  useEffect(() => {
-    const modal = document.querySelector(".sprint-survey");
-    if (!modal) return;
-    if (step === 3) modal.classList.remove("max-w-5xl");
-    else modal.classList.remove("max-w-xl");
-  }, [step]);
-
-  //TODO: Render the loading state into the modal
   if (!users) return <div></div>;
   if (isError) return <div>Error loading data</div>;
   return (
     <Transition appear show={showModal} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
-        <TransitionChild
+        <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
@@ -193,10 +179,10 @@ const SprintSurvey = ({
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-black/25" />
-        </TransitionChild>
+        </Transition.Child>
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
-            <TransitionChild
+            <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
               enterFrom="opacity-0"
@@ -205,15 +191,15 @@ const SprintSurvey = ({
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <DialogPanel
+              <Dialog.Panel
                 className={`sprint-survey flex h-auto transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all duration-500 ${modalWidth}`}
               >
-                <DialogTitle
+                <Dialog.Title
                   as="h3"
                   className="text-2xl font-semibold text-black"
                 >
                   Sprint Survey
-                </DialogTitle>
+                </Dialog.Title>
                 {isLoadingQuestions && <Loader />}
                 {allSprintQuestions && (
                   <>
@@ -300,8 +286,8 @@ const SprintSurvey = ({
                     </button>
                   )}
                 </footer>
-              </DialogPanel>
-            </TransitionChild>
+              </Dialog.Panel>
+            </Transition.Child>
           </div>
         </div>
       </Dialog>

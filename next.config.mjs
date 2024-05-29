@@ -14,6 +14,10 @@ const nextConfig = {
         // Optionally, you can also specify the pathname prefix if needed:
         // pathname: '/your/pathname/prefix/*',
       },
+      {
+        protocol: "https",
+        hostname: "*.amazonaws.com",
+      },
     ],
   },
   eslint: {

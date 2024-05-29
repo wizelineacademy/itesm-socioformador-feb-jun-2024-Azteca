@@ -1,22 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import NextImage from "next/image";
-import Banner0 from "@/public/Banner0.svg";
-import Banner1 from "@/public/Banner1.svg";
-import Banner2 from "@/public/Banner2.svg";
-import Banner3 from "@/public/Banner3.svg";
-import Banner4 from "@/public/Banner4.svg";
 import { updateBannerId } from "@/services/user";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-const images = [Banner0, Banner1, Banner2, Banner3, Banner4];
-
 const BannerImagePanel = ({ closeModal }: { closeModal: () => void }) => {
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
   const router = useRouter();
+  const images = [
+    "/Banner0.svg",
+    "/Banner1.svg",
+    "/Banner2.svg",
+    "/Banner3.svg",
+    "/Banner4.svg",
+  ];
 
   const handleImageClick = (index: number) => {
     setSelectedImage(index);
@@ -67,7 +66,7 @@ const BannerImagePanel = ({ closeModal }: { closeModal: () => void }) => {
           } mt-4 rounded-lg px-10 py-2 font-medium text-white drop-shadow-lg`}
           onClick={handleBannerSubmit}
         >
-          Upload
+          Done
         </button>
       </div>
     </div>
