@@ -7,20 +7,25 @@ import DashboardEmotionsSection from "@/components/Dashboard/DashboardEmotionsSe
 import DashboardSurveyCalendar from "@/components/Dashboard/DashboardSurveyCalendar";
 import PCPSection from "@/components/Dashboard/DashboardPCPSection";
 import Loader from "@/components/Loader";
-import { getRulerGraphInfo } from "@/services/user-dashboard";
+import {
+  getOverallStatistics,
+  getRulerGraphInfo,
+} from "@/services/user-dashboard";
 
 const Dashboard = async ({ params }: { params: { userId: string } }) => {
   const activeUserId = await getUserId();
   const isManagedBy = await getUserManagedBy(activeUserId, params.userId);
   const user = await getUserInfoById(params.userId);
 
-  const radarData = [
-    { statistic: "Communication", punctuation: 90 },
-    { statistic: "Motivation", punctuation: 68 },
-    { statistic: "Coworker Support", punctuation: 74 },
-    { statistic: "Manager Support", punctuation: 85 },
-    { statistic: "Punctuality", punctuation: 89 },
-  ];
+  // const radarData = [
+  //   { statistic: "Communication", punctuation: 90 },
+  //   { statistic: "Motivation", punctuation: 68 },
+  //   { statistic: "Coworker Support", punctuation: 74 },
+  //   { statistic: "Manager Support", punctuation: 85 },
+  //   { statistic: "Punctuality", punctuation: 89 },
+  // ];
+
+  const radarData = await getOverallStatistics(params.userId);
 
   const gaugeData = [
     {

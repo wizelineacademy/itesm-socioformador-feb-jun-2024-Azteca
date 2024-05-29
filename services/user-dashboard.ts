@@ -3,13 +3,13 @@
 import db from "@/db/drizzle";
 import {
   finalSurveyAnswer,
-  positiveSkill,
+  skill,
   question,
-  questionPositiveSkill,
   rulerEmotion,
   rulerSurveyAnswers,
   sprintSurveyAnswerCoworkers,
   sprintSurveyAnswerProject,
+  questionSkill,
 } from "@/db/schema";
 import { and, eq, or } from "drizzle-orm";
 
@@ -79,33 +79,77 @@ export async function getRulerGraphInfo(id: string) {
   return emotionsData;
 }
 
+function calculateSurveyOverallStatistics(
+  statistics: {
+    motivationTotal: number;
+    motivationMaxScore: number;
+
+    managerSupportTotal: number;
+    managerSupportMaxScore: number;
+
+    communicationTotal: number;
+    communicationMaxScore: number;
+
+    coworkerSupportTotal: number;
+    coworkerMaxScore: number;
+
+    punctualitySupportTotal: number;
+    punctualityMaxScore: number;
+  },
+  surveyAnswer: {
+    userId: string | null;
+    answer: number | null;
+    skillId: number | null;
+    skill: string | null;
+  }[],
+) {
+  surveyAnswer.forEach((answer) => {
+    switch (answer.skillId) {
+      case 20:
+        statistics.motivationTotal += answer.answer || 0;
+        statistics.motivationMaxScore += 10;
+        break;
+      case 40:
+        statistics.managerSupportTotal += answer.answer || 0;
+        statistics.managerSupportMaxScore += 10;
+        break;
+      case 2:
+        statistics.communicationTotal += answer.answer || 0;
+        statistics.communicationMaxScore += 10;
+        break;
+      case 41:
+        statistics.coworkerSupportTotal += answer.answer || 0;
+        statistics.coworkerMaxScore += 10;
+        break;
+      case 39:
+        statistics.punctualitySupportTotal += answer.answer || 0;
+        statistics.punctualityMaxScore += 10;
+        break;
+    }
+  });
+}
+
 export async function getOverallStatistics(userId: string) {
   const coworkersAnswers = await db
     .select({
       userId: sprintSurveyAnswerCoworkers.coworkerId,
       answer: sprintSurveyAnswerCoworkers.answer,
-      skillId: positiveSkill.id,
-      skill: positiveSkill.skill,
+      skillId: skill.id,
+      skill: skill.positiveSkill,
     })
     .from(sprintSurveyAnswerCoworkers)
     .leftJoin(question, eq(sprintSurveyAnswerCoworkers.questionId, question.id))
-    .leftJoin(
-      questionPositiveSkill,
-      eq(question.id, questionPositiveSkill.questionId),
-    )
-    .leftJoin(
-      positiveSkill,
-      eq(questionPositiveSkill.positiveSkillId, positiveSkill.id),
-    )
+    .leftJoin(questionSkill, eq(question.id, questionSkill.questionId))
+    .leftJoin(skill, eq(questionSkill.skillId, skill.id))
     .where(
       and(
         eq(sprintSurveyAnswerCoworkers.coworkerId, userId),
         or(
-          eq(positiveSkill.id, 20), // Motivation id
-          eq(positiveSkill.id, 40), // Manager support
-          eq(positiveSkill.id, 2), // Communication
-          eq(positiveSkill.id, 41), // Coworker support
-          eq(positiveSkill.id, 39), // Punctuality
+          eq(skill.id, 20), // Motivation id
+          eq(skill.id, 40), // Manager support
+          eq(skill.id, 2), // Communication
+          eq(skill.id, 41), // Coworker support
+          eq(skill.id, 39), // Punctuality
         ),
       ),
     );
@@ -114,28 +158,22 @@ export async function getOverallStatistics(userId: string) {
     .select({
       userId: sprintSurveyAnswerProject.userId,
       answer: sprintSurveyAnswerProject.answer,
-      skillId: positiveSkill.id,
-      skill: positiveSkill.skill,
+      skillId: skill.id,
+      skill: skill.positiveSkill,
     })
     .from(sprintSurveyAnswerProject)
     .leftJoin(question, eq(sprintSurveyAnswerProject.questionId, question.id))
-    .leftJoin(
-      questionPositiveSkill,
-      eq(question.id, questionPositiveSkill.questionId),
-    )
-    .leftJoin(
-      positiveSkill,
-      eq(questionPositiveSkill.positiveSkillId, positiveSkill.id),
-    )
+    .leftJoin(questionSkill, eq(question.id, questionSkill.questionId))
+    .leftJoin(skill, eq(questionSkill.skillId, skill.id))
     .where(
       and(
         eq(sprintSurveyAnswerProject.userId, userId),
         or(
-          eq(positiveSkill.id, 20), // Motivation id
-          eq(positiveSkill.id, 40), // Manager support
-          eq(positiveSkill.id, 2), // Communication
-          eq(positiveSkill.id, 41), // Coworker support
-          eq(positiveSkill.id, 39), // Punctuality
+          eq(skill.id, 20), // Motivation id
+          eq(skill.id, 40), // Manager support
+          eq(skill.id, 2), // Communication
+          eq(skill.id, 41), // Coworker support
+          eq(skill.id, 39), // Punctuality
         ),
       ),
     );
@@ -144,70 +182,77 @@ export async function getOverallStatistics(userId: string) {
     .select({
       userId: finalSurveyAnswer.userId,
       answer: finalSurveyAnswer.answer,
-      skillId: positiveSkill.id,
-      skill: positiveSkill.skill,
+      skillId: skill.id,
+      skill: skill.positiveSkill,
     })
     .from(finalSurveyAnswer)
     .leftJoin(question, eq(finalSurveyAnswer.questionId, question.id))
-    .leftJoin(
-      questionPositiveSkill,
-      eq(question.id, questionPositiveSkill.questionId),
-    )
-    .leftJoin(
-      positiveSkill,
-      eq(questionPositiveSkill.positiveSkillId, positiveSkill.id),
-    )
+    .leftJoin(questionSkill, eq(question.id, questionSkill.questionId))
+    .leftJoin(skill, eq(questionSkill.skillId, skill.id))
     .where(
       and(
         eq(finalSurveyAnswer.userId, userId),
         or(
-          eq(positiveSkill.id, 20), // Motivation id
-          eq(positiveSkill.id, 40), // Manager support
-          eq(positiveSkill.id, 2), // Communication
-          eq(positiveSkill.id, 41), // Coworker support
-          eq(positiveSkill.id, 39), // Punctuality
+          eq(skill.id, 20), // Motivation id
+          eq(skill.id, 40), // Manager support
+          eq(skill.id, 2), // Communication
+          eq(skill.id, 41), // Coworker support
+          eq(skill.id, 39), // Punctuality
         ),
       ),
     );
 
-  let communicationMaxScore = 0;
-  let communicationTotal = 0;
-  let motivationTotal = 0;
-  let coworkerSupportTotal = 0;
-  let managerSupportTotal = 0;
-  let punctualitySupportTotal = 0;
+  const scores = {
+    motivationTotal: 0,
+    motivationMaxScore: 0,
 
-  coworkersAnswers.forEach((answer) => {
-    switch (answer.skillId) {
-      case 20:
-        motivationTotal += 1;
-        break;
-      case 40:
-        managerSupportTotal += 1;
-        break;
-      case 2:
-        communicationTotal += 1;
-        communicationMaxScore += 10;
-        break;
-      case 41:
-        coworkerSupportTotal += 1;
-        break;
-      case 39:
-        punctualitySupportTotal += 1;
-        break;
-    }
-  });
+    managerSupportTotal: 0,
+    managerSupportMaxScore: 0,
+
+    communicationTotal: 0,
+    communicationMaxScore: 0,
+
+    coworkerSupportTotal: 0,
+    coworkerMaxScore: 0,
+
+    punctualitySupportTotal: 0,
+    punctualityMaxScore: 0,
+  };
+
+  calculateSurveyOverallStatistics(scores, coworkersAnswers);
+  calculateSurveyOverallStatistics(scores, sprintAnswers);
+  calculateSurveyOverallStatistics(scores, finalAnswers);
 
   const radarData = [
     {
       statistic: "Communication",
-      punctuation: (communicationTotal * 100) / communicationMaxScore,
+      punctuation:
+        (scores.communicationTotal * 100) / scores.communicationMaxScore,
     },
-    { statistic: "Motivation", punctuation: 68 },
-    { statistic: "Coworker Support", punctuation: 74 },
-    { statistic: "Manager Support", punctuation: 85 },
-    { statistic: "Punctuality", punctuation: 89 },
+    {
+      statistic: "Motivation",
+      punctuation: (scores.motivationTotal * 100) / scores.motivationMaxScore,
+    },
+    {
+      statistic: "Coworker Support",
+      punctuation:
+        (scores.coworkerSupportTotal * 100) / scores.coworkerMaxScore,
+    },
+    {
+      statistic: "Manager Support",
+      punctuation:
+        (scores.managerSupportTotal * 100) / scores.managerSupportMaxScore,
+    },
+    {
+      statistic: "Punctuality",
+      punctuation:
+        (scores.punctualitySupportTotal * 100) / scores.punctualityMaxScore,
+    },
   ];
+
+  console.log("SCORES: ", scores);
+
+  console.log("FINAL DATA: ", radarData);
 
   return radarData;
 }
