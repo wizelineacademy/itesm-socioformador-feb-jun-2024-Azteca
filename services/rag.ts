@@ -11,6 +11,7 @@ import {
   pipResourceSkill,
   project,
   projectMember,
+  question,
   questionSkill,
   skill,
   sprintSurvey,
@@ -279,9 +280,13 @@ async function orderFeedback(sprintSurveyId: number, uniqueWorkers: string[]) {
       sprintSurveyAnswerCoworkers,
       eq(sprintSurveyAnswerCoworkers.sprintSurveyId, sprintSurveyId),
     )
+    .innerJoin(
+      question,
+      eq(question.id, sprintSurveyAnswerCoworkers.questionId),
+    )
     .where(
       and(
-        isNull(sprintSurveyAnswerCoworkers.answer),
+        eq(question.type, "COWORKER_COMMENT"),
         eq(sprintSurvey.id, sprintSurveyId),
       ),
     );
@@ -298,9 +303,13 @@ async function orderFeedback(sprintSurveyId: number, uniqueWorkers: string[]) {
       sprintSurveyAnswerCoworkers,
       eq(sprintSurveyAnswerCoworkers.sprintSurveyId, sprintSurveyId),
     )
+    .innerJoin(
+      question,
+      eq(question.id, sprintSurveyAnswerCoworkers.questionId),
+    )
     .where(
       and(
-        isNull(sprintSurveyAnswerCoworkers.comment),
+        eq(question.type, "COWORKER_QUESTION"),
         eq(sprintSurvey.id, sprintSurveyId),
       ),
     );
@@ -424,7 +433,13 @@ async function getQuestionsSkills(sprintSurveyId: number) {
       questionId: sprintSurveyQuestion.questionId,
     })
     .from(sprintSurveyQuestion)
-    .where(eq(sprintSurveyQuestion.sprintSurveyId, sprintSurveyId));
+    .innerJoin(question, eq(question.id, sprintSurveyQuestion.questionId))
+    .where(
+      and(
+        eq(sprintSurveyQuestion.sprintSurveyId, sprintSurveyId),
+        eq(question.type, "COWORKER_QUESTION"),
+      ),
+    );
 
   const questionSkills: QuestionSkills = {};
 
