@@ -2,13 +2,16 @@
 import PCPResource from "@/components/PCP/PCPResource";
 import PCPTask from "@/components/PCP/PCPTask";
 import ProgressBar from "@/components/ProgressBar";
-import { useState, useEffect } from "react";
 import NoDataCard from "@/components/NoDataCard";
 import { Task, Resource } from "@/types/types";
 import PCPSection from "@/components/PCP/PCPSection";
+import { useQuery } from "@tanstack/react-query";
+import { getProjects } from "@/services/project";
+import { getUserTasksForCurrentSprintByProjectId } from "@/services/tasks-and-resources";
+import { useEffect, useState } from "react";
 
 // Datos dummy para las tareas
-const dummyTasks: Task[] = [
+const tasks: Task[] = [
   {
     id: 1,
     userId: null,
@@ -41,7 +44,7 @@ const dummyTasks: Task[] = [
 ];
 
 // Datos dummy para los recursos
-const dummyResources: Resource[] = [
+const resources: Resource[] = [
   {
     id: 1,
     userId: null,
@@ -73,31 +76,32 @@ const dummyResources: Resource[] = [
 ];
 
 const PCP = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [resources, setResources] = useState<Resource[]>([]);
+  const [projectId, setProjectId] = useState<number>();
+
+  const projectsQuery = useQuery({
+    queryKey: ["projects"],
+    queryFn: () => getProjects(),
+  });
 
   useEffect(() => {
-    // Usar datos dummy en lugar de llamar a la API
-    setTasks(dummyTasks);
-  }, []);
+    if (!projectsQuery.data) return;
+    setProjectId(projectsQuery.data[0].id);
+  }, [projectsQuery.data]);
 
-  useEffect(() => {
-    // Usar datos dummy en lugar de llamar a la API
-    setResources(dummyResources);
-  }, []);
+  const progressPercentage = 100;
 
-  const handleStatusChange = (index: number, status: string) => {
-    const newTasks = [...tasks];
-    newTasks[index].status = status;
-    setTasks(newTasks);
-  };
+  if (
+    projectsQuery.isError ||
+    (projectsQuery.data && projectsQuery.data.length === 0)
+  ) {
+    return (
+      <p>You dont have projects or there was an error fetching the data</p>
+    );
+  }
 
-  const progressPercentage = Math.round(
-    ((tasks.filter((task) => task.status === "done").length +
-      tasks.filter((task) => task.status === "in-progress").length / 2) /
-      tasks.length) *
-      100,
-  );
+  if (projectsQuery.isLoading) {
+    return <p>loading...</p>;
+  }
 
   return (
     <div>
@@ -110,6 +114,47 @@ const PCP = () => {
         </div>
         <ProgressBar width={progressPercentage} height={6} />
       </section>
+
+      <section id="pip-selectproject">
+        <select
+          onChange={(e) => {
+            console.log(e.target.value);
+            setProjectId(parseInt(e.target.value));
+          }}
+        >
+          {projectsQuery.data &&
+            projectsQuery.data.map((project) => (
+              <option key={project.id} value={project.id}>
+                {project.name}
+              </option>
+            ))}
+        </select>
+      </section>
+
+      {projectId && <PCPBody projectId={projectId} />}
+    </div>
+  );
+};
+
+const PCPBody = ({ projectId }: { projectId: number }) => {
+  const tasksQuery = useQuery({
+    queryKey: ["tasks", projectId],
+    queryFn: () => getUserTasksForCurrentSprintByProjectId(projectId),
+    retry: false,
+  });
+
+  if (tasksQuery.isLoading) {
+    return <p>loading...</p>;
+  }
+
+  if (tasksQuery.isError) {
+    return <NoDataCard text={tasksQuery.error.message} />;
+  }
+
+  return <>{JSON.stringify(tasksQuery.data)}</>;
+
+  return (
+    <>
       <section id="pip-tasks" className="mt-9 w-full">
         <PCPSection
           title="Tasks History"
@@ -129,7 +174,7 @@ const PCP = () => {
                 title={task.title}
                 description={task.description}
                 status={task.status}
-                onStatusChange={(status) => handleStatusChange(index, status)}
+                onStatusChange={(status) => console.log(index, status)}
               />
             ))}
           </div>
@@ -160,7 +205,7 @@ const PCP = () => {
           </div>
         </PCPSection>
       </section>
-    </div>
+    </>
   );
 };
 

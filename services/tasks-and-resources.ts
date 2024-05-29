@@ -4,12 +4,14 @@ import db from "@/db/drizzle";
 import { eq, lte, and, desc } from "drizzle-orm";
 import { auth } from "@/auth";
 
-export async function getUserTasksForCurrentSprint(projectId: number) {
+export async function getUserTasksForCurrentSprintByProjectId(
+  projectId: number,
+) {
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) throw new Error("You must be signed in");
 
-  const res = db
+  const res = await db
     .select()
     .from(sprintSurvey)
     .where(
@@ -23,9 +25,34 @@ export async function getUserTasksForCurrentSprint(projectId: number) {
     .orderBy(desc(sprintSurvey.scheduledAt))
     .limit(1);
 
-  console.log(res);
   // check if the sprint is not processed to throw an error
   // check if there's no sprint survey results throw an error
+  // check if all the surveys were answered, so the only one left is the project one
+
+  console.log(res);
+  if (!res[0]) {
+    throw new Error("No sprint survey was found");
+  }
+
+  if (!res[0].processed) {
+    throw new Error(
+      "Curreny sprint survey was found, but it is not processed yet",
+    );
+  }
+
+  const sprintSurveyId = res[0].id;
+
+  const tasks = await db
+    .select()
+    .from(pipTask)
+    .where(
+      and(
+        eq(pipTask.userId, userId),
+        eq(pipTask.sprintSurveyId, sprintSurveyId),
+      ),
+    );
+
+  return tasks;
 }
 
 export async function getUserTasksHistory() {}
