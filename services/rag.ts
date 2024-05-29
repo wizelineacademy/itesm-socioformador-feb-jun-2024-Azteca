@@ -91,53 +91,58 @@ async function cosineSimilarity(
 
 async function createTasks(weaknessesIds: Set<number>) {
   // get the name of the weaknesses
-  const weaknessesRecords = await db
-    .select({ negativeSkill: skill.negativeSkill })
-    .from(skill)
-    .where(inArray(skill.id, Array.from(weaknessesIds)));
+  let weaknessesRecords = [];
+  let cleanedTasks: string[] = [];
 
-  const weaknesses: string[] = weaknessesRecords.map(
-    (element) => element.negativeSkill as string,
-  );
+  if (weaknessesIds.size > 0) {
+    weaknessesRecords = await db
+      .select({ negativeSkill: skill.negativeSkill })
+      .from(skill)
+      .where(inArray(skill.id, Array.from(weaknessesIds)));
 
-  // join all the weaknesses in a string for a direct query
-  const stringWeaknesses: string = weaknesses.join(", ");
+    const weaknesses: string[] = weaknessesRecords.map(
+      (element) => element.negativeSkill as string,
+    );
 
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_KEY,
-  });
+    // join all the weaknesses in a string for a direct query
+    const stringWeaknesses: string = weaknesses.join(", ");
 
-  const tasksInstructions: string = `El siguiente query contiene todas las áreas de mejora de un usuario, debes crear tareas simples para la persona evaluada para mejorar su rendimiento o bienestar. Las tareas deben ser claras y concisas, deben estar relacionadas al query recibido, deben ser tareas simples que no tomen mucho tiempo al usuario pero que le permiten mejorar en su rendimiento o bienestar. Algunos ejemplos de tareas pueden ser "Hacer ejercicio", "Ir con el psicólogo", "Meditar", "Dormir 8 horas diarias", "Comer frutas y verduras", "Visitar a mi familia", etc., pero cuida que sean relacionadas a las áreas de mejora indicadas, que sean sencilas y que todas sean diferentes.
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_KEY,
+    });
 
-  Hay otras indicaciones muy importantes que debes seguir por cada tarea:
-  1. Cada tarea debe llevar un título y una descripción.
-  2. El título no debe superar los 64 caracteres y la descripción no debe superar los 256 caracteres.
-  3. Al crear ya sea el título o la descripción de cada tarea no debes usar nunca los caracteres "\n" ni ":" porque esos son caracteres especiales que yo te indicaré donde usar.
-  4. Vas a juntar el título de cada tarea con la descripción donde el separador de en medio es el caracter ":" sin espacios en blanco entre todos los caracteres, solo en el mensaje del título y de la descripción.
-  5. Vas a unir las estructuras de todas las tareas con el caracter "\n" como separador sin espacios en blanco entre la estructura de cada tarea y ese separador.
-  6. El query puede o no llegar a tener más de 10 áreas de oportunidad, si ese es el caso debes crear tareas que involucren 2 o más áreas de oportunidad en una misma, puedes tomarte la libertad de crear la cantidad de tareas que consideres pero que nunca exceda la cantidad de 10 tareas. Si son menos de 10 áreas de oportunidad crea una tarea por cada área de oportunidad.
-  7. La siguiente estructura es ilustrativa de cómo debes regresar el resultado con todas las tareas, fíjate en estructura no tanto en el contenido:
-  """
-  titulo_1:descripcion_1\ntitulo_2:descripcion_2\ntitulo_3:descripcion_3
-  """`;
+    const tasksInstructions: string = `El siguiente query contiene todas las áreas de mejora de un usuario, debes crear tareas simples para la persona evaluada para mejorar su rendimiento o bienestar. Las tareas deben ser claras y concisas, deben estar relacionadas al query recibido, deben ser tareas simples que no tomen mucho tiempo al usuario pero que le permiten mejorar en su rendimiento o bienestar. Algunos ejemplos de tareas pueden ser "Hacer ejercicio", "Ir con el psicólogo", "Meditar", "Dormir 8 horas diarias", "Comer frutas y verduras", "Visitar a mi familia", etc., pero cuida que sean relacionadas a las áreas de mejora indicadas, que sean sencilas y que todas sean diferentes.
 
-  const rawTasks = await openai.chat.completions.create({
-    model: "gpt-4",
-    messages: [
-      {
-        role: "system",
-        content: tasksInstructions,
-      },
-      {
-        role: "user",
-        content: stringWeaknesses,
-      },
-    ],
-  });
+    Hay otras indicaciones muy importantes que debes seguir por cada tarea:
+    1. Cada tarea debe llevar un título y una descripción.
+    2. El título no debe superar los 64 caracteres y la descripción no debe superar los 256 caracteres.
+    3. Al crear ya sea el título o la descripción de cada tarea no debes usar nunca los caracteres "\n" ni ":" porque esos son caracteres especiales que yo te indicaré donde usar.
+    4. Vas a juntar el título de cada tarea con la descripción donde el separador de en medio es el caracter ":" sin espacios en blanco entre todos los caracteres, solo en el mensaje del título y de la descripción.
+    5. Vas a unir las estructuras de todas las tareas con el caracter "\n" como separador sin espacios en blanco entre la estructura de cada tarea y ese separador.
+    6. El query puede o no llegar a tener más de 10 áreas de oportunidad, si ese es el caso debes crear tareas que involucren 2 o más áreas de oportunidad en una misma, puedes tomarte la libertad de crear la cantidad de tareas que consideres pero que nunca exceda la cantidad de 10 tareas. Si son menos de 10 áreas de oportunidad crea una tarea por cada área de oportunidad.
+    7. La siguiente estructura es ilustrativa de cómo debes regresar el resultado con todas las tareas, fíjate en estructura no tanto en el contenido:
+    """
+    titulo_1:descripcion_1\ntitulo_2:descripcion_2\ntitulo_3:descripcion_3
+    """`;
 
-  // clean the results of the generated tasks
-  const tasks = (rawTasks.choices[0].message.content as string).split("\n");
-  const cleanedTasks = tasks.filter((element) => element !== "");
+    const rawTasks = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system",
+          content: tasksInstructions,
+        },
+        {
+          role: "user",
+          content: stringWeaknesses,
+        },
+      ],
+    });
+
+    // clean the results of the generated tasks
+    const tasks = (rawTasks.choices[0].message.content as string).split("\n");
+    cleanedTasks = tasks.filter((element) => element !== "");
+  }
   return cleanedTasks;
 }
 
@@ -158,7 +163,21 @@ async function processOpenFeedback(
     .filter((element) => element !== "");
 
   // if there are no comments, return the same variables without any update
-  if (feedbackComments.length == 0) {
+  if (feedbackComments.length > 0) {
+    console.log(
+      "=============================================================",
+    );
+    console.log(
+      "=============================================================",
+    );
+    console.log("START OF COMMENTS ANALYSIS");
+    console.log(
+      "=============================================================",
+    );
+    console.log(
+      "=============================================================",
+    );
+
     let joinedFeedbackComments: string = feedbackComments.join("\n\n");
 
     // string cleaning
@@ -246,16 +265,18 @@ async function processOpenFeedback(
     recommendedResourcesIds.map((element) => uniqueResources.add(element));
 
     // get the negative skills solved by the selected resources, set them as weaknesses of the user
-    const newResourcesNegativeSkills = await db
-      .select({
-        negativeSkillId: pipResourceSkill.skillId,
-      })
-      .from(pipResourceSkill)
-      .where(inArray(pipResourceSkill.skillId, recommendedResourcesIds));
+    if (recommendedResourcesIds.length > 0) {
+      const newResourcesNegativeSkills = await db
+        .select({
+          negativeSkillId: pipResourceSkill.skillId,
+        })
+        .from(pipResourceSkill)
+        .where(inArray(pipResourceSkill.skillId, recommendedResourcesIds));
 
-    newResourcesNegativeSkills.forEach((element) => {
-      weaknessesIds.add(element.negativeSkillId as number);
-    });
+      newResourcesNegativeSkills.forEach((element) => {
+        weaknessesIds.add(element.negativeSkillId as number);
+      });
+    }
 
     // ==================== STRENGTHS ANALYSIS ====================
 
@@ -441,14 +462,12 @@ async function getQuestionsSkills(sprintSurveyId: number) {
       ),
     );
 
-  const questionSkills: QuestionSkills = {};
-
   questions.forEach(async (question) => {
     const associatedSkills = await db
       .select({ skillId: questionSkill.skillId })
       .from(questionSkill)
       .where(eq(questionSkill.questionId, question.questionId as number));
-    questionSkills[question.questionId as number] = associatedSkills.map(
+    questionsSkills[question.questionId as number] = associatedSkills.map(
       (element) => element.skillId as number,
     );
   });
@@ -498,7 +517,7 @@ export async function rulerAnalysis() {
 }
 
 // Main function
-export async function feedback_analysis(sprintSurveyId: number) {
+export async function feedbackAnalysis(sprintSurveyId: number) {
   const processedSurvey = await db
     .select({ processed: sprintSurvey.processed })
     .from(sprintSurvey)
@@ -506,7 +525,22 @@ export async function feedback_analysis(sprintSurveyId: number) {
 
   const notProcessedSurvey = !processedSurvey[0].processed;
 
+  // analyze survey only if it has not been processed
   if (notProcessedSurvey) {
+    console.log(
+      "=============================================================",
+    );
+    console.log(
+      "=============================================================",
+    );
+    console.log("START OF SPRINT ANALYSIS");
+    console.log(
+      "=============================================================",
+    );
+    console.log(
+      "=============================================================",
+    );
+
     const uniqueProjectUsers = await db
       .select({
         userId: projectMember.userId,
@@ -544,7 +578,7 @@ export async function feedback_analysis(sprintSurveyId: number) {
 
       // safety double check if the user has been checked in case of a failure in the middle of a previous survey analysis
       if (userTasksCount[0].count == 0 || userResourcesCount[0].count == 0) {
-        let uniqueResources: Set<number> = new Set<number>();
+        const uniqueResources: Set<number> = new Set<number>();
         orderedFeedback[userId].feedbackClassifications =
           await getFeedbackClassifications(
             orderedFeedback[userId].coworkersFeedback,
@@ -552,6 +586,8 @@ export async function feedback_analysis(sprintSurveyId: number) {
           );
 
         // ================== CLOSED FEEDBACK SUMMARIZED ==================
+        let strengthsIds: Set<number> = new Set();
+        let weaknessesIds: Set<number> = new Set();
         const userNegativeSkills: [number, number][] = []; // [coworkersCount, negativeSkillId]
 
         // get the detected negative skills
@@ -573,23 +609,25 @@ export async function feedback_analysis(sprintSurveyId: number) {
           .map((element) => element[1]);
 
         // get the associated resources with the negative skills
-        const closedFeedbackRecommendedResources = await db
-          .select({
-            resourceId: pipResourceSkill.pipResourceId,
-          })
-          .from(pipResourceSkill)
-          .where(inArray(pipResourceSkill.skillId, negativeSkillsIds));
+        if (negativeSkillsIds.length > 0) {
+          const closedFeedbackRecommendedResources = await db
+            .select({
+              resourceId: pipResourceSkill.pipResourceId,
+            })
+            .from(pipResourceSkill)
+            .where(inArray(pipResourceSkill.skillId, negativeSkillsIds));
 
-        const resourcesArrayIds = closedFeedbackRecommendedResources.map(
-          (element) => element.resourceId,
-        );
+          const resourcesArrayIds = closedFeedbackRecommendedResources.map(
+            (element) => element.resourceId,
+          );
 
-        // add the resources to the recommendations of the user
-        resourcesArrayIds.forEach((resourceId) =>
-          uniqueResources.add(resourceId as number),
-        );
+          // add the resources to the recommendations of the user
+          resourcesArrayIds.forEach((resourceId) =>
+            uniqueResources.add(resourceId as number),
+          );
 
-        let weaknessesIds: Set<number> = new Set(negativeSkillsIds);
+          weaknessesIds = new Set(negativeSkillsIds);
+        }
 
         const positiveSkillsIds: number[] = [];
 
@@ -600,10 +638,17 @@ export async function feedback_analysis(sprintSurveyId: number) {
           positiveSkillsIds.push(positiveSkillId);
         });
 
-        let strengthsIds: Set<number> = new Set(positiveSkillsIds);
+        strengthsIds = new Set(positiveSkillsIds);
+
+        console.log(userId);
+        console.log("Strengths", strengthsIds);
+        console.log("Weaknesses", weaknessesIds);
+        console.log("Resources ids", uniqueResources);
+        console.log("\n\n");
 
         // ================== ANALYSIS OF COMMENTS ==================
 
+        /*
         [strengthsIds, weaknessesIds, uniqueResources] =
           await processOpenFeedback(
             orderedFeedback[userId],
@@ -637,12 +682,21 @@ export async function feedback_analysis(sprintSurveyId: number) {
         }
 
         // set the strengths and weaknesses of the user
+        */
       }
     }
 
+    /*
     await db
       .update(sprintSurvey)
       .set({ processed: true })
       .where(eq(sprintSurvey.id, sprintSurveyId));
+    */
   }
+
+  console.log("=============================================================");
+  console.log("=============================================================");
+  console.log("END OF SPRINT ANALYSIS");
+  console.log("=============================================================");
+  console.log("=============================================================");
 }
