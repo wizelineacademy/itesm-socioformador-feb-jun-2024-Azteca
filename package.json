@@ -17,7 +17,8 @@
     "test:ci": "vitest run --coverage",
     "test:e2e": "npx playwright test",
     "tsc": "tsc",
-    "prepare": "husky"
+    "prepare": "husky",
+    "format": "prettier --write --ignore-unknown ."
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.583.0",
