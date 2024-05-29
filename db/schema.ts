@@ -166,6 +166,11 @@ export const skill = pgTable("skill", {
   negativeSkill: varchar("negative_skill", { length: 30 }),
 });
 
+export const questionSkill = pgTable("question_skill", {
+  questionId: integer("question_id").references(() => question.id),
+  skillId: integer("skill_id").references(() => skill.id),
+});
+
 export const sprintSurveyQuestion = pgTable("sprint_survey_question", {
   sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
   questionId: integer("question_id").references(() => question.id),
