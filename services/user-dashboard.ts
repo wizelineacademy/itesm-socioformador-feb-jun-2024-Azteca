@@ -10,6 +10,7 @@ import {
   sprintSurveyAnswerCoworkers,
   sprintSurveyAnswerProject,
   questionSkill,
+  pipTask,
 } from "@/db/schema";
 import { and, eq, or } from "drizzle-orm";
 
@@ -326,4 +327,39 @@ export async function getProductivityScore(userId: string) {
   );
 
   return productivityScore;
+}
+
+export async function getPCPStatus(userId: string) {
+  const pcpTasks = await db
+    .select({
+      status: pipTask.status,
+    })
+    .from(pipTask)
+    .where(eq(pipTask.userId, userId));
+  const totalTasks = pcpTasks.length;
+  let completedTasks = 0;
+  console.log("Total tasks: ", totalTasks);
+  console.log("Completed tasks: ", completedTasks);
+
+  pcpTasks.forEach((task) => {
+    if (task.status === "IN_PROGRESS") {
+      completedTasks += 0.5;
+    } else if (task.status === "DONE") {
+      completedTasks += 1;
+    }
+  });
+  console.log("Completed tasks: ", completedTasks);
+
+  let pcpCompletition = 0;
+  if (completedTasks != 0) {
+    pcpCompletition =
+      Math.round(((completedTasks * 100) / totalTasks) * 100) / 100;
+  }
+
+  const data = {
+    percentage: pcpCompletition,
+    type: "full",
+    gradient: { start: "#4598FB", end: "#6640D5" },
+  };
+  return data;
 }

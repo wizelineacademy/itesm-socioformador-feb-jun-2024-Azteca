@@ -9,6 +9,7 @@ import PCPSection from "@/components/Dashboard/DashboardPCPSection";
 import Loader from "@/components/Loader";
 import {
   getOverallStatistics,
+  getPCPStatus,
   getProductivityScore,
   getRulerGraphInfo,
 } from "@/services/user-dashboard";
@@ -41,11 +42,7 @@ const Dashboard = async ({ params }: { params: { userId: string } }) => {
     },
   ];
 
-  const PCPData = {
-    percentage: 63,
-    type: "full",
-    gradient: { start: "#4598FB", end: "#6640D5" },
-  };
+  const PCPData = await getPCPStatus(params.userId);
 
   const emotionsData = await getRulerGraphInfo(params.userId);
 
