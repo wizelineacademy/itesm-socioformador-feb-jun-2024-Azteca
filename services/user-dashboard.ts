@@ -250,9 +250,5 @@ export async function getOverallStatistics(userId: string) {
     },
   ];
 
-  console.log("SCORES: ", scores);
-
-  console.log("FINAL DATA: ", radarData);
-
   return radarData;
 }
