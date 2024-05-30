@@ -91,7 +91,6 @@ export const pipTask = pgTable("pip_task", {
   userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 64 }),
   description: varchar("description", { length: 256 }),
-  isDone: boolean("is_done"),
 });
 
 export const pipResourceKind = pgEnum("type_resource", [

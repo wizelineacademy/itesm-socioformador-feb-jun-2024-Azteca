@@ -283,7 +283,7 @@ async function processOpenFeedback(
     // analize the biased feedback
   }
 
-  return [strengthsIds, weaknessesIds, uniqueResources];
+  return [uniqueResources, strengthsIds, weaknessesIds];
 }
 
 async function orderFeedback(sprintSurveyId: number, uniqueWorkers: string[]) {
@@ -578,7 +578,7 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
 
       // safety double check if the user has been checked in case of a failure in the middle of a previous survey analysis
       if (userTasksCount[0].count == 0 || userResourcesCount[0].count == 0) {
-        const uniqueResources: Set<number> = new Set<number>();
+        let uniqueResources: Set<number> = new Set<number>();
         orderedFeedback[userId].feedbackClassifications =
           await getFeedbackClassifications(
             orderedFeedback[userId].coworkersFeedback,
@@ -648,14 +648,15 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
 
         // ================== ANALYSIS OF COMMENTS ==================
 
-        /*
-        [strengthsIds, weaknessesIds, uniqueResources] =
+        [uniqueResources, strengthsIds, weaknessesIds] =
           await processOpenFeedback(
             orderedFeedback[userId],
+            uniqueResources,
             strengthsIds,
             weaknessesIds,
-            uniqueResources,
           );
+
+        console.log("User: ", userId, "Resources: ", uniqueResources);
 
         // =========== STORE SELECTED TASKS AND RESOURCES ===========
 
@@ -667,7 +668,6 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
               userId: userId,
               title: title,
               description: description,
-              isDone: false,
               sprintSurveyId: sprintSurveyId,
             });
           }
@@ -682,16 +682,13 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
         }
 
         // set the strengths and weaknesses of the user
-        */
       }
     }
 
-    /*
     await db
       .update(sprintSurvey)
       .set({ processed: true })
       .where(eq(sprintSurvey.id, sprintSurveyId));
-    */
   }
 
   console.log("=============================================================");
