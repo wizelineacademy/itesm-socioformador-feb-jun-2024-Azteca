@@ -338,9 +338,6 @@ export async function getPCPStatus(userId: string) {
     .where(eq(pipTask.userId, userId));
   const totalTasks = pcpTasks.length;
   let completedTasks = 0;
-  console.log("Total tasks: ", totalTasks);
-  console.log("Completed tasks: ", completedTasks);
-
   pcpTasks.forEach((task) => {
     if (task.status === "IN_PROGRESS") {
       completedTasks += 0.5;
@@ -348,7 +345,6 @@ export async function getPCPStatus(userId: string) {
       completedTasks += 1;
     }
   });
-  console.log("Completed tasks: ", completedTasks);
 
   let pcpCompletition = 0;
   if (completedTasks != 0) {
