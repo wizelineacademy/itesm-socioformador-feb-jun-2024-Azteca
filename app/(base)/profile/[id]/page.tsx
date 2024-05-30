@@ -7,9 +7,13 @@ import ProjectsCarousel from "@/components/ProjectsCarousel";
 import ProfileTraits from "@/components/Profile/ProfileTraits";
 import Loader from "@/components/Loader";
 
+import { feedbackAnalysis } from "@/services/rag";
+
 const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
   const user = await getUserInfoById(params.id);
   const traits = await getUserTraitsById(params.id);
+
+  feedbackAnalysis(52);
 
   return (
     <main>

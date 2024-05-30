@@ -120,7 +120,8 @@ async function createTasks(weaknessesIds: Set<number>) {
     4. Vas a juntar el título de cada tarea con la descripción donde el separador de en medio es el caracter ":" sin espacios en blanco entre todos los caracteres, solo en el mensaje del título y de la descripción.
     5. Vas a unir las estructuras de todas las tareas con el caracter "\n" como separador sin espacios en blanco entre la estructura de cada tarea y ese separador.
     6. El query puede o no llegar a tener más de 10 áreas de oportunidad, si ese es el caso debes crear tareas que involucren 2 o más áreas de oportunidad en una misma, puedes tomarte la libertad de crear la cantidad de tareas que consideres pero que nunca exceda la cantidad de 10 tareas. Si son menos de 10 áreas de oportunidad crea una tarea por cada área de oportunidad.
-    7. La siguiente estructura es ilustrativa de cómo debes regresar el resultado con todas las tareas, fíjate en estructura no tanto en el contenido:
+    7. Aunque las áreas de mejora sean en inglés el contenido de las tareas que vas a generar debe estar en español.
+    8. La siguiente estructura es ilustrativa de cómo debes regresar el resultado con todas las tareas, fíjate en estructura no tanto en el contenido:
     """
     titulo_1:descripcion_1\ntitulo_2:descripcion_2\ntitulo_3:descripcion_3
     """`;
@@ -644,7 +645,7 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
         console.log("Strengths", strengthsIds);
         console.log("Weaknesses", weaknessesIds);
         console.log("Resources ids", uniqueResources);
-        console.log("\n\n");
+        console.log("\n");
 
         // ================== ANALYSIS OF COMMENTS ==================
 
@@ -656,8 +657,10 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
             weaknessesIds,
           );
 
-        console.log("User: ", userId, "Resources: ", uniqueResources);
-
+        console.log("Strengths after comments analysis: ", strengthsIds);
+        console.log("Weaknesses after comments analysis: ", weaknessesIds);
+        console.log("Resources after comments analysis: ", uniqueResources);
+        console.log("\n\n\n");
         // =========== STORE SELECTED TASKS AND RESOURCES ===========
 
         if (weaknessesIds.size > 0) {
