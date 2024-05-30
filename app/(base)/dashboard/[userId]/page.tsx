@@ -9,6 +9,7 @@ import PCPSection from "@/components/Dashboard/DashboardPCPSection";
 import Loader from "@/components/Loader";
 import {
   getOverallStatistics,
+  getProductivityScore,
   getRulerGraphInfo,
 } from "@/services/user-dashboard";
 
@@ -16,13 +17,13 @@ const Dashboard = async ({ params }: { params: { userId: string } }) => {
   const activeUserId = await getUserId();
   const isManagedBy = await getUserManagedBy(activeUserId, params.userId);
   const user = await getUserInfoById(params.userId);
-
   const radarData = await getOverallStatistics(params.userId);
 
+  const productivityScore = await getProductivityScore(params.userId);
   const gaugeData = [
     {
       title: "Productivity Level",
-      percentage: 78,
+      percentage: productivityScore,
       type: "half",
       gradient: { start: "#988511", end: "#FEDE1C" },
     },

@@ -26,9 +26,28 @@ export async function getRulerGraphInfo(id: string) {
     .leftJoin(rulerEmotion, eq(rulerSurveyAnswers.emotionId, rulerEmotion.id))
     .where(eq(rulerSurveyAnswers.userId, id));
 
-  if (res.length === 0) {
-    throw new Error("No emotions could not be found");
-  }
+  const emotionsData = [
+    {
+      title: "High Energy - Unpleasant",
+      percentage: 0,
+      gradient: { start: "#ee824e", end: "#e14a5f" },
+    },
+    {
+      title: "High Energy - Pleasant",
+      percentage: 0,
+      gradient: { start: "#f4e37c", end: "#f4b745" },
+    },
+    {
+      title: "Low Energy - Unpleasant",
+      percentage: 0,
+      gradient: { start: "#92bef6", end: "#7481f7" },
+    },
+    {
+      title: "Low Energy - Pleasant",
+      percentage: 0,
+      gradient: { start: "#9feba8", end: "#6bc68c" },
+    },
+  ];
 
   let quadrant1 = 0;
   let quadrant2 = 0;
@@ -53,28 +72,14 @@ export async function getRulerGraphInfo(id: string) {
 
   // Calculate the total number of emotions
   const totalEmotions = res.length;
-  const emotionsData = [
-    {
-      title: "High Energy - Unpleasant",
-      percentage: Math.round((quadrant2 / totalEmotions) * 100 * 100) / 100,
-      gradient: { start: "#ee824e", end: "#e14a5f" },
-    },
-    {
-      title: "High Energy - Pleasant",
-      percentage: Math.round((quadrant1 / totalEmotions) * 100 * 100) / 100,
-      gradient: { start: "#f4e37c", end: "#f4b745" },
-    },
-    {
-      title: "Low Energy - Unpleasant",
-      percentage: Math.round((quadrant3 / totalEmotions) * 100 * 100) / 100,
-      gradient: { start: "#92bef6", end: "#7481f7" },
-    },
-    {
-      title: "Low Energy - Pleasant",
-      percentage: Math.round((quadrant4 / totalEmotions) * 100 * 100) / 100,
-      gradient: { start: "#9feba8", end: "#6bc68c" },
-    },
-  ];
+  emotionsData[0].percentage =
+    Math.round((quadrant2 / totalEmotions) * 100 * 100) / 100;
+  emotionsData[1].percentage =
+    Math.round((quadrant1 / totalEmotions) * 100 * 100) / 100;
+  emotionsData[2].percentage =
+    Math.round((quadrant3 / totalEmotions) * 100 * 100) / 100;
+  emotionsData[3].percentage =
+    Math.round((quadrant4 / totalEmotions) * 100 * 100) / 100;
 
   return emotionsData;
 }
@@ -251,4 +256,74 @@ export async function getOverallStatistics(userId: string) {
   ];
 
   return radarData;
+}
+
+// calculates for graphs productivity, self perception level, stress level
+export async function getProductivityScore(userId: string) {
+  const coworkersAnswers = await db
+    .select({
+      userId: sprintSurveyAnswerCoworkers.coworkerId,
+      answer: sprintSurveyAnswerCoworkers.answer,
+      skillId: skill.id,
+      skill: skill.positiveSkill,
+    })
+    .from(sprintSurveyAnswerCoworkers)
+    .leftJoin(question, eq(sprintSurveyAnswerCoworkers.questionId, question.id))
+    .leftJoin(questionSkill, eq(question.id, questionSkill.questionId))
+    .leftJoin(skill, eq(questionSkill.skillId, skill.id))
+    .where(
+      and(
+        eq(sprintSurveyAnswerCoworkers.coworkerId, userId),
+        or(eq(skill.id, 42)),
+      ),
+    );
+
+  const sprintAnswers = await db
+    .select({
+      userId: sprintSurveyAnswerProject.userId,
+      answer: sprintSurveyAnswerProject.answer,
+      skillId: skill.id,
+      skill: skill.positiveSkill,
+    })
+    .from(sprintSurveyAnswerProject)
+    .leftJoin(question, eq(sprintSurveyAnswerProject.questionId, question.id))
+    .leftJoin(questionSkill, eq(question.id, questionSkill.questionId))
+    .leftJoin(skill, eq(questionSkill.skillId, skill.id))
+    .where(
+      and(eq(sprintSurveyAnswerProject.userId, userId), or(eq(skill.id, 42))),
+    );
+
+  const finalAnswers = await db
+    .select({
+      userId: finalSurveyAnswer.userId,
+      answer: finalSurveyAnswer.answer,
+      skillId: skill.id,
+      skill: skill.positiveSkill,
+    })
+    .from(finalSurveyAnswer)
+    .leftJoin(question, eq(finalSurveyAnswer.questionId, question.id))
+    .leftJoin(questionSkill, eq(question.id, questionSkill.questionId))
+    .leftJoin(skill, eq(questionSkill.skillId, skill.id))
+    .where(and(eq(finalSurveyAnswer.userId, userId), or(eq(skill.id, 42))));
+
+  let productivityTotal = 0;
+  let productivityMaxScore = 0;
+
+  coworkersAnswers.forEach((answer) => {
+    productivityTotal += answer.answer || 0;
+    productivityMaxScore += 10;
+  });
+  sprintAnswers.forEach((answer) => {
+    productivityTotal += answer.answer || 0;
+    productivityMaxScore += 10;
+  });
+  finalAnswers.forEach((answer) => {
+    productivityTotal += answer.answer || 0;
+    productivityMaxScore += 10;
+  });
+  const productivityScore = Math.round(
+    (productivityTotal / productivityMaxScore) * 100,
+  );
+
+  return productivityScore;
 }
