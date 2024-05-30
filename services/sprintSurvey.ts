@@ -42,37 +42,45 @@ export async function createSprintSurvey(projectId: number) {
 export async function submitSprintSurveyAnswers(
   surveyAnswer: SprintSurveyAnswer,
 ) {
-  console.log(surveyAnswer);
   // Get the User ID of the user logged
   const session = await auth();
   const userId = session?.user?.id as string;
-  // Insert Project Answers
-  await db
-    .insert(sprintSurveyAnswerProject)
-    .values(
-      surveyAnswer.projectAnswers.map((projAns) => ({
-        userId: userId,
-        sprintSurveyId: surveyAnswer.sprintSurveyId,
-        questionId: projAns.questionId,
-        answer: projAns.answer,
-      })),
-    )
-    .catch((error) => console.log(error));
 
-  // Insert Cokorkers Answers
+  console.log(surveyAnswer.projectAnswers);
+  // Insert Project Answers
+  if (surveyAnswer.projectAnswers.length > 0) {
+    await db
+      .insert(sprintSurveyAnswerProject)
+      .values(
+        surveyAnswer.projectAnswers.map((projAns) => ({
+          userId: userId,
+          sprintSurveyId: surveyAnswer.sprintSurveyId,
+          questionId: projAns.questionId,
+          answer: projAns.answer,
+        })),
+      )
+      .catch((error) => console.log(error));
+  }
+
+  // Insert Coworkers Answers
   surveyAnswer.coworkersAnswers.forEach((answer) => {
     submitSprintCoworkersAns(userId, surveyAnswer.sprintSurveyId, answer);
   });
 
-  await db.insert(sprintSurveyAnswerCoworkers).values(
-    surveyAnswer.coworkersComments.map((comments) => ({
-      userId: userId,
-      sprintSurveyId: surveyAnswer.sprintSurveyId,
-      questionId: surveyAnswer.commentId,
-      coworkerId: comments.coworkerId,
-      comment: comments.comment,
-    })),
-  );
+  if (surveyAnswer.coworkersComments.length > 0) {
+    await db
+      .insert(sprintSurveyAnswerCoworkers)
+      .values(
+        surveyAnswer.coworkersComments.map((comments) => ({
+          userId: userId,
+          sprintSurveyId: surveyAnswer.sprintSurveyId,
+          questionId: surveyAnswer.commentId,
+          coworkerId: comments.coworkerId,
+          comment: comments.comment,
+        })),
+      )
+      .catch((error) => console.log(error));
+  }
 }
 
 async function submitSprintCoworkersAns(
@@ -83,16 +91,85 @@ async function submitSprintCoworkersAns(
     answers: Array<{ coworkerId: string; answer: number }>;
   },
 ) {
-  await db.insert(sprintSurveyAnswerCoworkers).values(
-    questions.answers.map((coworkerAns) => ({
-      userId: userId,
-      sprintSurveyId: surveyId,
-      questionId: questions.questionId,
-      coworkerId: coworkerAns.coworkerId,
-      answer: coworkerAns.answer,
-    })),
-  );
+  if (questions.answers.length > 0) {
+    await db
+      .insert(sprintSurveyAnswerCoworkers)
+      .values(
+        questions.answers.map((coworkerAns) => ({
+          userId: userId,
+          sprintSurveyId: surveyId,
+          questionId: questions.questionId,
+          coworkerId: coworkerAns.coworkerId,
+          answer: coworkerAns.answer,
+        })),
+      )
+      .catch((error) => console.log(error));
+  }
 }
+
+// export async function submitSprintSurveyAnswers(
+//   surveyAnswer: SprintSurveyAnswer,
+// ) {
+//   console.log(surveyAnswer);
+//   // Get the User ID of the user logged
+//   const session = await auth();
+//   const userId = session?.user?.id as string;
+
+//   console.log(surveyAnswer.projectAnswers);
+//   // Insert Project Answers
+//   await db
+//     .insert(sprintSurveyAnswerProject)
+//     .values(
+//       // surveyAnswer.projectAnswers.map((projAns) => ({
+//       //   userId: userId,
+//       //   sprintSurveyId: surveyAnswer.sprintSurveyId,
+//       //   questionId: projAns.questionId,
+//       //   answer: projAns.answer,
+//       // })),
+//       {
+//         userId: userId,
+//         sprintSurveyId: surveyAnswer.sprintSurveyId,
+//         questionId: 26,
+//         answer: 7,
+//       },
+//     )
+//     .catch((error) => console.log(error));
+
+//   // Insert Cokorkers Answers
+//   surveyAnswer.coworkersAnswers.forEach((answer) => {
+//     submitSprintCoworkersAns(userId, surveyAnswer.sprintSurveyId, answer);
+//   });
+//   if (surveyAnswer.coworkersAnswers.length > 0) {
+//     await db.insert(sprintSurveyAnswerCoworkers).values(
+//       surveyAnswer.coworkersComments.map((comments) => ({
+//         userId: userId,
+//         sprintSurveyId: surveyAnswer.sprintSurveyId,
+//         questionId: surveyAnswer.commentId,
+//         coworkerId: comments.coworkerId,
+//         comment: comments.comment,
+//       })),
+//     );
+//   }
+// }
+
+// async function submitSprintCoworkersAns(
+//   userId: string,
+//   surveyId: number,
+//   questions: {
+//     questionId: keyof SurveyStepTwoAnswer;
+//     answers: Array<{ coworkerId: string; answer: number }>;
+//   },
+// ) {
+//   await db.insert(sprintSurveyAnswerCoworkers).values(
+//     questions.answers.map((coworkerAns) => ({
+//       userId: userId,
+//       sprintSurveyId: surveyId,
+//       questionId: questions.questionId,
+//       coworkerId: coworkerAns.coworkerId,
+//       answer: coworkerAns.answer,
+//     })),
+//   );
+// }
 
 export async function getOverallStatistics(projectId: number) {
   // Obtener el promedio de respuestas para Comunicación
