@@ -41,6 +41,7 @@ const BannerImagePanel = ({ closeModal }: { closeModal: () => void }) => {
       <div className="flex space-x-4">
         {images.map((src, index) => (
           <button
+            data-testid={`banner-image-${index}`}
             key={index}
             className={`rounded border-2 ${selectedImage === index ? "border-primary" : "border-transparent"}`}
             onClick={() => handleImageClick(index)}

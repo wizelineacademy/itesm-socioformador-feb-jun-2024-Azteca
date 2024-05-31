@@ -70,6 +70,7 @@ const Notifications = ({
   return (
     <Menu as="div" className="relative inline-block text-left">
       <Menu.Button
+        data-testid="notification-button"
         onClick={() => setIsActive(!isActive)}
         className={`${isActive ? "bg-primary" : "bg-white transition-all delay-0 hover:scale-[1.175]"} group rounded-full p-2 drop-shadow-lg`}
       >

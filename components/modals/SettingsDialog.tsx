@@ -55,6 +55,7 @@ const SettingsDialog = ({ showModal, onClose }: SettingsDialogProps) => {
                       Profile Image
                     </Tabs.Tab>
                     <Tabs.Tab
+                      data-testid="banner-tab"
                       value="bannerImage"
                       style={{ fontWeight: 500, fontSize: "16px" }}
                     >
