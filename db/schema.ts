@@ -198,6 +198,8 @@ export const sprintSurvey = pgTable("sprint_survey", {
   processed: boolean("processed").default(false),
 });
 
+export type SelectSprintSurvey = typeof sprintSurvey.$inferSelect;
+
 export const sprintSurveyAnswerProject = pgTable(
   "sprint_survey_answer_project",
   {
