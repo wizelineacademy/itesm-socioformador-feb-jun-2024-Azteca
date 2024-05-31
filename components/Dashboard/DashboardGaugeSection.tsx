@@ -1,5 +1,6 @@
 import React from "react";
 import GaugeChart from "@/components/GaugeChart";
+import InfoToolTip from "@/components/InfoToolTip";
 
 interface GaugeSectionProps {
   gaugeData: {
@@ -17,6 +18,10 @@ const DashboardGaugeSection: React.FC<GaugeSectionProps> = ({ gaugeData }) => (
         key={index}
         className="flex w-fit flex-col rounded-xl bg-white px-10 py-5 drop-shadow-lg"
       >
+        <InfoToolTip
+          description="This is a summary of your overall statistics."
+          size="sm"
+        />
         <GaugeChart
           percentage={gauge.percentage}
           type={gauge.type}

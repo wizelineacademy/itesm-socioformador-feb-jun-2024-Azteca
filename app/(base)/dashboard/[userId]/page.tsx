@@ -5,7 +5,7 @@ import DashboardGaugeSection from "@/components/Dashboard/DashboardGaugeSection"
 import DashboardRadarSection from "@/components/Dashboard/DashboardRadarSection";
 import DashboardEmotionsSection from "@/components/Dashboard/DashboardEmotionsSection";
 import DashboardSurveyCalendar from "@/components/Dashboard/DashboardSurveyCalendar";
-import PCPSection from "@/components/Dashboard/DashboardPCPSection";
+import DashboardPCPSection from "@/components/Dashboard/DashboardPCPSection";
 import Loader from "@/components/Loader";
 import { getRulerGraphInfo } from "@/services/user-dashboard";
 
@@ -83,7 +83,7 @@ const Dashboard = async ({ params }: { params: { userId: string } }) => {
         </div>
         <div className="mt-4 grid gap-7">
           <DashboardSurveyCalendar completedSurveys={completedSurveys} />
-          <PCPSection PCPData={PCPData} />
+          <DashboardPCPSection PCPData={PCPData} />
         </div>
       </div>
     </Suspense>

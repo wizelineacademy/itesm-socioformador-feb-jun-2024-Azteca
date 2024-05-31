@@ -3,6 +3,7 @@
 import React from "react";
 import { Indicator } from "@mantine/core";
 import { Calendar } from "@mantine/dates";
+import InfoToolTip from "@/components/InfoToolTip";
 
 interface SurveyCalendarProps {
   completedSurveys: { date: Date; color: string }[];
@@ -20,7 +21,9 @@ const DashboardSurveyCalendar: React.FC<SurveyCalendarProps> = ({
   completedSurveys,
 }) => (
   <div className="flex w-fit flex-col rounded-xl bg-white px-10 py-5 drop-shadow-lg">
+    <InfoToolTip description="This is a summary of the surveys you have completed." />
     <Calendar
+      className="px-2"
       renderDay={(date: Date) => {
         const surveysToday = completedSurveys.filter((survey) =>
           dateMatches(survey.date, date),
