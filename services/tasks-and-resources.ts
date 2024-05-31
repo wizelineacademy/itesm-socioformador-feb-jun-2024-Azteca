@@ -58,6 +58,12 @@ export async function getUserTasksForCurrentSprintByProjectId(
       ),
     );
 
+  if (tasks.length === 0) {
+    throw new Error("No tasks available. Ask your manager for an update.");
+  }
+
+  console.log(tasks);
+
   return tasks;
 }
 
@@ -98,6 +104,11 @@ export async function getUserTasksHistory(projectId: number) {
   }, [] as SelectSprintSurveyWithTasks[]);
 
   // TODO: inform the frontend when the survey is pending for processing
+
+  if (sprintSurveysWithTasks.length === 0) {
+    throw new Error("No task history available");
+  }
+
   return sprintSurveysWithTasks;
 }
 

@@ -40,7 +40,7 @@ const PCP = () => {
     (projectsQuery.data && projectsQuery.data.length === 0)
   ) {
     return (
-      <p>You dont have projects or there was an error fetching the data</p>
+      <NoDataCard text="You dont have projects or there was an error fetching the data" />
     );
   }
 
@@ -100,18 +100,6 @@ const PCPTasks = ({ projectId }: { projectId: number }) => {
     retry: false,
   });
 
-  if (tasksQuery.isError) {
-    return <NoDataCard text={tasksQuery.error.message} />;
-  }
-
-  if (tasksQuery.isLoading || !tasksQuery.data) {
-    return <p>loading...</p>;
-  }
-
-  if (tasksQuery.data.length === 0) {
-    <NoDataCard text="No tasks available. Ask your manager for an update." />;
-  }
-
   return (
     <section id="pip-tasks" className="mt-9 w-full">
       <div className="mb-6">
@@ -125,13 +113,21 @@ const PCPTasks = ({ projectId }: { projectId: number }) => {
           </button>
         </div>
 
-        <div className="mt-2">
-          <div className="mb-10 mt-2 flex w-full flex-row flex-wrap gap-12 overflow-x-auto pb-3">
-            {tasksQuery.data.map((task) => (
-              <PCPTask key={task.id} task={task} projectId={projectId} />
-            ))}
-          </div>
-        </div>
+        {tasksQuery.isLoading ? (
+          <p>loading...</p>
+        ) : tasksQuery.isError ? (
+          <NoDataCard text={tasksQuery.error.message} />
+        ) : (
+          tasksQuery.data && (
+            <div className="mt-2">
+              <div className="mb-10 mt-2 flex w-full flex-row flex-wrap gap-12 overflow-x-auto pb-3">
+                {tasksQuery.data.map((task) => (
+                  <PCPTask key={task.id} task={task} projectId={projectId} />
+                ))}
+              </div>
+            </div>
+          )
+        )}
 
         <DialogComponent
           isOpen={isDialogOpen}
@@ -151,13 +147,18 @@ const PCPTasksDialogContent = ({ projectId }: { projectId: number }) => {
   const tasksHistoryQuery = useQuery({
     queryKey: ["tasks-history", projectId],
     queryFn: () => getUserTasksHistory(projectId),
+    retry: false,
   });
 
   const { mutateAsync } = useMutation({
     mutationFn: updateTask,
   });
 
-  if (!tasksHistoryQuery.data) {
+  if (tasksHistoryQuery.isError) {
+    return <NoDataCard text={tasksHistoryQuery.error.message} />;
+  }
+
+  if (tasksHistoryQuery.isLoading || !tasksHistoryQuery.data) {
     return <p>loading...</p>;
   }
 
@@ -176,79 +177,85 @@ const PCPTasksDialogContent = ({ projectId }: { projectId: number }) => {
           {sprint.scheduledAt && (
             <p className="py-1 text-lg font-medium">{`Sprint ${formatDate(sprint.scheduledAt)}`}</p>
           )}
-          {sprint.tasks.map((task) => {
-            const currentStatusOption =
-              statusOptions.find((option) => option.value === task.status) ||
-              statusOptions[0];
+          {sprint.processed ? (
+            sprint.tasks.map((task) => {
+              const currentStatusOption =
+                statusOptions.find((option) => option.value === task.status) ||
+                statusOptions[0];
 
-            return (
-              <div
-                key={task.id}
-                className="flex items-center justify-between py-1"
-              >
-                <p className="text-graySubtitle">{task.title}</p>
-                <div className="flex items-center space-x-4">
-                  {/* Description Dropdown */}
-                  <Menu as="div" className="relative inline-block text-left">
-                    <div>
-                      <Menu.Button className="flex items-center text-sm text-blue-500 underline">
-                        <InfoIcon color="text-black" size="h-6 w-6" />
-                      </Menu.Button>
-                    </div>
-                    <Menu.Items className="absolute right-0 z-50 mt-2 w-fit origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      <div className="px-4 py-1 text-sm text-gray-700">
-                        {task.description}
+              return (
+                <div
+                  key={task.id}
+                  className="flex items-center justify-between py-1"
+                >
+                  <p className="text-graySubtitle">{task.title}</p>
+                  <div className="flex items-center space-x-4">
+                    {/* Description Dropdown */}
+                    <Menu as="div" className="relative inline-block text-left">
+                      <div>
+                        <Menu.Button className="flex items-center text-sm text-blue-500 underline">
+                          <InfoIcon color="text-black" size="h-6 w-6" />
+                        </Menu.Button>
                       </div>
-                    </Menu.Items>
-                  </Menu>
+                      <Menu.Items className="absolute right-0 z-50 mt-2 w-fit origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <div className="px-4 py-1 text-sm text-gray-700">
+                          {task.description}
+                        </div>
+                      </Menu.Items>
+                    </Menu>
 
-                  {/* Status Change Button */}
-                  <Menu as="div" className="relative inline-block text-left">
-                    <div className="flex items-center">
-                      <Menu.Button
-                        className={`h-6 w-6 transform cursor-pointer rounded-full border ${currentStatusOption.color} outline-${currentStatusOption.color} transition-all duration-200 ease-in-out hover:scale-110`}
-                      >
-                        <span className="sr-only">Change status</span>
-                      </Menu.Button>
-                    </div>
-                    <Menu.Items className="absolute right-0 z-50 mt-2 w-44 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      <div className="py-1">
-                        {statusOptions.map((option) => (
-                          <Menu.Item key={option.value}>
-                            {({ active }) => (
-                              <button
-                                className={`${
-                                  active ? "bg-gray-100" : ""
-                                } group flex w-full items-center px-4 py-2 text-sm text-gray-700`}
-                                onClick={async () => {
-                                  await mutateAsync({
-                                    taskId: task.id,
-                                    newStatus:
-                                      option.value as typeof task.status,
-                                  });
-                                  await queryClient.invalidateQueries({
-                                    queryKey: ["tasks", projectId],
-                                  });
-                                  await queryClient.invalidateQueries({
-                                    queryKey: ["tasks-history", projectId],
-                                  });
-                                }}
-                              >
-                                <span
-                                  className={`mr-3 inline-block h-4 w-4 rounded-full ${option.color}`}
-                                ></span>
-                                {option.label}
-                              </button>
-                            )}
-                          </Menu.Item>
-                        ))}
+                    {/* Status Change Button */}
+                    <Menu as="div" className="relative inline-block text-left">
+                      <div className="flex items-center">
+                        <Menu.Button
+                          className={`h-6 w-6 transform cursor-pointer rounded-full border ${currentStatusOption.color} outline-${currentStatusOption.color} transition-all duration-200 ease-in-out hover:scale-110`}
+                        >
+                          <span className="sr-only">Change status</span>
+                        </Menu.Button>
                       </div>
-                    </Menu.Items>
-                  </Menu>
+                      <Menu.Items className="absolute right-0 z-50 mt-2 w-44 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <div className="py-1">
+                          {statusOptions.map((option) => (
+                            <Menu.Item key={option.value}>
+                              {({ active }) => (
+                                <button
+                                  className={`${
+                                    active ? "bg-gray-100" : ""
+                                  } group flex w-full items-center px-4 py-2 text-sm text-gray-700`}
+                                  onClick={async () => {
+                                    await mutateAsync({
+                                      taskId: task.id,
+                                      newStatus:
+                                        option.value as typeof task.status,
+                                    });
+                                    await queryClient.invalidateQueries({
+                                      queryKey: ["tasks", projectId],
+                                    });
+                                    await queryClient.invalidateQueries({
+                                      queryKey: ["tasks-history", projectId],
+                                    });
+                                  }}
+                                >
+                                  <span
+                                    className={`mr-3 inline-block h-4 w-4 rounded-full ${option.color}`}
+                                  ></span>
+                                  {option.label}
+                                </button>
+                              )}
+                            </Menu.Item>
+                          ))}
+                        </div>
+                      </Menu.Items>
+                    </Menu>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          ) : (
+            <div className="py-2">
+              <NoDataCard text="Survey not procesed yet, ask your manager to do it" />
+            </div>
+          )}
         </div>
       ))}
     </div>
