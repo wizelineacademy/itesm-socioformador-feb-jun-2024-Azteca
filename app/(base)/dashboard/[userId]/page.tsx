@@ -13,6 +13,7 @@ import {
   getProductivityScore,
   getRulerGraphInfo,
   getSelfPerceptionScore,
+  getStressScore,
 } from "@/services/user-dashboard";
 
 const Dashboard = async ({ params }: { params: { userId: string } }) => {
@@ -23,6 +24,7 @@ const Dashboard = async ({ params }: { params: { userId: string } }) => {
 
   const productivityScore = await getProductivityScore(params.userId);
   const selfPerceptionScore = await getSelfPerceptionScore(params.userId);
+  const stressScore = await getStressScore(params.userId);
   const gaugeData = [
     {
       title: "Productivity Level",
@@ -38,7 +40,7 @@ const Dashboard = async ({ params }: { params: { userId: string } }) => {
     },
     {
       title: "Stress Level",
-      percentage: 56,
+      percentage: stressScore,
       type: "half",
       gradient: { start: "#881931", end: "#EE2B55" },
     },

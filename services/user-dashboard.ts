@@ -433,3 +433,46 @@ export async function getSelfPerceptionScore(userId: string) {
 
   return totalSelfPerceptionScore;
 }
+
+// Function to calculate stress score based on energy and pleasantness
+function calculateStressScore(energy: number, pleasantness: number) {
+  const idealEnergy = 0;
+  const idealPleasantness = 6;
+  const maxDistance = Math.sqrt(
+    Math.pow(6 - idealEnergy, 2) + Math.pow(-6 - idealPleasantness, 2),
+  );
+
+  const distance = Math.sqrt(
+    Math.pow(energy - idealEnergy, 2) +
+      Math.pow(pleasantness - idealPleasantness, 2),
+  );
+  const stressScore = (distance / maxDistance) * 100;
+
+  return stressScore;
+}
+
+export async function getStressScore(userId: string) {
+  const emotions = await db
+    .select({
+      emotionPleasantness: rulerEmotion.pleasantness,
+      emotionEnergy: rulerEmotion.energy,
+    })
+    .from(rulerSurveyAnswers)
+    .leftJoin(rulerEmotion, eq(rulerSurveyAnswers.emotionId, rulerEmotion.id))
+    .where(eq(rulerSurveyAnswers.userId, userId));
+
+  const totalStressScore = emotions.reduce((sum, emotion) => {
+    const { emotionEnergy, emotionPleasantness } = emotion;
+    if (emotionEnergy == null || emotionPleasantness == null) {
+      return sum;
+    }
+    const stressScore = calculateStressScore(
+      emotionEnergy,
+      emotionPleasantness,
+    );
+    return sum + stressScore;
+  }, 0);
+
+  const averageStressScore = totalStressScore / emotions.length;
+  return Math.round(averageStressScore);
+}
