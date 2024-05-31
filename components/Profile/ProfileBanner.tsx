@@ -38,6 +38,7 @@ const ProfileBanner: React.FC<ProfileBannerProps> = async ({ user }) => {
           )}
         </div>
         <Image
+          data-testid={user.bannerId}
           src={`/${user.bannerId}` || "/Banner1.svg"}
           alt="Banner Image"
           width={100}

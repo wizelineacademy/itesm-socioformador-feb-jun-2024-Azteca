@@ -7,10 +7,13 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { deleteProjectById, updateFeedback } from "@/services/project";
 import { useRouter } from "next/navigation";
 import { getUserRole } from "@/services/user";
+import { getOverallStatistics } from "@/services/sprintSurvey";
+
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon";
 
 const Project = ({ params }: { params: { projectId: string } }) => {
   const router = useRouter();
+  const projectId = parseInt(params.projectId);
 
   const [isUpdateFeedbackPopupOpen, setIsUpdateFeedbackPopupOpen] =
     useState(false);
@@ -28,28 +31,39 @@ const Project = ({ params }: { params: { projectId: string } }) => {
     queryFn: () => getUserRole(),
   });
 
-  const radarData = [
-    {
-      statistic: "Communication",
-      punctuation: 90,
-    },
-    {
-      statistic: "Motivation",
-      punctuation: 68,
-    },
-    {
-      statistic: "Coworker Support",
-      punctuation: 74,
-    },
-    {
-      statistic: "Manager Support",
-      punctuation: 85,
-    },
-    {
-      statistic: "Punctuality",
-      punctuation: 89,
-    },
-  ];
+  const { data: statistics, isLoading: isLoadingStatistics } = useQuery({
+    queryKey: ["project-overall-statistics", projectId],
+    queryFn: () => getOverallStatistics(projectId),
+  });
+
+  if (isLoadingStatistics) {
+    return <div>Loading...</div>;
+  }
+
+  const radarData = statistics
+    ? [
+        {
+          statistic: "Communication",
+          punctuation: statistics.communication,
+        },
+        {
+          statistic: "Motivation",
+          punctuation: statistics.motivation,
+        },
+        {
+          statistic: "Coworker Support",
+          punctuation: statistics.coworkerSupport,
+        },
+        {
+          statistic: "Manager Support",
+          punctuation: statistics.managerSupport,
+        },
+        {
+          statistic: "Punctuality",
+          punctuation: statistics.punctuality,
+        },
+      ]
+    : [];
   const areaData = [
     {
       month: "Jan",
