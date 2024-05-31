@@ -46,7 +46,6 @@ export async function submitSprintSurveyAnswers(
   const session = await auth();
   const userId = session?.user?.id as string;
 
-  console.log(surveyAnswer.projectAnswers);
   // Insert Project Answers
   if (surveyAnswer.projectAnswers.length > 0) {
     await db
