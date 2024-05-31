@@ -12,6 +12,7 @@ import {
   getPCPStatus,
   getProductivityScore,
   getRulerGraphInfo,
+  getSelfPerceptionScore,
 } from "@/services/user-dashboard";
 
 const Dashboard = async ({ params }: { params: { userId: string } }) => {
@@ -21,6 +22,7 @@ const Dashboard = async ({ params }: { params: { userId: string } }) => {
   const radarData = await getOverallStatistics(params.userId);
 
   const productivityScore = await getProductivityScore(params.userId);
+  const selfPerceptionScore = await getSelfPerceptionScore(params.userId);
   const gaugeData = [
     {
       title: "Productivity Level",
@@ -30,7 +32,7 @@ const Dashboard = async ({ params }: { params: { userId: string } }) => {
     },
     {
       title: "Self Perception Level",
-      percentage: 64,
+      percentage: selfPerceptionScore,
       type: "half",
       gradient: { start: "#295A95", end: "#4598FB" },
     },

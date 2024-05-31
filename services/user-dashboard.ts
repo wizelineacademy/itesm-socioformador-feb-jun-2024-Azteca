@@ -359,3 +359,77 @@ export async function getPCPStatus(userId: string) {
   };
   return data;
 }
+
+export async function getSelfPerceptionScore(userId: string) {
+  const coworkersAnswers = await db
+    .select({
+      userId: sprintSurveyAnswerCoworkers.coworkerId,
+      answer: sprintSurveyAnswerCoworkers.answer,
+      skillId: skill.id,
+      skill: skill.positiveSkill,
+    })
+    .from(sprintSurveyAnswerCoworkers)
+    .leftJoin(question, eq(sprintSurveyAnswerCoworkers.questionId, question.id))
+    .leftJoin(questionSkill, eq(question.id, questionSkill.questionId))
+    .leftJoin(skill, eq(questionSkill.skillId, skill.id))
+    .where(
+      and(
+        eq(sprintSurveyAnswerCoworkers.coworkerId, userId),
+        or(eq(skill.id, 43)),
+      ),
+    );
+
+  const finalAnswers = await db
+    .select({
+      userId: finalSurveyAnswer.userId,
+      answer: finalSurveyAnswer.answer,
+      skillId: skill.id,
+      skill: skill.positiveSkill,
+    })
+    .from(finalSurveyAnswer)
+    .leftJoin(question, eq(finalSurveyAnswer.questionId, question.id))
+    .leftJoin(questionSkill, eq(question.id, questionSkill.questionId))
+    .leftJoin(skill, eq(questionSkill.skillId, skill.id))
+    .where(and(eq(finalSurveyAnswer.userId, userId), or(eq(skill.id, 43))));
+
+  const questionsMaxScore =
+    (coworkersAnswers.length + finalAnswers.length) * 10;
+  let questionsTotal = 0;
+
+  coworkersAnswers.forEach((answer) => {
+    questionsTotal += answer.answer || 0;
+  });
+  finalAnswers.forEach((answer) => {
+    questionsTotal += answer.answer || 0;
+  });
+
+  const emotions = await db
+    .select({
+      answeredAt: rulerSurveyAnswers.answeredAt,
+      emotionId: rulerEmotion.id,
+      emotionName: rulerEmotion.name,
+      emotionPleasantness: rulerEmotion.pleasantness,
+      emotionEnergy: rulerEmotion.energy,
+    })
+    .from(rulerSurveyAnswers)
+    .leftJoin(rulerEmotion, eq(rulerSurveyAnswers.emotionId, rulerEmotion.id))
+    .where(eq(rulerSurveyAnswers.userId, userId));
+
+  const totalEmotions = emotions.length * 10;
+  let goodSelfPerceptionScore = 0;
+
+  emotions.forEach((answer) => {
+    if (answer.emotionPleasantness == null) {
+      goodSelfPerceptionScore = goodSelfPerceptionScore;
+    } else if (answer.emotionPleasantness > 0) {
+      goodSelfPerceptionScore += 10;
+    }
+  });
+
+  const totalSelfPerceptionScore = Math.round(
+    ((questionsTotal + goodSelfPerceptionScore) * 100) /
+      (questionsMaxScore + totalEmotions),
+  );
+
+  return totalSelfPerceptionScore;
+}
