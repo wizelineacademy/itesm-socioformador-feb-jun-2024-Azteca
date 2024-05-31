@@ -252,31 +252,37 @@ async function processOpenFeedback(
       }
     }
 
+    console.log("Positive comments: ", commentClassifications.positive);
+    console.log("Negative comments: ", commentClassifications.negative);
+    console.log("Biased comments: ", commentClassifications.biased);
+
     // ==================== RAG AND WEAKNESSES ANALYSIS ====================
 
     // add the recommended resources of the user
-    const allResources: EmbeddingRecord[] = await db
-      .select({ id: pipResource.id, embedding: pipResource.embedding })
-      .from(pipResource);
-    const recommendedResourcesIds = await cosineSimilarity(
-      commentClassifications.negative,
-      allResources,
-    );
-    recommendedResourcesIds.splice(5);
-    recommendedResourcesIds.map((element) => uniqueResources.add(element));
+    if (commentClassifications.negative !== "") {
+      const allResources: EmbeddingRecord[] = await db
+        .select({ id: pipResource.id, embedding: pipResource.embedding })
+        .from(pipResource);
+      const recommendedResourcesIds = await cosineSimilarity(
+        commentClassifications.negative,
+        allResources,
+      );
+      recommendedResourcesIds.splice(5);
+      recommendedResourcesIds.map((element) => uniqueResources.add(element));
 
-    // get the negative skills solved by the selected resources, set them as weaknesses of the user
-    if (recommendedResourcesIds.length > 0) {
-      const newResourcesNegativeSkills = await db
-        .select({
-          negativeSkillId: pipResourceSkill.skillId,
-        })
-        .from(pipResourceSkill)
-        .where(inArray(pipResourceSkill.skillId, recommendedResourcesIds));
+      // get the negative skills solved by the selected resources, set them as weaknesses of the user
+      if (recommendedResourcesIds.length > 0) {
+        const newResourcesNegativeSkills = await db
+          .select({
+            negativeSkillId: pipResourceSkill.skillId,
+          })
+          .from(pipResourceSkill)
+          .where(inArray(pipResourceSkill.skillId, recommendedResourcesIds));
 
-      newResourcesNegativeSkills.forEach((element) => {
-        weaknessesIds.add(element.negativeSkillId as number);
-      });
+        newResourcesNegativeSkills.forEach((element) => {
+          weaknessesIds.add(element.negativeSkillId as number);
+        });
+      }
     }
 
     // ==================== STRENGTHS ANALYSIS ====================
