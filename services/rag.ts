@@ -1,7 +1,7 @@
 "use server";
 import OpenAI from "openai";
 import db from "@/db/drizzle";
-import { and, count, eq, inArray, isNull } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNull } from "drizzle-orm";
 import { auth } from "@/auth";
 import similarity from "compute-cosine-similarity";
 
@@ -13,6 +13,7 @@ import {
   projectMember,
   question,
   questionSkill,
+  rulerEmotion,
   skill,
   sprintSurvey,
   sprintSurveyAnswerCoworkers,
@@ -111,7 +112,7 @@ async function createTasks(weaknessesIds: Set<number>) {
       apiKey: process.env.OPENAI_KEY,
     });
 
-    const tasksInstructions: string = `El siguiente query contiene todas las áreas de mejora de un usuario, debes crear tareas simples para la persona evaluada para mejorar su rendimiento o bienestar. Las tareas deben ser claras y concisas, deben estar relacionadas al query recibido, deben ser tareas simples que no tomen mucho tiempo al usuario pero que le permiten mejorar en su rendimiento o bienestar. Algunos ejemplos de tareas pueden ser "Hacer ejercicio", "Ir con el psicólogo", "Meditar", "Dormir 8 horas diarias", "Comer frutas y verduras", "Visitar a mi familia", etc., pero cuida que sean relacionadas a las áreas de mejora indicadas, que sean sencilas y que todas sean diferentes.
+    const tasksInstructions: string = `El siguiente query representa ya sea lo que está pasando un usuario o sus áreas donde debe mejorar, debes crear tareas simples para la persona evaluada para mejorar su rendimiento o bienestar. Las tareas deben ser claras y concisas, deben estar relacionadas al query recibido, deben ser tareas simples que no tomen mucho tiempo al usuario pero que le permiten mejorar en su rendimiento o bienestar. Algunos ejemplos de tareas pueden ser "Hacer ejercicio", "Ir con el psicólogo", "Meditar", "Dormir 8 horas diarias", "Comer frutas y verduras", "Visitar a mi familia", etc., pero cuida que sean relacionadas al query ingresado, que sean sencilas y que todas sean diferentes.
 
     Hay otras indicaciones muy importantes que debes seguir por cada tarea:
     1. Cada tarea debe llevar un título y una descripción.
@@ -119,8 +120,8 @@ async function createTasks(weaknessesIds: Set<number>) {
     3. Al crear ya sea el título o la descripción de cada tarea no debes usar nunca los caracteres "\n" ni ":" porque esos son caracteres especiales que yo te indicaré donde usar.
     4. Vas a juntar el título de cada tarea con la descripción donde el separador de en medio es el caracter ":" sin espacios en blanco entre todos los caracteres, solo en el mensaje del título y de la descripción.
     5. Vas a unir las estructuras de todas las tareas con el caracter "\n" como separador sin espacios en blanco entre la estructura de cada tarea y ese separador.
-    6. El query puede o no llegar a tener más de 10 áreas de oportunidad, si ese es el caso debes crear tareas que involucren 2 o más áreas de oportunidad en una misma, puedes tomarte la libertad de crear la cantidad de tareas que consideres pero que nunca exceda la cantidad de 10 tareas. Si son menos de 10 áreas de oportunidad crea una tarea por cada área de oportunidad.
-    7. Aunque las áreas de mejora sean en inglés el contenido de las tareas que vas a generar debe estar en español.
+    6. El query puede o no llegar a tener más de 10 áreas de oportunidad, si ese es el caso debes crear tareas que involucren 2 o más áreas de oportunidad en una misma, puedes tomarte la libertad de crear la cantidad de tareas que consideres pero que nunca exceda la cantidad de 10 tareas. Si son menos de 10 áreas de oportunidad crea una tarea por cada área de oportunidad. Si el query es más relacionado al bienestar el usuario y no a su rendimiento laboral, las tareas deben estar relacionadas a mejorar su bienestar emocional, físico o mental y deben ser máximo 5.
+    7. Aunque el contenido del query sea en inglés la generación de las tareas que vas a generar debe estar en español.
     8. La siguiente estructura es ilustrativa de cómo debes regresar el resultado con todas las tareas, fíjate en estructura no tanto en el contenido:
     """
     titulo_1:descripcion_1\ntitulo_2:descripcion_2\ntitulo_3:descripcion_3
@@ -165,20 +166,6 @@ async function processOpenFeedback(
 
   // if there are no comments, return the same variables without any update
   if (feedbackComments.length > 0) {
-    console.log(
-      "=============================================================",
-    );
-    console.log(
-      "=============================================================",
-    );
-    console.log("START OF COMMENTS ANALYSIS");
-    console.log(
-      "=============================================================",
-    );
-    console.log(
-      "=============================================================",
-    );
-
     let joinedFeedbackComments: string = feedbackComments.join("\n\n");
 
     // string cleaning
@@ -482,45 +469,29 @@ async function getQuestionsSkills(sprintSurveyId: number) {
   return questionsSkills;
 }
 
-/* async function setResourcesEmbeddings() {
-  try {
-    const noEmbeddingResources = await db
-      .select()
-      .from(pipResource)
-      .where(sql`embedding::text = '[]'`);
+export async function rulerAnalysis(
+  userId: number,
+  emotionId: number,
+  sprintSurveyId: number,
+) {
+  const emotionInfo = await db
+    .select({
+      id: rulerEmotion.id,
+      name: rulerEmotion.name,
+      description: rulerEmotion.description,
+      embedding: rulerEmotion.embedding,
+      pleasentess: rulerEmotion.pleasantness,
+      energy: rulerEmotion.energy,
+    })
+    .from(rulerEmotion)
+    .where(eq(rulerEmotion.id, emotionId));
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_KEY,
-    });
-
-    for (const resource of noEmbeddingResources) {
-      const description = resource.description as string;
-
-      const response = await openai.embeddings.create({
-        model: "text-embedding-3-small",
-        input: description,
-        encoding_format: "float",
-      });
-
-      const array = response.data[0].embedding;
-
-      await db
-        .update(pipResource)
-        .set({ embedding: array })
-        .where(eq(pipResource.id, resource.id))
-        .execute();
-    }
-  } catch (err) {
-    console.error("Error retrieving resources:", err);
+  // recommend tasks and resources only if the emotion is negative
+  const pleasentess = emotionInfo[0].pleasentess as number;
+  if (pleasentess < 1) {
   }
-} */
 
-export async function rulerAnalysis() {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) throw new Error("You must be signed in");
-
-  // recommend resources only if the mood of the user is negative, check the previous resources recommended to experiment
+  // guardar tasks y recursos en la base de datos
 }
 
 // Main function
@@ -534,20 +505,6 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
 
   // analyze survey only if it has not been processed
   if (notProcessedSurvey) {
-    console.log(
-      "=============================================================",
-    );
-    console.log(
-      "=============================================================",
-    );
-    console.log("START OF SPRINT ANALYSIS");
-    console.log(
-      "=============================================================",
-    );
-    console.log(
-      "=============================================================",
-    );
-
     const uniqueProjectUsers = await db
       .select({
         userId: projectMember.userId,
@@ -699,10 +656,4 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
       .set({ processed: true })
       .where(eq(sprintSurvey.id, sprintSurveyId));
   }
-
-  console.log("=============================================================");
-  console.log("=============================================================");
-  console.log("END OF SPRINT ANALYSIS");
-  console.log("=============================================================");
-  console.log("=============================================================");
 }
