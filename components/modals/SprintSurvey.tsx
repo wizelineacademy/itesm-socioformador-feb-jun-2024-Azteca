@@ -61,12 +61,6 @@ const SprintSurvey = ({
     ) as Questions[];
   }, [allSprintQuestions]);
 
-  /*   const coworkerCommentQuestions: Questions[] | undefined = useMemo(() => {
-    return allSprintQuestions?.filter(
-      (question) => question.type === "COWORKER_COMMENT",
-    );
-  }, [allSprintQuestions]); */
-
   const [sprintAnswer, setSprintAnswer] = useState<SprintSurveyAnswer>({
     userId: userId,
     sprintSurveyId: sprintSurveyId,
@@ -137,6 +131,23 @@ const SprintSurvey = ({
       )?.id as number;
       sprintAnswer.coworkersAnswers.push(questionObject);
     });
+  };
+
+  const handleStepOneAnswer = () => {
+    const projectQuestions = [...sprintAnswer.projectAnswers];
+    sprintQuestions?.forEach((question) => {
+      const wasAnswered = projectQuestions.find(
+        (answer) => answer.questionId === question.id,
+      );
+      if (!wasAnswered) {
+        projectQuestions.push({
+          questionId: question.id,
+          answer: 6,
+        });
+      }
+    });
+    setSprintAnswer({ ...sprintAnswer, projectAnswers: projectQuestions });
+    setStep(2);
   };
 
   const handleStepTwoAnswer = () => {
@@ -235,7 +246,7 @@ const SprintSurvey = ({
                     <button
                       type="button"
                       className="mx-auto rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
-                      onClick={() => handleNavigation(2)}
+                      onClick={handleStepOneAnswer}
                     >
                       Next
                     </button>
