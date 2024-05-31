@@ -7,7 +7,10 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { deleteProjectById, updateFeedback } from "@/services/project";
 import { useRouter } from "next/navigation";
 import { getUserRole } from "@/services/user";
-import { getOverallStatistics } from "@/services/sprintSurvey";
+import {
+  getOverallStatistics,
+  getDetailedProjectStatistics,
+} from "@/services/sprintSurvey";
 
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon";
 
@@ -36,10 +39,11 @@ const Project = ({ params }: { params: { projectId: string } }) => {
     queryFn: () => getOverallStatistics(projectId),
   });
 
-  if (isLoadingStatistics) {
-    return <div>Loading...</div>;
-  }
-
+  const { data: detailedStatistics, isLoading: isLoadingDetailedStatistics } =
+    useQuery({
+      queryKey: ["project-detailed-statistics", projectId],
+      queryFn: () => getDetailedProjectStatistics(projectId),
+    });
   const radarData = statistics
     ? [
         {
@@ -91,33 +95,39 @@ const Project = ({ params }: { params: { projectId: string } }) => {
       growthOportunities: 78,
     },
   ];
-  const gaugeData = [
-    {
-      title: "Resources Satisfaction",
-      percentage: 78,
-      type: "half",
-      gradient: { start: "#988511", end: "#FEDE1C" },
-    },
-    {
-      title: "Listening Feeling",
-      percentage: 64,
-      type: "half",
-      gradient: { start: "#295A95", end: "#4598FB" },
-    },
-    {
-      title: "Recognition Feeling",
-      percentage: 56,
-      type: "half",
-      gradient: { start: "#881931", end: "#EE2B55" },
-    },
-    {
-      title: "Respect and Trust Environment",
-      percentage: 85,
-      type: "half",
-      gradient: { start: "#35216F", end: "#6640D5" },
-    },
-  ];
+  const gaugeData = detailedStatistics
+    ? [
+        {
+          title: "Resources Satisfaction",
+          percentage: detailedStatistics.resourcesSatisfaction,
+          type: "half",
+          gradient: { start: "#988511", end: "#FEDE1C" },
+        },
+        {
+          title: "Listening Feeling",
+          percentage: detailedStatistics.listeningFeeling,
+          type: "half",
+          gradient: { start: "#295A95", end: "#4598FB" },
+        },
+        {
+          title: "Recognition Feeling",
+          percentage: detailedStatistics.recognitionFeeling,
+          type: "half",
+          gradient: { start: "#881931", end: "#EE2B55" },
+        },
+        {
+          title: "Respect and Trust Environment",
+          percentage: detailedStatistics.respectTrustEnvironment,
+          type: "half",
+          gradient: { start: "#35216F", end: "#6640D5" },
+        },
+      ]
+    : [];
   const progressBarPercentage = 74;
+
+  if (isLoadingStatistics || isLoadingDetailedStatistics) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="mt-2">
@@ -186,7 +196,7 @@ const Project = ({ params }: { params: { projectId: string } }) => {
             className="flex w-fit flex-col rounded-xl bg-white px-10 py-5 drop-shadow-lg"
           >
             <GaugeChart
-              percentage={gauge.percentage}
+              percentage={Number(gauge.percentage)}
               type={gauge.type}
               gradient={gauge.gradient}
             />

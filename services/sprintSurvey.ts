@@ -7,6 +7,7 @@ import {
   sprintSurveyAnswerCoworkers,
   sprintSurveyAnswerProject,
   projectMember,
+  finalSurveyAnswer,
 } from "@/db/schema";
 import { eq, or, sql, and } from "drizzle-orm";
 
@@ -161,19 +162,19 @@ export async function getOverallStatistics(projectId: number) {
   // Obtener el promedio de respuestas para Soporte del Manager
   const managerSupportResult = await db
     .select({
-      manager_support: sql`AVG(${sprintSurveyAnswerCoworkers.answer}) * 10`.as(
+      manager_support: sql`AVG(${sprintSurveyAnswerProject.answer}) * 10`.as(
         "manager_support",
       ),
     })
-    .from(sprintSurveyAnswerCoworkers)
+    .from(sprintSurveyAnswerProject)
     .innerJoin(
       projectMember,
-      eq(sprintSurveyAnswerCoworkers.coworkerId, projectMember.userId),
+      eq(sprintSurveyAnswerProject.userId, projectMember.userId),
     )
     .where(
       and(
         eq(projectMember.projectId, projectId),
-        eq(sprintSurveyAnswerCoworkers.questionId, 27),
+        eq(sprintSurveyAnswerProject.questionId, 27),
       ),
     );
 
@@ -206,5 +207,97 @@ export async function getOverallStatistics(projectId: number) {
     punctuality,
     managerSupport,
     coworkerSupport,
+  };
+}
+export async function getDetailedProjectStatistics(projectId: number) {
+  // Obtener el promedio de respuestas para "Listening Feeling"
+  const listeningFeelingResult = await db
+    .select({
+      listeningFeeling: sql`AVG(${finalSurveyAnswer.answer}) * 10`.as(
+        "listeningFeeling",
+      ),
+    })
+    .from(finalSurveyAnswer)
+    .innerJoin(
+      projectMember,
+      eq(finalSurveyAnswer.userId, projectMember.userId),
+    )
+    .where(
+      and(
+        eq(projectMember.projectId, projectId),
+        eq(finalSurveyAnswer.questionId, 36),
+      ),
+    );
+
+  const listeningFeeling = listeningFeelingResult[0]?.listeningFeeling || 0;
+
+  // Obtener el promedio de respuestas para "Recognition Feeling"
+  const recognitionFeelingResult = await db
+    .select({
+      recognitionFeeling: sql`AVG(${finalSurveyAnswer.answer}) * 10`.as(
+        "recognitionFeeling",
+      ),
+    })
+    .from(finalSurveyAnswer)
+    .innerJoin(
+      projectMember,
+      eq(finalSurveyAnswer.userId, projectMember.userId),
+    )
+    .where(
+      and(
+        eq(projectMember.projectId, projectId),
+        eq(finalSurveyAnswer.questionId, 35),
+      ),
+    );
+
+  const recognitionFeeling =
+    recognitionFeelingResult[0]?.recognitionFeeling || 0;
+
+  // Obtener el promedio de respuestas para "Respect and Trust Environment"
+  const respectTrustEnvironmentResult = await db
+    .select({
+      respectTrustEnvironment: sql`AVG(${finalSurveyAnswer.answer}) * 10`.as(
+        "respectTrustEnvironment",
+      ),
+    })
+    .from(finalSurveyAnswer)
+    .innerJoin(
+      projectMember,
+      eq(finalSurveyAnswer.userId, projectMember.userId),
+    )
+    .where(
+      and(
+        eq(projectMember.projectId, projectId),
+        eq(finalSurveyAnswer.questionId, 39),
+      ),
+    );
+  const respectTrustEnvironment =
+    respectTrustEnvironmentResult[0]?.respectTrustEnvironment || 0;
+  const resourcesSatisfactionResult = await db
+    .select({
+      resourcesSatisfaction:
+        sql`AVG(${sprintSurveyAnswerProject.answer}) * 10`.as(
+          "resourcesSatisfaction",
+        ),
+    })
+    .from(sprintSurveyAnswerProject)
+    .innerJoin(
+      projectMember,
+      eq(sprintSurveyAnswerProject.userId, projectMember.userId),
+    )
+    .where(
+      and(
+        eq(projectMember.projectId, projectId),
+        eq(sprintSurveyAnswerProject.questionId, 26),
+      ),
+    );
+  const resourcesSatisfaction =
+    resourcesSatisfactionResult[0]?.resourcesSatisfaction || 0;
+
+  return {
+    listeningFeeling,
+    recognitionFeeling,
+    respectTrustEnvironment,
+    resourcesSatisfaction,
   };
 }
