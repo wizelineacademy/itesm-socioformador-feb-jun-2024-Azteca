@@ -11,6 +11,10 @@ import {
   sprintSurveyAnswerProject,
   questionSkill,
   pipTask,
+  sprintSurvey,
+  project,
+  projectMember,
+  finalSurvey,
 } from "@/db/schema";
 import { and, eq, or } from "drizzle-orm";
 
@@ -475,4 +479,61 @@ export async function getStressScore(userId: string) {
 
   const averageStressScore = totalStressScore / emotions.length;
   return Math.round(averageStressScore);
+}
+
+export async function getCalendarInfo(userId: string) {
+  const finalSurveyDates = await db
+    .selectDistinctOn([finalSurvey.id], {
+      finalSurveyDate: finalSurvey.scheduledAt,
+    })
+    .from(projectMember)
+    .leftJoin(project, eq(projectMember.projectId, project.id))
+    .leftJoin(finalSurvey, eq(project.id, finalSurvey.projectId))
+    .where(or(eq(projectMember.userId, userId), eq(project.managerId, userId)));
+
+  const sprintSurveyDates = await db
+    .selectDistinctOn([sprintSurvey.id], {
+      sprintSurveyDate: sprintSurvey.scheduledAt,
+    })
+    .from(projectMember)
+    .leftJoin(project, eq(projectMember.projectId, project.id))
+    .leftJoin(sprintSurvey, eq(project.id, sprintSurvey.projectId))
+    .where(or(eq(projectMember.userId, userId), eq(project.managerId, userId)));
+
+  const rulerSurveyDates = await db
+    .selectDistinct({
+      rulerSurveyDate: rulerSurveyAnswers.answeredAt,
+    })
+    .from(rulerSurveyAnswers)
+    .where(eq(rulerSurveyAnswers.userId, userId));
+
+  const completedSurveys: { date: Date; color: string }[] = [];
+
+  finalSurveyDates.forEach((answer) => {
+    if (answer.finalSurveyDate !== null) {
+      completedSurveys.push({
+        date: answer.finalSurveyDate,
+        color: "orange",
+      });
+    }
+  });
+
+  sprintSurveyDates.forEach((answer) => {
+    if (answer.sprintSurveyDate !== null) {
+      completedSurveys.push({
+        date: answer.sprintSurveyDate,
+        color: "green",
+      });
+    }
+  });
+
+  rulerSurveyDates.forEach((answer) => {
+    if (answer.rulerSurveyDate !== null) {
+      completedSurveys.push({
+        date: answer.rulerSurveyDate,
+        color: "blue",
+      });
+    }
+  });
+  return completedSurveys;
 }

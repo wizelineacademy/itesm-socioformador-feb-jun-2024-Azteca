@@ -8,6 +8,7 @@ import DashboardSurveyCalendar from "@/components/Dashboard/DashboardSurveyCalen
 import PCPSection from "@/components/Dashboard/DashboardPCPSection";
 import Loader from "@/components/Loader";
 import {
+  getCalendarInfo,
   getOverallStatistics,
   getPCPStatus,
   getProductivityScore,
@@ -49,17 +50,9 @@ const Dashboard = async ({ params }: { params: { userId: string } }) => {
   const PCPData = await getPCPStatus(params.userId);
 
   const emotionsData = await getRulerGraphInfo(params.userId);
+  getCalendarInfo(params.userId);
 
-  const completedSurveys = [
-    { date: new Date(2024, 0, 5), color: "red" },
-    { date: new Date(2024, 3, 5), color: "red" },
-    { date: new Date(2024, 3, 5), color: "green" },
-    { date: new Date(2024, 3, 5), color: "yellow" },
-    { date: new Date(2024, 3, 16), color: "yellow" },
-    { date: new Date(2024, 3, 23), color: "blue" },
-    { date: new Date(2024, 4, 15), color: "blue" },
-  ];
-
+  const completedSurveys = await getCalendarInfo(params.userId);
   return (
     <Suspense
       fallback={
