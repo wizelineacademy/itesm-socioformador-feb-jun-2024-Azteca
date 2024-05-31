@@ -17,6 +17,7 @@ const FormTextInput = ({ name, type, label }: FormTextInputProps) => {
   return (
     <div className="relative mt-6 flex w-full flex-col">
       <input
+        data-testid={name}
         autoComplete={type === "email" || name === "name" ? "on" : "off"}
         id={name}
         name={name}

@@ -143,7 +143,11 @@ const RulerStepOne = ({
     }
   };
   return (
-    <div className="flex flex-col" id="ruler-step-one">
+    <div
+      className="flex flex-col"
+      id="ruler-step-one"
+      data-testid="ruler-step-one"
+    >
       <p className="my-2 text-sm text-graySubtitle">How do you feel today?</p>
       <section id="ruler-survey" className="flex flex-col text-center">
         <div className="flex flex-col gap-4">
@@ -151,6 +155,7 @@ const RulerStepOne = ({
             <div key={rowIndex} className="flex flex-row gap-4">
               {row.map((emotion: Emotion, colIndex) => (
                 <button
+                  data-testid={`emotion-${rowIndex}-${colIndex}`}
                   id={`${rowIndex}-${colIndex}`}
                   key={colIndex}
                   onMouseEnter={() => expandSize(rowIndex, colIndex)}
@@ -158,7 +163,10 @@ const RulerStepOne = ({
                   onClick={() => handleClick(emotion)}
                   className={`${emotionBgColor(emotion)} z-10 h-10 w-14 cursor-pointer rounded-full text-center text-transparent transition-transform duration-500 hover:z-50 hover:scale-150 hover:text-white`}
                 >
-                  <p className="text-[0.5rem] font-semibold duration-500">
+                  <p
+                    data-testid={`emotion-name-${rowIndex}-${colIndex}`}
+                    className="text-[0.5rem] font-semibold duration-500"
+                  >
                     {emotion.name}
                   </p>
                 </button>

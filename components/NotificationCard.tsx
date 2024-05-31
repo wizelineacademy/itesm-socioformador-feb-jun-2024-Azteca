@@ -11,7 +11,7 @@ const NotificationCard = ({ notification }: NotificationCardProps) => {
   const getTitle = (type: string) => {
     switch (type) {
       case "RULER":
-        return " Daily Ruler Survey";
+        return "Daily Ruler Survey";
       case "SPRINT":
         return "Sprint Survey";
       case "FINAL":
@@ -23,6 +23,7 @@ const NotificationCard = ({ notification }: NotificationCardProps) => {
 
   return (
     <div
+      data-testid={`${getTitle(notification.type)}`}
       className={`flex w-full items-center rounded-t-md border-b-2 border-gray-200 p-2 hover:bg-gray-200`}
     >
       <svg

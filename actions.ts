@@ -34,7 +34,7 @@ export const registerAction = async (formData: FormData) => {
     const dbError = e as DatabaseError;
 
     let errorType: DatabaseErrorType;
-    if (dbError.message === "Email already registered")
+    if (dbError.message === "Email already registered 23505")
       errorType = "UniqueConstraintViolation";
     else if (dbError.message === "Error registering the user")
       errorType = "ConnectionError";

@@ -40,6 +40,7 @@ const UserIconNavbar = ({
   return (
     <Menu as="div" className="relative inline-block text-left">
       <Menu.Button
+        data-testid="user-icon-navbar"
         as="div"
         onClick={() => setIsClicked(!isClicked)}
         className={`${onSite || isClicked ? "bg-primary" : "bg-white transition-all delay-0 hover:scale-[1.175]"} flex rounded-full drop-shadow-lg`}
@@ -91,6 +92,7 @@ const UserIconNavbar = ({
               )}
             </Menu.Item>
             <button
+              data-testid="settings-button"
               onClick={() => {
                 showSettingsModal();
               }}
@@ -108,10 +110,12 @@ const UserIconNavbar = ({
               </Menu.Item>
             </button>
           </div>
-          <button className="w-full px-1 py-1" onClick={handleSignOut}>
+          <div className="w-full px-1 py-1">
             <Menu.Item>
               {({ active }) => (
                 <button
+                  data-testid="signout-button"
+                  onClick={handleSignOut}
                   className={`${
                     active ? "bg-red-700 text-white" : "text-gray-900"
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
@@ -120,7 +124,7 @@ const UserIconNavbar = ({
                 </button>
               )}
             </Menu.Item>
-          </button>
+          </div>
         </Menu.Items>
       </Transition>
     </Menu>
