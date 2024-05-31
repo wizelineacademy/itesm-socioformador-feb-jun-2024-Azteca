@@ -1,14 +1,13 @@
+"use client";
 import Link from "next/link";
 import ProjectIcon from "../components/icons/ProjectIcon";
+import { usePathname } from "next/navigation";
 
 interface ProjectIconNavbarInterface {
   path: string;
-  currentPath: string;
 }
-const ProjectNavbarIcon = ({
-  path,
-  currentPath,
-}: ProjectIconNavbarInterface) => {
+const ProjectNavbarIcon = ({ path }: ProjectIconNavbarInterface) => {
+  const currentPath = usePathname();
   const isActive = currentPath === path;
   return (
     <Link

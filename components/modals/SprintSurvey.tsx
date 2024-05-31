@@ -61,12 +61,6 @@ const SprintSurvey = ({
     ) as Questions[];
   }, [allSprintQuestions]);
 
-  /*   const coworkerCommentQuestions: Questions[] | undefined = useMemo(() => {
-    return allSprintQuestions?.filter(
-      (question) => question.type === "COWORKER_COMMENT",
-    );
-  }, [allSprintQuestions]); */
-
   const [sprintAnswer, setSprintAnswer] = useState<SprintSurveyAnswer>({
     userId: userId,
     sprintSurveyId: sprintSurveyId,
@@ -139,6 +133,23 @@ const SprintSurvey = ({
     });
   };
 
+  const handleStepOneAnswer = () => {
+    const projectQuestions = [...sprintAnswer.projectAnswers];
+    sprintQuestions?.forEach((question) => {
+      const wasAnswered = projectQuestions.find(
+        (answer) => answer.questionId === question.id,
+      );
+      if (!wasAnswered) {
+        projectQuestions.push({
+          questionId: question.id,
+          answer: 6,
+        });
+      }
+    });
+    setSprintAnswer({ ...sprintAnswer, projectAnswers: projectQuestions });
+    setStep(2);
+  };
+
   const handleStepTwoAnswer = () => {
     if (!isSurveyCompleted()) {
       toast.error("Please fill all the fields before submitting the survey.");
@@ -164,8 +175,8 @@ const SprintSurvey = ({
   };
 
   const modalWidth = step === 3 ? "max-w-xl" : "max-w-5xl";
-  if (!users) return <div></div>;
   if (isError) return <div>Error loading data</div>;
+
   return (
     <Transition appear show={showModal} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -192,7 +203,7 @@ const SprintSurvey = ({
               leaveTo="opacity-0"
             >
               <Dialog.Panel
-                className={`sprint-survey flex h-auto transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all duration-500 ${modalWidth}`}
+                className={`sprint-survey flex h-auto transform flex-col rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all duration-500 ${modalWidth}`}
               >
                 <Dialog.Title
                   as="h3"
@@ -201,7 +212,7 @@ const SprintSurvey = ({
                   Sprint Survey
                 </Dialog.Title>
                 {isLoadingQuestions && <Loader />}
-                {allSprintQuestions && (
+                {allSprintQuestions && users && (
                   <>
                     {step === 1 && (
                       <SprintStepOne
@@ -234,8 +245,8 @@ const SprintSurvey = ({
                   {step === 1 && (
                     <button
                       type="button"
-                      className="mx-auto rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
-                      onClick={() => handleNavigation(2)}
+                      className={`${isLoadingQuestions && "hidden"} mx-auto rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark`}
+                      onClick={handleStepOneAnswer}
                     >
                       Next
                     </button>

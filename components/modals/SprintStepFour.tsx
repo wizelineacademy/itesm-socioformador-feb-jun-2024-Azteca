@@ -18,6 +18,7 @@ const SprintStepFour = ({
 }: SprintStepFour) => {
   const [usersSelected, setUsersSelected] = useState<Coworker[]>([]);
   const [selectableUsers, setSelectableUsers] = useState<Coworker[]>(users);
+  const maxWordCount = 300;
   const onChangeValue = (comment: string, userId: string) => {
     const newCoworkersComments = [...sprintSurveyAnswer.coworkersComments];
     const index = newCoworkersComments.findIndex(
@@ -135,16 +136,29 @@ const SprintStepFour = ({
                       />
                     </button>
                   </div>
-                  <textarea
-                    value={
-                      sprintSurveyAnswer.coworkersComments.find(
-                        (coworker) => coworker.coworkerId === user.userId,
-                      )?.comment || ""
-                    }
-                    onChange={(e) => onChangeValue(e.target.value, user.userId)}
-                    placeholder="Type some feedback..."
-                    className="w-full rounded-lg border border-primary-light p-1 text-sm placeholder:left-1 placeholder:text-sm focus:outline-primary-dark"
-                  />
+                  <div className="d-flex w-full flex-col">
+                    <textarea
+                      value={
+                        sprintSurveyAnswer.coworkersComments.find(
+                          (coworker) => coworker.coworkerId === user.userId,
+                        )?.comment || ""
+                      }
+                      onChange={(e) =>
+                        onChangeValue(e.target.value, user.userId)
+                      }
+                      placeholder="Type some feedback..."
+                      className="w-full rounded-lg border border-primary-light p-1 text-sm placeholder:left-1 placeholder:text-sm focus:outline-primary-dark"
+                      maxLength={maxWordCount}
+                    />
+                    <span className="float-end text-xs font-light">
+                      {
+                        sprintSurveyAnswer.coworkersComments.find(
+                          (coworker) => coworker.coworkerId === user.userId,
+                        )?.comment.length
+                      }
+                      /{maxWordCount}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
