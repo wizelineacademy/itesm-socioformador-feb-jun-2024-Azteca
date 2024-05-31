@@ -1,9 +1,9 @@
-interface PIPIconProps {
+interface PCPIconProps {
   color: string;
   size: string;
 }
 
-const PIPIcon = ({ color, size }: PIPIconProps) => {
+const PCPIcon = ({ color, size }: PCPIconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -22,4 +22,4 @@ const PIPIcon = ({ color, size }: PIPIconProps) => {
   );
 };
 
-export default PIPIcon;
+export default PCPIcon;

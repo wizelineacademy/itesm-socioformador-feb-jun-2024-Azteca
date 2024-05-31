@@ -85,14 +85,22 @@ export const userTrait = pgTable(
   // composite primary key on (userId, traitId)
 );
 
+export const taskStatusEnum = pgEnum("status", [
+  "PENDING",
+  "IN_PROGRESS",
+  "DONE",
+]);
+
 export const pipTask = pgTable("pip_task", {
   id: serial("id").primaryKey(),
   sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
   userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 64 }),
   description: varchar("description", { length: 256 }),
-  isDone: boolean("is_done"),
+  status: taskStatusEnum("status").default("PENDING").notNull(),
 });
+
+export type SelectPipTask = typeof pipTask.$inferSelect;
 
 export const pipResourceKind = pgEnum("type_resource", [
   "BOOK",
@@ -189,6 +197,8 @@ export const sprintSurvey = pgTable("sprint_survey", {
   scheduledAt: date("scheduled_at", { mode: "date" }),
   processed: boolean("processed").default(false),
 });
+
+export type SelectSprintSurvey = typeof sprintSurvey.$inferSelect;
 
 export const sprintSurveyAnswerProject = pgTable(
   "sprint_survey_answer_project",
