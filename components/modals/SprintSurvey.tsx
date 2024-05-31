@@ -175,8 +175,8 @@ const SprintSurvey = ({
   };
 
   const modalWidth = step === 3 ? "max-w-xl" : "max-w-5xl";
-  if (!users) return <div></div>;
   if (isError) return <div>Error loading data</div>;
+
   return (
     <Transition appear show={showModal} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -203,7 +203,7 @@ const SprintSurvey = ({
               leaveTo="opacity-0"
             >
               <Dialog.Panel
-                className={`sprint-survey flex h-auto transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all duration-500 ${modalWidth}`}
+                className={`sprint-survey flex h-auto transform flex-col rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all duration-500 ${modalWidth}`}
               >
                 <Dialog.Title
                   as="h3"
@@ -212,7 +212,7 @@ const SprintSurvey = ({
                   Sprint Survey
                 </Dialog.Title>
                 {isLoadingQuestions && <Loader />}
-                {allSprintQuestions && (
+                {allSprintQuestions && users && (
                   <>
                     {step === 1 && (
                       <SprintStepOne
@@ -245,7 +245,7 @@ const SprintSurvey = ({
                   {step === 1 && (
                     <button
                       type="button"
-                      className="mx-auto rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark"
+                      className={`${isLoadingQuestions && "hidden"} mx-auto rounded-full bg-primary px-7 py-2 text-base font-medium text-white transition-all duration-100 hover:bg-primary-dark hover:ring-2 hover:ring-primary-dark`}
                       onClick={handleStepOneAnswer}
                     >
                       Next

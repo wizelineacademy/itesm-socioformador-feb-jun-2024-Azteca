@@ -1,11 +1,13 @@
+"use client";
 import Link from "next/link";
 import PCPIcon from "./icons/PCPIcon";
+import { usePathname } from "next/navigation";
 
 interface PCPIconInterface {
   path: string;
-  currentPath: string;
 }
-const PCPIconNavbar = ({ path, currentPath }: PCPIconInterface) => {
+const PCPIconNavbar = ({ path }: PCPIconInterface) => {
+  const currentPath = usePathname();
   const isActive = currentPath === path;
   return (
     <Link
