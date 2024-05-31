@@ -1,18 +1,20 @@
+"use client";
 import Link from "next/link";
-import PIPIcon from "./icons/PIPIcon";
+import PCPIcon from "./icons/PCPIcon";
+import { usePathname } from "next/navigation";
 
-interface PIPIconInterface {
+interface PCPIconInterface {
   path: string;
-  currentPath: string;
 }
-const PIPIconNavbar = ({ path, currentPath }: PIPIconInterface) => {
+const PCPIconNavbar = ({ path }: PCPIconInterface) => {
+  const currentPath = usePathname();
   const isActive = currentPath === path;
   return (
     <Link
       href={path}
       className={`${isActive ? "bg-primary" : "bg-white transition-all delay-0 hover:scale-[1.175]"} group rounded-full p-2 drop-shadow-lg`}
     >
-      <PIPIcon
+      <PCPIcon
         color={isActive ? "text-white" : "text-primary"}
         size="h-6 w-6"
       />
@@ -20,4 +22,4 @@ const PIPIconNavbar = ({ path, currentPath }: PIPIconInterface) => {
   );
 };
 
-export default PIPIconNavbar;
+export default PCPIconNavbar;

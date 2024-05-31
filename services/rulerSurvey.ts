@@ -7,12 +7,13 @@ import { RulerSurveyAnswer } from "@/types/types";
 import { auth } from "@/auth";
 
 export async function submitRulerSurveyAnswer(surveyAnswer: RulerSurveyAnswer) {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    throw new Error("You most be signed in");
+  if (!surveyAnswer.userId || surveyAnswer.userId === undefined) {
+    const session = await auth();
+    surveyAnswer.userId = session?.user?.id;
+    if (!surveyAnswer.userId) {
+      throw new Error("You most be signed in");
+    }
   }
-
   // Insert ruler answer to db
   await db.insert(rulerSurveyAnswers).values({
     userId: userId,

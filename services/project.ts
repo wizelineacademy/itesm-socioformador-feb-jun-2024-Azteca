@@ -60,6 +60,7 @@ export async function createProject({
     .returning({ id: project.id });
   const { id: projectId } = res[0];
 
+  console.log("MEMBERS", members);
   // Link the members to that project
   await db.insert(projectMember).values(
     members.map((member) => ({

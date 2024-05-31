@@ -97,6 +97,7 @@ const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel
+                data-testid="ruler-survey"
                 id="ruler-modal"
                 className={`flex ${modalWidth} w-full transform flex-col overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all duration-500`}
               >
@@ -107,6 +108,7 @@ const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
                   <p className="text-2xl font-semibold">Ruler Survey</p>
                   <div className="flex h-8 min-w-fit max-w-[40ch] flex-col justify-center self-end text-sm">
                     <span
+                      data-testid="chosen-emotion"
                       className={
                         getEmotionTextColor() + " text-end font-medium"
                       }
