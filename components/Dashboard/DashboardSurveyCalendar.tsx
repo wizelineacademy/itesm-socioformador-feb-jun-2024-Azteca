@@ -21,7 +21,11 @@ const DashboardSurveyCalendar: React.FC<SurveyCalendarProps> = ({
   completedSurveys,
 }) => (
   <div className="flex w-fit flex-col rounded-xl bg-white px-10 py-5 drop-shadow-lg">
-    <InfoToolTip description="This is a summary of the surveys you have completed." />
+    <InfoToolTip
+      description='Each indicator shows a survey type answered:<br /><span style="display: flex; align-items: center; gap: 0;"><span style="display: inline-block; width: 10px; height: 10px; background-color: #0063FF; border-radius: 50%; margin-right: 5px;"></span>RULER Survey</span><span style="display: flex; align-items: center; gap: 0;"><span style="display: inline-block; width: 10px; height: 10px; background-color: #2BDD66; border-radius: 50%; margin-right: 5px;"></span>Sprint Sprint</span><span style="display: flex; align-items: center; gap: 0;"><span style="display: inline-block; width: 10px; height: 10px; background-color: #fc8a08; border-radius: 50%; margin-right: 5px;"></span>Project Survey</span>'
+      size="md"
+    />
+
     <Calendar
       className="px-2"
       renderDay={(date: Date) => {

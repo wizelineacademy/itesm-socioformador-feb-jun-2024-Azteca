@@ -12,7 +12,7 @@ interface PCPSectionProps {
 
 const DashboardPCPSection: React.FC<PCPSectionProps> = ({ PCPData }) => (
   <div className="flex flex-col rounded-xl bg-white px-10 py-4 drop-shadow-lg">
-    <InfoToolTip description="Personal Carreer Plan" />
+    <InfoToolTip description="Show the progress of your Personal Carreer Plan" />
     <p className="mt-2 text-center text-xl font-semibold text-graySubtitle">
       Personal Career Plan
     </p>

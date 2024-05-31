@@ -16,7 +16,7 @@ const DashboardEmotionsSection: React.FC<EmotionsSectionProps> = ({
 }) => (
   <div className="relative flex min-w-96 flex-col items-center rounded-xl bg-white px-10 py-5 drop-shadow-lg">
     <InfoToolTip
-      description="This is a summary of the emotions you have been feeling recently."
+      description="Shows the percentage of each quadrant of the RULER Survey"
       size="lg"
     />
     <div className="flex">

@@ -26,7 +26,7 @@ const InfoToolTip = ({ description, size }: InfoToolTipProps) => {
   return (
     <div className="absolute right-6 top-6">
       <Tooltip
-        label={description}
+        label={<span dangerouslySetInnerHTML={{ __html: description }} />}
         position="left-start"
         multiline
         w={tooltipWidth}
@@ -34,8 +34,11 @@ const InfoToolTip = ({ description, size }: InfoToolTipProps) => {
         offset={{ mainAxis: -20, crossAxis: 28 }}
         color="gray"
       >
-        <button>
-          <InfoIcon color="text-black" size="h-6 w-6" />
+        <button className="group">
+          <InfoIcon
+            color="text-grayText group-hover:text-black transition-colors duration-200"
+            size="h-6 w-6"
+          />
         </button>
       </Tooltip>
     </div>
