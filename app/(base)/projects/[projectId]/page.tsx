@@ -128,6 +128,7 @@ const Project = ({ params }: { params: { projectId: string } }) => {
   if (isLoadingStatistics || isLoadingDetailedStatistics) {
     return <div>Loading...</div>;
   }
+  console.log(gaugeData);
 
   return (
     <div className="mt-2">

@@ -199,7 +199,9 @@ export async function getOverallStatistics(projectId: number) {
       ),
     );
 
-  const coworkerSupport = coworkerSupportResult[0]?.coworker_support || 0;
+  const coworkerSupport = Math.round(
+    Number(coworkerSupportResult[0]?.coworker_support ?? 0),
+  );
 
   return {
     communication,
@@ -229,7 +231,9 @@ export async function getDetailedProjectStatistics(projectId: number) {
       ),
     );
 
-  const listeningFeeling = listeningFeelingResult[0]?.listeningFeeling || 0;
+  const listeningFeeling = Math.round(
+    Number(listeningFeelingResult[0]?.listeningFeeling ?? 0),
+  );
 
   // Obtener el promedio de respuestas para "Recognition Feeling"
   const recognitionFeelingResult = await db
@@ -250,8 +254,9 @@ export async function getDetailedProjectStatistics(projectId: number) {
       ),
     );
 
-  const recognitionFeeling =
-    recognitionFeelingResult[0]?.recognitionFeeling || 0;
+  const recognitionFeeling = Math.round(
+    Number(recognitionFeelingResult[0]?.recognitionFeeling ?? 0),
+  );
 
   // Obtener el promedio de respuestas para "Respect and Trust Environment"
   const respectTrustEnvironmentResult = await db
@@ -271,8 +276,9 @@ export async function getDetailedProjectStatistics(projectId: number) {
         eq(finalSurveyAnswer.questionId, 39),
       ),
     );
-  const respectTrustEnvironment =
-    respectTrustEnvironmentResult[0]?.respectTrustEnvironment || 0;
+  const respectTrustEnvironment = Math.round(
+    Number(respectTrustEnvironmentResult[0]?.respectTrustEnvironment ?? 0),
+  );
   const resourcesSatisfactionResult = await db
     .select({
       resourcesSatisfaction:
@@ -291,8 +297,9 @@ export async function getDetailedProjectStatistics(projectId: number) {
         eq(sprintSurveyAnswerProject.questionId, 26),
       ),
     );
-  const resourcesSatisfaction =
-    resourcesSatisfactionResult[0]?.resourcesSatisfaction || 0;
+  const resourcesSatisfaction = Math.round(
+    Number(resourcesSatisfactionResult[0]?.resourcesSatisfaction ?? 0),
+  );
 
   return {
     listeningFeeling,
