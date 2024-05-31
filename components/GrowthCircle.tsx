@@ -10,15 +10,20 @@ interface GradientColor {
 interface GrowthCircleProps {
   percentage: number; // Expected to be between 0 and 100
   gradient: GradientColor;
+  minSize?: number; // Optional minimum size
+  maxSize?: number; // Optional maximum size
 }
 
-const GrowthCircle = ({ percentage, gradient }: GrowthCircleProps) => {
+const GrowthCircle = ({
+  percentage,
+  gradient,
+  minSize = 50,
+  maxSize = 150,
+}: GrowthCircleProps) => {
   const [gradientId] = useState(`gradient${gradientIdCounter++}`);
 
-  // Base size for the circle
-  const baseSize = 400;
-  // Calculate radius based on percentage
-  const radius = (percentage / 100) * (baseSize / 2);
+  // Calculate the radius based on percentage and ensure it is between minSize/2 and maxSize/2
+  const radius = (maxSize / 2 - minSize / 2) * (percentage / 100) + minSize / 2;
   const size = radius * 2;
   // Calculate the font size as 40% of the radius
   const fontSize = radius * 0.4;

@@ -1,12 +1,17 @@
 import React from "react";
 import { RadarChart } from "@mantine/charts";
+import InfoToolTip from "@/components/InfoToolTip";
 
 interface RadarSectionProps {
   radarData: { statistic: string; punctuation: number }[];
 }
 
 const DashboardRadarSection: React.FC<RadarSectionProps> = ({ radarData }) => (
-  <div className="flex w-fit flex-col items-center rounded-xl bg-white px-4 pt-10 drop-shadow-lg">
+  <div className="flex w-fit flex-col items-center rounded-xl bg-white px-4 pt-5 drop-shadow-lg">
+    <InfoToolTip
+      description="Provides a comprehensive view of various performance metrics.<br />Higher values indicate better performance in each area."
+      size="lg"
+    />
     <h4 className="text-xl font-medium">Overall Statistics</h4>
     <RadarChart
       h={380}
