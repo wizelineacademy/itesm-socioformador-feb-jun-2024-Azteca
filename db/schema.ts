@@ -117,6 +117,8 @@ export const pipResource = pgTable("pip_resource", {
   embedding: json("embedding").$type<number[]>(),
 });
 
+export type SelectPipResource = typeof pipResource.$inferSelect;
+
 export const userResource = pgTable(
   "user_resource",
   {

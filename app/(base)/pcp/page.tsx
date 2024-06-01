@@ -4,6 +4,8 @@ import NoDataCard from "@/components/NoDataCard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getProjects } from "@/services/project";
 import {
+  getUserResourcesForCurrentSprint,
+  getUserResourcesHistory,
   getUserTasksForCurrentSprintByProjectId,
   getUserTasksHistory,
   updateTask,
@@ -11,8 +13,13 @@ import {
 import { useEffect, useState } from "react";
 import DialogComponent from "@/components/DialogComponent";
 import { Menu } from "@headlessui/react";
-import { SelectPipTask } from "@/db/schema";
+import { SelectPipResource, SelectPipTask } from "@/db/schema";
 import InfoIcon from "@/components/icons/InfoIcon";
+import VideoIcon from "@/components/icons/VideoIcon";
+import BookIcon from "@/components/icons/BookIcon";
+import ArticleIcon from "@/components/icons/ArticleIcon";
+import Link from "next/link";
+import ChevronRightIcon from "@/components/icons/ChevronRightIcon";
 
 const statusOptions = [
   { label: "Pending", color: "bg-red-500", value: "PENDING" },
@@ -26,6 +33,8 @@ const PCP = () => {
   const projectsQuery = useQuery({
     queryKey: ["projects"],
     queryFn: () => getProjects(),
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
@@ -79,6 +88,7 @@ const PCP = () => {
       {projectId && (
         <>
           <PCPTasks projectId={projectId} />
+          <PCPResources projectId={projectId} />
         </>
       )}
     </div>
@@ -98,6 +108,7 @@ const PCPTasks = ({ projectId }: { projectId: number }) => {
     queryKey: ["tasks", projectId],
     queryFn: () => getUserTasksForCurrentSprintByProjectId(projectId),
     retry: false,
+    refetchOnWindowFocus: false,
   });
 
   return (
@@ -148,6 +159,7 @@ const PCPTasksDialogContent = ({ projectId }: { projectId: number }) => {
     queryKey: ["tasks-history", projectId],
     queryFn: () => getUserTasksHistory(projectId),
     retry: false,
+    refetchOnWindowFocus: false,
   });
 
   const { mutateAsync } = useMutation({
@@ -334,39 +346,188 @@ const PCPTask = ({
   );
 };
 
-/* export const PCPResources = () => {
-  const tasksQuery = useQuery({
-    queryKey: ["tasks", projectId],
-    queryFn: () => getUserTasksForCurrentSprintByProjectId(projectId),
+const PCPResources = ({ projectId }: { projectId: number }) => {
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const openDialog = () => {
+    setIsDialogOpen(true);
+  };
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+  };
+
+  const resourcesQuery = useQuery({
+    queryKey: ["resources", projectId],
+    queryFn: () => getUserResourcesForCurrentSprint(projectId),
     retry: false,
+    refetchOnWindowFocus: false,
   });
 
   return (
-    <section id="pip-resources" className="mt-9 w-full">
-      <PCPSection
-        title="Resources History"
-        showMore={true}
-        // userId={params.id}
-        type="resources"
-      >
-        <div className="mb-10 mt-2 flex w-full flex-row flex-wrap gap-12 overflow-x-auto pb-3">
-          {resources.length === 0 && (
-            <div className="mx-auto flex justify-center">
-              <NoDataCard text="No resources available. Ask your manager for an update." />
-            </div>
-          )}
-          {resources.map((resource) => (
-            <PCPResource
-              title={resource.title}
-              description={resource.description}
-              key={resource.id}
-              type={resource.kind}
-            />
-          ))}
+    <section id="pip-tasks" className="mt-9 w-full">
+      <div className="mb-6">
+        <div className="mx-auto flex justify-between">
+          <h3 className="text-3xl font-medium text-black">Resources</h3>
+          <button
+            className="cursor-pointer self-center text-sm text-graySubtitle"
+            onClick={openDialog}
+          >
+            Show History
+          </button>
         </div>
-      </PCPSection>
+
+        {resourcesQuery.isLoading ? (
+          <p>loading...</p>
+        ) : resourcesQuery.isError ? (
+          <NoDataCard text={resourcesQuery.error.message} />
+        ) : (
+          resourcesQuery.data && (
+            <div className="mt-2">
+              <div className="mb-10 mt-2 flex w-full flex-row flex-wrap gap-12 overflow-x-auto pb-3">
+                {resourcesQuery.data.map((resource) => (
+                  <PCPResource key={resource.id} resource={resource} />
+                ))}
+              </div>
+            </div>
+          )
+        )}
+
+        <DialogComponent
+          isOpen={isDialogOpen}
+          onClose={closeDialog}
+          title="Tasks History"
+        >
+          <PCPResourcesDialogContent projectId={projectId} />
+        </DialogComponent>
+      </div>
     </section>
   );
-}; */
+};
+
+const PCPResource = ({ resource }: { resource: SelectPipResource }) => {
+  const renderIcon = () => {
+    switch (resource.kind) {
+      case "VIDEO":
+        return <VideoIcon size="h-10 w-10" color="text-primary" />;
+      case "BOOK":
+        return <BookIcon size="h-10 w-10" color="text-primary" />;
+      case "ARTICLE":
+        return <ArticleIcon size="h-10 w-10" color="text-primary" />;
+      default:
+        return <ArticleIcon size="h-10 w-10" color="text-primary" />;
+    }
+  };
+
+  const renderButtonLabel = () => {
+    switch (resource.kind) {
+      case "VIDEO":
+        return "Watch it";
+      case "BOOK":
+        return "Get it";
+      case "ARTICLE":
+        return "Read it";
+      default:
+        return "Read it";
+    }
+  };
+
+  return (
+    <div className="box-border flex h-48 w-52 shrink-0 flex-col rounded-xl bg-white p-3 shadow-lg">
+      <header className="flex items-center">
+        {renderIcon()}
+        <p className="text-md ms-3 text-wrap font-semibold">{resource.title}</p>
+      </header>
+      <p className="font-regular mb-2 mt-3 h-full overflow-hidden text-ellipsis text-xs  text-[#9E9E9E]">
+        {resource.description}
+      </p>
+      <button className="mx-auto w-fit rounded-full bg-primary px-7 py-1 text-xs font-medium text-white">
+        <Link
+          target="_blank"
+          href={`https://www.google.com/search?q=${resource.title}`}
+        >
+          {renderButtonLabel()}
+        </Link>
+      </button>
+    </div>
+  );
+};
+
+const PCPResourcesDialogContent = ({ projectId }: { projectId: number }) => {
+  const queryClient = useQueryClient();
+
+  const resourcesHistoryQuery = useQuery({
+    queryKey: ["resources-history", projectId],
+    queryFn: () => getUserResourcesHistory(projectId),
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const { mutateAsync } = useMutation({
+    mutationFn: updateTask,
+  });
+
+  if (resourcesHistoryQuery.isError) {
+    return <NoDataCard text={resourcesHistoryQuery.error.message} />;
+  }
+
+  if (resourcesHistoryQuery.isLoading || !resourcesHistoryQuery.data) {
+    return <p>loading...</p>;
+  }
+
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleString("default", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  return (
+    <div>
+      {resourcesHistoryQuery.data.map((sprint) => (
+        <div key={sprint.id}>
+          {sprint.scheduledAt && (
+            <p className="py-1 text-lg font-medium">{`Sprint ${formatDate(sprint.scheduledAt)}`}</p>
+          )}
+          {sprint.processed ? (
+            sprint.resources.map((resource) => (
+              <div
+                key={resource.id}
+                className="flex items-center justify-between py-1"
+              >
+                <p className="text-graySubtitle">{resource.title}</p>
+                <div className="flex items-center gap-4">
+                  {/* Description Dropdown */}
+                  <Menu as="div" className="relative inline-block text-left">
+                    <div>
+                      <Menu.Button className="flex items-center text-sm text-blue-500 underline">
+                        <InfoIcon color="text-black" size="h-6 w-6" />
+                      </Menu.Button>
+                    </div>
+                    <Menu.Items className="absolute right-0 z-50 mt-2 w-fit origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <div className="px-4 py-1 text-sm text-gray-700">
+                        {resource.description}
+                      </div>
+                    </Menu.Items>
+                  </Menu>
+                  <Link
+                    href={`https://www.google.com/search?q=${resource.title}`}
+                    target="_blank"
+                    className="flex h-6 w-6 items-center justify-center rounded-full bg-primary"
+                  >
+                    <ChevronRightIcon size="h-3 w-3" color="white" />
+                  </Link>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="py-2">
+              <NoDataCard text="Survey not procesed yet, ask your manager to do it" />
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export default PCP;
