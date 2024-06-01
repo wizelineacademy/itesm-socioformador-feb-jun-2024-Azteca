@@ -73,7 +73,9 @@ const ComboBoxSearch = () => {
                 <Combobox.Option
                   key={person.id}
                   value={person}
-                  className={`flex cursor-default select-none items-center gap-2 rounded-xl px-2 py-1 text-sm text-gray-900 data-[focus]:bg-primary-light data-[focus]:text-white`}
+                  className={({ active }) =>
+                    `flex cursor-default select-none items-center gap-2 rounded-xl px-2 py-1 text-sm text-gray-900 ${active && "bg-primary-light text-white"}`
+                  }
                 >
                   <UserProfileButton size="2xs" photoUrl={person?.photoUrl} />
                   <span className="truncate">{person.name}</span>
