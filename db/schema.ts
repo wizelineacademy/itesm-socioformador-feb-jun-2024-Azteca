@@ -110,7 +110,6 @@ export const pipResourceKind = pgEnum("type_resource", [
 
 export const pipResource = pgTable("pip_resource", {
   id: serial("id").primaryKey(),
-  sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
   title: varchar("title", { length: 64 }),
   kind: pipResourceKind("type_resource"),
   description: varchar("description", { length: 1024 }),
@@ -158,8 +157,8 @@ export const rulerSurveyAnswers = pgTable(
 
 export const questionTypeEnum = pgEnum("type_question", [
   "SPRINT_QUESTION",
-  "COWORKER_QUESTION",
-  "COWORKER_COMMENT",
+  /*   "COWORKER_QUESTION",
+  "COWORKER_COMMENT", */
   "FINAL_PROJECT_QUESTION",
   "FINAL_PROJECT_COMMENT",
 ]);
