@@ -58,7 +58,7 @@ interface EmbeddingRecord {
 async function cosineSimilarity(
   baseMessage: string,
   embeddingRecords: EmbeddingRecord[],
-) {
+): Promise<number[]> {
   const recordsSimilarity: [GLfloat, number][] = [];
 
   const openai = new OpenAI({
@@ -91,61 +91,46 @@ async function cosineSimilarity(
   return recordsId;
 }
 
-async function createTasks(weaknessesIds: Set<number>) {
-  // get the name of the weaknesses
-  let weaknessesRecords = [];
+async function createTasks(weaknessMessage: string): Promise<string[]> {
   let cleanedTasks: string[] = [];
 
-  if (weaknessesIds.size > 0) {
-    weaknessesRecords = await db
-      .select({ negativeSkill: skill.negativeSkill })
-      .from(skill)
-      .where(inArray(skill.id, Array.from(weaknessesIds)));
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_KEY,
+  });
 
-    const weaknesses: string[] = weaknessesRecords.map(
-      (element) => element.negativeSkill as string,
-    );
+  const tasksInstructions: string = `El siguiente query representa ya sea lo que está pasando un usuario o sus áreas donde debe mejorar, debes crear tareas simples para la persona evaluada para mejorar su rendimiento o bienestar. Las tareas deben ser claras y concisas, deben estar relacionadas al query recibido, deben ser tareas simples que no tomen mucho tiempo al usuario pero que le permiten mejorar en su rendimiento o bienestar. Algunos ejemplos de tareas pueden ser "Hacer ejercicio", "Ir con el psicólogo", "Meditar", "Dormir 8 horas diarias", "Comer frutas y verduras", "Visitar a mi familia", etc., pero cuida que sean relacionadas al query ingresado, que sean sencilas y que todas sean diferentes.
 
-    // join all the weaknesses in a string for a direct query
-    const stringWeaknesses: string = weaknesses.join(", ");
+  Hay otras indicaciones muy importantes que debes seguir por cada tarea:
+  1. Cada tarea debe llevar un título y una descripción.
+  2. El título no debe superar los 64 caracteres y la descripción no debe superar los 256 caracteres.
+  3. Al crear ya sea el título o la descripción de cada tarea no debes usar nunca los caracteres "\n" ni ":" porque esos son caracteres especiales que yo te indicaré donde usar.
+  4. Vas a juntar el título de cada tarea con la descripción donde el separador de en medio es el caracter ":" sin espacios en blanco entre todos los caracteres, solo en el mensaje del título y de la descripción.
+  5. Vas a unir las estructuras de todas las tareas con el caracter "\n" como separador sin espacios en blanco entre la estructura de cada tarea y ese separador.
+  6. El query puede o no llegar a tener más de 10 áreas de oportunidad, si ese es el caso debes crear tareas que involucren 2 o más áreas de oportunidad en una misma, puedes tomarte la libertad de crear la cantidad de tareas que consideres pero que nunca exceda la cantidad de 10 tareas. Si son menos de 10 áreas de oportunidad crea una tarea por cada área de oportunidad. Si el query es más relacionado al bienestar el usuario y no a su rendimiento laboral, las tareas deben estar relacionadas a mejorar su bienestar emocional, físico o mental y deben ser máximo 5.
+  7. Aunque el contenido del query sea en inglés la generación de las tareas que vas a generar debe estar en español.
+  8. La siguiente estructura es ilustrativa de cómo debes regresar el resultado con todas las tareas, fíjate en estructura no tanto en el contenido:
+  """
+  titulo_1:descripcion_1\ntitulo_2:descripcion_2\ntitulo_3:descripcion_3
+  """`;
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_KEY,
-    });
+  const rawTasks = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [
+      {
+        role: "system",
+        content: tasksInstructions,
+      },
+      {
+        role: "user",
+        content: weaknessMessage,
+      },
+    ],
+  });
 
-    const tasksInstructions: string = `El siguiente query representa ya sea lo que está pasando un usuario o sus áreas donde debe mejorar, debes crear tareas simples para la persona evaluada para mejorar su rendimiento o bienestar. Las tareas deben ser claras y concisas, deben estar relacionadas al query recibido, deben ser tareas simples que no tomen mucho tiempo al usuario pero que le permiten mejorar en su rendimiento o bienestar. Algunos ejemplos de tareas pueden ser "Hacer ejercicio", "Ir con el psicólogo", "Meditar", "Dormir 8 horas diarias", "Comer frutas y verduras", "Visitar a mi familia", etc., pero cuida que sean relacionadas al query ingresado, que sean sencilas y que todas sean diferentes.
+  // clean the results of the generated tasks
+  const tasks = (rawTasks.choices[0].message.content as string).split("\n");
+  cleanedTasks = tasks.filter((element) => element !== "");
 
-    Hay otras indicaciones muy importantes que debes seguir por cada tarea:
-    1. Cada tarea debe llevar un título y una descripción.
-    2. El título no debe superar los 64 caracteres y la descripción no debe superar los 256 caracteres.
-    3. Al crear ya sea el título o la descripción de cada tarea no debes usar nunca los caracteres "\n" ni ":" porque esos son caracteres especiales que yo te indicaré donde usar.
-    4. Vas a juntar el título de cada tarea con la descripción donde el separador de en medio es el caracter ":" sin espacios en blanco entre todos los caracteres, solo en el mensaje del título y de la descripción.
-    5. Vas a unir las estructuras de todas las tareas con el caracter "\n" como separador sin espacios en blanco entre la estructura de cada tarea y ese separador.
-    6. El query puede o no llegar a tener más de 10 áreas de oportunidad, si ese es el caso debes crear tareas que involucren 2 o más áreas de oportunidad en una misma, puedes tomarte la libertad de crear la cantidad de tareas que consideres pero que nunca exceda la cantidad de 10 tareas. Si son menos de 10 áreas de oportunidad crea una tarea por cada área de oportunidad. Si el query es más relacionado al bienestar el usuario y no a su rendimiento laboral, las tareas deben estar relacionadas a mejorar su bienestar emocional, físico o mental y deben ser máximo 5.
-    7. Aunque el contenido del query sea en inglés la generación de las tareas que vas a generar debe estar en español.
-    8. La siguiente estructura es ilustrativa de cómo debes regresar el resultado con todas las tareas, fíjate en estructura no tanto en el contenido:
-    """
-    titulo_1:descripcion_1\ntitulo_2:descripcion_2\ntitulo_3:descripcion_3
-    """`;
-
-    const rawTasks = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [
-        {
-          role: "system",
-          content: tasksInstructions,
-        },
-        {
-          role: "user",
-          content: stringWeaknesses,
-        },
-      ],
-    });
-
-    // clean the results of the generated tasks
-    const tasks = (rawTasks.choices[0].message.content as string).split("\n");
-    cleanedTasks = tasks.filter((element) => element !== "");
-  }
   return cleanedTasks;
 }
 
@@ -281,7 +266,10 @@ async function processOpenFeedback(
   return [uniqueResources, strengthsIds, weaknessesIds];
 }
 
-async function orderFeedback(sprintSurveyId: number, uniqueWorkers: string[]) {
+async function orderFeedback(
+  sprintSurveyId: number,
+  uniqueWorkers: string[],
+): Promise<FeedbackRecords> {
   const feedbackRecords: FeedbackRecords = {};
 
   const coworkersOpenFeedback = await db
@@ -379,7 +367,7 @@ async function orderFeedback(sprintSurveyId: number, uniqueWorkers: string[]) {
 async function getFeedbackClassifications(
   coworkersFeedback: FeedbackCategory,
   questionsSkills: QuestionSkills,
-) {
+): Promise<FeedbackClassifications> {
   const feedbackClassifications: FeedbackClassifications = {
     positive: {},
     negative: {},
@@ -442,7 +430,9 @@ async function getFeedbackClassifications(
   return feedbackClassifications;
 }
 
-async function getQuestionsSkills(sprintSurveyId: number) {
+async function getQuestionsSkills(
+  sprintSurveyId: number,
+): Promise<QuestionSkills> {
   const questionsSkills: QuestionSkills = {};
   const questions = await db
     .select({
@@ -508,7 +498,7 @@ export async function rulerAnalysis(
       allResources,
     );
 
-    const tasks = await createTasks(baseMessage);
+    const tasks: string[] = await createTasks(baseMessage);
 
     tasks.forEach(async (task) => {
       const [title, description] = task.split(":");
