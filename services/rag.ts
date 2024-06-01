@@ -14,6 +14,7 @@ import {
   question,
   questionSkill,
   rulerEmotion,
+  rulerSurveyAnswers,
   skill,
   sprintSurvey,
   sprintSurveyAnswerCoworkers,
@@ -470,13 +471,13 @@ async function getQuestionsSkills(sprintSurveyId: number) {
 }
 
 export async function rulerAnalysis(
-  userId: number,
+  userId: string,
+  userComment: string,
   emotionId: number,
   sprintSurveyId: number,
 ) {
   const emotionInfo = await db
     .select({
-      id: rulerEmotion.id,
       name: rulerEmotion.name,
       description: rulerEmotion.description,
       embedding: rulerEmotion.embedding,
@@ -489,9 +490,44 @@ export async function rulerAnalysis(
   // recommend tasks and resources only if the emotion is negative
   const pleasentess = emotionInfo[0].pleasentess as number;
   if (pleasentess < 1) {
-  }
+    const allResources = await db
+      .select({ id: pipResource.id, embedding: pipResource.embedding })
+      .from(pipResource);
 
-  // guardar tasks y recursos en la base de datos
+    let baseMessage: string = "This is the mood of the user:\n";
+    baseMessage += ((emotionInfo[0].name as string) +
+      ": " +
+      emotionInfo[0].description) as string;
+
+    if (userComment !== "") {
+      baseMessage += "\n\n" + "and this are his thoughts:\n" + userComment;
+    }
+
+    const recommendedResourcesIds: number[] = await cosineSimilarity(
+      baseMessage,
+      allResources,
+    );
+
+    const tasks = await createTasks(baseMessage);
+
+    tasks.forEach(async (task) => {
+      const [title, description] = task.split(":");
+      await db.insert(pipTask).values({
+        userId: userId,
+        title: title,
+        description: description,
+        sprintSurveyId: sprintSurveyId,
+      });
+    });
+
+    recommendedResourcesIds.forEach(async (resourceId) => {
+      await db.insert(userResource).values({
+        userId: userId,
+        resourceId: resourceId,
+        sprintSurveyId: sprintSurveyId,
+      });
+    });
+  }
 }
 
 // Main function
@@ -628,7 +664,7 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
 
         if (weaknessesIds.size > 0) {
           const tasks = await createTasks(weaknessesIds);
-          for (const task of tasks) {
+          for (let task of tasks) {
             const [title, description] = task.split(":");
             await db.insert(pipTask).values({
               userId: userId,
