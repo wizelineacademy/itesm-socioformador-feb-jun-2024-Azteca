@@ -7,60 +7,52 @@ import DashboardEmotionsSection from "@/components/Dashboard/DashboardEmotionsSe
 import DashboardSurveyCalendar from "@/components/Dashboard/DashboardSurveyCalendar";
 import DashboardPCPSection from "@/components/Dashboard/DashboardPCPSection";
 import Loader from "@/components/Loader";
-import { getRulerGraphInfo } from "@/services/user-dashboard";
+import {
+  getCalendarInfo,
+  getOverallStatistics,
+  getPCPStatus,
+  getProductivityScore,
+  getRulerGraphInfo,
+  getSelfPerceptionScore,
+  getStressScore,
+} from "@/services/user-dashboard";
 
 const Dashboard = async ({ params }: { params: { userId: string } }) => {
   const activeUserId = await getUserId();
   const isManagedBy = await getUserManagedBy(activeUserId, params.userId);
   const user = await getUserInfoById(params.userId);
+  const radarData = await getOverallStatistics(params.userId);
 
-  const radarData = [
-    { statistic: "Communication", punctuation: 90 },
-    { statistic: "Motivation", punctuation: 68 },
-    { statistic: "Coworker Support", punctuation: 74 },
-    { statistic: "Manager Support", punctuation: 85 },
-    { statistic: "Punctuality", punctuation: 89 },
-  ];
-
+  const productivityScore = await getProductivityScore(params.userId);
+  const selfPerceptionScore = await getSelfPerceptionScore(params.userId);
+  const stressScore = await getStressScore(params.userId);
   const gaugeData = [
     {
       title: "Productivity Level",
-      percentage: 78,
+      percentage: productivityScore,
       type: "half",
       gradient: { start: "#988511", end: "#FEDE1C" },
     },
     {
       title: "Self Perception Level",
-      percentage: 64,
+      percentage: selfPerceptionScore,
       type: "half",
       gradient: { start: "#295A95", end: "#4598FB" },
     },
     {
       title: "Stress Level",
-      percentage: 56,
+      percentage: stressScore,
       type: "half",
       gradient: { start: "#881931", end: "#EE2B55" },
     },
   ];
 
-  const PCPData = {
-    percentage: 63,
-    type: "full",
-    gradient: { start: "#4598FB", end: "#6640D5" },
-  };
+  const PCPData = await getPCPStatus(params.userId);
 
   const emotionsData = await getRulerGraphInfo(params.userId);
+  getCalendarInfo(params.userId);
 
-  const completedSurveys = [
-    { date: new Date(2024, 0, 5), color: "red" },
-    { date: new Date(2024, 3, 5), color: "red" },
-    { date: new Date(2024, 3, 5), color: "green" },
-    { date: new Date(2024, 3, 5), color: "yellow" },
-    { date: new Date(2024, 3, 16), color: "yellow" },
-    { date: new Date(2024, 3, 23), color: "blue" },
-    { date: new Date(2024, 4, 15), color: "blue" },
-  ];
-
+  const completedSurveys = await getCalendarInfo(params.userId);
   return (
     <Suspense
       fallback={
