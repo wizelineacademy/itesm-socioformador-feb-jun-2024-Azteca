@@ -452,17 +452,11 @@ const PCPResource = ({ resource }: { resource: SelectPipResource }) => {
 };
 
 const PCPResourcesDialogContent = ({ projectId }: { projectId: number }) => {
-  const queryClient = useQueryClient();
-
   const resourcesHistoryQuery = useQuery({
     queryKey: ["resources-history", projectId],
     queryFn: () => getUserResourcesHistory(projectId),
     retry: false,
     refetchOnWindowFocus: false,
-  });
-
-  const { mutateAsync } = useMutation({
-    mutationFn: updateTask,
   });
 
   if (resourcesHistoryQuery.isError) {

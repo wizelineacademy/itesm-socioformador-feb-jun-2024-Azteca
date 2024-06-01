@@ -58,7 +58,8 @@ export async function getUserTasksForCurrentSprintByProjectId(
         eq(pipTask.userId, userId),
         eq(pipTask.sprintSurveyId, currentSprintSurvey.id),
       ),
-    );
+    )
+    .orderBy(asc(pipTask.title));
 
   if (tasks.length === 0) {
     throw new Error("No tasks available. Ask your manager for an update.");
@@ -83,7 +84,8 @@ export async function getUserTasksHistory(projectId: number) {
         // sprint surveys of sprints that have been already scheduled (i.e. the surveys have already been launched)
         lte(sprintSurvey.scheduledAt, new Date()),
       ),
-    );
+    )
+    .orderBy(desc(sprintSurvey.scheduledAt), asc(pipTask.title));
 
   interface SelectSprintSurveyWithTasks extends SelectSprintSurvey {
     tasks: SelectPipTask[];
@@ -140,7 +142,9 @@ export async function getUserResourcesForCurrentSprint(projectId: number) {
         eq(userResource.userId, userId),
         eq(userResource.sprintSurveyId, currentSprintSurvey.id),
       ),
-    );
+    )
+    .orderBy(asc(pipResource.title));
+
   const resources = res.map((e) => ({ ...e.resource }));
 
   if (resources.length === 0) {
