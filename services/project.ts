@@ -10,7 +10,12 @@ import {
   user,
 } from "@/db/schema";
 import { and, eq, ne, or } from "drizzle-orm";
-import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+import {
+  SQSClient,
+  SendMessageBatchCommand,
+  SendMessageBatchRequestEntry,
+  SendMessageCommand,
+} from "@aws-sdk/client-sqs";
 import { Resource } from "sst";
 import { SQSMessageBody } from "@/types/types";
 import { feedbackAnalysis } from "./rag";
@@ -141,19 +146,27 @@ export async function getCoworkersInProject(sprintSurveyId: number) {
 
 export async function updateFeedback(projectId: number) {
   console.log("UPDATE_FEEDBACK", projectId);
-
   const client = new SQSClient();
 
-  const sprintSurveyIds = [53]; // This should come from db
+  const sprintSurveyIds = [52, 53, 54, 55]; // This should come from db
 
-  for (const sprintSurveyId of sprintSurveyIds) {
-    await client.send(
-      new SendMessageCommand({
-        QueueUrl: Resource.FeedbackFlowQueue.url,
-        MessageBody: JSON.stringify({
-          sprintSurveyId,
-        }),
+  const entries: SendMessageBatchRequestEntry[] = sprintSurveyIds.map(
+    (sprintSurveyId) => ({
+      Id: crypto.randomUUID(),
+      MessageGroupId: "UPDATE_FEEDBACK",
+      MessageDeduplicationId: crypto.randomUUID(),
+      MessageBody: JSON.stringify({
+        sprintSurveyId,
       }),
-    );
-  }
+    }),
+  );
+
+  const response = await client.send(
+    new SendMessageBatchCommand({
+      QueueUrl: Resource.FeedbackFlowQueue.url,
+      Entries: entries,
+    }),
+  );
+
+  console.log("response", response);
 }

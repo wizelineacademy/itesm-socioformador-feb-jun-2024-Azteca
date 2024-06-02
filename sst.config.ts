@@ -20,18 +20,32 @@ export default $config({
     });
 
     const queue = new sst.aws.Queue("FeedbackFlowQueue", {
-      fifo: false,
+      fifo: true,
+      transform: {
+        queue: {
+          visibilityTimeoutSeconds: 900 * 6,
+        },
+      },
     });
 
-    queue.subscribe({
-      link: [PostgresURL],
-      handler: "handlers/subscriber.handler",
-      environment: {
-        POSTGRES_URL: PostgresURL.value,
-        OPENAI_KEY: OpenAIKey.value,
+    queue.subscribe(
+      {
+        link: [queue, PostgresURL],
+        handler: "handlers/subscriber.handler",
+        environment: {
+          POSTGRES_URL: PostgresURL.value,
+          OPENAI_KEY: OpenAIKey.value,
+        },
+        timeout: "900 seconds",
       },
-      timeout: "15 minutes",
-    });
+      {
+        transform: {
+          eventSourceMapping: {
+            batchSize: 1,
+          },
+        },
+      },
+    );
 
     new sst.aws.Nextjs("FeedbackFlowAppf", {
       link: [bucket, queue, AuthSecret, PostgresURL],

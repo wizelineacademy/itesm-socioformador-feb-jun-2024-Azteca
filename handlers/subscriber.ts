@@ -1,7 +1,6 @@
-import db from "@/db/drizzle";
-import { pipTask, sprintSurvey } from "@/db/schema";
 import { feedbackAnalysis } from "@/services/rag";
-import { eq } from "drizzle-orm";
+import { DeleteMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
+import { Resource } from "sst";
 
 // TODO: this stuff should come from either @sst/sqs or @aws/sqs
 interface Record {
@@ -19,15 +18,28 @@ interface EventType {
 }
 
 export const handler = async (event: EventType) => {
+  const messageBody = JSON.parse(event.Records[0].body) as {
+    sprintSurveyId: number;
+  };
+  console.log("HANDLER", messageBody.sprintSurveyId);
+  console.log("RECORDS", event.Records);
+
   // Note: we should wrap everything inside a try-catch block to avoid putting SQS messages in retention state
   try {
-    const messageBody = JSON.parse(event.Records[0].body) as {
-      sprintSurveyId: number;
-    };
     await feedbackAnalysis(messageBody.sprintSurveyId);
   } catch (error) {
     console.log("ERROR:", error);
   }
+
+  const client = new SQSClient();
+  const response = await client.send(
+    new DeleteMessageCommand({
+      QueueUrl: Resource.FeedbackFlowQueue.url,
+      ReceiptHandle: event.Records[0].receiptHandle,
+    }),
+  );
+
+  console.log("del response", response);
 
   return "ok";
 };
