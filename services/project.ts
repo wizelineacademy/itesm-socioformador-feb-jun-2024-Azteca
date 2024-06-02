@@ -9,10 +9,13 @@ import {
   sprintSurvey,
   user,
 } from "@/db/schema";
-import { and, eq, ne, or } from "drizzle-orm";
-import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+import { and, asc, desc, eq, ne, or } from "drizzle-orm";
+import {
+  SQSClient,
+  SendMessageBatchCommand,
+  SendMessageBatchRequestEntry,
+} from "@aws-sdk/client-sqs";
 import { Resource } from "sst";
-import { SQSMessageBody } from "@/types/types";
 
 export async function getProjects() {
   // get all of the projects in which the user is either a member or a manager
@@ -155,24 +158,93 @@ export async function getCoworkersInProject(sprintSurveyId: number) {
     );
 }
 
-export async function updateFeedback(projectId: number) {
-  console.log(projectId);
+export async function getUpdateFeedbackHistory({
+  projectId,
+}: {
+  projectId: number;
+}) {
+  type SurveyStatus = "COMPLETED" | "PENDING" | "NOT_AVAILABLE";
+  interface Survey {
+    type: "SPRINT" | "FINAL";
+    scheduledAt: Date;
+    status: SurveyStatus;
+  }
 
+  const getStatus = (scheduledAt: Date, processed: boolean): SurveyStatus => {
+    const today = new Date();
+    if (scheduledAt <= today) {
+      // meaning it was already sent to users
+      if (processed) {
+        return "COMPLETED";
+      } else {
+        return "PENDING";
+      }
+    }
+    return "NOT_AVAILABLE";
+  };
+
+  const surveys: Survey[] = [];
+
+  const sprintSurveys = await db
+    .select()
+    .from(sprintSurvey)
+    .where(eq(sprintSurvey.projectId, projectId))
+    .orderBy(asc(sprintSurvey.scheduledAt));
+
+  sprintSurveys.forEach((s) => {
+    surveys.push({
+      type: "SPRINT",
+      // TODO: make these types from drizzle schema to be non-null
+      scheduledAt: s.scheduledAt as Date,
+      status: getStatus(s.scheduledAt as Date, s.processed as boolean),
+    });
+  });
+
+  const finalSurveys = await db
+    .select()
+    .from(finalSurvey)
+    .where(eq(finalSurvey.projectId, projectId))
+    .orderBy(asc(finalSurvey.scheduledAt));
+
+  finalSurveys.forEach((s) => {
+    surveys.push({
+      type: "FINAL",
+      // TODO: make these types from drizzle schema to be non-null
+      scheduledAt: s.scheduledAt as Date,
+      status: getStatus(s.scheduledAt as Date, s.processed as boolean),
+    });
+  });
+
+  if (surveys.length === 0) {
+    throw new Error("No feedback history available");
+  }
+
+  return surveys;
+}
+
+export async function updateFeedback(projectId: number) {
+  console.log("UPDATE_FEEDBACK", projectId);
   const client = new SQSClient();
 
-  for (let i = 0; i < 20; i++) {
-    console.log("SCHEDULED EVENT NO", i);
+  const sprintSurveyIds = [52, 53, 54, 55]; // This should come from db
 
-    const messageBody = {
-      projectId: i,
-      content: "Hello from the subscriber",
-    } as SQSMessageBody;
-
-    await client.send(
-      new SendMessageCommand({
-        QueueUrl: Resource.FeedbackFlowQueue.url,
-        MessageBody: JSON.stringify(messageBody),
+  const entries: SendMessageBatchRequestEntry[] = sprintSurveyIds.map(
+    (sprintSurveyId) => ({
+      Id: crypto.randomUUID(),
+      MessageGroupId: "UPDATE_FEEDBACK",
+      MessageDeduplicationId: crypto.randomUUID(),
+      MessageBody: JSON.stringify({
+        sprintSurveyId,
       }),
-    );
-  }
+    }),
+  );
+
+  const response = await client.send(
+    new SendMessageBatchCommand({
+      QueueUrl: Resource.FeedbackFlowQueue.url,
+      Entries: entries,
+    }),
+  );
+
+  console.log("response", response);
 }

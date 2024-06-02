@@ -106,8 +106,3 @@ export type Resource = {
   kind: string | null;
   url: string | null;
 };
-
-export type SQSMessageBody = {
-  projectId: number;
-  content: string;
-};
