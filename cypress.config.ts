@@ -17,7 +17,7 @@ export default defineConfig({
     viewportWidth: 1920,
     viewportHeight: 1080,
     baseUrl: "http://localhost:3000",
-    setupNodeEvents(on, config) {
+    setupNodeEvents(on) {
       on("task", {
         async deleteDummyUser({ email }) {
           await db
