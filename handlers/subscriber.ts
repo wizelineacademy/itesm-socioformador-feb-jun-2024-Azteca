@@ -1,4 +1,7 @@
-import { SQSMessageBody } from "@/types/types";
+import db from "@/db/drizzle";
+import { pipTask, sprintSurvey } from "@/db/schema";
+import { feedbackAnalysis } from "@/services/rag";
+import { eq } from "drizzle-orm";
 
 // TODO: this stuff should come from either @sst/sqs or @aws/sqs
 interface Record {
@@ -16,16 +19,15 @@ interface EventType {
 }
 
 export const handler = async (event: EventType) => {
-  const messageBody = JSON.parse(event.Records[0].body) as SQSMessageBody;
-
-  const min = 10000; // 10 seconds in milliseconds
-  const max = 30000; // 30 seconds in milliseconds
-  const randomDuration = Math.floor(Math.random() * (max - min + 1)) + min;
-
-  // Set the timeout with the random duration
-  setTimeout(() => {
-    console.log(messageBody);
-  }, randomDuration);
+  // Note: we should wrap everything inside a try-catch block to avoid putting SQS messages in retention state
+  try {
+    const messageBody = JSON.parse(event.Records[0].body) as {
+      sprintSurveyId: number;
+    };
+    await feedbackAnalysis(messageBody.sprintSurveyId);
+  } catch (error) {
+    console.log("ERROR:", error);
+  }
 
   return "ok";
 };

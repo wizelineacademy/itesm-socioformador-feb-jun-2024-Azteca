@@ -13,6 +13,7 @@ import { and, eq, ne, or } from "drizzle-orm";
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 import { Resource } from "sst";
 import { SQSMessageBody } from "@/types/types";
+import { feedbackAnalysis } from "./rag";
 
 export async function getProjects() {
   // get all of the projects in which the user is either a member or a manager
@@ -139,22 +140,19 @@ export async function getCoworkersInProject(sprintSurveyId: number) {
 }
 
 export async function updateFeedback(projectId: number) {
-  console.log(projectId);
+  console.log("UPDATE_FEEDBACK", projectId);
 
   const client = new SQSClient();
 
-  for (let i = 0; i < 20; i++) {
-    console.log("SCHEDULED EVENT NO", i);
+  const sprintSurveyIds = [53]; // This should come from db
 
-    const messageBody = {
-      projectId: i,
-      content: "Hello from the subscriber",
-    } as SQSMessageBody;
-
+  for (const sprintSurveyId of sprintSurveyIds) {
     await client.send(
       new SendMessageCommand({
         QueueUrl: Resource.FeedbackFlowQueue.url,
-        MessageBody: JSON.stringify(messageBody),
+        MessageBody: JSON.stringify({
+          sprintSurveyId,
+        }),
       }),
     );
   }

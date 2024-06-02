@@ -13,6 +13,7 @@ export default $config({
   async run() {
     const AuthSecret = new sst.Secret("AuthSecret");
     const PostgresURL = new sst.Secret("PostgresURL");
+    const OpenAIKey = new sst.Secret("OpenAIKey");
 
     const bucket = new sst.aws.Bucket("FeedbackFlowBucket", {
       public: true,
@@ -22,7 +23,15 @@ export default $config({
       fifo: false,
     });
 
-    queue.subscribe("handlers/subscriber.handler");
+    queue.subscribe({
+      link: [PostgresURL],
+      handler: "handlers/subscriber.handler",
+      environment: {
+        POSTGRES_URL: PostgresURL.value,
+        OPENAI_KEY: OpenAIKey.value,
+      },
+      timeout: "15 minutes",
+    });
 
     new sst.aws.Nextjs("FeedbackFlowAppf", {
       link: [bucket, queue, AuthSecret, PostgresURL],
