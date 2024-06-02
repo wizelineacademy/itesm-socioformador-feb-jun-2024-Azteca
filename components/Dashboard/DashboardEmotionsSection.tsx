@@ -28,7 +28,7 @@ const DashboardEmotionsSection: React.FC<EmotionsSectionProps> = ({
       {emotionsData.map((circle, index) => (
         <div
           key={index}
-          className="flex items-center justify-center drop-shadow-lg"
+          className="flex items-center justify-center drop-shadow-lg transition-transform duration-300 ease-in-out hover:scale-125"
         >
           <Tooltip.Floating label={circle.title} color={circle.gradient.end}>
             <div>

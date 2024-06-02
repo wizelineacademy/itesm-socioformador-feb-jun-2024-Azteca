@@ -30,15 +30,15 @@ export default function ProjectCard({
   }
 
   return (
-    <div className="flex w-fit items-center gap-10 rounded-lg bg-white p-4">
-      <div>
+    <div className="flex h-full max-h-40 w-fit items-center gap-10 rounded-lg bg-white p-4">
+      <div className="flex h-full flex-col">
         <h3 className="w-[20ch] pb-2 text-base font-medium">{name}</h3>
         {date && <p className="pb-4 text-sm text-graySubtitle">{date}</p>}
         {description && (
           <p className="w-[30ch] pb-4 text-xs text-grayText">{description}</p>
         )}
         <p className="pb-4 text-sm text-graySubtitle">In progress</p>
-        <div className="ml-[6px]">
+        <div className="ml-[6px] mt-auto">
           <ul className="flex">
             {coworkersQuery.data.map((coworker, index) => (
               <li key={index}>
