@@ -149,10 +149,38 @@ const RulerStepOne = ({
       data-testid="ruler-step-one"
     >
       <p className="my-2 text-sm text-graySubtitle">How do you feel today?</p>
+      <div className="absolute left-[-17rem] top-[53%] z-50 flex w-[70%] -rotate-90 flex-row items-center  gap-5  leading-none">
+        <p>Low</p>
+        <div className="h-0.5 w-1/3 bg-gradient-to-r from-blue-800 to-blue-500" />
+        <p className="">Energy</p>
+        <div className="flex w-[30%] flex-row items-center">
+          <div className="h-0.5 w-full bg-gradient-to-r from-red-600 to-red-300" />
+          <div
+            id="triange"
+            className="h-0.5 w-0 rotate-90 border-b-[15px] border-l-[7.5px] border-r-[7.5px] border-b-red-300 border-l-transparent border-r-transparent"
+          />
+        </div>
+        <p>High</p>
+      </div>
+
+      <div className="flex w-full flex-row items-center justify-end gap-5 py-2 pe-3 leading-none">
+        <p>Low</p>
+        <div className="h-0.5 w-1/3 bg-gradient-to-r from-red-800 to-red-500" />
+        <p className="">Pleasentness</p>
+        <div className="flex w-[30%] flex-row items-center">
+          <div className="h-0.5 w-full bg-gradient-to-r from-yellow-600 to-yellow-300" />
+          <div
+            id="triange"
+            className="h-0.5 w-0 rotate-90 border-b-[15px] border-l-[7.5px] border-r-[7.5px] border-b-yellow-300 border-l-transparent border-r-transparent"
+          />
+        </div>
+        <p>High</p>
+      </div>
+
       <section id="ruler-survey" className="flex flex-col text-center">
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3 self-end">
           {rulerEmotionsMatrix.map((row, rowIndex) => (
-            <div key={rowIndex} className="flex flex-row gap-4">
+            <div key={rowIndex} className="flex flex-row gap-3">
               {row.map((emotion: Emotion, colIndex) => (
                 <button
                   data-testid={`emotion-${rowIndex}-${colIndex}`}

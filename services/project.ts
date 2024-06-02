@@ -43,6 +43,23 @@ export async function getProjects() {
   return projects;
 }
 
+export async function getProjectById(projectId: number) {
+  // get the project by id
+  const res = await db
+    .select({
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      startDate: project.startDate,
+      endDate: project.endDate,
+      sprintSurveyPeriodicityInDays: project.sprintSurveyPeriodicityInDays,
+    })
+    .from(project)
+    .where(eq(project.id, projectId));
+
+  return res[0];
+}
+
 type NewProject = Omit<typeof project.$inferInsert, "managerId">;
 
 export async function createProject({

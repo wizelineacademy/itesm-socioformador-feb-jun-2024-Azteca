@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import db from "@/db/drizzle";
-import { and, count, eq, inArray, isNull } from "drizzle-orm";
+import { and, count, eq, inArray } from "drizzle-orm";
 import similarity from "compute-cosine-similarity";
 
 import {
