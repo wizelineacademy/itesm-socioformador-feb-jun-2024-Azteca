@@ -39,7 +39,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   });
 
   return (
-    <div className="mb-6">
+    <div className="mb-4">
       <div className="mx-auto flex justify-between">
         <h3 className="text-2xl font-medium text-black">{title}</h3>
         {showMore && (

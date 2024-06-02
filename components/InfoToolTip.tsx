@@ -24,7 +24,7 @@ const InfoToolTip = ({ description, size }: InfoToolTipProps) => {
   }
 
   return (
-    <div className="absolute right-6 top-6">
+    /*     <div className="absolute right-6 top-6">
       <Tooltip
         label={<span dangerouslySetInnerHTML={{ __html: description }} />}
         position="left-start"
@@ -41,7 +41,8 @@ const InfoToolTip = ({ description, size }: InfoToolTipProps) => {
           />
         </button>
       </Tooltip>
-    </div>
+    </div> */
+    <div></div>
   );
 };
 

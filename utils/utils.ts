@@ -16,13 +16,13 @@ const months: { [key: string]: string } = {
 };
 
 const days: { [key: string]: string } = {
-  Mon: "Sunday",
-  Tue: "Monday",
-  Wed: "Tuesday",
-  Thu: "Wednesday",
-  Fri: "Thursday",
-  Sat: "Friday",
-  Sun: "Saturday",
+  Mon: "Monday",
+  Tue: "Tuesday",
+  Wed: "Wednesday",
+  Thu: "Thursday",
+  Fri: "Friday",
+  Sat: "Saturday",
+  Sun: "Sunday",
 };
 
 export const parseDate = (unformattedDate: Date): DateObject => {

@@ -4,7 +4,11 @@ import React, { useState } from "react";
 import { RadarChart, AreaChart } from "@mantine/charts";
 import GaugeChart from "@/components/GaugeChart";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { deleteProjectById, updateFeedback } from "@/services/project";
+import {
+  deleteProjectById,
+  getProjectById,
+  updateFeedback,
+} from "@/services/project";
 import { useRouter } from "next/navigation";
 import { getUserRole } from "@/services/user";
 import {
@@ -13,6 +17,7 @@ import {
 } from "@/services/sprintSurvey";
 
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon";
+import Loader from "@/components/Loader";
 
 const Project = ({ params }: { params: { projectId: string } }) => {
   const router = useRouter();
@@ -32,6 +37,11 @@ const Project = ({ params }: { params: { projectId: string } }) => {
   const userRoleQuery = useQuery({
     queryKey: ["user-role"],
     queryFn: () => getUserRole(),
+  });
+
+  const { data: projectData, isLoading: isLoadingProjectData } = useQuery({
+    queryKey: ["project-data", projectId],
+    queryFn: () => getProjectById(projectId),
   });
 
   const { data: statistics, isLoading: isLoadingStatistics } = useQuery({
@@ -125,15 +135,23 @@ const Project = ({ params }: { params: { projectId: string } }) => {
     : [];
   const progressBarPercentage = 74;
 
-  if (isLoadingStatistics || isLoadingDetailedStatistics) {
-    return <div>Loading...</div>;
+  if (
+    isLoadingStatistics ||
+    isLoadingDetailedStatistics ||
+    isLoadingProjectData
+  ) {
+    return (
+      <div className="h-[80dvh]">
+        <Loader />
+      </div>
+    );
   }
   console.log(gaugeData);
 
   return (
     <div className="mt-2">
       <div className="flex justify-between">
-        <p className="text-3xl font-medium">Project 1</p>
+        <p className="text-3xl font-medium">{projectData?.name}</p>
         {userRoleQuery.data &&
           (userRoleQuery.data === "MANAGER" ||
             userRoleQuery.data === "ADMIN") && (
