@@ -9,16 +9,13 @@ import {
   sprintSurvey,
   user,
 } from "@/db/schema";
-import { and, eq, ne, or } from "drizzle-orm";
+import { and, asc, desc, eq, ne, or } from "drizzle-orm";
 import {
   SQSClient,
   SendMessageBatchCommand,
   SendMessageBatchRequestEntry,
-  SendMessageCommand,
 } from "@aws-sdk/client-sqs";
 import { Resource } from "sst";
-import { SQSMessageBody } from "@/types/types";
-import { feedbackAnalysis } from "./rag";
 
 export async function getProjects() {
   // get all of the projects in which the user is either a member or a manager
@@ -142,6 +139,70 @@ export async function getCoworkersInProject(sprintSurveyId: number) {
         ne(user.id, currentUserId), // Exclude the current user from the results
       ),
     );
+}
+
+export async function getUpdateFeedbackHistory({
+  projectId,
+}: {
+  projectId: number;
+}) {
+  type SurveyStatus = "COMPLETED" | "PENDING" | "NOT_AVAILABLE";
+  interface Survey {
+    type: "SPRINT" | "FINAL";
+    scheduledAt: Date;
+    status: SurveyStatus;
+  }
+
+  const getStatus = (scheduledAt: Date, processed: boolean): SurveyStatus => {
+    const today = new Date();
+    if (scheduledAt <= today) {
+      // meaning it was already sent to users
+      if (processed) {
+        return "COMPLETED";
+      } else {
+        return "PENDING";
+      }
+    }
+    return "NOT_AVAILABLE";
+  };
+
+  const surveys: Survey[] = [];
+
+  const sprintSurveys = await db
+    .select()
+    .from(sprintSurvey)
+    .where(eq(sprintSurvey.projectId, projectId))
+    .orderBy(asc(sprintSurvey.scheduledAt));
+
+  sprintSurveys.forEach((s) => {
+    surveys.push({
+      type: "SPRINT",
+      // TODO: make these types from drizzle schema to be non-null
+      scheduledAt: s.scheduledAt as Date,
+      status: getStatus(s.scheduledAt as Date, s.processed as boolean),
+    });
+  });
+
+  const finalSurveys = await db
+    .select()
+    .from(finalSurvey)
+    .where(eq(finalSurvey.projectId, projectId))
+    .orderBy(asc(finalSurvey.scheduledAt));
+
+  finalSurveys.forEach((s) => {
+    surveys.push({
+      type: "FINAL",
+      // TODO: make these types from drizzle schema to be non-null
+      scheduledAt: s.scheduledAt as Date,
+      status: getStatus(s.scheduledAt as Date, s.processed as boolean),
+    });
+  });
+
+  if (surveys.length === 0) {
+    throw new Error("No feedback history available");
+  }
+
+  return surveys;
 }
 
 export async function updateFeedback(projectId: number) {
