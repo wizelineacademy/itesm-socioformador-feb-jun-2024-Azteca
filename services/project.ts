@@ -9,7 +9,7 @@ import {
   sprintSurvey,
   user,
 } from "@/db/schema";
-import { and, asc, desc, eq, ne, or } from "drizzle-orm";
+import { and, asc, eq, ne, or } from "drizzle-orm";
 import {
   SQSClient,
   SendMessageBatchCommand,
