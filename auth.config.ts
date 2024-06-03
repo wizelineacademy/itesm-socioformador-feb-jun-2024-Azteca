@@ -64,7 +64,7 @@ export const authConfig = {
           return Response.redirect(new URL("/forbbiden", nextUrl));
         }
       }
-
+      console.log("url actual", nextUrl.pathname);
       if (
         nextUrl.pathname.startsWith("/login") ||
         nextUrl.pathname.startsWith("/register")
