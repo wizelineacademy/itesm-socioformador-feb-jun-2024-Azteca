@@ -30,7 +30,7 @@ export default function ProjectCard({
   }
 
   return (
-    <div className="flex h-full max-h-40 w-fit items-center gap-10 rounded-lg bg-white p-4">
+    <div className="flex h-full min-h-40 w-fit items-center gap-10 rounded-lg bg-white p-4">
       <div className="flex h-full flex-col">
         <h3 className="w-[20ch] pb-2 text-base font-medium">{name}</h3>
         {date && <p className="pb-4 text-sm text-graySubtitle">{date}</p>}

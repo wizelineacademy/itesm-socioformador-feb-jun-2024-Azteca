@@ -5,10 +5,12 @@ import { signIn } from "@/auth";
 import { registerUser } from "./services/user";
 import { DatabaseErrorType } from "./types/errorTypes";
 import { DatabaseError } from "pg";
+import { redirect } from "next/navigation";
 
 export const loginAction = async (formData: FormData) => {
   try {
     await signIn("credentials", formData);
+    redirect("/profile");
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {

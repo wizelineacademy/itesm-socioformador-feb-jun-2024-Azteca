@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { getUserId, getUserManagedBy, getUserInfoById } from "@/services/user";
 import UserProfile from "@/components/Dashboard/DashboardProfileLink";
 import DashboardGaugeSection from "@/components/Dashboard/DashboardGaugeSection";
@@ -6,7 +6,6 @@ import DashboardRadarSection from "@/components/Dashboard/DashboardRadarSection"
 import DashboardEmotionsSection from "@/components/Dashboard/DashboardEmotionsSection";
 import DashboardSurveyCalendar from "@/components/Dashboard/DashboardSurveyCalendar";
 import DashboardPCPSection from "@/components/Dashboard/DashboardPCPSection";
-import Loader from "@/components/Loader";
 import {
   getCalendarInfo,
   getOverallStatistics,
@@ -54,18 +53,12 @@ const Dashboard = async ({ params }: { params: { userId: string } }) => {
 
   const completedSurveys = await getCalendarInfo(params.userId);
   return (
-    <Suspense
-      fallback={
-        <div className="h-[80dvh] w-full">
-          <Loader />
-        </div>
-      }
-    >
+    <>
       {isManagedBy && (
         <UserProfile userId={params.userId} userName={user.name} />
       )}
 
-      <div className="mt-2 flex justify-between">
+      <div className="mt-2 flex flex-row justify-between md:flex-row">
         <div className="grid gap-7">
           <DashboardGaugeSection gaugeData={gaugeData} />
           <div className="flex justify-between">
@@ -78,7 +71,7 @@ const Dashboard = async ({ params }: { params: { userId: string } }) => {
           <DashboardPCPSection PCPData={PCPData} />
         </div>
       </div>
-    </Suspense>
+    </>
   );
 };
 

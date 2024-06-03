@@ -16,7 +16,7 @@ export async function submitRulerSurveyAnswer(surveyAnswer: RulerSurveyAnswer) {
   }
   // Insert ruler answer to db
   await db.insert(rulerSurveyAnswers).values({
-    userId: userId,
+    userId: surveyAnswer.userId,
     emotionId: surveyAnswer.emotion?.id,
     answeredAt: sql`CURRENT_TIMESTAMP`,
     comment: surveyAnswer.comment,

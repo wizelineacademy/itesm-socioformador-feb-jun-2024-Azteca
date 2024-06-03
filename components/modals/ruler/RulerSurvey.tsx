@@ -14,7 +14,6 @@ import { useRouter } from "next/navigation";
 interface RulerSurveyProps {
   showModal: boolean;
   onClose: () => void;
-  rulerSurveyId: number;
 }
 
 const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {

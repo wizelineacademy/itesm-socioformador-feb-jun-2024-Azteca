@@ -84,7 +84,6 @@ const Notifications = () => {
         <RulerSurvey
           showModal={showRulerModal}
           onClose={() => setShowRulerModal(false)}
-          rulerSurveyId={notificationId}
         />
       )}
       <Menu as="div" className="relative inline-block text-left">
