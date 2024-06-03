@@ -25,7 +25,7 @@ jobs:
 
       - name: Install SST
         run: |
-          wget https://github.com/sst/ion/releases/download/v0.0.384/sst-linux-amd64.deb 
+          wget https://github.com/sst/ion/releases/download/0.0.399/sst-linux-amd64.deb 
           sudo dpkg -i sst-linux-amd64.deb
 
       - name: Install Bun
