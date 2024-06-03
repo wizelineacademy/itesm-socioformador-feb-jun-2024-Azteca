@@ -15,10 +15,11 @@ import {
   Text,
 } from "@mantine/core";
 import { Employee } from "@/types/types";
+import toast from "react-hot-toast";
 
 const CreateProject = () => {
   const router = useRouter();
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const employeesQuery = useQuery({
     queryKey: ["employees"],
     queryFn: () => getAllEmployees(),
@@ -28,6 +29,7 @@ const CreateProject = () => {
   const createProjectMutation = useMutation({
     mutationFn: createProject,
     onSuccess: () => {
+      toast.success("Project created successfully.");
       router.replace("/projects");
       router.refresh();
     },
@@ -39,6 +41,8 @@ const CreateProject = () => {
   ]);
 
   const handleForm = (formData: FormData) => {
+    setIsLoading(true);
+
     const startDate = rangeDates[0];
     const endDate = rangeDates[1];
     const name = formData.get("name")?.toString();
@@ -57,7 +61,6 @@ const CreateProject = () => {
     ) {
       throw new Error("User should fill all fields");
     }
-
     createProjectMutation.mutate({
       newProject: {
         name,
@@ -68,6 +71,7 @@ const CreateProject = () => {
       },
       members: memberIds,
     });
+    setIsLoading(false);
   };
 
   const [selectedMembers, setSelectedMembers] = useState<Employee[]>([]);
@@ -294,11 +298,12 @@ const CreateProject = () => {
                 Cancel
               </button>
               <button
-                className="h-fit w-fit self-end rounded-xl bg-primary px-10 py-2 text-xl font-medium text-white drop-shadow-lg"
+                className={`${isLoading ? "bg-red-600" : "bg-primary"} h-fit w-fit self-end rounded-xl px-10 py-2 text-xl font-medium text-white drop-shadow-lg`}
                 type="submit"
                 onClick={() => {
                   console.log(selectedMembers);
                 }}
+                disabled={isLoading}
               >
                 Create
               </button>
