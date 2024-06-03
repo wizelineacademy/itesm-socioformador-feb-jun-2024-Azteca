@@ -19,7 +19,7 @@ export default $config({
       public: true,
     });
 
-    const queue = new sst.aws.Queue("FeedbackFlowQueue", {
+    const queue = new sst.aws.Queue("FeedbackFlowQueueV3", {
       fifo: true,
       transform: {
         queue: {
