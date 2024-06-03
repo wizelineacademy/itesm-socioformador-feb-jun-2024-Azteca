@@ -15,6 +15,7 @@ import { getUserRole } from "@/services/user";
 import {
   getOverallStatistics,
   getDetailedProjectStatistics,
+  getGrowthData, // Importar el nuevo servicio
 } from "@/services/sprintSurvey";
 
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon";
@@ -56,6 +57,11 @@ const Project = ({ params }: { params: { projectId: string } }) => {
       queryKey: ["project-detailed-statistics", projectId],
       queryFn: () => getDetailedProjectStatistics(projectId),
     });
+
+  const { data: growthData, isLoading: isLoadingGrowthData } = useQuery({
+    queryKey: ["project-growth-data", projectId],
+    queryFn: () => getGrowthData(projectId), // Consumir el nuevo servicio
+  });
   const radarData = statistics
     ? [
         {
@@ -80,33 +86,15 @@ const Project = ({ params }: { params: { projectId: string } }) => {
         },
       ]
     : [];
-  const areaData = [
-    {
-      month: "Jan",
-      growthSupport: 89,
-      growthOportunities: 70,
-    },
-    {
-      month: "Feb",
-      growthSupport: 76,
-      growthOportunities: 82,
-    },
-    {
-      month: "Mar",
-      growthSupport: 95,
-      growthOportunities: 89,
-    },
-    {
-      month: "Apr",
-      growthSupport: 72,
-      growthOportunities: 85,
-    },
-    {
-      month: "May",
-      growthSupport: 83,
-      growthOportunities: 78,
-    },
-  ];
+  const areaData = growthData
+    ? growthData.growthSupportData.map((item, index) => ({
+        month: item.month,
+        growthSupport: item.averageAnswer,
+        growthOportunities:
+          growthData.growthOpportunitiesData[index]?.averageAnswer || 0,
+      }))
+    : [];
+
   const gaugeData = detailedStatistics
     ? [
         {
@@ -140,7 +128,8 @@ const Project = ({ params }: { params: { projectId: string } }) => {
   if (
     isLoadingStatistics ||
     isLoadingDetailedStatistics ||
-    isLoadingProjectData
+    isLoadingProjectData ||
+    isLoadingGrowthData // Agregar el estado de carga de los datos de crecimiento
   ) {
     return (
       <div className="h-[80dvh]">

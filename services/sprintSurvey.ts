@@ -9,7 +9,7 @@ import {
   projectMember,
   finalSurveyAnswer,
 } from "@/db/schema";
-import { eq, or, sql, and } from "drizzle-orm";
+import { eq, or, sql, and, inArray } from "drizzle-orm";
 
 import {
   Questions,
@@ -320,3 +320,69 @@ export async function getDetailedProjectStatistics(projectId: number) {
     resourcesSatisfaction,
   };
 }
+
+export const getGrowthData = async (projectId: number) => {
+  const growthSupportQuestions = [27, 37, 38]; // Preguntas relacionadas con soporte de crecimiento
+  const growthOpportunitiesQuestions = [37, 38]; // Preguntas relacionadas con oportunidades de crecimiento
+
+  // Obtener los datos de soporte de crecimiento
+  const growthSupportDataResults = await db
+    .select({
+      month: sql`EXTRACT(MONTH FROM ${finalSurveyAnswer.answeredAt})`.as(
+        "month",
+      ),
+      averageAnswer: sql`AVG(${finalSurveyAnswer.answer})`.as("averageAnswer"),
+    })
+    .from(finalSurveyAnswer)
+    .innerJoin(
+      projectMember,
+      eq(finalSurveyAnswer.userId, projectMember.userId),
+    )
+    .where(
+      and(
+        eq(projectMember.projectId, projectId),
+        inArray(finalSurveyAnswer.questionId, growthSupportQuestions),
+      ),
+    )
+    .groupBy(sql`EXTRACT(MONTH FROM ${finalSurveyAnswer.answeredAt})`)
+    .execute();
+
+  const growthSupportData = growthSupportDataResults.map((result) => ({
+    month: result.month,
+    averageAnswer: result.averageAnswer,
+  }));
+
+  // Obtener los datos de oportunidades de crecimiento
+  const growthOpportunitiesDataResults = await db
+    .select({
+      month: sql`EXTRACT(MONTH FROM ${finalSurveyAnswer.answeredAt})`.as(
+        "month",
+      ),
+      averageAnswer: sql`AVG(${finalSurveyAnswer.answer})`.as("averageAnswer"),
+    })
+    .from(finalSurveyAnswer)
+    .innerJoin(
+      projectMember,
+      eq(finalSurveyAnswer.userId, projectMember.userId),
+    )
+    .where(
+      and(
+        eq(projectMember.projectId, projectId),
+        inArray(finalSurveyAnswer.questionId, growthOpportunitiesQuestions),
+      ),
+    )
+    .groupBy(sql`EXTRACT(MONTH FROM ${finalSurveyAnswer.answeredAt})`)
+    .execute();
+
+  const growthOpportunitiesData = growthOpportunitiesDataResults.map(
+    (result) => ({
+      month: result.month,
+      averageAnswer: result.averageAnswer,
+    }),
+  );
+
+  return {
+    growthSupportData,
+    growthOpportunitiesData,
+  };
+};
