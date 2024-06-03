@@ -15,7 +15,7 @@ declare module "sst" {
       name: string
       type: "sst.aws.Bucket"
     }
-    FeedbackFlowQueue: {
+    FeedbackFlowQueueV3: {
       type: "sst.aws.Queue"
       url: string
     }

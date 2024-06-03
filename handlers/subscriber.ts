@@ -34,7 +34,7 @@ export const handler = async (event: EventType) => {
   const client = new SQSClient();
   const response = await client.send(
     new DeleteMessageCommand({
-      QueueUrl: Resource.FeedbackFlowQueue.url,
+      QueueUrl: Resource.FeedbackFlowQueueV3.url,
       ReceiptHandle: event.Records[0].receiptHandle,
     }),
   );

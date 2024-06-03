@@ -241,7 +241,7 @@ export async function updateFeedback(projectId: number) {
 
   const response = await client.send(
     new SendMessageBatchCommand({
-      QueueUrl: Resource.FeedbackFlowQueue.url,
+      QueueUrl: Resource.FeedbackFlowQueueV3.url,
       Entries: entries,
     }),
   );
