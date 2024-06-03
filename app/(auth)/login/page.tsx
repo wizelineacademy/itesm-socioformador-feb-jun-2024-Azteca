@@ -2,9 +2,11 @@
 import { loginAction } from "@/actions";
 import FormTextInput from "@/components/FormTextInput";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 const Login = () => {
+  const router = useRouter();
   const clientLoginAction = async (formData: FormData) => {
     const result = await loginAction(formData);
     if (result) {
@@ -16,6 +18,8 @@ const Login = () => {
           toast.error("Something went wrong. Try again.");
           break;
       }
+    } else {
+      router.push("/dashboard");
     }
   };
 
