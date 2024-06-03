@@ -147,6 +147,33 @@ async function createTasks(weaknessesIds: Set<number>) {
   return cleanedTasks;
 }
 
+async function reduceTask(message: string, maxLength: number): Promise<string> {
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_KEY,
+  });
+
+  const intructions: string =
+    "El siguiente es un mensaje largo, debes reducir su longitud para que no exceda " +
+    maxLength +
+    " caracteres, pero sin que el mensaje pierda su significado ni su escencia.";
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [
+      {
+        role: "system",
+        content: ``,
+      },
+      {
+        role: "user",
+        content: message,
+      },
+    ],
+  });
+
+  return response.choices[0].message.content as string;
+}
+
 async function processOpenFeedback(
   userFeedback: {
     coworkersFeedback: FeedbackCategory;
@@ -673,10 +700,18 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
           const tasks = await createTasks(weaknessesIds);
           for (const task of tasks) {
             const [title, description] = task.split(":");
+            let newTitle = title;
+            let newDescription = description;
+            if (title.length > 64) {
+              newTitle = await reduceTask(title, 64);
+            }
+            if (description.length > 256) {
+              newDescription = await reduceTask(description, 256);
+            }
             await db.insert(pipTask).values({
               userId: userId,
-              title: title,
-              description: description,
+              title: newTitle,
+              description: newDescription,
               sprintSurveyId: sprintSurveyId,
             });
           }
