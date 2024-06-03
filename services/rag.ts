@@ -14,7 +14,6 @@ import {
   question,
   questionSkill,
   rulerEmotion,
-  rulerSurveyAnswers,
   skill,
   sprintSurvey,
   sprintSurveyAnswerCoworkers,
@@ -527,6 +526,13 @@ export async function rulerAnalysis(
 
     recommendedResourcesIds.splice(5);
 
+    console.log(baseMessage);
+    console.log("================================================");
+    console.log("================================================");
+    console.log("================================================");
+    console.log("RECOMMENDED RESOURCES: ", recommendedResourcesIds);
+
+    /*
     const tasks: string[] = await createTasks(baseMessage);
 
     tasks.forEach(async (task) => {
@@ -554,6 +560,7 @@ export async function rulerAnalysis(
         sprintSurveyId: sprintSurveyId,
       });
     });
+    */
   } else {
     console.log("================================================");
     console.log("================================================");
