@@ -511,13 +511,13 @@ export async function rulerAnalysis(
       .select({ id: pipResource.id, embedding: pipResource.embedding })
       .from(pipResource);
 
-    let baseMessage: string = "This is the mood of the user:\n";
+    let baseMessage: string = "Este es el estado de ánimo del usuario:\n";
     baseMessage += ((emotionInfo[0].name as string) +
       ": " +
       emotionInfo[0].description) as string;
 
     if (userComment !== "") {
-      baseMessage += "\n\n" + "and this are his thoughts:\n" + userComment;
+      baseMessage += "\n\n" + "Y estos son sus pensamientos:\n" + userComment;
     }
 
     const recommendedResourcesIds: number[] = await cosineSimilarity(
@@ -525,14 +525,24 @@ export async function rulerAnalysis(
       allResources,
     );
 
+    recommendedResourcesIds.splice(5);
+
     const tasks: string[] = await createTasks(baseMessage);
 
     tasks.forEach(async (task) => {
       const [title, description] = task.split(":");
+      let newTitle = title;
+      let newDescription = description;
+      if (title.length > 64) {
+        newTitle = await reduceTask(title, 64);
+      }
+      if (description.length > 256) {
+        newDescription = await reduceTask(description, 256);
+      }
       await db.insert(pipTask).values({
         userId: userId,
-        title: title,
-        description: description,
+        title: newTitle,
+        description: newDescription,
         sprintSurveyId: sprintSurveyId,
       });
     });
@@ -544,6 +554,14 @@ export async function rulerAnalysis(
         sprintSurveyId: sprintSurveyId,
       });
     });
+  } else {
+    console.log("================================================");
+    console.log("================================================");
+    console.log("================================================");
+    console.log("HAVE A NICE DAY");
+    console.log("================================================");
+    console.log("================================================");
+    console.log("================================================");
   }
 }
 
@@ -680,7 +698,21 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
         // =========== STORE SELECTED TASKS AND RESOURCES ===========
 
         if (weaknessesIds.size > 0) {
-          const tasks = await createTasks(weaknessesIds);
+          // get the name of the weaknesses
+
+          const weaknessesRecords = await db
+            .select({ negativeSkill: skill.negativeSkill })
+            .from(skill)
+            .where(inArray(skill.id, Array.from(weaknessesIds)));
+
+          const weaknessesNames: string[] = weaknessesRecords.map(
+            (element) => element.negativeSkill as string,
+          );
+
+          // join all the weaknesses in a string for a direct query
+          const stringWeaknesses: string = weaknessesNames.join(", ");
+
+          const tasks = await createTasks(stringWeaknesses);
           for (let task of tasks) {
             const [title, description] = task.split(":");
             let newTitle = title;
