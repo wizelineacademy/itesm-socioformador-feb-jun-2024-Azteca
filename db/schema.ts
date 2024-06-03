@@ -85,14 +85,22 @@ export const userTrait = pgTable(
   // composite primary key on (userId, traitId)
 );
 
+export const taskStatusEnum = pgEnum("status", [
+  "PENDING",
+  "IN_PROGRESS",
+  "DONE",
+]);
+
 export const pipTask = pgTable("pip_task", {
   id: serial("id").primaryKey(),
   sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
   userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 64 }),
   description: varchar("description", { length: 256 }),
-  isDone: boolean("is_done"),
+  status: taskStatusEnum("status").default("PENDING").notNull(),
 });
+
+export type SelectPipTask = typeof pipTask.$inferSelect;
 
 export const pipResourceKind = pgEnum("type_resource", [
   "BOOK",
@@ -102,12 +110,13 @@ export const pipResourceKind = pgEnum("type_resource", [
 
 export const pipResource = pgTable("pip_resource", {
   id: serial("id").primaryKey(),
-  sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
   title: varchar("title", { length: 64 }),
   kind: pipResourceKind("type_resource"),
   description: varchar("description", { length: 1024 }),
   embedding: json("embedding").$type<number[]>(),
 });
+
+export type SelectPipResource = typeof pipResource.$inferSelect;
 
 export const userResource = pgTable(
   "user_resource",
@@ -160,40 +169,25 @@ export const question = pgTable("question", {
   type: questionTypeEnum("type").notNull(),
 });
 
-export const positiveSkill = pgTable("positive_skill", {
-  id: serial("positive_skill_id").primaryKey(),
-  skill: varchar("skill", { length: 30 }),
+export const skill = pgTable("skill", {
+  id: serial("skill_id").primaryKey(),
+  positiveSkill: varchar("positive_skill", { length: 30 }),
+  negativeSkill: varchar("negative_skill", { length: 30 }),
 });
 
-export const negativeSkill = pgTable("negative_skill", {
-  id: serial("negative_skill_id").primaryKey(),
-  skill: varchar("skill", { length: 30 }),
-});
-
-export const questionPositiveSkill = pgTable("question_positive_skill", {
+export const questionSkill = pgTable("question_skill", {
   questionId: integer("question_id").references(() => question.id),
-  positiveSkillId: integer("positive_skill_id").references(
-    () => positiveSkill.id,
-  ),
+  skillId: integer("skill_id").references(() => skill.id),
 });
 
-export const questionNegativeSkill = pgTable("question_negative_skill", {
-  questionId: integer("question_id").references(() => question.id),
-  negativeSkillId: integer("negative_skill_id").references(
-    () => negativeSkill.id,
-  ),
+export const pipResourceSkill = pgTable("pip_resource_skill", {
+  pipResourceId: integer("pip_resource_id").references(() => pipResource.id),
+  skillId: integer("skill_id").references(() => skill.id),
 });
 
 export const sprintSurveyQuestion = pgTable("sprint_survey_question", {
   sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
   questionId: integer("question_id").references(() => question.id),
-});
-
-export const pipResourceNegativeSkill = pgTable("pip_resource_negative_skill", {
-  pipResourceId: integer("pip_resource_id").references(() => pipResource.id),
-  negativeSkillId: integer("negative_skill_id").references(
-    () => negativeSkill.id,
-  ),
 });
 
 export const sprintSurvey = pgTable("sprint_survey", {
@@ -204,6 +198,8 @@ export const sprintSurvey = pgTable("sprint_survey", {
   scheduledAt: date("scheduled_at", { mode: "date" }),
   processed: boolean("processed").default(false),
 });
+
+export type SelectSprintSurvey = typeof sprintSurvey.$inferSelect;
 
 export const sprintSurveyAnswerProject = pgTable(
   "sprint_survey_answer_project",
@@ -255,6 +251,9 @@ export const finalSurveyAnswer = pgTable(
     }),
     questionId: integer("question_id").references(() => question.id),
     answer: integer("answer"),
+    answeredAt: date("answered_at", { mode: "date" }).default(
+      sql`CURRENT_TIMESTAMP::date`,
+    ), // Nueva columna
     comment: text("comment"),
   },
   // composite primary key on (userId, finalSurveyId)

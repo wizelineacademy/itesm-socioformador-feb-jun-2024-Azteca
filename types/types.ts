@@ -95,7 +95,7 @@ export type Task = {
   userId: string | null;
   title: string | null;
   description: string | null;
-  isDone: boolean | null;
+  status: string | null;
 };
 
 export type Resource = {
@@ -104,9 +104,5 @@ export type Resource = {
   title: string | null;
   description: string | null;
   kind: string | null;
-};
-
-export type SQSMessageBody = {
-  projectId: number;
-  content: string;
+  url: string | null;
 };

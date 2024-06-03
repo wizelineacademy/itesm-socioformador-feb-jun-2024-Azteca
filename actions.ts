@@ -5,10 +5,12 @@ import { signIn } from "@/auth";
 import { registerUser } from "./services/user";
 import { DatabaseErrorType } from "./types/errorTypes";
 import { DatabaseError } from "pg";
+import { redirect } from "next/navigation";
 
 export const loginAction = async (formData: FormData) => {
   try {
     await signIn("credentials", formData);
+    redirect("/profile");
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
@@ -34,7 +36,7 @@ export const registerAction = async (formData: FormData) => {
     const dbError = e as DatabaseError;
 
     let errorType: DatabaseErrorType;
-    if (dbError.message === "Email already registered")
+    if (dbError.message === "Email already registered 23505")
       errorType = "UniqueConstraintViolation";
     else if (dbError.message === "Error registering the user")
       errorType = "ConnectionError";

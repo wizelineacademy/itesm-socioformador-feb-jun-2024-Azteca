@@ -40,11 +40,11 @@ const SprintStepOne = ({
         questions.map((question, index) => (
           <Slider
             key={index}
-            name="MS_RF"
+            name={question.id.toString()}
             value={
               sprintSurveyAnswer.projectAnswers.find(
                 (answer) => answer.questionId === question.id,
-              )?.answer
+              )?.answer || 6
             }
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               onChangeValue(e, question.id)

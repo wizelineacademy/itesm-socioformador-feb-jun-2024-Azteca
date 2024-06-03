@@ -12,6 +12,8 @@ import { getUserId } from "@/services/user";
 import toast from "react-hot-toast";
 import Loader from "../Loader";
 
+import { useRouter } from "next/navigation";
+
 interface ProjectSurveyProps {
   showModal: boolean;
   onClose: () => void;
@@ -22,15 +24,16 @@ const ProjectSurvey = ({
   onClose,
   projectSurveyId,
 }: ProjectSurveyProps) => {
+  const router = useRouter();
+
   const { mutate } = useMutation({
     mutationFn: submitProjectAnswer,
     onSuccess: () => {
-      console.log("Encuesta enviada");
+      router.refresh();
       toast.success("Encuesta enviada exitosamente!");
       onClose();
     },
     onError: () => {
-      console.log("Error al enviar la encuesta");
       toast.error("Error al enviar la encuesta");
       onClose();
     },

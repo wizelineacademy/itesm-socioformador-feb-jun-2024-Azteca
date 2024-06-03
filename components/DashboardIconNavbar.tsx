@@ -1,12 +1,14 @@
+"use client";
 import Link from "next/link";
 import DashboardIcon from "../components/icons/DashboardIcon";
+import { usePathname } from "next/navigation";
 
 interface DashboardIconInterface {
   path: string;
-  currentPath: string;
 }
-const DashboardIconNavbar = ({ path, currentPath }: DashboardIconInterface) => {
-  const isActive = currentPath === path;
+const DashboardIconNavbar = ({ path }: DashboardIconInterface) => {
+  const currentPath = usePathname();
+  const isActive = currentPath.startsWith(path);
   return (
     <Link
       href={path}

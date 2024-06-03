@@ -28,7 +28,11 @@ const RulerStepTwo = ({
       return "border-yellow-100 bg-yellow-100/20 focus:outline-yellow-200 focus-within:outline-yellow-200";
   };
   return (
-    <form action={onClose} className={`flex h-40 flex-col`}>
+    <form
+      data-testid="ruler-step-two"
+      action={onClose}
+      className={`flex h-40 flex-col`}
+    >
       <div className="mt-4 flex flex-col items-center ">
         <label
           htmlFor="emotion-description"

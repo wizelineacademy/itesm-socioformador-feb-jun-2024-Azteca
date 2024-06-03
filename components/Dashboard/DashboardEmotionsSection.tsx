@@ -2,7 +2,7 @@
 import React from "react";
 import { Tooltip } from "@mantine/core";
 import GrowthCircle from "@/components/GrowthCircle";
-
+import InfoToolTip from "@/components/InfoToolTip";
 interface EmotionsSectionProps {
   emotionsData: {
     title: string;
@@ -14,15 +14,21 @@ interface EmotionsSectionProps {
 const DashboardEmotionsSection: React.FC<EmotionsSectionProps> = ({
   emotionsData,
 }) => (
-  <div className="flex min-w-96 flex-col items-center rounded-xl bg-white px-10 py-5 drop-shadow-lg">
-    <p className="mx-auto mt-2 text-center text-xl font-semibold text-graySubtitle">
-      Emotions Summary
-    </p>
-    <div className="grid grid-cols-2 gap-5 pt-10">
+  <div className="relative flex min-w-96 flex-col items-center rounded-xl bg-white px-10 py-5 drop-shadow-lg">
+    <InfoToolTip
+      description="Shows the percentage of each quadrant of the RULER Survey"
+      size="lg"
+    />
+    <div className="flex">
+      <p className="mx-auto text-center text-xl font-semibold text-graySubtitle">
+        Emotions Summary
+      </p>
+    </div>
+    <div className="grid grid-cols-2 gap-10 pt-10">
       {emotionsData.map((circle, index) => (
         <div
           key={index}
-          className="flex items-center justify-center drop-shadow-lg"
+          className="flex items-center justify-center drop-shadow-lg transition-transform duration-300 ease-in-out hover:scale-125"
         >
           <Tooltip.Floating label={circle.title} color={circle.gradient.end}>
             <div>
