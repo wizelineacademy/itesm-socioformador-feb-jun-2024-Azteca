@@ -37,6 +37,7 @@ export default $config({
           OPENAI_KEY: OpenAIKey.value,
         },
         timeout: "900 seconds",
+        runtime: "nodejs20.x",
       },
       {
         transform: {
