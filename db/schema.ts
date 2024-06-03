@@ -251,6 +251,9 @@ export const finalSurveyAnswer = pgTable(
     }),
     questionId: integer("question_id").references(() => question.id),
     answer: integer("answer"),
+    answeredAt: date("answered_at", { mode: "date" }).default(
+      sql`CURRENT_TIMESTAMP::date`,
+    ), // Nueva columna
     comment: text("comment"),
   },
   // composite primary key on (userId, finalSurveyId)

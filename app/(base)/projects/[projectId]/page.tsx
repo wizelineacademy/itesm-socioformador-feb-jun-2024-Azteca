@@ -6,6 +6,7 @@ import GaugeChart from "@/components/GaugeChart";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   deleteProjectById,
+  getUpdateFeedbackHistory,
   getProjectById,
   updateFeedback,
 } from "@/services/project";
@@ -14,9 +15,11 @@ import { getUserRole } from "@/services/user";
 import {
   getOverallStatistics,
   getDetailedProjectStatistics,
+  getGrowthData, // Importar el nuevo servicio
 } from "@/services/sprintSurvey";
 
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon";
+import NoDataCard from "@/components/NoDataCard";
 import Loader from "@/components/Loader";
 
 const Project = ({ params }: { params: { projectId: string } }) => {
@@ -54,6 +57,11 @@ const Project = ({ params }: { params: { projectId: string } }) => {
       queryKey: ["project-detailed-statistics", projectId],
       queryFn: () => getDetailedProjectStatistics(projectId),
     });
+
+  const { data: growthData, isLoading: isLoadingGrowthData } = useQuery({
+    queryKey: ["project-growth-data", projectId],
+    queryFn: () => getGrowthData(projectId), // Consumir el nuevo servicio
+  });
   const radarData = statistics
     ? [
         {
@@ -78,33 +86,15 @@ const Project = ({ params }: { params: { projectId: string } }) => {
         },
       ]
     : [];
-  const areaData = [
-    {
-      month: "Jan",
-      growthSupport: 89,
-      growthOportunities: 70,
-    },
-    {
-      month: "Feb",
-      growthSupport: 76,
-      growthOportunities: 82,
-    },
-    {
-      month: "Mar",
-      growthSupport: 95,
-      growthOportunities: 89,
-    },
-    {
-      month: "Apr",
-      growthSupport: 72,
-      growthOportunities: 85,
-    },
-    {
-      month: "May",
-      growthSupport: 83,
-      growthOportunities: 78,
-    },
-  ];
+  const areaData = growthData
+    ? growthData.growthSupportData.map((item, index) => ({
+        month: item.month,
+        growthSupport: item.averageAnswer,
+        growthOportunities:
+          growthData.growthOpportunitiesData[index]?.averageAnswer || 0,
+      }))
+    : [];
+
   const gaugeData = detailedStatistics
     ? [
         {
@@ -138,7 +128,8 @@ const Project = ({ params }: { params: { projectId: string } }) => {
   if (
     isLoadingStatistics ||
     isLoadingDetailedStatistics ||
-    isLoadingProjectData
+    isLoadingProjectData ||
+    isLoadingGrowthData // Agregar el estado de carga de los datos de crecimiento
   ) {
     return (
       <div className="h-[80dvh]">
@@ -160,19 +151,7 @@ const Project = ({ params }: { params: { projectId: string } }) => {
               <div className="relative z-10 flex items-center gap-1">
                 {/* popup */}
                 {isUpdateFeedbackPopupOpen && (
-                  <div className="absolute right-full top-full z-0 text-nowrap rounded-xl bg-white p-4 drop-shadow-lg">
-                    <h2 className="mb-10 text-xl font-medium">
-                      Update History
-                    </h2>
-                    <div className="flex gap-20">
-                      <p>Survey 04/04/2024</p>
-                      <p className="text-green-600">Completed</p>
-                    </div>
-                    <div className="flex gap-20">
-                      <p>Survey 04/04/2024</p>
-                      <p className="text-green-600">Completed</p>
-                    </div>
-                  </div>
+                  <UpdateFeedbackHistoryPopup projectId={projectId} />
                 )}
 
                 {/* open-popup-button */}
@@ -297,6 +276,61 @@ const Project = ({ params }: { params: { projectId: string } }) => {
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
+const UpdateFeedbackHistoryPopup = ({ projectId }: { projectId: number }) => {
+  const updateFeedbackHistoryQuery = useQuery({
+    queryKey: ["update-feedback-history"],
+    queryFn: () => getUpdateFeedbackHistory({ projectId }),
+    retry: false,
+  });
+
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleString("default", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  if (updateFeedbackHistoryQuery.isError) {
+    return <NoDataCard text={updateFeedbackHistoryQuery.error.message} />;
+  }
+
+  if (
+    updateFeedbackHistoryQuery.isLoading ||
+    !updateFeedbackHistoryQuery.data
+  ) {
+    return <p>Loading...</p>;
+  }
+
+  return (
+    <div className="absolute right-full top-full z-0 text-nowrap rounded-xl bg-white p-4 drop-shadow-lg">
+      <h2 className="mb-4 text-xl font-medium">Update History</h2>
+      {updateFeedbackHistoryQuery.data.map((survey, idx) => (
+        <div key={idx} className="flex justify-between gap-20">
+          <p>
+            {survey.type === "SPRINT"
+              ? "Sprint Survey"
+              : survey.type === "FINAL"
+                ? "Final Survey"
+                : "UNREACHABLE"}{" "}
+            -{" "}
+            <span className="text-gray-500">
+              {formatDate(survey.scheduledAt)}
+            </span>
+          </p>
+          {survey.status === "COMPLETED" ? (
+            <p className="text-green-600">Completed</p>
+          ) : survey.status === "PENDING" ? (
+            <p className="text-red-600">Pending</p>
+          ) : survey.status === "NOT_AVAILABLE" ? (
+            <p className="text-gray-600">Pending</p>
+          ) : null}
+        </div>
+      ))}
     </div>
   );
 };

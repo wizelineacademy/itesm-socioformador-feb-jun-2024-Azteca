@@ -1,8 +1,6 @@
-"use server";
 import OpenAI from "openai";
 import db from "@/db/drizzle";
 import { and, count, eq, inArray } from "drizzle-orm";
-import { auth } from "@/auth";
 import similarity from "compute-cosine-similarity";
 
 import {
@@ -516,15 +514,13 @@ async function getQuestionsSkills(sprintSurveyId: number) {
 } */
 
 export async function rulerAnalysis() {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) throw new Error("You must be signed in");
-
   // recommend resources only if the mood of the user is negative, check the previous resources recommended to experiment
 }
 
 // Main function
 export async function feedbackAnalysis(sprintSurveyId: number) {
+  console.log(`*** PROCESSING SPRINTSURVEYID ${sprintSurveyId} ***`);
+
   const processedSurvey = await db
     .select({ processed: sprintSurvey.processed })
     .from(sprintSurvey)
