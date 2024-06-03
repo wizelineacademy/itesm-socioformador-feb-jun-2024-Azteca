@@ -76,6 +76,9 @@ export const authConfig = {
 
       return true;
     },
+    async redirect({ url, baseUrl }) {
+      return url.startsWith(baseUrl) ? url : baseUrl;
+    },
     async jwt({ token, user: jwtUser, trigger }) {
       // Persist the OAuth access_token and or the user id to the token right after signin
       if (trigger === "signIn") {
