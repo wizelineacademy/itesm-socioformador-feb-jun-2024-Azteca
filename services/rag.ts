@@ -1,8 +1,7 @@
 "use server";
 import OpenAI from "openai";
 import db from "@/db/drizzle";
-import { and, count, desc, eq, inArray, isNull } from "drizzle-orm";
-import { auth } from "@/auth";
+import { and, count, desc, eq, inArray } from "drizzle-orm";
 import similarity from "compute-cosine-similarity";
 
 import {
@@ -138,7 +137,7 @@ async function reduceTask(message: string, maxLength: number): Promise<string> {
     apiKey: process.env.OPENAI_KEY,
   });
 
-  const intructions: string =
+  const instructions: string =
     "El siguiente es un mensaje largo, debes reducir su longitud para que no exceda " +
     maxLength +
     " caracteres, pero sin que el mensaje pierda su significado ni su escencia.";
@@ -148,7 +147,7 @@ async function reduceTask(message: string, maxLength: number): Promise<string> {
     messages: [
       {
         role: "system",
-        content: ``,
+        content: instructions,
       },
       {
         role: "user",
@@ -526,13 +525,6 @@ export async function rulerAnalysis(
 
     recommendedResourcesIds.splice(5);
 
-    console.log(baseMessage);
-    console.log("================================================");
-    console.log("================================================");
-    console.log("================================================");
-    console.log("RECOMMENDED RESOURCES: ", recommendedResourcesIds);
-
-    /*
     const tasks: string[] = await createTasks(baseMessage);
 
     tasks.forEach(async (task) => {
@@ -560,15 +552,6 @@ export async function rulerAnalysis(
         sprintSurveyId: sprintSurveyId,
       });
     });
-    */
-  } else {
-    console.log("================================================");
-    console.log("================================================");
-    console.log("================================================");
-    console.log("HAVE A NICE DAY");
-    console.log("================================================");
-    console.log("================================================");
-    console.log("================================================");
   }
 }
 
@@ -592,9 +575,15 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
       .innerJoin(projectMember, eq(projectMember.projectId, project.id))
       .where(eq(sprintSurvey.id, sprintSurveyId));
 
-    const ids = uniqueProjectUsers.map((user) => user.userId as string);
-    const orderedFeedback = await orderFeedback(sprintSurveyId, ids);
-    const questionsSkills = await getQuestionsSkills(sprintSurveyId);
+    const ids: string[] = uniqueProjectUsers.map(
+      (user) => user.userId as string,
+    );
+    const orderedFeedback: FeedbackRecords = await orderFeedback(
+      sprintSurveyId,
+      ids,
+    );
+    const questionsSkills: QuestionSkills =
+      await getQuestionsSkills(sprintSurveyId);
 
     // iterate through each unique user of the project and read the feedback received
     for (const userId of Object.keys(orderedFeedback)) {
