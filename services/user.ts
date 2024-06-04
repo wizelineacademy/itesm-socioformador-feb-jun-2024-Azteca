@@ -1,6 +1,13 @@
 "use server";
 
-import { projectMember, user, userRoleEnum, project, skill } from "@/db/schema";
+import {
+  projectMember,
+  user,
+  userRoleEnum,
+  project,
+  skill,
+  userSkill,
+} from "@/db/schema";
 import db from "@/db/drizzle";
 import { eq, not, and, or, asc, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -168,32 +175,30 @@ export const updateLightMode = async ({
     .execute();
 };
 
-export async function getUserTraitsById(id: string) {
+export async function getUserSkillsById(id: string) {
   const strengths = await db
     .select({
-      id: skill.id,
       name: skill.positiveSkill,
-      description: skill.,
-      kind: skill.kind,
+      description: skill.positiveDescription,
     })
-    .from(trait)
-    .innerJoin(userTrait, eq(userTrait.traitId, trait.id))
-    .innerJoin(user, eq(userTrait.userId, user.id))
-    .where(eq(user.id, id));
+    .from(skill)
+    .leftJoin(userSkill, eq(userSkill.skillId, skill.id))
+    .where(and(eq(userSkill.userId, id), eq(userSkill.kind, "STRENGTH")));
 
-  const strengths_arr = [];
-  const areasOfOportunity_arr = [];
+  const areasOfOportunity = await db
+    .select({
+      name: skill.negativeSkill,
+      description: skill.negativeDescription,
+    })
+    .from(skill)
+    .leftJoin(userSkill, eq(userSkill.skillId, skill.id))
+    .where(
+      and(eq(userSkill.userId, id), eq(userSkill.kind, "AREA_OF_OPPORTUNITY")),
+    );
 
-  for (let c = 0; c < res.length; c++) {
-    if (res[c].kind == "AREA_OF_OPPORTUNITY") {
-      areasOfOportunity_arr.push(res[c]);
-    } else if (res[c].kind == "STRENGTH") {
-      strengths_arr.push(res[c]);
-    }
-  }
   const traits = {
-    strengths: strengths_arr,
-    areasOfOportunity: areasOfOportunity_arr,
+    strengths: strengths,
+    areasOfOportunity: areasOfOportunity,
   };
   return traits;
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { getUserInfoById, getUserTraitsById } from "@/services/user";
+import { getUserInfoById, getUserSkillsById } from "@/services/user";
 import ProfileBanner from "@/components/Profile/ProfileBanner";
 import ProfileSection from "@/components/Profile/ProfileSection";
 import CoWorkersCarousel from "@/components/CoWorkersCarousel";
@@ -8,7 +8,7 @@ import ProfileTraits from "@/components/Profile/ProfileTraits";
 
 const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
   const user = await getUserInfoById(params.id);
-  const traits = await getUserTraitsById(params.id);
+  const traits = await getUserSkillsById(params.id);
 
   return (
     <main>
