@@ -26,7 +26,7 @@ export default function ProjectsCarousel({ userId }: { userId: string }) {
   }
 
   return (
-    <ul className="mt-2 flex w-full flex-row gap-4 overflow-x-auto">
+    <ul className="mt-2 flex w-full flex-row gap-4 overflow-x-auto pb-2">
       {projectsQuery.data.map((project, index) => (
         <li key={index}>
           <ProjectCard id={project.id} name={project.name} />

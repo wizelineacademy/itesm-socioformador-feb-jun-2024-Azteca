@@ -43,7 +43,7 @@ const ComboBoxSearch = () => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative" data-testid="navbar-searchbar">
       <Combobox value={null} onChange={handleSelect}>
         <SearchBar
           type="comboboxImput"

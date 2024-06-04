@@ -8,6 +8,7 @@ on:
 env:
   AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
   POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+  OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
 
 jobs:
   build:
@@ -24,7 +25,7 @@ jobs:
 
       - name: Install SST
         run: |
-          wget https://github.com/sst/ion/releases/download/v0.0.384/sst-linux-amd64.deb 
+          wget https://github.com/sst/ion/releases/download/v0.0.399/sst-linux-amd64.deb 
           sudo dpkg -i sst-linux-amd64.deb
 
       - name: Install Bun
@@ -45,6 +46,7 @@ jobs:
         run: |
           sst secret set AuthSecret ${{ secrets.AUTH_SECRET }} --stage=prod
           sst secret set PostgresURL ${{ secrets.POSTGRES_URL }} --stage=prod
+          sst secret set OpenAIKey ${{ secrets.OPENAI_KEY }} --stage=prod
 
       - name: Deploy to AWS with SST
         run: |

@@ -4,12 +4,23 @@ import React, { useState } from "react";
 import { RadarChart, AreaChart } from "@mantine/charts";
 import GaugeChart from "@/components/GaugeChart";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { deleteProjectById, updateFeedback } from "@/services/project";
+import {
+  deleteProjectById,
+  getUpdateFeedbackHistory,
+  getProjectById,
+  updateFeedback,
+} from "@/services/project";
 import { useRouter } from "next/navigation";
 import { getUserRole } from "@/services/user";
-import { getOverallStatistics } from "@/services/sprintSurvey";
+import {
+  getOverallStatistics,
+  getDetailedProjectStatistics,
+  getGrowthData, // Importar el nuevo servicio
+} from "@/services/sprintSurvey";
 
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon";
+import NoDataCard from "@/components/NoDataCard";
+import Loader from "@/components/Loader";
 
 const Project = ({ params }: { params: { projectId: string } }) => {
   const router = useRouter();
@@ -31,15 +42,26 @@ const Project = ({ params }: { params: { projectId: string } }) => {
     queryFn: () => getUserRole(),
   });
 
+  const { data: projectData, isLoading: isLoadingProjectData } = useQuery({
+    queryKey: ["project-data", projectId],
+    queryFn: () => getProjectById(projectId),
+  });
+
   const { data: statistics, isLoading: isLoadingStatistics } = useQuery({
     queryKey: ["project-overall-statistics", projectId],
     queryFn: () => getOverallStatistics(projectId),
   });
 
-  if (isLoadingStatistics) {
-    return <div>Loading...</div>;
-  }
+  const { data: detailedStatistics, isLoading: isLoadingDetailedStatistics } =
+    useQuery({
+      queryKey: ["project-detailed-statistics", projectId],
+      queryFn: () => getDetailedProjectStatistics(projectId),
+    });
 
+  const { data: growthData, isLoading: isLoadingGrowthData } = useQuery({
+    queryKey: ["project-growth-data", projectId],
+    queryFn: () => getGrowthData(projectId), // Consumir el nuevo servicio
+  });
   const radarData = statistics
     ? [
         {
@@ -64,65 +86,63 @@ const Project = ({ params }: { params: { projectId: string } }) => {
         },
       ]
     : [];
-  const areaData = [
-    {
-      month: "Jan",
-      growthSupport: 89,
-      growthOportunities: 70,
-    },
-    {
-      month: "Feb",
-      growthSupport: 76,
-      growthOportunities: 82,
-    },
-    {
-      month: "Mar",
-      growthSupport: 95,
-      growthOportunities: 89,
-    },
-    {
-      month: "Apr",
-      growthSupport: 72,
-      growthOportunities: 85,
-    },
-    {
-      month: "May",
-      growthSupport: 83,
-      growthOportunities: 78,
-    },
-  ];
-  const gaugeData = [
-    {
-      title: "Resources Satisfaction",
-      percentage: 78,
-      type: "half",
-      gradient: { start: "#988511", end: "#FEDE1C" },
-    },
-    {
-      title: "Listening Feeling",
-      percentage: 64,
-      type: "half",
-      gradient: { start: "#295A95", end: "#4598FB" },
-    },
-    {
-      title: "Recognition Feeling",
-      percentage: 56,
-      type: "half",
-      gradient: { start: "#881931", end: "#EE2B55" },
-    },
-    {
-      title: "Respect and Trust Environment",
-      percentage: 85,
-      type: "half",
-      gradient: { start: "#35216F", end: "#6640D5" },
-    },
-  ];
+  const areaData = growthData
+    ? growthData.growthSupportData.map((item, index) => ({
+        month: item.month,
+        growthSupport: item.averageAnswer,
+        growthOportunities:
+          growthData.growthOpportunitiesData[index]?.averageAnswer || 0,
+      }))
+    : [];
+
+  const gaugeData = detailedStatistics
+    ? [
+        {
+          title: "Resources Satisfaction",
+          percentage: detailedStatistics.resourcesSatisfaction,
+          type: "half",
+          gradient: { start: "#988511", end: "#FEDE1C" },
+        },
+        {
+          title: "Listening Feeling",
+          percentage: detailedStatistics.listeningFeeling,
+          type: "half",
+          gradient: { start: "#295A95", end: "#4598FB" },
+        },
+        {
+          title: "Recognition Feeling",
+          percentage: detailedStatistics.recognitionFeeling,
+          type: "half",
+          gradient: { start: "#881931", end: "#EE2B55" },
+        },
+        {
+          title: "Respect and Trust Environment",
+          percentage: detailedStatistics.respectTrustEnvironment,
+          type: "half",
+          gradient: { start: "#35216F", end: "#6640D5" },
+        },
+      ]
+    : [];
   const progressBarPercentage = 74;
+
+  if (
+    isLoadingStatistics ||
+    isLoadingDetailedStatistics ||
+    isLoadingProjectData ||
+    isLoadingGrowthData // Agregar el estado de carga de los datos de crecimiento
+  ) {
+    return (
+      <div className="h-[80dvh]">
+        <Loader />
+      </div>
+    );
+  }
+  console.log(gaugeData);
 
   return (
     <div className="mt-2">
       <div className="flex justify-between">
-        <p className="text-3xl font-medium">Project 1</p>
+        <p className="text-3xl font-medium">{projectData?.name}</p>
         {userRoleQuery.data &&
           (userRoleQuery.data === "MANAGER" ||
             userRoleQuery.data === "ADMIN") && (
@@ -131,19 +151,7 @@ const Project = ({ params }: { params: { projectId: string } }) => {
               <div className="relative z-10 flex items-center gap-1">
                 {/* popup */}
                 {isUpdateFeedbackPopupOpen && (
-                  <div className="absolute right-full top-full z-0 text-nowrap rounded-xl bg-white p-4 drop-shadow-lg">
-                    <h2 className="mb-10 text-xl font-medium">
-                      Update History
-                    </h2>
-                    <div className="flex gap-20">
-                      <p>Survey 04/04/2024</p>
-                      <p className="text-green-600">Completed</p>
-                    </div>
-                    <div className="flex gap-20">
-                      <p>Survey 04/04/2024</p>
-                      <p className="text-green-600">Completed</p>
-                    </div>
-                  </div>
+                  <UpdateFeedbackHistoryPopup projectId={projectId} />
                 )}
 
                 {/* open-popup-button */}
@@ -186,7 +194,7 @@ const Project = ({ params }: { params: { projectId: string } }) => {
             className="flex w-fit flex-col rounded-xl bg-white px-10 py-5 drop-shadow-lg"
           >
             <GaugeChart
-              percentage={gauge.percentage}
+              percentage={Number(gauge.percentage)}
               type={gauge.type}
               gradient={gauge.gradient}
             />
@@ -268,6 +276,61 @@ const Project = ({ params }: { params: { projectId: string } }) => {
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
+const UpdateFeedbackHistoryPopup = ({ projectId }: { projectId: number }) => {
+  const updateFeedbackHistoryQuery = useQuery({
+    queryKey: ["update-feedback-history"],
+    queryFn: () => getUpdateFeedbackHistory({ projectId }),
+    retry: false,
+  });
+
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleString("default", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  if (updateFeedbackHistoryQuery.isError) {
+    return <NoDataCard text={updateFeedbackHistoryQuery.error.message} />;
+  }
+
+  if (
+    updateFeedbackHistoryQuery.isLoading ||
+    !updateFeedbackHistoryQuery.data
+  ) {
+    return <p>Loading...</p>;
+  }
+
+  return (
+    <div className="absolute right-full top-full z-0 text-nowrap rounded-xl bg-white p-4 drop-shadow-lg">
+      <h2 className="mb-4 text-xl font-medium">Update History</h2>
+      {updateFeedbackHistoryQuery.data.map((survey, idx) => (
+        <div key={idx} className="flex justify-between gap-20">
+          <p>
+            {survey.type === "SPRINT"
+              ? "Sprint Survey"
+              : survey.type === "FINAL"
+                ? "Final Survey"
+                : "UNREACHABLE"}{" "}
+            -{" "}
+            <span className="text-gray-500">
+              {formatDate(survey.scheduledAt)}
+            </span>
+          </p>
+          {survey.status === "COMPLETED" ? (
+            <p className="text-green-600">Completed</p>
+          ) : survey.status === "PENDING" ? (
+            <p className="text-red-600">Pending</p>
+          ) : survey.status === "NOT_AVAILABLE" ? (
+            <p className="text-gray-600">Pending</p>
+          ) : null}
+        </div>
+      ))}
     </div>
   );
 };

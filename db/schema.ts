@@ -110,12 +110,13 @@ export const pipResourceKind = pgEnum("type_resource", [
 
 export const pipResource = pgTable("pip_resource", {
   id: serial("id").primaryKey(),
-  sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
   title: varchar("title", { length: 64 }),
   kind: pipResourceKind("type_resource"),
   description: varchar("description", { length: 1024 }),
   embedding: json("embedding").$type<number[]>(),
 });
+
+export type SelectPipResource = typeof pipResource.$inferSelect;
 
 export const userResource = pgTable(
   "user_resource",
@@ -250,6 +251,9 @@ export const finalSurveyAnswer = pgTable(
     }),
     questionId: integer("question_id").references(() => question.id),
     answer: integer("answer"),
+    answeredAt: date("answered_at", { mode: "date" }).default(
+      sql`CURRENT_TIMESTAMP::date`,
+    ), // Nueva columna
     comment: text("comment"),
   },
   // composite primary key on (userId, finalSurveyId)

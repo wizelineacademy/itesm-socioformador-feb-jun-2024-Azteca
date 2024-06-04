@@ -1,4 +1,3 @@
-"use server";
 import OpenAI from "openai";
 import db from "@/db/drizzle";
 import { and, count, desc, eq, inArray } from "drizzle-orm";
@@ -557,6 +556,8 @@ export async function rulerAnalysis(
 
 // Main function
 export async function feedbackAnalysis(sprintSurveyId: number) {
+  console.log(`*** PROCESSING SPRINTSURVEYID ${sprintSurveyId} ***`);
+
   const processedSurvey = await db
     .select({ processed: sprintSurvey.processed })
     .from(sprintSurvey)

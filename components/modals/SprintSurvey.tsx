@@ -21,6 +21,7 @@ import {
 import toast from "react-hot-toast";
 import { getUserId } from "@/services/user";
 import Loader from "../Loader";
+import { useRouter } from "next/navigation";
 
 interface SprintSurveyProps {
   showModal: boolean;
@@ -33,6 +34,8 @@ const SprintSurvey = ({
   onClose,
   sprintSurveyId,
 }: SprintSurveyProps) => {
+  const router = useRouter();
+
   const [step, setStep] = useState<number>(1);
   const { data: users, isError } = useQuery({
     queryKey: ["coworkers", 34],
@@ -161,6 +164,7 @@ const SprintSurvey = ({
   const submitSurveyAnswers = useMutation({
     mutationFn: () => submitSprintSurveyAnswers(sprintAnswer),
     onSuccess: () => {
+      router.refresh();
       toast.success("Encuesta enviada exitosamente!");
     },
     onError: () => {
