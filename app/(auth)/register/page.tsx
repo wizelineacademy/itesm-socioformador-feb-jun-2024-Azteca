@@ -2,9 +2,11 @@
 import { registerAction } from "@/actions";
 import FormTextInput from "@/components/FormTextInput";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 const Register = () => {
+  const router = useRouter();
   const clientRegisterAction = async (formData: FormData) => {
     const result = await registerAction(formData);
     if (result) {
@@ -14,6 +16,9 @@ const Register = () => {
         toast.error("Network error. Try again.");
       else if (result === "GeneralError")
         toast.error("There was an error saving the data. Try again.");
+    } else {
+      toast.success("Account created successfully.");
+      router.push("/profile");
     }
   };
 
