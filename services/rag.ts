@@ -4,6 +4,7 @@ import { and, count, eq, inArray } from "drizzle-orm";
 import similarity from "compute-cosine-similarity";
 
 import {
+  finalSurvey,
   pipTask,
   pipResource,
   pipResourceSkill,
@@ -745,5 +746,43 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
       .update(sprintSurvey)
       .set({ processed: true })
       .where(eq(sprintSurvey.id, sprintSurveyId));
+  }
+}
+
+export async function projectAnalysis(finalSurveyId: number) {
+  const processedFinalSurvey = await db
+    .select({ processed: finalSurvey.processed })
+    .from(finalSurvey)
+    .where(eq(finalSurvey.id, finalSurveyId));
+
+  const notProcessedFinalSurvey = !processedFinalSurvey[0].processed;
+
+  // analyze survey only if it has not been processed
+  if (notProcessedFinalSurvey) {
+    const manager = await db
+      .select({ managerId: project.managerId })
+      .from(finalSurvey)
+      .innerJoin(project, eq(project.id, finalSurvey.projectId))
+      .where(eq(finalSurvey.id, finalSurveyId));
+
+    const managerId: string = manager[0].managerId;
+
+    const uniqueProjectUsers = await db
+      .select({
+        userId: projectMember.userId,
+      })
+      .from(finalSurvey)
+      .innerJoin(project, eq(project.id, finalSurvey.projectId))
+      .innerJoin(projectMember, eq(projectMember.projectId, project.id))
+      .where(eq(finalSurvey.id, finalSurveyId));
+
+    const uniqueWorkersIds = uniqueProjectUsers.map(
+      (element) => element.userId,
+    );
+
+    await db
+      .update(finalSurvey)
+      .set({ processed: true })
+      .where(eq(finalSurvey.id, finalSurveyId));
   }
 }

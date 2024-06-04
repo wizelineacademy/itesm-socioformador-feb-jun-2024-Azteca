@@ -6,9 +6,13 @@ import CoWorkersCarousel from "@/components/CoWorkersCarousel";
 import ProjectsCarousel from "@/components/ProjectsCarousel";
 import ProfileTraits from "@/components/Profile/ProfileTraits";
 
+import { projectAnalysis } from "@/services/rag";
+
 const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
   const user = await getUserInfoById(params.id);
   const traits = await getUserTraitsById(params.id);
+
+  projectAnalysis(52);
 
   return (
     <main>
