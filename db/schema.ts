@@ -141,9 +141,7 @@ export const rulerSurveyAnswers = pgTable(
   {
     userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
     emotionId: integer("emotion_id").references(() => rulerEmotion.id),
-    answeredAt: date("answered_at", { mode: "date" }).default(
-      sql`CURRENT_TIMESTAMP::date`,
-    ),
+    answeredAt: date("answered_at", { mode: "date" }),
     comment: text("comment"),
   },
   // composite primary key on (userId, rulerSurveyId)
@@ -247,9 +245,7 @@ export const finalSurveyAnswer = pgTable(
     }),
     questionId: integer("question_id").references(() => question.id),
     answer: integer("answer"),
-    answeredAt: date("answered_at", { mode: "date" }).default(
-      sql`CURRENT_TIMESTAMP::date`,
-    ), // Nueva columna
+    answeredAt: date("answered_at", { mode: "date" }),
     comment: text("comment"),
   },
   // composite primary key on (userId, finalSurveyId)
