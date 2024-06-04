@@ -21,7 +21,6 @@ import BookIcon from "@/components/icons/BookIcon";
 import ArticleIcon from "@/components/icons/ArticleIcon";
 import Link from "next/link";
 import ChevronRightIcon from "@/components/icons/ChevronRightIcon";
-import ChevronDownIcon from "@/components/icons/ChevronDownIcon";
 
 const statusOptions = [
   { label: "Pending", color: "bg-red-500", value: "PENDING" },
@@ -139,7 +138,7 @@ const PCPTasks = ({ projectId }: { projectId: number }) => {
   });
 
   return (
-    <section id="pip-tasks" className="mt-9 w-full">
+    <section id="pip-tasks" className="mt-5 w-full">
       <div className="mb-6">
         <div className="mx-auto flex justify-between">
           <h3 className="text-3xl font-medium text-black">Tasks</h3>
@@ -158,7 +157,7 @@ const PCPTasks = ({ projectId }: { projectId: number }) => {
         ) : (
           tasksQuery.data && (
             <div className="mt-2">
-              <div className="mb-10 mt-2 flex w-full flex-row flex-wrap gap-12 overflow-x-auto pb-3">
+              <div className="mb-10 mt-2 flex flex-row gap-12 overflow-x-auto whitespace-nowrap pb-3">
                 {tasksQuery.data.map((task) => (
                   <PCPTask key={task.id} task={task} projectId={projectId} />
                 ))}
@@ -390,7 +389,7 @@ const PCPResources = ({ projectId }: { projectId: number }) => {
   });
 
   return (
-    <section id="pip-tasks" className="mt-9 w-full">
+    <section id="pip-tasks" className="mt-5 w-full">
       <div className="mb-6">
         <div className="mx-auto flex justify-between">
           <h3 className="text-3xl font-medium text-black">Resources</h3>
@@ -409,7 +408,7 @@ const PCPResources = ({ projectId }: { projectId: number }) => {
         ) : (
           resourcesQuery.data && (
             <div className="mt-2">
-              <div className="mb-10 mt-2 flex w-full flex-row flex-wrap gap-12 overflow-x-auto pb-3">
+              <div className="mb-10 mt-2 flex flex-row gap-12 overflow-x-auto whitespace-nowrap pb-3">
                 {resourcesQuery.data.map((resource) => (
                   <PCPResource key={resource.id} resource={resource} />
                 ))}
