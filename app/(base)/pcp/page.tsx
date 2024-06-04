@@ -523,7 +523,7 @@ const PCPResourcesDialogContent = ({ projectId }: { projectId: number }) => {
                         <InfoIcon color="text-black" size="h-6 w-6" />
                       </Menu.Button>
                     </div>
-                    <Menu.Items className="absolute right-0 z-50 mt-2 w-fit origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <Menu.Items className="absolute right-0 z-50 mt-2 w-80 origin-top-right rounded-md bg-white ring-1 ring-black ring-opacity-5 drop-shadow-lg focus:outline-none">
                       <div className="px-4 py-1 text-sm text-gray-700">
                         {resource.description}
                       </div>
