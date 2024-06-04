@@ -62,25 +62,19 @@ export const projectMember = pgTable(
   // composite primary key on (userId, projectId)
 );
 
-export const traitKindEnum = pgEnum("trait_kind", [
+export const skillKindEnum = pgEnum("trait_kind", [
   "STRENGTH",
   "AREA_OF_OPPORTUNITY",
 ]);
 
-export const trait = pgTable("trait", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 64 }),
-  description: varchar("description", { length: 1024 }),
-  kind: traitKindEnum("kind"),
-});
-
-export const userTrait = pgTable(
-  "user_trait",
+export const userSkill = pgTable(
+  "user_skill",
   {
     userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
-    traitId: integer("trait_id").references(() => trait.id, {
+    skillId: integer("skill_id").references(() => skill.id, {
       onDelete: "cascade",
     }),
+    kind: skillKindEnum("kind"),
   },
   // composite primary key on (userId, traitId)
 );
