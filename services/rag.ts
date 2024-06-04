@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import db from "@/db/drizzle";
-import { and, count, desc, eq, inArray } from "drizzle-orm";
+import { and, count, eq, inArray } from "drizzle-orm";
 import similarity from "compute-cosine-similarity";
 
 import {
@@ -710,7 +710,7 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
           const stringWeaknesses: string = weaknessesNames.join(", ");
 
           const tasks = await createTasks(stringWeaknesses);
-          for (let task of tasks) {
+          for (const task of tasks) {
             const [title, description] = task.split(":");
             let newTitle = title;
             let newDescription = description;
