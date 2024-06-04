@@ -15,10 +15,14 @@ export async function submitRulerSurveyAnswer(surveyAnswer: RulerSurveyAnswer) {
     }
   }
   // Insert ruler answer to db
+  const answeredAt = new Date(
+    new Date().toLocaleString("es-MX", { timeZone: "America/Monterrey" }),
+  );
+
   await db.insert(rulerSurveyAnswers).values({
     userId: surveyAnswer.userId,
     emotionId: surveyAnswer.emotion?.id,
-    answeredAt: sql`CURRENT_TIMESTAMP`,
+    answeredAt: answeredAt,
     comment: surveyAnswer.comment,
   });
 }

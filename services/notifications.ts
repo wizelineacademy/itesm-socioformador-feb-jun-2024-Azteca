@@ -20,6 +20,16 @@ export async function getNotifications() {
 
   const notifications = [];
 
+  const currentTimestamp = new Date(
+    new Date().toLocaleString("es-MX", { timeZone: "America/Monterrey" }),
+  );
+
+  const currentDateString = currentTimestamp.toISOString().split("T")[0];
+  const currentDateTimeString = currentTimestamp
+    .toISOString()
+    .replace("T", " ")
+    .split(".")[0];
+
   // Get the notifications of the sprint surveys
   const sprintSurveys = await db
     .select({
@@ -40,7 +50,7 @@ export async function getNotifications() {
         eq(projectMember.userId, userId), // the surveys belong to a user's project
         eq(sprintSurveyAnswerProject.userId, userId),
         eq(sprintSurvey.processed, false), // the surveys aren't processed
-        gte(sql`CURRENT_TIMESTAMP`, sprintSurvey.scheduledAt), // the survey itself is active (i.e. has been scheduled)
+        gte(sql`${currentDateTimeString}`, sprintSurvey.scheduledAt), // the survey itself is active (i.e. has been scheduled)
       ),
     );
   if (sprintSurveys.length > 0) {
@@ -67,7 +77,7 @@ export async function getNotifications() {
       and(
         eq(projectMember.userId, userId), // the surveys belong to a user's project
         eq(finalSurvey.processed, false), // the surveys aren't processed
-        gte(sql`CURRENT_TIMESTAMP`, finalSurvey.scheduledAt), // the survey itself is active (i.e. has been scheduled)
+        gte(sql`${currentDateTimeString}`, finalSurvey.scheduledAt), // the survey itself is active (i.e. has been scheduled)
       ),
     );
 
@@ -87,7 +97,7 @@ export async function getNotifications() {
     .where(
       and(
         eq(rulerSurveyAnswers.userId, userId), // the survey belongs to the user
-        eq(rulerSurveyAnswers.answeredAt, sql`CURRENT_TIMESTAMP::date`), // is today's survey
+        eq(rulerSurveyAnswers.answeredAt, sql`${currentDateString}`), // is today's survey
       ),
     );
 

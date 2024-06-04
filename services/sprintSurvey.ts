@@ -32,9 +32,13 @@ export async function getSprintSurveyQuestions(): Promise<Questions[]> {
 }
 
 export async function createSprintSurvey(projectId: number) {
+  const answeredAt = new Date(
+    new Date().toLocaleString("es-MX", { timeZone: "America/Monterrey" }),
+  );
+
   const res = await db
     .insert(sprintSurvey)
-    .values({ projectId: projectId, scheduledAt: sql`CURRENT_TIMESTAMP` })
+    .values({ projectId: projectId, scheduledAt: answeredAt })
     .returning({ id: sprintSurvey.id });
 
   return res[0];
