@@ -456,21 +456,39 @@ async function getFeedbackClassifications(
 }
 
 async function getQuestionsSkills(
-  sprintSurveyId: number,
+  surveyId: number,
+  type: string,
 ): Promise<QuestionSkills> {
-  const questionsSkills: QuestionSkills = {};
-  const questions = await db
-    .select({
-      questionId: sprintSurveyQuestion.questionId,
-    })
-    .from(sprintSurveyQuestion)
-    .innerJoin(question, eq(question.id, sprintSurveyQuestion.questionId))
-    .where(
-      and(
-        eq(sprintSurveyQuestion.sprintSurveyId, sprintSurveyId),
-        eq(question.type, "COWORKER_QUESTION"),
-      ),
-    );
+  let questionsSkills: QuestionSkills = {};
+  let questions: any[] = [];
+
+  if (type === "COWORKER_QUESTION") {
+    const questions = await db
+      .select({
+        questionId: sprintSurveyQuestion.questionId,
+      })
+      .from(sprintSurveyQuestion)
+      .innerJoin(question, eq(question.id, sprintSurveyQuestion.questionId))
+      .where(
+        and(
+          eq(sprintSurveyQuestion.sprintSurveyId, surveyId),
+          eq(question.type, "COWORKER_QUESTION"),
+        ),
+      );
+  } else if (type === "FINAL_PROJECT_QUESTION") {
+    const questions = await db
+      .select({
+        questionId: sprintSurveyQuestion.questionId,
+      })
+      .from(sprintSurveyQuestion)
+      .innerJoin(question, eq(question.id, sprintSurveyQuestion.questionId))
+      .where(
+        and(
+          eq(sprintSurveyQuestion.sprintSurveyId, surveyId),
+          eq(question.type, "COWORKER_QUESTION"),
+        ),
+      );
+  }
 
   questions.forEach(async (question) => {
     const associatedSkills = await db
@@ -569,7 +587,7 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
   // analyze survey only if it has not been processed
   if (notProcessedSurvey) {
     const uniqueProjectUsers = await db
-      .select({
+      .selectDistinct({
         userId: projectMember.userId,
       })
       .from(sprintSurvey)
@@ -584,8 +602,10 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
       sprintSurveyId,
       ids,
     );
-    const questionsSkills: QuestionSkills =
-      await getQuestionsSkills(sprintSurveyId);
+    const questionsSkills: QuestionSkills = await getQuestionsSkills(
+      sprintSurveyId,
+      "COWORKER_QUESTION",
+    );
 
     // iterate through each unique user of the project and read the feedback received
     for (const userId of Object.keys(orderedFeedback)) {
@@ -673,12 +693,6 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
 
         strengthsIds = new Set(positiveSkillsIds);
 
-        console.log(userId);
-        console.log("Strengths", strengthsIds);
-        console.log("Weaknesses", weaknessesIds);
-        console.log("Resources ids", uniqueResources);
-        console.log("\n");
-
         // ================== ANALYSIS OF COMMENTS ==================
 
         [uniqueResources, strengthsIds, weaknessesIds] =
@@ -689,10 +703,6 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
             weaknessesIds,
           );
 
-        console.log("Strengths after comments analysis: ", strengthsIds);
-        console.log("Weaknesses after comments analysis: ", weaknessesIds);
-        console.log("Resources after comments analysis: ", uniqueResources);
-        console.log("\n\n\n");
         // =========== STORE SELECTED TASKS AND RESOURCES ===========
 
         if (weaknessesIds.size > 0) {
@@ -768,7 +778,7 @@ export async function projectAnalysis(finalSurveyId: number) {
     const managerId: string = manager[0].managerId;
 
     const uniqueProjectUsers = await db
-      .select({
+      .selectDistinct({
         userId: projectMember.userId,
       })
       .from(finalSurvey)
@@ -776,13 +786,22 @@ export async function projectAnalysis(finalSurveyId: number) {
       .innerJoin(projectMember, eq(projectMember.projectId, project.id))
       .where(eq(finalSurvey.id, finalSurveyId));
 
-    const uniqueWorkersIds = uniqueProjectUsers.map(
-      (element) => element.userId,
-    );
+    const uniqueWorkersIds = uniqueProjectUsers.map((worker) => worker.userId);
 
+    console.log("=========================================");
+    console.log("=========================================");
+    console.log("Manager: ", managerId);
+    console.log("=========================================");
+    console.log("=========================================");
+    console.log("Workers: ", uniqueWorkersIds);
+    console.log("=========================================");
+    console.log("=========================================");
+
+    /*
     await db
       .update(finalSurvey)
       .set({ processed: true })
       .where(eq(finalSurvey.id, finalSurveyId));
+    */
   }
 }
