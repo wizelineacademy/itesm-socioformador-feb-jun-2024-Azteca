@@ -21,6 +21,7 @@ import BookIcon from "@/components/icons/BookIcon";
 import ArticleIcon from "@/components/icons/ArticleIcon";
 import Link from "next/link";
 import ChevronRightIcon from "@/components/icons/ChevronRightIcon";
+import ChevronDownIcon from "@/components/icons/ChevronDownIcon";
 
 const statusOptions = [
   { label: "Pending", color: "bg-red-500", value: "PENDING" },
@@ -82,20 +83,33 @@ const PCP = () => {
         <ProgressBar width={progressPercentage} height={6} />
       </section>
 
-      <section id="pip-selectproject">
-        <select
-          onChange={(e) => {
-            console.log(e.target.value);
-            setProjectId(parseInt(e.target.value));
-          }}
-        >
-          {projectsQuery.data &&
-            projectsQuery.data.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.name}
-              </option>
-            ))}
-        </select>
+      <section id="pip-selectproject" className="pt-4">
+        <div className="relative inline-block w-full">
+          <select
+            onChange={(e) => {
+              console.log(e.target.value);
+              setProjectId(parseInt(e.target.value));
+            }}
+            className="focus:shadow-outline w-full appearance-none rounded border border-gray-400 bg-white p-2 font-medium leading-tight drop-shadow-lg hover:border-gray-500 focus:border-primary focus:outline-none"
+          >
+            <option>Personal Improvement</option>
+            {projectsQuery.data &&
+              projectsQuery.data.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.name}
+                </option>
+              ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+            <svg
+              className="h-4 w-4 fill-current"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <path d="M5.516 7.548a.75.75 0 011.06.025L10 10.704l3.424-3.13a.75.75 0 011.06-.024.75.75 0 01.024 1.06l-4 3.5a.75.75 0 01-1.084 0l-4-3.5a.75.75 0 01.024-1.06z" />
+            </svg>
+          </div>
+        </div>
       </section>
 
       {projectId && (
