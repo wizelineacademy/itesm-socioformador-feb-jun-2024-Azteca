@@ -193,6 +193,7 @@ export const sprintSurvey = pgTable("sprint_survey", {
   }),
   scheduledAt: date("scheduled_at", { mode: "date" }),
   processed: boolean("processed").default(false),
+  isProcessing: boolean("is_processing").default(false).notNull(),
 });
 
 export type SelectSprintSurvey = typeof sprintSurvey.$inferSelect;
@@ -236,6 +237,7 @@ export const finalSurvey = pgTable("final_survey", {
     onDelete: "cascade",
   }),
   processed: boolean("processed").default(false),
+  isProcessing: boolean("is_processing").default(false).notNull(),
 });
 
 export const finalSurveyAnswer = pgTable(
