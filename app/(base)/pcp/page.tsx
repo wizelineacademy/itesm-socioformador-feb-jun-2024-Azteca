@@ -4,6 +4,7 @@ import NoDataCard from "@/components/NoDataCard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getProjects } from "@/services/project";
 import {
+  getCurrentSprintSurvey,
   getUserResourcesForCurrentSprint,
   getUserResourcesHistory,
   getUserTasksForCurrentSprintByProjectId,
@@ -42,6 +43,18 @@ const PCP = () => {
     setProjectId(projectsQuery.data[0].id);
   }, [projectsQuery.data]);
 
+  const sprintSurveyQuery = useQuery({
+    queryKey: ["sprintSurvey", projectId],
+    queryFn: () => getCurrentSprintSurvey(projectId || 0),
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const scheduledAt = sprintSurveyQuery.data?.scheduledAt;
+  const formattedDate = scheduledAt
+    ? new Date(scheduledAt).toLocaleDateString("es-ES")
+    : "";
+
   const progressPercentage = 100;
 
   if (
@@ -63,7 +76,7 @@ const PCP = () => {
         <div className="flex items-center justify-between">
           <p className=" mb-2 text-3xl font-semibold">Personal Career Plan</p>
           <p className=" mb-2 text-xl font-medium text-graySubtitle">
-            Sprint 28/05/2024
+            {`Sprint ${formattedDate}`}
           </p>
         </div>
         <ProgressBar width={progressPercentage} height={6} />
