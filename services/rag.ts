@@ -522,7 +522,7 @@ export async function rulerAnalysis(
 
   // recommend tasks and resources only if the emotion is negative
   const pleasentess = emotionInfo[0].pleasentess as number;
-  if (pleasentess < 1) {
+  if (pleasentess < -3) {
     const allResources = await db
       .select({ id: pipResource.id, embedding: pipResource.embedding })
       .from(pipResource);
