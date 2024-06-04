@@ -12,6 +12,7 @@ describe("Profile", () => {
     cy.get('[data-testid="banner-tab"]').click();
     cy.get(`[data-testid="banner-image-${randomNumber}"]`).click();
     cy.get("button").contains("Done").click();
+    cy.visit("/profile");
     cy.get(`[data-testid="Banner${randomNumber}.svg"]`).should(
       "have.attr",
       "src",

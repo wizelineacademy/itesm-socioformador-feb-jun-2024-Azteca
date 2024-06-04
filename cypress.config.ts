@@ -17,24 +17,21 @@ export default defineConfig({
     viewportWidth: 1920,
     viewportHeight: 1080,
     baseUrl: "http://localhost:3000",
-    setupNodeEvents(on) {
+    setupNodeEvents(on, config) {
       on("task", {
         async deleteDummyUser({ email }) {
-          await db
-            .delete(user)
-            .where(eq(user.email, email))
-            .then((res) => {
-              if (res) {
-                return true;
-              }
-            })
-            .catch((err) => {
-              console.error(err);
-              return false;
-            });
-          return null;
+          try {
+            const res = await db.delete(user).where(eq(user.email, email));
+
+            return res ? true : false;
+          } catch (err) {
+            console.error(err);
+            return false;
+          }
         },
       });
+
+      return config;
     },
   },
 });

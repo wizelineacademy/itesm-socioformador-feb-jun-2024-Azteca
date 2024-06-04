@@ -59,6 +59,7 @@
     "@babel/core": "^7.24.6",
     "@babel/preset-env": "^7.24.6",
     "@babel/preset-react": "^7.24.6",
+    "@cypress/code-coverage": "^3.12.39",
     "@playwright/test": "^1.44.0",
     "@testing-library/jest-dom": "^6.4.5",
     "@testing-library/react": "^15.0.7",
