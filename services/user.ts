@@ -1,8 +1,7 @@
 "use server";
 
-import { projectMember, user, userRoleEnum, project } from "@/db/schema";
+import { projectMember, user, userRoleEnum, project, skill } from "@/db/schema";
 import db from "@/db/drizzle";
-import * as schema from "@/db/schema";
 import { eq, not, and, or, asc, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { auth } from "@/auth";
@@ -12,19 +11,19 @@ import { DatabaseError } from "pg";
 export async function getUserInfoById(id: string) {
   const res = await db
     .select({
-      id: schema.user.id,
-      name: schema.user.name,
-      email: schema.user.email,
-      jobTitle: schema.user.jobTitle,
-      department: schema.user.department,
-      photoUrl: schema.user.photoUrl,
-      role: schema.user.role,
-      bannerId: schema.user.bannerId,
-      primaryColor: schema.user.primaryColor,
-      lightMode: schema.user.lightMode,
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      jobTitle: user.jobTitle,
+      department: user.department,
+      photoUrl: user.photoUrl,
+      role: user.role,
+      bannerId: user.bannerId,
+      primaryColor: user.primaryColor,
+      lightMode: user.lightMode,
     })
-    .from(schema.user)
-    .where(eq(schema.user.id, id));
+    .from(user)
+    .where(eq(user.id, id));
 
   if (res.length === 0) {
     throw new Error("User could not be found");
@@ -37,19 +36,19 @@ export async function getUserInfo() {
   const id = session?.user?.id as string;
   const res = await db
     .select({
-      id: schema.user.id,
-      name: schema.user.name,
-      email: schema.user.email,
-      jobTitle: schema.user.jobTitle,
-      department: schema.user.department,
-      photoUrl: schema.user.photoUrl,
-      role: schema.user.role,
-      bannerId: schema.user.bannerId,
-      primaryColor: schema.user.primaryColor,
-      lightMode: schema.user.lightMode,
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      jobTitle: user.jobTitle,
+      department: user.department,
+      photoUrl: user.photoUrl,
+      role: user.role,
+      bannerId: user.bannerId,
+      primaryColor: user.primaryColor,
+      lightMode: user.lightMode,
     })
-    .from(schema.user)
-    .where(eq(schema.user.id, id));
+    .from(user)
+    .where(eq(user.id, id));
 
   if (res.length === 0) {
     throw new Error("User could not be found");
@@ -170,17 +169,17 @@ export const updateLightMode = async ({
 };
 
 export async function getUserTraitsById(id: string) {
-  const res = await db
+  const strengths = await db
     .select({
-      id: schema.trait.id,
-      name: schema.trait.name,
-      description: schema.trait.description,
-      kind: schema.trait.kind,
+      id: skill.id,
+      name: skill.positiveSkill,
+      description: skill.,
+      kind: skill.kind,
     })
-    .from(schema.trait)
-    .innerJoin(schema.userTrait, eq(schema.userTrait.traitId, schema.trait.id))
-    .innerJoin(schema.user, eq(schema.userTrait.userId, schema.user.id))
-    .where(eq(schema.user.id, id));
+    .from(trait)
+    .innerJoin(userTrait, eq(userTrait.traitId, trait.id))
+    .innerJoin(user, eq(userTrait.userId, user.id))
+    .where(eq(user.id, id));
 
   const strengths_arr = [];
   const areasOfOportunity_arr = [];
@@ -207,20 +206,20 @@ export async function getCoWorkers(userId: string | null | undefined) {
       throw new Error("You most be signed in");
     }
   }
-  const pm = alias(schema.projectMember, "pm");
-  const pm2 = alias(schema.projectMember, "pm2");
+  const pm = alias(projectMember, "pm");
+  const pm2 = alias(projectMember, "pm2");
   const res = await db
     .selectDistinct({
-      id: schema.user.id,
-      name: schema.user.name,
-      email: schema.user.email,
-      jobTitle: schema.user.jobTitle,
-      department: schema.user.department,
-      photoUrl: schema.user.photoUrl,
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      jobTitle: user.jobTitle,
+      department: user.department,
+      photoUrl: user.photoUrl,
     })
     .from(pm)
     .innerJoin(pm2, eq(pm.projectId, pm2.projectId))
-    .innerJoin(schema.user, eq(schema.user.id, pm2.userId))
+    .innerJoin(user, eq(user.id, pm2.userId))
     .where(eq(pm.userId, userId));
 
   const coworkers = res.filter((user) => user.id !== userId);
@@ -237,34 +236,26 @@ export async function getProjectsProfile(userId: string | null | undefined) {
   }
 
   const res = await db
-    .selectDistinctOn([schema.project.id], {
-      id: schema.project.id,
-      name: schema.project.name,
-      description: schema.project.description,
-      startDate: schema.project.startDate,
-      endDate: schema.project.endDate,
+    .selectDistinctOn([project.id], {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      startDate: project.startDate,
+      endDate: project.endDate,
     })
-    .from(schema.projectMember)
-    .innerJoin(
-      schema.project,
-      eq(schema.projectMember.projectId, schema.project.id),
-    )
-    .where(
-      or(
-        eq(schema.projectMember.userId, userId),
-        eq(schema.project.managerId, userId),
-      ),
-    );
+    .from(projectMember)
+    .innerJoin(project, eq(projectMember.projectId, project.id))
+    .where(or(eq(projectMember.userId, userId), eq(project.managerId, userId)));
   return res;
 }
 
 export async function getAllEmployees() {
   const res = await db
     .select({
-      id: schema.user.id,
-      name: schema.user.name,
-      email: schema.user.email,
-      photoUrl: schema.user.photoUrl,
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      photoUrl: user.photoUrl,
     })
     .from(user)
     .where(not(eq(user.role, "ADMIN")));
@@ -273,14 +264,14 @@ export async function getAllEmployees() {
 export async function searchUsers(query: string) {
   const res = await db
     .select({
-      id: schema.user.id,
-      name: schema.user.name,
-      email: schema.user.email,
-      photoUrl: schema.user.photoUrl,
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      photoUrl: user.photoUrl,
     })
-    .from(schema.user)
-    .where(sql`${schema.user.name} ILIKE ${`%${query}%`}`)
-    .orderBy(asc(schema.user.name));
+    .from(user)
+    .where(sql`${user.name} ILIKE ${`%${query}%`}`)
+    .orderBy(asc(user.name));
 
   return res;
 }

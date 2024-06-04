@@ -152,7 +152,7 @@ export const rulerSurveyAnswers = pgTable(
 export const questionTypeEnum = pgEnum("type_question", [
   "SPRINT_QUESTION",
   "COWORKER_QUESTION",
-  "COWORKER_COMMENT",
+  // "COWORKER_COMMENT",
   "FINAL_PROJECT_QUESTION",
   "FINAL_PROJECT_COMMENT",
 ]);
@@ -167,6 +167,8 @@ export const skill = pgTable("skill", {
   id: serial("skill_id").primaryKey(),
   positiveSkill: varchar("positive_skill", { length: 30 }),
   negativeSkill: varchar("negative_skill", { length: 30 }),
+  positiveDescription: varchar("positive_description", { length: 1024 }),
+  negativeDescription: varchar("negative_description", { length: 1024 }),
 });
 
 export const questionSkill = pgTable("question_skill", {
