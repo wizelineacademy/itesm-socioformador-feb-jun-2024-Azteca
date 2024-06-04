@@ -8,6 +8,7 @@ import {
   projectMember,
   rulerSurveyAnswers,
   sprintSurvey,
+  sprintSurveyAnswerProject,
 } from "@/db/schema";
 import { eq, and, sql, gte } from "drizzle-orm";
 import { Notification } from "@/types/types";
@@ -25,24 +26,30 @@ export async function getNotifications() {
       id: sprintSurvey.id,
       projectName: project.name,
       date: sprintSurvey.scheduledAt,
+      answerUserId: sprintSurveyAnswerProject.userId,
     })
     .from(sprintSurvey)
     .innerJoin(project, eq(project.id, sprintSurvey.projectId))
     .innerJoin(projectMember, eq(projectMember.projectId, project.id))
+    .leftJoin(
+      sprintSurveyAnswerProject,
+      and(eq(sprintSurvey.id, sprintSurveyAnswerProject.sprintSurveyId)),
+    )
     .where(
       and(
         eq(projectMember.userId, userId), // the surveys belong to a user's project
+        eq(sprintSurveyAnswerProject.userId, userId),
         eq(sprintSurvey.processed, false), // the surveys aren't processed
         gte(sql`CURRENT_TIMESTAMP`, sprintSurvey.scheduledAt), // the survey itself is active (i.e. has been scheduled)
       ),
     );
-
   if (sprintSurveys.length > 0) {
     for (const sprintSurvey of sprintSurveys) {
-      notifications.push({
-        ...sprintSurvey,
-        type: "SPRINT",
-      });
+      if (!(sprintSurvey.answerUserId === userId))
+        notifications.push({
+          ...sprintSurvey,
+          type: "SPRINT",
+        });
     }
   }
 
