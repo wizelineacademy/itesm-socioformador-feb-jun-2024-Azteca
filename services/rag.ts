@@ -11,6 +11,7 @@ import {
   projectMember,
   question,
   questionSkill,
+  rulerEmotion,
   skill,
   sprintSurvey,
   sprintSurveyAnswerCoworkers,
@@ -54,7 +55,7 @@ interface EmbeddingRecord {
 async function cosineSimilarity(
   baseMessage: string,
   embeddingRecords: EmbeddingRecord[],
-) {
+): Promise<number[]> {
   const recordsSimilarity: [GLfloat, number][] = [];
 
   const openai = new OpenAI({
@@ -87,62 +88,74 @@ async function cosineSimilarity(
   return recordsId;
 }
 
-async function createTasks(weaknessesIds: Set<number>) {
-  // get the name of the weaknesses
-  let weaknessesRecords = [];
+async function createTasks(weaknessMessage: string): Promise<string[]> {
   let cleanedTasks: string[] = [];
 
-  if (weaknessesIds.size > 0) {
-    weaknessesRecords = await db
-      .select({ negativeSkill: skill.negativeSkill })
-      .from(skill)
-      .where(inArray(skill.id, Array.from(weaknessesIds)));
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_KEY,
+  });
 
-    const weaknesses: string[] = weaknessesRecords.map(
-      (element) => element.negativeSkill as string,
-    );
+  const tasksInstructions: string = `El siguiente query representa ya sea lo que está pasando un usuario o sus áreas donde debe mejorar, debes crear tareas simples para la persona evaluada para mejorar su rendimiento o bienestar. Las tareas deben ser claras y concisas, deben estar relacionadas al query recibido, deben ser tareas simples que no tomen mucho tiempo al usuario pero que le permiten mejorar en su rendimiento o bienestar. Algunos ejemplos de tareas pueden ser "Hacer ejercicio", "Ir con el psicólogo", "Meditar", "Dormir 8 horas diarias", "Comer frutas y verduras", "Visitar a mi familia", etc., pero cuida que sean relacionadas al query ingresado, que sean sencilas y que todas sean diferentes.
 
-    // join all the weaknesses in a string for a direct query
-    const stringWeaknesses: string = weaknesses.join(", ");
+  Hay otras indicaciones muy importantes que debes seguir por cada tarea:
+  1. Cada tarea debe llevar un título y una descripción.
+  2. El título no debe superar los 64 caracteres y la descripción no debe superar los 256 caracteres.
+  3. Al crear ya sea el título o la descripción de cada tarea no debes usar nunca los caracteres "\n" ni ":" porque esos son caracteres especiales que yo te indicaré donde usar.
+  4. Vas a juntar el título de cada tarea con la descripción donde el separador de en medio es el caracter ":" sin espacios en blanco entre todos los caracteres, solo en el mensaje del título y de la descripción.
+  5. Vas a unir las estructuras de todas las tareas con el caracter "\n" como separador sin espacios en blanco entre la estructura de cada tarea y ese separador.
+  6. El query puede o no llegar a tener más de 10 áreas de oportunidad, si ese es el caso debes crear tareas que involucren 2 o más áreas de oportunidad en una misma, puedes tomarte la libertad de crear la cantidad de tareas que consideres pero que nunca exceda la cantidad de 10 tareas. Si son menos de 10 áreas de oportunidad crea una tarea por cada área de oportunidad. Si el query es más relacionado al bienestar el usuario y no a su rendimiento laboral, las tareas deben estar relacionadas a mejorar su bienestar emocional, físico o mental y deben ser máximo 5.
+  7. Aunque el contenido del query sea en inglés la generación de las tareas que vas a generar debe estar en español.
+  8. La siguiente estructura es ilustrativa de cómo debes regresar el resultado con todas las tareas, fíjate en estructura no tanto en el contenido:
+  """
+  titulo_1:descripcion_1\ntitulo_2:descripcion_2\ntitulo_3:descripcion_3
+  """`;
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_KEY,
-    });
+  const rawTasks = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [
+      {
+        role: "system",
+        content: tasksInstructions,
+      },
+      {
+        role: "user",
+        content: weaknessMessage,
+      },
+    ],
+  });
 
-    const tasksInstructions: string = `El siguiente query contiene todas las áreas de mejora de un usuario, debes crear tareas simples para la persona evaluada para mejorar su rendimiento o bienestar. Las tareas deben ser claras y concisas, deben estar relacionadas al query recibido, deben ser tareas simples que no tomen mucho tiempo al usuario pero que le permiten mejorar en su rendimiento o bienestar. Algunos ejemplos de tareas pueden ser "Hacer ejercicio", "Ir con el psicólogo", "Meditar", "Dormir 8 horas diarias", "Comer frutas y verduras", "Visitar a mi familia", etc., pero cuida que sean relacionadas a las áreas de mejora indicadas, que sean sencilas y que todas sean diferentes.
+  // clean the results of the generated tasks
+  const tasks = (rawTasks.choices[0].message.content as string).split("\n");
+  cleanedTasks = tasks.filter((element) => element !== "");
 
-    Hay otras indicaciones muy importantes que debes seguir por cada tarea:
-    1. Cada tarea debe llevar un título y una descripción.
-    2. El título no debe superar los 64 caracteres y la descripción no debe superar los 256 caracteres.
-    3. Al crear ya sea el título o la descripción de cada tarea no debes usar nunca los caracteres "\n" ni ":" porque esos son caracteres especiales que yo te indicaré donde usar.
-    4. Vas a juntar el título de cada tarea con la descripción donde el separador de en medio es el caracter ":" sin espacios en blanco entre todos los caracteres, solo en el mensaje del título y de la descripción.
-    5. Vas a unir las estructuras de todas las tareas con el caracter "\n" como separador sin espacios en blanco entre la estructura de cada tarea y ese separador.
-    6. El query puede o no llegar a tener más de 10 áreas de oportunidad, si ese es el caso debes crear tareas que involucren 2 o más áreas de oportunidad en una misma, puedes tomarte la libertad de crear la cantidad de tareas que consideres pero que nunca exceda la cantidad de 10 tareas. Si son menos de 10 áreas de oportunidad crea una tarea por cada área de oportunidad.
-    7. Aunque las áreas de mejora sean en inglés el contenido de las tareas que vas a generar debe estar en español.
-    8. La siguiente estructura es ilustrativa de cómo debes regresar el resultado con todas las tareas, fíjate en estructura no tanto en el contenido:
-    """
-    titulo_1:descripcion_1\ntitulo_2:descripcion_2\ntitulo_3:descripcion_3
-    """`;
-
-    const rawTasks = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [
-        {
-          role: "system",
-          content: tasksInstructions,
-        },
-        {
-          role: "user",
-          content: stringWeaknesses,
-        },
-      ],
-    });
-
-    // clean the results of the generated tasks
-    const tasks = (rawTasks.choices[0].message.content as string).split("\n");
-    cleanedTasks = tasks.filter((element) => element !== "");
-  }
   return cleanedTasks;
+}
+
+async function reduceTask(message: string, maxLength: number): Promise<string> {
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_KEY,
+  });
+
+  const instructions: string =
+    "El siguiente es un mensaje largo, debes reducir su longitud para que no exceda " +
+    maxLength +
+    " caracteres, pero sin que el mensaje pierda su significado ni su escencia.";
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [
+      {
+        role: "system",
+        content: instructions,
+      },
+      {
+        role: "user",
+        content: message,
+      },
+    ],
+  });
+
+  return response.choices[0].message.content as string;
 }
 
 async function processOpenFeedback(
@@ -163,20 +176,6 @@ async function processOpenFeedback(
 
   // if there are no comments, return the same variables without any update
   if (feedbackComments.length > 0) {
-    console.log(
-      "=============================================================",
-    );
-    console.log(
-      "=============================================================",
-    );
-    console.log("START OF COMMENTS ANALYSIS");
-    console.log(
-      "=============================================================",
-    );
-    console.log(
-      "=============================================================",
-    );
-
     let joinedFeedbackComments: string = feedbackComments.join("\n\n");
 
     // string cleaning
@@ -291,7 +290,10 @@ async function processOpenFeedback(
   return [uniqueResources, strengthsIds, weaknessesIds];
 }
 
-async function orderFeedback(sprintSurveyId: number, uniqueWorkers: string[]) {
+async function orderFeedback(
+  sprintSurveyId: number,
+  uniqueWorkers: string[],
+): Promise<FeedbackRecords> {
   const feedbackRecords: FeedbackRecords = {};
 
   const coworkersOpenFeedback = await db
@@ -389,7 +391,7 @@ async function orderFeedback(sprintSurveyId: number, uniqueWorkers: string[]) {
 async function getFeedbackClassifications(
   coworkersFeedback: FeedbackCategory,
   questionsSkills: QuestionSkills,
-) {
+): Promise<FeedbackClassifications> {
   const feedbackClassifications: FeedbackClassifications = {
     positive: {},
     negative: {},
@@ -452,7 +454,9 @@ async function getFeedbackClassifications(
   return feedbackClassifications;
 }
 
-async function getQuestionsSkills(sprintSurveyId: number) {
+async function getQuestionsSkills(
+  sprintSurveyId: number,
+): Promise<QuestionSkills> {
   const questionsSkills: QuestionSkills = {};
   const questions = await db
     .select({
@@ -480,41 +484,74 @@ async function getQuestionsSkills(sprintSurveyId: number) {
   return questionsSkills;
 }
 
-/* async function setResourcesEmbeddings() {
-  try {
-    const noEmbeddingResources = await db
-      .select()
-      .from(pipResource)
-      .where(sql`embedding::text = '[]'`);
+export async function rulerAnalysis(
+  userId: string,
+  userComment: string,
+  emotionId: number,
+  sprintSurveyId: number,
+) {
+  const emotionInfo = await db
+    .select({
+      name: rulerEmotion.name,
+      description: rulerEmotion.description,
+      embedding: rulerEmotion.embedding,
+      pleasentess: rulerEmotion.pleasantness,
+      energy: rulerEmotion.energy,
+    })
+    .from(rulerEmotion)
+    .where(eq(rulerEmotion.id, emotionId));
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_KEY,
+  // recommend tasks and resources only if the emotion is negative
+  const pleasentess = emotionInfo[0].pleasentess as number;
+  if (pleasentess < 1) {
+    const allResources = await db
+      .select({ id: pipResource.id, embedding: pipResource.embedding })
+      .from(pipResource);
+
+    let baseMessage: string = "Este es el estado de ánimo del usuario:\n";
+    baseMessage += ((emotionInfo[0].name as string) +
+      ": " +
+      emotionInfo[0].description) as string;
+
+    if (userComment !== "") {
+      baseMessage += "\n\n" + "Y estos son sus pensamientos:\n" + userComment;
+    }
+
+    const recommendedResourcesIds: number[] = await cosineSimilarity(
+      baseMessage,
+      allResources,
+    );
+
+    recommendedResourcesIds.splice(5);
+
+    const tasks: string[] = await createTasks(baseMessage);
+
+    tasks.forEach(async (task) => {
+      const [title, description] = task.split(":");
+      let newTitle = title;
+      let newDescription = description;
+      if (title.length > 64) {
+        newTitle = await reduceTask(title, 64);
+      }
+      if (description.length > 256) {
+        newDescription = await reduceTask(description, 256);
+      }
+      await db.insert(pipTask).values({
+        userId: userId,
+        title: newTitle,
+        description: newDescription,
+        sprintSurveyId: sprintSurveyId,
+      });
     });
 
-    for (const resource of noEmbeddingResources) {
-      const description = resource.description as string;
-
-      const response = await openai.embeddings.create({
-        model: "text-embedding-3-small",
-        input: description,
-        encoding_format: "float",
+    recommendedResourcesIds.forEach(async (resourceId) => {
+      await db.insert(userResource).values({
+        userId: userId,
+        resourceId: resourceId,
+        sprintSurveyId: sprintSurveyId,
       });
-
-      const array = response.data[0].embedding;
-
-      await db
-        .update(pipResource)
-        .set({ embedding: array })
-        .where(eq(pipResource.id, resource.id))
-        .execute();
-    }
-  } catch (err) {
-    console.error("Error retrieving resources:", err);
+    });
   }
-} */
-
-export async function rulerAnalysis() {
-  // recommend resources only if the mood of the user is negative, check the previous resources recommended to experiment
 }
 
 // Main function
@@ -530,20 +567,6 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
 
   // analyze survey only if it has not been processed
   if (notProcessedSurvey) {
-    console.log(
-      "=============================================================",
-    );
-    console.log(
-      "=============================================================",
-    );
-    console.log("START OF SPRINT ANALYSIS");
-    console.log(
-      "=============================================================",
-    );
-    console.log(
-      "=============================================================",
-    );
-
     const uniqueProjectUsers = await db
       .select({
         userId: projectMember.userId,
@@ -553,9 +576,15 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
       .innerJoin(projectMember, eq(projectMember.projectId, project.id))
       .where(eq(sprintSurvey.id, sprintSurveyId));
 
-    const ids = uniqueProjectUsers.map((user) => user.userId as string);
-    const orderedFeedback = await orderFeedback(sprintSurveyId, ids);
-    const questionsSkills = await getQuestionsSkills(sprintSurveyId);
+    const ids: string[] = uniqueProjectUsers.map(
+      (user) => user.userId as string,
+    );
+    const orderedFeedback: FeedbackRecords = await orderFeedback(
+      sprintSurveyId,
+      ids,
+    );
+    const questionsSkills: QuestionSkills =
+      await getQuestionsSkills(sprintSurveyId);
 
     // iterate through each unique user of the project and read the feedback received
     for (const userId of Object.keys(orderedFeedback)) {
@@ -666,13 +695,35 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
         // =========== STORE SELECTED TASKS AND RESOURCES ===========
 
         if (weaknessesIds.size > 0) {
-          const tasks = await createTasks(weaknessesIds);
+          // get the name of the weaknesses
+
+          const weaknessesRecords = await db
+            .select({ negativeSkill: skill.negativeSkill })
+            .from(skill)
+            .where(inArray(skill.id, Array.from(weaknessesIds)));
+
+          const weaknessesNames: string[] = weaknessesRecords.map(
+            (element) => element.negativeSkill as string,
+          );
+
+          // join all the weaknesses in a string for a direct query
+          const stringWeaknesses: string = weaknessesNames.join(", ");
+
+          const tasks = await createTasks(stringWeaknesses);
           for (const task of tasks) {
             const [title, description] = task.split(":");
+            let newTitle = title;
+            let newDescription = description;
+            if (title.length > 64) {
+              newTitle = await reduceTask(title, 64);
+            }
+            if (description.length > 256) {
+              newDescription = await reduceTask(description, 256);
+            }
             await db.insert(pipTask).values({
               userId: userId,
-              title: title,
-              description: description,
+              title: newTitle,
+              description: newDescription,
               sprintSurveyId: sprintSurveyId,
             });
           }
@@ -695,10 +746,4 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
       .set({ processed: true })
       .where(eq(sprintSurvey.id, sprintSurveyId));
   }
-
-  console.log("=============================================================");
-  console.log("=============================================================");
-  console.log("END OF SPRINT ANALYSIS");
-  console.log("=============================================================");
-  console.log("=============================================================");
 }
