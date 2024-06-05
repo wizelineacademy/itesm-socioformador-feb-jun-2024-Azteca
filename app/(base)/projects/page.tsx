@@ -29,7 +29,7 @@ const Projects = async () => {
             </Link>
           )}
         </div>
-        <div className="mx-auto flex max-w-[60%] flex-wrap items-center justify-center gap-6">
+        <div className="mx-auto flex flex-wrap items-center justify-center gap-6 overflow-x-auto">
           {projects.map((project) => (
             <ProjectCard
               key={project.id}
