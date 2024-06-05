@@ -9,7 +9,7 @@ import {
   sprintSurvey,
   user,
 } from "@/db/schema";
-import { and, asc, eq, ne, or } from "drizzle-orm";
+import { and, asc, eq, inArray, ne, or } from "drizzle-orm";
 import {
   SQSClient,
   SendMessageBatchCommand,
@@ -165,6 +165,7 @@ export type SurveyStatus =
   | "NOT_AVAILABLE";
 
 export interface Survey {
+  id: number;
   type: "SPRINT" | "FINAL";
   scheduledAt: Date;
   status: SurveyStatus;
@@ -205,6 +206,7 @@ export async function getUpdateFeedbackHistory({
 
   sprintSurveys.forEach((s) => {
     surveys.push({
+      id: s.id,
       type: "SPRINT",
       // TODO: make these types from drizzle schema to be non-null
       scheduledAt: s.scheduledAt as Date,
@@ -224,6 +226,7 @@ export async function getUpdateFeedbackHistory({
 
   finalSurveys.forEach((s) => {
     surveys.push({
+      id: s.id,
       type: "FINAL",
       // TODO: make these types from drizzle schema to be non-null
       scheduledAt: s.scheduledAt as Date,
@@ -246,7 +249,29 @@ export async function updateFeedback(projectId: number) {
   console.log("UPDATE_FEEDBACK", projectId);
   const client = new SQSClient();
 
-  const sprintSurveyIds = [52, 53, 54, 55]; // This should come from db
+  const feedbackHistory = await getUpdateFeedbackHistory({ projectId });
+
+  const sprintSurveyIds = feedbackHistory
+    .filter((s) => s.status === "PENDING" && s.type === "SPRINT")
+    .map((s) => s.id);
+  console.log("SPRINT_SURVEY_IDS", sprintSurveyIds);
+  await db
+    .update(sprintSurvey)
+    .set({
+      isProcessing: true,
+    })
+    .where(inArray(sprintSurvey.id, sprintSurveyIds));
+
+  const finalSurveyIds = feedbackHistory
+    .filter((s) => s.status === "PENDING" && s.type === "FINAL")
+    .map((s) => s.id);
+  console.log("FINAL_SURVEY_IDS", finalSurveyIds);
+  await db
+    .update(sprintSurvey)
+    .set({
+      isProcessing: true,
+    })
+    .where(inArray(sprintSurvey.id, finalSurveyIds));
 
   const entries: SendMessageBatchRequestEntry[] = sprintSurveyIds.map(
     (sprintSurveyId) => ({

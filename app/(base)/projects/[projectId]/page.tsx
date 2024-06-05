@@ -27,12 +27,13 @@ import Reload from "@/components/icons/Reload";
 
 const Project = ({ params }: { params: { projectId: string } }) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const projectId = parseInt(params.projectId);
 
   const [isUpdateFeedbackPopupOpen, setIsUpdateFeedbackPopupOpen] =
     useState(false);
 
-  const { mutate } = useMutation({
+  const deleteProjectMutation = useMutation({
     mutationFn: deleteProjectById,
     onSuccess: () => {
       router.replace("/projects");
@@ -207,6 +208,9 @@ const Project = ({ params }: { params: { projectId: string } }) => {
                   className="rounded-lg bg-primary px-3 py-2 text-white disabled:bg-gray-400"
                   onClick={async () => {
                     await updateFeedback(parseInt(params.projectId));
+                    await queryClient.invalidateQueries({
+                      queryKey: ["update-feedback-history"],
+                    });
                   }}
                 >
                   Update Feedback
@@ -215,8 +219,10 @@ const Project = ({ params }: { params: { projectId: string } }) => {
               {/* Delete button */}
               <button
                 className="rounded-lg bg-red-800 px-3 py-2 text-white"
-                onClick={() => {
-                  mutate(parseInt(params.projectId));
+                onClick={async () => {
+                  await deleteProjectMutation.mutateAsync(
+                    parseInt(params.projectId),
+                  );
                 }}
               >
                 Delete
@@ -406,7 +412,7 @@ const UpdateFeedbackHistoryPopup = ({
           ) : survey.status === "PENDING" ? (
             <p className="text-red-600">Pending</p>
           ) : survey.status === "NOT_AVAILABLE" ? (
-            <p className="text-gray-600">Pending</p>
+            <p className="text-gray-600">Not Available</p>
           ) : null}
         </div>
       ))}
