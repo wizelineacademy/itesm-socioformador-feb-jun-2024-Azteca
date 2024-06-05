@@ -680,7 +680,11 @@ async function getQuestionsSkills(
   type: string,
 ): Promise<QuestionSkills> {
   const questionsSkills: QuestionSkills = {};
-  let questions: any[] = [];
+  type Question = {
+    questionId: number | null;
+  };
+
+  let questions: Question[] = [];
 
   if (type === "COWORKER_QUESTION") {
     questions = await db
