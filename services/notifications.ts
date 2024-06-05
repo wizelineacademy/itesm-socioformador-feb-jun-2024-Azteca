@@ -91,7 +91,6 @@ export async function getNotifications() {
       ),
     );
 
-  console.log("FINAL SURVEY: ", finalSurveys);
   if (finalSurveys.length > 0) {
     for (const finalSurvey of finalSurveys) {
       notifications.push({
@@ -111,8 +110,6 @@ export async function getNotifications() {
         eq(rulerSurveyAnswers.answeredAt, sql`CURRENT_TIMESTAMP::date`), // is today's survey
       ),
     );
-
-  console.log("RULER :", rulerSurveys);
 
   if (rulerSurveys.length === 0) {
     // if there are no answers, send notification
