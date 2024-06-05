@@ -12,7 +12,7 @@ import {
 } from "@/types/types";
 import SprintStepThree from "./SprintStepThree";
 import SprintStepFour from "./SprintStepFour";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCoworkersInProject } from "@/services/project";
 import {
   getSprintSurveyQuestions,
@@ -21,7 +21,6 @@ import {
 import toast from "react-hot-toast";
 import { getUserId } from "@/services/user";
 import Loader from "../Loader";
-import { useRouter } from "next/navigation";
 
 interface SprintSurveyProps {
   showModal: boolean;
@@ -34,8 +33,6 @@ const SprintSurvey = ({
   onClose,
   sprintSurveyId,
 }: SprintSurveyProps) => {
-  const router = useRouter();
-
   const [step, setStep] = useState<number>(1);
   const { data: users, isError } = useQuery({
     queryKey: ["coworkers", 34],
@@ -161,10 +158,12 @@ const SprintSurvey = ({
     setStep(3);
   };
 
+  const queryClient = useQueryClient();
+
   const submitSurveyAnswers = useMutation({
     mutationFn: () => submitSprintSurveyAnswers(sprintAnswer),
     onSuccess: () => {
-      router.refresh();
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
       toast.success("Encuesta enviada exitosamente!");
     },
     onError: () => {
