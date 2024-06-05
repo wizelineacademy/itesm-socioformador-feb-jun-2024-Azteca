@@ -17,7 +17,7 @@ const InfoToolTip = ({ description, size }: InfoToolTipProps) => {
       tooltipWidth = 280;
       break;
     case "lg":
-      tooltipWidth = 360;
+      tooltipWidth = 340;
       break;
     default:
       tooltipWidth = 280;
