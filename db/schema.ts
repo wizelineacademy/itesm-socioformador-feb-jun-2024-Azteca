@@ -86,7 +86,11 @@ export const taskStatusEnum = pgEnum("status", [
 
 export const pipTask = pgTable("pip_task", {
   id: serial("id").primaryKey(),
+  rulerSurveyId: integer("ruler_survey_id").references(
+    () => rulerSurveyAnswers.id,
+  ),
   sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
+  finalSurveyId: integer("final_survey_id").references(() => finalSurvey.id),
   userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 64 }),
   description: varchar("description", { length: 256 }),
@@ -118,9 +122,13 @@ export const userResource = pgTable(
     resourceId: serial("resource_id").references(() => pipResource.id, {
       onDelete: "cascade",
     }),
+    rulerSurveyId: integer("ruler_survey_id").references(
+      () => rulerSurveyAnswers.id,
+    ),
     sprintSurveyId: integer("sprint_survey_id").references(
       () => sprintSurvey.id,
     ),
+    finalSurveyId: integer("final_survey_id").references(() => finalSurvey.id),
   },
   // composite primary key on (userId, resourceId)
 );
@@ -138,10 +146,12 @@ export const rulerEmotion = pgTable("ruler_emotion", {
 export const rulerSurveyAnswers = pgTable(
   "ruler_survey_answers",
   {
+    id: serial("id").primaryKey(),
     userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
     emotionId: integer("emotion_id").references(() => rulerEmotion.id),
     answeredAt: date("answered_at", { mode: "date" }),
     comment: text("comment"),
+    processed: boolean("processed").default(false),
   },
   // composite primary key on (userId, rulerSurveyId)
 );
@@ -149,7 +159,7 @@ export const rulerSurveyAnswers = pgTable(
 export const questionTypeEnum = pgEnum("type_question", [
   "SPRINT_QUESTION",
   "COWORKER_QUESTION",
-  // "COWORKER_COMMENT",
+  "COWORKER_COMMENT",
   "FINAL_PROJECT_QUESTION",
   "FINAL_PROJECT_COMMENT",
 ]);
