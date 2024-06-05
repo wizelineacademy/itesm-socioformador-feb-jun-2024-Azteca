@@ -54,7 +54,7 @@ export default function EmblaCarousel({ userId }: { userId: string }) {
 
   return (
     <div className="embla" ref={emblaRef}>
-      <ul className="embla__container px-1 py-3">
+      <ul className="embla__container px-1 py-4">
         {coworkersQuery.data.map((user, index) => (
           <Tooltip.Floating label={user.name} color="#6640D5" key={index}>
             <li className="embla__slide__coworker">
