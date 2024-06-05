@@ -140,6 +140,7 @@ export const rulerEmotion = pgTable("ruler_emotion", {
 export const rulerSurveyAnswers = pgTable(
   "ruler_survey_answers",
   {
+    id: serial("id").primaryKey(),
     userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
     emotionId: integer("emotion_id").references(() => rulerEmotion.id),
     answeredAt: date("answered_at", { mode: "date" }),

@@ -189,6 +189,10 @@ async function processCoworkersOpenFeedback(
     joinedFeedbackComments = joinedFeedbackComments.replaceAll("sesgado:", "");
     joinedFeedbackComments = joinedFeedbackComments.replaceAll("  ", " ");
 
+    console.log("===========================================");
+    console.log("COMMENTS PROCESSING");
+    console.log("===========================================");
+
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_KEY,
     });
