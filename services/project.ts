@@ -158,25 +158,37 @@ export async function getCoworkersInProject(sprintSurveyId: number) {
     );
 }
 
+export type SurveyStatus =
+  | "COMPLETED"
+  | "PENDING"
+  | "PROCESSING"
+  | "NOT_AVAILABLE";
+
+export interface Survey {
+  type: "SPRINT" | "FINAL";
+  scheduledAt: Date;
+  status: SurveyStatus;
+}
+
 export async function getUpdateFeedbackHistory({
   projectId,
 }: {
   projectId: number;
 }) {
-  type SurveyStatus = "COMPLETED" | "PENDING" | "NOT_AVAILABLE";
-  interface Survey {
-    type: "SPRINT" | "FINAL";
-    scheduledAt: Date;
-    status: SurveyStatus;
-  }
-
-  const getStatus = (scheduledAt: Date, processed: boolean): SurveyStatus => {
+  const getStatus = (
+    scheduledAt: Date,
+    processed: boolean,
+    isProcessing: boolean,
+  ): SurveyStatus => {
     const today = new Date();
     if (scheduledAt <= today) {
       // meaning it was already sent to users
       if (processed) {
         return "COMPLETED";
       } else {
+        if (isProcessing) {
+          return "PROCESSING";
+        }
         return "PENDING";
       }
     }
@@ -196,7 +208,11 @@ export async function getUpdateFeedbackHistory({
       type: "SPRINT",
       // TODO: make these types from drizzle schema to be non-null
       scheduledAt: s.scheduledAt as Date,
-      status: getStatus(s.scheduledAt as Date, s.processed as boolean),
+      status: getStatus(
+        s.scheduledAt as Date,
+        s.processed as boolean,
+        s.isProcessing,
+      ),
     });
   });
 
@@ -211,7 +227,11 @@ export async function getUpdateFeedbackHistory({
       type: "FINAL",
       // TODO: make these types from drizzle schema to be non-null
       scheduledAt: s.scheduledAt as Date,
-      status: getStatus(s.scheduledAt as Date, s.processed as boolean),
+      status: getStatus(
+        s.scheduledAt as Date,
+        s.processed as boolean,
+        s.isProcessing,
+      ),
     });
   });
 

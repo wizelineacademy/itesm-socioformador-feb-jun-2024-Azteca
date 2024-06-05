@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import { RadarChart, AreaChart } from "@mantine/charts";
 import GaugeChart from "@/components/GaugeChart";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { Survey } from "@/services/project";
 import {
   deleteProjectById,
   getUpdateFeedbackHistory,
@@ -19,8 +20,9 @@ import {
 } from "@/services/sprintSurvey";
 
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon";
-import NoDataCard from "@/components/NoDataCard";
 import Loader from "@/components/Loader";
+import Spinner from "@/components/icons/Spinner";
+import Reload from "@/components/icons/Reload";
 
 const Project = ({ params }: { params: { projectId: string } }) => {
   const router = useRouter();
@@ -35,6 +37,16 @@ const Project = ({ params }: { params: { projectId: string } }) => {
       router.replace("/projects");
       router.refresh();
     },
+  });
+
+  const {
+    data: feedbackHistoryData,
+    isLoading: isLoadingFeedbackHistoryData,
+    isRefetching: isRefetchingFeedbackHistoryData,
+  } = useQuery({
+    queryKey: ["update-feedback-history"],
+    queryFn: () => getUpdateFeedbackHistory({ projectId }),
+    retry: false,
   });
 
   const userRoleQuery = useQuery({
@@ -126,6 +138,8 @@ const Project = ({ params }: { params: { projectId: string } }) => {
   const progressBarPercentage = 74;
 
   if (
+    isLoadingFeedbackHistoryData ||
+    !feedbackHistoryData ||
     isLoadingStatistics ||
     isLoadingDetailedStatistics ||
     isLoadingProjectData ||
@@ -137,7 +151,6 @@ const Project = ({ params }: { params: { projectId: string } }) => {
       </div>
     );
   }
-  console.log(gaugeData);
 
   return (
     <div className="mt-2">
@@ -151,7 +164,12 @@ const Project = ({ params }: { params: { projectId: string } }) => {
               <div className="relative z-10 flex items-center gap-1">
                 {/* popup */}
                 {isUpdateFeedbackPopupOpen && (
-                  <UpdateFeedbackHistoryPopup projectId={projectId} />
+                  <UpdateFeedbackHistoryPopup
+                    feedbackHistoryData={feedbackHistoryData}
+                    isRefetchingFeedbackHistoryData={
+                      isRefetchingFeedbackHistoryData
+                    }
+                  />
                 )}
 
                 {/* open-popup-button */}
@@ -166,7 +184,11 @@ const Project = ({ params }: { params: { projectId: string } }) => {
                 </button>
                 {/* update-button */}
                 <button
-                  className="rounded-lg bg-primary px-3 py-2 text-white"
+                  disabled={
+                    feedbackHistoryData.filter((s) => s.status === "PROCESSING")
+                      .length > 0
+                  }
+                  className="rounded-lg bg-primary px-3 py-2 text-white disabled:bg-gray-400"
                   onClick={async () => {
                     await updateFeedback(parseInt(params.projectId));
                   }}
@@ -280,12 +302,14 @@ const Project = ({ params }: { params: { projectId: string } }) => {
   );
 };
 
-const UpdateFeedbackHistoryPopup = ({ projectId }: { projectId: number }) => {
-  const updateFeedbackHistoryQuery = useQuery({
-    queryKey: ["update-feedback-history"],
-    queryFn: () => getUpdateFeedbackHistory({ projectId }),
-    retry: false,
-  });
+const UpdateFeedbackHistoryPopup = ({
+  feedbackHistoryData,
+  isRefetchingFeedbackHistoryData,
+}: {
+  feedbackHistoryData: Survey[];
+  isRefetchingFeedbackHistoryData: boolean;
+}) => {
+  const queryClient = useQueryClient();
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleString("default", {
@@ -295,21 +319,26 @@ const UpdateFeedbackHistoryPopup = ({ projectId }: { projectId: number }) => {
     });
   };
 
-  if (updateFeedbackHistoryQuery.isError) {
-    return <NoDataCard text={updateFeedbackHistoryQuery.error.message} />;
-  }
-
-  if (
-    updateFeedbackHistoryQuery.isLoading ||
-    !updateFeedbackHistoryQuery.data
-  ) {
-    return <p>Loading...</p>;
-  }
-
   return (
     <div className="absolute right-full top-full z-0 text-nowrap rounded-xl bg-white p-4 drop-shadow-lg">
-      <h2 className="mb-4 text-xl font-medium">Update History</h2>
-      {updateFeedbackHistoryQuery.data.map((survey, idx) => (
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-xl font-medium">Update History</h2>
+        <button
+          className="rounded-lg bg-primary p-1 text-white disabled:bg-gray-400"
+          disabled={isRefetchingFeedbackHistoryData}
+          onClick={async () => {
+            await queryClient.invalidateQueries({
+              queryKey: ["update-feedback-history"],
+            });
+          }}
+        >
+          <span className="sr-only">reload</span>
+          <div className="h-6 w-6">
+            <Reload />
+          </div>
+        </button>
+      </div>
+      {feedbackHistoryData?.map((survey, idx) => (
         <div key={idx} className="flex justify-between gap-20">
           <p>
             {survey.type === "SPRINT"
@@ -324,6 +353,13 @@ const UpdateFeedbackHistoryPopup = ({ projectId }: { projectId: number }) => {
           </p>
           {survey.status === "COMPLETED" ? (
             <p className="text-green-600">Completed</p>
+          ) : survey.status === "PROCESSING" ? (
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 fill-cyan-600 text-gray-200">
+                <Spinner />
+              </div>
+              <p className="text-cyan-600">Processing...</p>
+            </div>
           ) : survey.status === "PENDING" ? (
             <p className="text-red-600">Pending</p>
           ) : survey.status === "NOT_AVAILABLE" ? (
