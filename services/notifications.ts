@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import db from "@/db/drizzle";
 import {
   finalSurvey,
+  finalSurveyAnswer,
   project,
   projectMember,
   rulerSurveyAnswers,
@@ -55,11 +56,12 @@ export async function getNotifications() {
     );
   if (sprintSurveys.length > 0) {
     for (const sprintSurvey of sprintSurveys) {
-      if (!(sprintSurvey.answerUserId === userId))
+      if (!(sprintSurvey.answerUserId === userId)) {
         notifications.push({
           ...sprintSurvey,
           type: "SPRINT",
         });
+      }
     }
   }
 
@@ -69,10 +71,15 @@ export async function getNotifications() {
       id: finalSurvey.id,
       projectName: project.name,
       date: finalSurvey.scheduledAt,
+      answerUserId: finalSurveyAnswer.userId,
     })
     .from(finalSurvey)
     .innerJoin(project, eq(project.id, finalSurvey.projectId))
     .innerJoin(projectMember, eq(projectMember.projectId, project.id))
+    .leftJoin(
+      finalSurveyAnswer,
+      and(eq(finalSurvey.id, finalSurveyAnswer.finalSurveyId)),
+    )
     .where(
       and(
         eq(projectMember.userId, userId), // the surveys belong to a user's project
@@ -83,10 +90,12 @@ export async function getNotifications() {
 
   if (finalSurveys.length > 0) {
     for (const finalSurvey of finalSurveys) {
-      notifications.push({
-        ...finalSurvey,
-        type: "FINAL",
-      });
+      if (!(finalSurvey.answerUserId === userId)) {
+        notifications.push({
+          ...finalSurvey,
+          type: "FINAL",
+        });
+      }
     }
   }
 
