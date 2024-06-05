@@ -152,7 +152,7 @@ export const rulerSurveyAnswers = pgTable(
 export const questionTypeEnum = pgEnum("type_question", [
   "SPRINT_QUESTION",
   "COWORKER_QUESTION",
-  // "COWORKER_COMMENT",
+  "COWORKER_COMMENT",
   "FINAL_PROJECT_QUESTION",
   "FINAL_PROJECT_COMMENT",
 ]);
