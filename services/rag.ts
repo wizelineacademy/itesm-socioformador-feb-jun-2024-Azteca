@@ -205,7 +205,7 @@ async function processCoworkersOpenFeedback(
     6. Es importante que en tu respuesta el orden de las clasificaciones de sentimientos sea el mismo en que los presenté en el paso 2.
     7. No respondas ni expliques tu procedimiento, limítate a cumplir con las instrucciones especificadas con la estructura especificada, haz el análisis de todo el contenido del texto sin dejar oraciones sin procesar.
     
-    Este es un ejemplo del resultado esperado, la categoría 'biased' se encuentra vacía porque ningún comentario encajó en las instrucciones proporcionadas de ese sentimiento y así se deben representar las categorías cuando ningún comentario pertenezca a ella, recuerda que es solo un ejemplo, pon atención en la estructura, no tanto en el contenido:
+    Este es un ejemplo del resultado esperado, la categoría 'biased' se encuentra vacía porque ningún comentario encajó en las instrucciones proporcionadas de ese sentimiento y así se deben representar las categorías cuando ningún comentario pertenezca a ella, recuerda que es solo un ejemplo, pon atención en la estructura, no en el contenido:
     """
     positive: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
     \n\n
@@ -323,19 +323,20 @@ async function processProjectOpenFeedback(
       apiKey: process.env.OPENAI_KEY,
     });
 
-    const classificationInstructions: string = `El siguiente query contiene varias retroalimentaciones hacia una persona. Realiza las siguientes instrucciones:
-    1. Identifica las ideas claves de todo el texto, sepáralo por cada idea tomando en cuenta la coherencia entre las oraciones y las ideas que expresan guardando la conexión del asunto, puedes ignorar signos de puntuación si una misma oración une ideas diferentes, pero tu prioridad es separar las oraciones con ideas atómicas.
-    2. De las oraciones agrupadas por ideas, sepáralas en las siguientes 3 clasificaciones de sentimientos, tomando en cuenta la descripción de cada una:
+    const classificationInstructions: string = `El siguiente query contiene varios comentarios que opinan acerca de un proyecto, pero en los comentarios podrían ir ideas que van dirigidas al manager del mismo proyecto, realiza las siguientes instrucciones:
+    1. Identifica las oraciones que van dirigidas únicamente al manager del proyecto, sepáralas por cada idea tomando en cuenta la coherencia entre las oraciones y las ideas que expresan guardando la conexión del asunto, puedes ignorar signos de puntuación si una misma oración une ideas diferentes, pero tu prioridad es separar las oraciones con ideas atómicas que se refieren al manager, no al proyecto en sí.
+    2. Si en el query no hay ningún comentario dirigido hacia el manager entonces devuelve un string completamente vacío ("") e ignora los siguientes pasos.
+    3. De las oraciones agrupadas por ideas, sepáralas en las siguientes 3 clasificaciones de sentimientos, tomando en cuenta la descripción de cada una:
       * positive: cualquier cumplido, elogio o felicitación a la persona que recibe el comentario o a su desempeño en el trabajo. Las críticas constructivas si bien son una forma saludable de dar retroalimentación no cuentan como comentario positivo porque destacan una necesidad de mejora de la persona evaluada.
       * negative: cualquier comentario relacionado con críticas constructivas o áreas de mejora en las habilidades de la persona y en su desempeño laboral. Si hay un comentario relacionado con la inteligencia emocional o una crítica a al carácter de la persona sé muy cauteloso y presta atención si el comentario es objetivo y si habla con hechos, ya que es posible que pueda involucrar un ataque personal, tómalo como un comentario constructivo si brinda hechos e información de forma objetiva.
       * biased: cualquier comentario o crítica relacionada con la raza, color de piel, creencias, sexo, preferencias sexuales de la persona evaluada o comentarios con insultos y ataques personales. No es lo mismo que un comentario negativo porque no es imparcial.
-    3. En cada una de las 3 clasificaciones de sentimiento une todas las oraciones en un párrafo sin importar si antes las oraciones se encontraban en otros párrafos, en ese caso debes separar las ideas con signos de puntuación pero deben encontrarse en el mismo párrafo si todas las oraciones tienen el mismo sentimiento en común de los 3 especificados, si encuentras varias oraciones diferentes que encuentren lo mismo omite todas las redundancias, conserva solo ideas únicas. Al unir las oraciones de cada clasificación debe haber una conexión clara entre las ideas, pero es posible que en la unión no haya coherencia gramatical o por signos de puntuación, si ese es el caso puedes modificar ligeramente las palabras o signos para unir todas las oraciones en un párrafo de la clasificación en cuestión, pero no alteres el contenido del mensaje que expresan.
-    4. Separa las 3 clasificaciones con el separador "\n\n" que solo puede aparecer entre la clasificación de cada sentimiento, no en el párrafo formado de oraciones de cada clasificación.
-    5. Si hay clasificaciones de sentimientos que no cuentan con ninguna oración porque ninguna cayó en esa categoría, aun así incluye el nombre del sentimiento con el separador definido en el paso anterior.
-    6. Es importante que en tu respuesta el orden de las clasificaciones de sentimientos sea el mismo en que los presenté en el paso 2.
-    7. No respondas ni expliques tu procedimiento, limítate a cumplir con las instrucciones especificadas con la estructura especificada, haz el análisis de todo el contenido del texto sin dejar oraciones sin procesar.
+    4. En cada una de las 3 clasificaciones de sentimiento une todas las oraciones en un párrafo sin importar si antes las oraciones se encontraban en otros párrafos, en ese caso debes separar las ideas con signos de puntuación pero deben encontrarse en el mismo párrafo si todas las oraciones tienen el mismo sentimiento en común de los 3 especificados, si encuentras varias oraciones diferentes que encuentren lo mismo omite todas las redundancias, conserva solo ideas únicas. Al unir las oraciones de cada clasificación debe haber una conexión clara entre las ideas, pero es posible que en la unión no haya coherencia gramatical o por signos de puntuación, si ese es el caso puedes modificar ligeramente las palabras o signos para unir todas las oraciones en un párrafo de la clasificación en cuestión, pero no alteres el contenido del mensaje que expresan.
+    5. Separa las 3 clasificaciones con el separador "\n\n" que solo puede aparecer entre la clasificación de cada sentimiento, no en el párrafo formado de oraciones de cada clasificación.
+    6. Si hay clasificaciones de sentimientos que no cuentan con ninguna oración porque ninguna cayó en esa categoría, aun así incluye el nombre del sentimiento con el separador definido en el paso anterior.
+    7. Es importante que en tu respuesta el orden de las clasificaciones de sentimientos sea el mismo en que los presenté en el paso 3.
+    8. No respondas ni expliques tu procedimiento, limítate a cumplir con las instrucciones especificadas con la estructura especificada, haz el análisis de todo el contenido del texto sin dejar oraciones sin procesar.
     
-    Este es un ejemplo del resultado esperado, la categoría 'biased' se encuentra vacía porque ningún comentario encajó en las instrucciones proporcionadas de ese sentimiento y así se deben representar las categorías cuando ningún comentario pertenezca a ella, recuerda que es solo un ejemplo, pon atención en la estructura, no tanto en el contenido:
+    Este es un ejemplo del resultado esperado cuando hay comentarios hacia el manager, la categoría 'biased' se encuentra vacía porque ningún comentario encajó en las instrucciones proporcionadas de ese sentimiento y así se deben representar las categorías cuando ningún comentario pertenezca a ella, recuerda que es solo un ejemplo, pon atención en la estructura, no en el contenido:
     """
     positive: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
     \n\n
@@ -345,7 +346,7 @@ async function processProjectOpenFeedback(
     """`;
 
     // classify the feedback into 3 categories: positive, negative, biased
-    const classifiedFeedback = await openai.chat.completions.create({
+    const response = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
         {
@@ -359,62 +360,65 @@ async function processProjectOpenFeedback(
       ],
     });
 
-    // clean the results of the classification
-    const sentiments = (
-      classifiedFeedback.choices[0].message.content as string
-    ).split("\n\n");
-    const cleanedSentiments = sentiments.filter((element) => element !== "");
+    const classifiedFeedback = response.choices[0].message.content as string;
 
-    const commentClassifications = {
-      positive: "",
-      negative: "",
-      biased: "",
-    };
+    // if feedback to the manager was found, process it
+    if (classifiedFeedback !== "") {
+      // clean the results of the classification
+      const sentiments = classifiedFeedback.split("\n\n");
+      const cleanedSentiments = sentiments.filter((element) => element !== "");
 
-    for (const sentiment of cleanedSentiments) {
-      if (sentiment.includes("positive:")) {
-        commentClassifications.positive = sentiment.substring(10);
-      } else if (sentiment.includes("negative:")) {
-        commentClassifications.negative = sentiment.substring(10);
-      } else if (sentiment.includes("biased:")) {
-        commentClassifications.biased = sentiment.substring(8);
+      const commentClassifications = {
+        positive: "",
+        negative: "",
+        biased: "",
+      };
+
+      for (const sentiment of cleanedSentiments) {
+        if (sentiment.includes("positive:")) {
+          commentClassifications.positive = sentiment.substring(10);
+        } else if (sentiment.includes("negative:")) {
+          commentClassifications.negative = sentiment.substring(10);
+        } else if (sentiment.includes("biased:")) {
+          commentClassifications.biased = sentiment.substring(8);
+        }
       }
-    }
 
-    console.log("Positive comments: ", commentClassifications.positive);
-    console.log("Negative comments: ", commentClassifications.negative);
-    console.log("Biased comments: ", commentClassifications.biased);
+      console.log("Positive comments: ", commentClassifications.positive);
+      console.log("Negative comments: ", commentClassifications.negative);
+      console.log("Biased comments: ", commentClassifications.biased);
 
-    // ==================== RAG AND WEAKNESSES ANALYSIS ====================
+      // ==================== RAG AND WEAKNESSES ANALYSIS ====================
 
-    // add the recommended resources of the user
-    if (commentClassifications.negative !== "") {
-      const allResources: EmbeddingRecord[] = await db
-        .select({ id: pipResource.id, embedding: pipResource.embedding })
-        .from(pipResource);
-      const recommendedResourcesIds = await cosineSimilarity(
-        commentClassifications.negative,
-        allResources,
-      );
-      recommendedResourcesIds.splice(5);
-      recommendedResourcesIds.map((element) => uniqueResources.add(element));
+      // add the recommended resources of the user
+      if (commentClassifications.negative !== "") {
+        const allResources: EmbeddingRecord[] = await db
+          .select({ id: pipResource.id, embedding: pipResource.embedding })
+          .from(pipResource);
+        const recommendedResourcesIds = await cosineSimilarity(
+          commentClassifications.negative,
+          allResources,
+        );
+        recommendedResourcesIds.splice(5);
+        recommendedResourcesIds.map((element) => uniqueResources.add(element));
 
-      // get the negative skills solved by the selected resources, set them as weaknesses of the user
-      if (recommendedResourcesIds.length > 0) {
-        const newResourcesNegativeSkills = await db
-          .select({
-            negativeSkillId: pipResourceSkill.skillId,
-          })
-          .from(pipResourceSkill)
-          .where(inArray(pipResourceSkill.skillId, recommendedResourcesIds));
+        // get the negative skills solved by the selected resources, set them as weaknesses of the user
+        if (recommendedResourcesIds.length > 0) {
+          const newResourcesNegativeSkills = await db
+            .select({
+              negativeSkillId: pipResourceSkill.skillId,
+            })
+            .from(pipResourceSkill)
+            .where(inArray(pipResourceSkill.skillId, recommendedResourcesIds));
 
-        newResourcesNegativeSkills.forEach((element) => {
-          weaknessesIds.add(element.negativeSkillId as number);
-        });
+          newResourcesNegativeSkills.forEach((element) => {
+            weaknessesIds.add(element.negativeSkillId as number);
+          });
+        }
       }
-    }
 
-    // analize the biased feedback
+      // analize the biased feedback
+    }
   }
 
   return [uniqueResources, strengthsIds, weaknessesIds];
@@ -820,7 +824,7 @@ async function setUserPCP(
   // get the associated resources with the negative skills
   if (negativeSkillsIds.length > 0) {
     const closedFeedbackRecommendedResources = await db
-      .select({
+      .selectDistinct({
         resourceId: pipResourceSkill.pipResourceId,
       })
       .from(pipResourceSkill)
