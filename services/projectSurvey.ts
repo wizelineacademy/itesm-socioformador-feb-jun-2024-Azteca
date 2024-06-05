@@ -20,9 +20,13 @@ export async function getProjectQuestions() {
 }
 
 export async function createProjectSurvey(projectId: number) {
+  const answeredAt = new Date(
+    new Date().toLocaleString("es-MX", { timeZone: "America/Monterrey" }),
+  );
+
   const res = await db
     .insert(finalSurvey)
-    .values({ scheduledAt: sql`CURRENT_TIMESTAMP`, projectId: projectId })
+    .values({ scheduledAt: answeredAt, projectId: projectId })
     .returning({ id: finalSurvey.id });
 
   return res[0];
