@@ -5,6 +5,7 @@ import similarity from "compute-cosine-similarity";
 
 import {
   finalSurvey,
+  finalSurveyAnswer,
   pipTask,
   pipResource,
   pipResourceSkill,
@@ -291,11 +292,13 @@ async function processOpenFeedback(
   return [uniqueResources, strengthsIds, weaknessesIds];
 }
 
-async function orderFeedback(
+async function orderCoworkersFeedback(
   sprintSurveyId: number,
   uniqueWorkers: string[],
 ): Promise<FeedbackRecords> {
   const feedbackRecords: FeedbackRecords = {};
+
+  // get all the feedback
 
   const coworkersOpenFeedback = await db
     .select({
@@ -344,6 +347,7 @@ async function orderFeedback(
     );
 
   // initialize the empty structure with the keys
+
   for (const userId of uniqueWorkers) {
     const filteredCoworkers = uniqueWorkers.filter(
       (element): element is string =>
@@ -367,6 +371,8 @@ async function orderFeedback(
     }
   }
 
+  // fill the structure with the feedback
+
   coworkersOpenFeedback.forEach((record) => {
     if (record.coworkerId !== null && record.coworkerId !== undefined) {
       feedbackRecords[record.userId as string]["coworkersFeedback"][
@@ -379,6 +385,85 @@ async function orderFeedback(
     if (record.coworkerId !== null && record.coworkerId !== undefined) {
       feedbackRecords[record.userId as string]["coworkersFeedback"][
         record.coworkerId
+      ].closedFeedback.push([
+        record.questionId as number,
+        record.answer as number,
+      ]);
+    }
+  });
+
+  return feedbackRecords;
+}
+
+async function orderProjectFeedback(
+  finalSurveyId: number,
+  managerId: string,
+  uniqueWorkers: string[],
+) {
+  const feedbackRecords: FeedbackRecords = {};
+
+  // get all the feedback
+
+  const projectClosedFeedback = await db
+    .select({
+      userId: finalSurveyAnswer.userId,
+      questionId: finalSurveyAnswer.questionId,
+      answer: finalSurveyAnswer.answer,
+    })
+    .from(finalSurveyAnswer)
+    .where(
+      and(
+        eq(question.type, "FINAL_PROJECT_QUESTION"),
+        eq(finalSurvey.id, finalSurveyId),
+      ),
+    );
+
+  const projectOpenFeedback = await db
+    .select({
+      userId: finalSurveyAnswer.userId,
+      questionId: finalSurveyAnswer.questionId,
+      comment: finalSurveyAnswer.comment,
+    })
+    .from(finalSurveyAnswer)
+    .where(
+      and(
+        eq(question.type, "FINAL_PROJECT_COMMENT"),
+        eq(finalSurvey.id, finalSurveyId),
+      ),
+    );
+
+  // initialize the empty structure with the keys
+
+  feedbackRecords[managerId] = {
+    coworkersFeedback: {},
+    feedbackClassifications: {
+      positive: {},
+      negative: {},
+      biased: {},
+    },
+  };
+
+  for (const workerId of uniqueWorkers) {
+    feedbackRecords[managerId]["coworkersFeedback"][workerId] = {
+      openFeedback: "",
+      closedFeedback: [],
+    };
+  }
+
+  // fill the structure with the feedback
+
+  projectOpenFeedback.forEach((record) => {
+    if (record.userId !== null && record.userId !== undefined) {
+      feedbackRecords[managerId]["coworkersFeedback"][
+        record.userId
+      ].openFeedback = record.comment as string;
+    }
+  });
+
+  projectClosedFeedback.forEach((record) => {
+    if (record.userId !== null && record.userId !== undefined) {
+      feedbackRecords[managerId]["coworkersFeedback"][
+        record.userId
       ].closedFeedback.push([
         record.questionId as number,
         record.answer as number,
@@ -459,8 +544,8 @@ async function getQuestionsSkills(
   surveyId: number,
   type: string,
 ): Promise<QuestionSkills> {
-  let questionsSkills: QuestionSkills = {};
-  let questions: any[] = [];
+  const questionsSkills: QuestionSkills = {};
+  const questions: any[] = [];
 
   if (type === "COWORKER_QUESTION") {
     const questions = await db
@@ -598,7 +683,7 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
     const ids: string[] = uniqueProjectUsers.map(
       (user) => user.userId as string,
     );
-    const orderedFeedback: FeedbackRecords = await orderFeedback(
+    const orderedFeedback: FeedbackRecords = await orderCoworkersFeedback(
       sprintSurveyId,
       ids,
     );
@@ -797,11 +882,22 @@ export async function projectAnalysis(finalSurveyId: number) {
     console.log("=========================================");
     console.log("=========================================");
 
-    /*
+    const questionsSkills: QuestionSkills = await getQuestionsSkills(
+      finalSurveyId,
+      "FINAL_PROJECT_QUESTION",
+    );
+
+    const orderedFeedback: FeedbackRecords = {};
+
+    orderedFeedback[managerId].feedbackClassifications =
+      await getFeedbackClassifications(
+        orderedFeedback[managerId].coworkersFeedback,
+        questionsSkills,
+      );
+
     await db
       .update(finalSurvey)
       .set({ processed: true })
       .where(eq(finalSurvey.id, finalSurveyId));
-    */
   }
 }
