@@ -87,6 +87,7 @@ export const taskStatusEnum = pgEnum("status", [
 export const pipTask = pgTable("pip_task", {
   id: serial("id").primaryKey(),
   sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
+  finalSurveyId: integer("final_survey_id").references(() => finalSurvey.id),
   userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 64 }),
   description: varchar("description", { length: 256 }),
@@ -121,6 +122,7 @@ export const userResource = pgTable(
     sprintSurveyId: integer("sprint_survey_id").references(
       () => sprintSurvey.id,
     ),
+    finalSurveyId: integer("final_survey_id").references(() => finalSurvey.id),
   },
   // composite primary key on (userId, resourceId)
 );
@@ -142,6 +144,7 @@ export const rulerSurveyAnswers = pgTable(
     emotionId: integer("emotion_id").references(() => rulerEmotion.id),
     answeredAt: date("answered_at", { mode: "date" }),
     comment: text("comment"),
+    processed: boolean("processed").default(false),
   },
   // composite primary key on (userId, rulerSurveyId)
 );
