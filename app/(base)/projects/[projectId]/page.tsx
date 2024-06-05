@@ -224,7 +224,7 @@ const Project = ({ params }: { params: { projectId: string } }) => {
           </div>
         ))}
       </div>
-      <div className="mt-4 flex justify-between">
+      <div className="mt-4 flex justify-between gap-12">
         {/* Radar Chart */}
         <div className="flex h-fit w-fit flex-col items-center rounded-xl bg-white px-4 pt-4 drop-shadow-lg">
           <h4 className="text-xl font-medium">Overall Statistics</h4>
@@ -248,9 +248,9 @@ const Project = ({ params }: { params: { projectId: string } }) => {
             }}
           />
         </div>
-        <div className="grid gap-7">
+        <div className="grid w-full gap-7">
           {/* Progress Bar */}
-          <div className="flex h-fit w-fit flex-col rounded-xl bg-white p-4 drop-shadow-lg">
+          <div className="flex h-fit w-full flex-col rounded-xl bg-white p-4 drop-shadow-lg">
             <div className="flex justify-between">
               <div>
                 <p className="pb-2 text-lg font-medium">Employee Overload</p>
@@ -269,7 +269,7 @@ const Project = ({ params }: { params: { projectId: string } }) => {
                 size="lg"
               />
             </div>
-            <div className="w-[780px] rounded-full bg-gray-200 p-1">
+            <div className="w-full rounded-full bg-gray-200 p-1">
               <div
                 className="h-6 rounded-full bg-gradient-to-r from-green-400 via-yellow-400 to-orange-500"
                 style={{ width: `70%` }}
@@ -277,7 +277,7 @@ const Project = ({ params }: { params: { projectId: string } }) => {
             </div>
           </div>
           {/* Area Chart */}
-          <div className="flex h-fit w-fit flex-col items-center rounded-xl bg-white px-4 pb-4 pt-6 drop-shadow-lg">
+          <div className="flex h-fit w-full flex-col items-center rounded-xl bg-white px-4 pb-4 pt-6 drop-shadow-lg">
             <div className="absolute right-[-6px] top-[2px] z-50">
               <InfoToolTip
                 description="Represents the level of support for growth and the the availability of growth opportunities  over time.<br />A steady increase indicates consistent growth support or increasing opportunities."
@@ -286,7 +286,7 @@ const Project = ({ params }: { params: { projectId: string } }) => {
             </div>
             <AreaChart
               h={200}
-              w={780}
+              // w={780}
               data={areaData}
               dataKey="month"
               series={[
