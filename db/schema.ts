@@ -86,6 +86,9 @@ export const taskStatusEnum = pgEnum("status", [
 
 export const pipTask = pgTable("pip_task", {
   id: serial("id").primaryKey(),
+  rulerSurveyId: integer("ruler_survey_id").references(
+    () => rulerSurveyAnswers.id,
+  ),
   sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
   finalSurveyId: integer("final_survey_id").references(() => finalSurvey.id),
   userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
@@ -119,6 +122,9 @@ export const userResource = pgTable(
     resourceId: serial("resource_id").references(() => pipResource.id, {
       onDelete: "cascade",
     }),
+    rulerSurveyId: integer("ruler_survey_id").references(
+      () => rulerSurveyAnswers.id,
+    ),
     sprintSurveyId: integer("sprint_survey_id").references(
       () => sprintSurvey.id,
     ),
@@ -153,7 +159,7 @@ export const rulerSurveyAnswers = pgTable(
 export const questionTypeEnum = pgEnum("type_question", [
   "SPRINT_QUESTION",
   "COWORKER_QUESTION",
-  "COWORKER_COMMENT",
+  // "COWORKER_COMMENT",
   "FINAL_PROJECT_QUESTION",
   "FINAL_PROJECT_COMMENT",
 ]);
