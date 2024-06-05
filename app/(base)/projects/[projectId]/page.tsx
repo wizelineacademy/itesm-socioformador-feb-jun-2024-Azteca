@@ -21,6 +21,7 @@ import {
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon";
 import NoDataCard from "@/components/NoDataCard";
 import Loader from "@/components/Loader";
+import InfoToolTip from "@/components/InfoToolTip";
 
 const Project = ({ params }: { params: { projectId: string } }) => {
   const router = useRouter();
@@ -139,6 +140,21 @@ const Project = ({ params }: { params: { projectId: string } }) => {
   }
   console.log(gaugeData);
 
+  const getTooltipDescription = (title: string) => {
+    switch (title) {
+      case "Resources Satisfaction":
+        return "Indicates the level of satisfaction with the available resources.<br />Higher values suggest greater satisfaction with the resources provided.";
+      case "Listening Feeling":
+        return "Represents how well individuals feel they are being listened to.<br />Higher percentages indicate a stronger sense of being heard.";
+      case "Recognition Feeling":
+        return "Shows how individuals perceive recognition for their efforts.<br />Higher values reflect a greater feeling of being recognized.";
+      case "Respect and Trust Environment":
+        return "Indicates the current perception of respect and trust within the environment.<br />Higher percentages suggest a more respectful and trusting atmosphere.";
+      default:
+        return `Indicates the current ${title}`;
+    }
+  };
+
   return (
     <div className="mt-2">
       <div className="flex justify-between">
@@ -193,6 +209,10 @@ const Project = ({ params }: { params: { projectId: string } }) => {
             key={index}
             className="flex w-fit flex-col rounded-xl bg-white px-10 py-5 drop-shadow-lg"
           >
+            <InfoToolTip
+              description={getTooltipDescription(gauge.title)}
+              size="sm"
+            />
             <GaugeChart
               percentage={Number(gauge.percentage)}
               type={gauge.type}
@@ -208,6 +228,10 @@ const Project = ({ params }: { params: { projectId: string } }) => {
         {/* Radar Chart */}
         <div className="flex h-fit w-fit flex-col items-center rounded-xl bg-white px-4 pt-4 drop-shadow-lg">
           <h4 className="text-xl font-medium">Overall Statistics</h4>
+          <InfoToolTip
+            description="Provides a comprehensive view of various performance metrics.<br />Higher values indicate better performance in each area."
+            size="lg"
+          />
           <RadarChart
             h={380}
             w={460}
@@ -233,9 +257,17 @@ const Project = ({ params }: { params: { projectId: string } }) => {
                 <p className="pb-2 text-5xl font-semibold">{`${progressBarPercentage}%`}</p>
               </div>
               <div>
-                <p className="text-md text-red-600">+ 3.1%</p>
-                <p className="text-sm text-grayText">to last week</p>
+                <div>
+                  <p className="text-md text-red-600">+ 3.1%</p>
+                  <p className="text-sm text-grayText">to last week</p>
+                </div>
               </div>
+            </div>
+            <div className="absolute right-[-6px] top-[-6px]">
+              <InfoToolTip
+                description="Indicates the current level of employee overload.<br />A higher percentage reflects a greater degree of overload."
+                size="lg"
+              />
             </div>
             <div className="w-[780px] rounded-full bg-gray-200 p-1">
               <div
@@ -246,6 +278,12 @@ const Project = ({ params }: { params: { projectId: string } }) => {
           </div>
           {/* Area Chart */}
           <div className="flex h-fit w-fit flex-col items-center rounded-xl bg-white px-4 pb-4 pt-6 drop-shadow-lg">
+            <div className="absolute right-[-6px] top-[2px] z-50">
+              <InfoToolTip
+                description="Represents the level of support for growth and the the availability of growth opportunities  over time.<br />A steady increase indicates consistent growth support or increasing opportunities."
+                size="lg"
+              />
+            </div>
             <AreaChart
               h={200}
               w={780}
@@ -272,6 +310,11 @@ const Project = ({ params }: { params: { projectId: string } }) => {
               tooltipAnimationDuration={200}
               strokeWidth={3}
               fillOpacity={0.25}
+              styles={{
+                legendItem: {
+                  margin: "0 20px 0 0",
+                },
+              }}
             />
           </div>
         </div>
