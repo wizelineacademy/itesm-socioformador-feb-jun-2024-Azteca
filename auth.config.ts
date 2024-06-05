@@ -64,7 +64,7 @@ export const authConfig = {
           return Response.redirect(new URL("/forbbiden", nextUrl));
         }
       }
-      console.log("url actual", nextUrl.pathname);
+
       if (
         nextUrl.pathname.startsWith("/login") ||
         nextUrl.pathname.startsWith("/register")
@@ -75,9 +75,6 @@ export const authConfig = {
         return Response.redirect(new URL(`/profile/${auth.user?.id}`, nextUrl));
 
       return true;
-    },
-    async redirect({ url, baseUrl }) {
-      return url.startsWith(baseUrl) ? url : baseUrl;
     },
     async jwt({ token, user: jwtUser, trigger }) {
       // Persist the OAuth access_token and or the user id to the token right after signin
