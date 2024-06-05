@@ -251,10 +251,6 @@ async function processCoworkersOpenFeedback(
       }
     }
 
-    console.log("Positive comments: ", commentClassifications.positive);
-    console.log("Negative comments: ", commentClassifications.negative);
-    console.log("Biased comments: ", commentClassifications.biased);
-
     // ==================== RAG AND WEAKNESSES ANALYSIS ====================
 
     // add the recommended resources of the user
@@ -383,10 +379,6 @@ async function processProjectOpenFeedback(
           commentClassifications.biased = sentiment.substring(8);
         }
       }
-
-      console.log("Positive comments: ", commentClassifications.positive);
-      console.log("Negative comments: ", commentClassifications.negative);
-      console.log("Biased comments: ", commentClassifications.biased);
 
       // ==================== RAG AND WEAKNESSES ANALYSIS ====================
 
@@ -1056,15 +1048,6 @@ export async function projectAnalysis(finalSurveyId: number) {
     const uniqueWorkersIds = uniqueProjectUsers.map(
       (worker) => worker.userId,
     ) as string[];
-
-    console.log("=========================================");
-    console.log("=========================================");
-    console.log("Manager: ", managerId);
-    console.log("=========================================");
-    console.log("=========================================");
-    console.log("Workers: ", uniqueWorkersIds);
-    console.log("=========================================");
-    console.log("=========================================");
 
     const questionsSkills: QuestionSkills = await getQuestionsSkills(
       finalSurveyId,
