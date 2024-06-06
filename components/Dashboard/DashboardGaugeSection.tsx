@@ -20,7 +20,7 @@ const getTooltipDescription = (title: string) => {
     case "Stress Level":
       return "Indicates the current stress level.<br />Higher percentages reflect higher stress.";
     default:
-      return "This is a summary of your overall statistics.";
+      return `Indicates the current ${title}`;
   }
 };
 

@@ -58,15 +58,15 @@ const Dashboard = async ({ params }: { params: { userId: string } }) => {
         <UserProfile userId={params.userId} userName={user.name} />
       )}
 
-      <div className="mt-2 flex flex-row justify-between md:flex-row">
-        <div className="grid gap-7">
+      <div className="mx-auto mt-2 flex flex-row justify-evenly gap-10">
+        <div className="flex flex-col justify-between gap-10">
           <DashboardGaugeSection gaugeData={gaugeData} />
-          <div className="flex justify-between">
+          <div className="flex flex-row justify-between">
             <DashboardRadarSection radarData={radarData} />
             <DashboardEmotionsSection emotionsData={emotionsData} />
           </div>
         </div>
-        <div className="mt-4 grid gap-7">
+        <div className="mt-4 flex flex-col justify-between">
           <DashboardSurveyCalendar completedSurveys={completedSurveys} />
           <DashboardPCPSection PCPData={PCPData} />
         </div>

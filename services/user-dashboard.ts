@@ -3,7 +3,6 @@
 import db from "@/db/drizzle";
 import {
   finalSurveyAnswer,
-  skill,
   question,
   rulerEmotion,
   rulerSurveyAnswers,
@@ -77,14 +76,17 @@ export async function getRulerGraphInfo(id: string) {
 
   // Calculate the total number of emotions
   const totalEmotions = res.length;
-  emotionsData[0].percentage =
-    Math.round((quadrant2 / totalEmotions) * 100 * 100) / 100;
-  emotionsData[1].percentage =
-    Math.round((quadrant1 / totalEmotions) * 100 * 100) / 100;
-  emotionsData[2].percentage =
-    Math.round((quadrant3 / totalEmotions) * 100 * 100) / 100;
-  emotionsData[3].percentage =
-    Math.round((quadrant4 / totalEmotions) * 100 * 100) / 100;
+
+  if (totalEmotions > 0) {
+    emotionsData[0].percentage =
+      Math.round((quadrant2 / totalEmotions) * 100 * 100) / 100;
+    emotionsData[1].percentage =
+      Math.round((quadrant1 / totalEmotions) * 100 * 100) / 100;
+    emotionsData[2].percentage =
+      Math.round((quadrant3 / totalEmotions) * 100 * 100) / 100;
+    emotionsData[3].percentage =
+      Math.round((quadrant4 / totalEmotions) * 100 * 100) / 100;
+  }
 
   return emotionsData;
 }
@@ -107,10 +109,8 @@ function calculateSurveyOverallStatistics(
     punctualityMaxScore: number;
   },
   surveyAnswer: {
-    userId: string | null;
     answer: number | null;
     skillId: number | null;
-    skill: string | null;
   }[],
 ) {
   surveyAnswer.forEach((answer) => {
@@ -142,72 +142,63 @@ function calculateSurveyOverallStatistics(
 export async function getOverallStatistics(userId: string) {
   const coworkersAnswers = await db
     .select({
-      userId: sprintSurveyAnswerCoworkers.coworkerId,
+      skillId: questionSkill.skillId,
       answer: sprintSurveyAnswerCoworkers.answer,
-      skillId: skill.id,
-      skill: skill.positiveSkill,
     })
     .from(sprintSurveyAnswerCoworkers)
     .leftJoin(question, eq(sprintSurveyAnswerCoworkers.questionId, question.id))
     .leftJoin(questionSkill, eq(question.id, questionSkill.questionId))
-    .leftJoin(skill, eq(questionSkill.skillId, skill.id))
     .where(
       and(
         eq(sprintSurveyAnswerCoworkers.coworkerId, userId),
         or(
-          eq(skill.id, 20), // Motivation id
-          eq(skill.id, 40), // Manager support
-          eq(skill.id, 2), // Communication
-          eq(skill.id, 41), // Coworker support
-          eq(skill.id, 39), // Punctuality
+          eq(questionSkill.skillId, 20), // Motivation id
+          eq(questionSkill.skillId, 40), // Manager support
+          eq(questionSkill.skillId, 2), // Communication
+          eq(questionSkill.skillId, 41), // Coworker support
+          eq(questionSkill.skillId, 39), // Punctuality
         ),
       ),
     );
 
   const sprintAnswers = await db
     .select({
-      userId: sprintSurveyAnswerProject.userId,
+      skillId: questionSkill.skillId,
       answer: sprintSurveyAnswerProject.answer,
-      skillId: skill.id,
-      skill: skill.positiveSkill,
     })
     .from(sprintSurveyAnswerProject)
     .leftJoin(question, eq(sprintSurveyAnswerProject.questionId, question.id))
     .leftJoin(questionSkill, eq(question.id, questionSkill.questionId))
-    .leftJoin(skill, eq(questionSkill.skillId, skill.id))
     .where(
       and(
         eq(sprintSurveyAnswerProject.userId, userId),
         or(
-          eq(skill.id, 20), // Motivation id
-          eq(skill.id, 40), // Manager support
-          eq(skill.id, 2), // Communication
-          eq(skill.id, 41), // Coworker support
-          eq(skill.id, 39), // Punctuality
+          eq(questionSkill.skillId, 20), // Motivation id
+          eq(questionSkill.skillId, 40), // Manager support
+          eq(questionSkill.skillId, 2), // Communication
+          eq(questionSkill.skillId, 41), // Coworker support
+          eq(questionSkill.skillId, 39), // Punctuality
         ),
       ),
     );
 
   const finalAnswers = await db
     .select({
-      userId: finalSurveyAnswer.userId,
+      skillId: questionSkill.skillId,
       answer: finalSurveyAnswer.answer,
-      skillId: skill.id,
-      skill: skill.positiveSkill,
     })
     .from(finalSurveyAnswer)
     .leftJoin(question, eq(finalSurveyAnswer.questionId, question.id))
     .leftJoin(questionSkill, eq(question.id, questionSkill.questionId))
-    .leftJoin(skill, eq(questionSkill.skillId, skill.id))
     .where(
       and(
         eq(finalSurveyAnswer.userId, userId),
         or(
-          eq(skill.id, 20), // Motivation id
-          eq(skill.id, 40), // Manager support
-          eq(skill.id, 2), // Communication
-          eq(skill.id, 41), // Coworker support
-          eq(skill.id, 39), // Punctuality
+          eq(questionSkill.skillId, 20), // Motivation id
+          eq(questionSkill.skillId, 40), // Manager support
+          eq(questionSkill.skillId, 2), // Communication
+          eq(questionSkill.skillId, 41), // Coworker support
+          eq(questionSkill.skillId, 39), // Punctuality
         ),
       ),
     );
@@ -269,17 +260,15 @@ export async function getProductivityScore(userId: string) {
     .select({
       userId: sprintSurveyAnswerCoworkers.coworkerId,
       answer: sprintSurveyAnswerCoworkers.answer,
-      skillId: skill.id,
-      skill: skill.positiveSkill,
+      skillId: questionSkill.skillId,
     })
     .from(sprintSurveyAnswerCoworkers)
     .leftJoin(question, eq(sprintSurveyAnswerCoworkers.questionId, question.id))
     .leftJoin(questionSkill, eq(question.id, questionSkill.questionId))
-    .leftJoin(skill, eq(questionSkill.skillId, skill.id))
     .where(
       and(
         eq(sprintSurveyAnswerCoworkers.coworkerId, userId),
-        or(eq(skill.id, 42)),
+        eq(questionSkill.skillId, 42),
       ),
     );
 
@@ -287,50 +276,62 @@ export async function getProductivityScore(userId: string) {
     .select({
       userId: sprintSurveyAnswerProject.userId,
       answer: sprintSurveyAnswerProject.answer,
-      skillId: skill.id,
-      skill: skill.positiveSkill,
+      skillId: questionSkill.skillId,
     })
     .from(sprintSurveyAnswerProject)
     .leftJoin(question, eq(sprintSurveyAnswerProject.questionId, question.id))
     .leftJoin(questionSkill, eq(question.id, questionSkill.questionId))
-    .leftJoin(skill, eq(questionSkill.skillId, skill.id))
     .where(
-      and(eq(sprintSurveyAnswerProject.userId, userId), or(eq(skill.id, 42))),
+      and(
+        eq(sprintSurveyAnswerProject.userId, userId),
+        eq(questionSkill.skillId, 42),
+      ),
     );
 
   const finalAnswers = await db
     .select({
       userId: finalSurveyAnswer.userId,
       answer: finalSurveyAnswer.answer,
-      skillId: skill.id,
-      skill: skill.positiveSkill,
+      skillId: questionSkill.skillId,
     })
     .from(finalSurveyAnswer)
     .leftJoin(question, eq(finalSurveyAnswer.questionId, question.id))
     .leftJoin(questionSkill, eq(question.id, questionSkill.questionId))
-    .leftJoin(skill, eq(questionSkill.skillId, skill.id))
-    .where(and(eq(finalSurveyAnswer.userId, userId), or(eq(skill.id, 42))));
+    .where(
+      and(eq(finalSurveyAnswer.userId, userId), eq(questionSkill.skillId, 42)),
+    );
 
-  let productivityTotal = 0;
-  let productivityMaxScore = 0;
+  // Check that  answers exist
+  if (
+    coworkersAnswers.length > 0 &&
+    sprintAnswers.length > 0 &&
+    finalAnswers.length > 0
+  ) {
+    // Se calcula el total de respuestas que se obtuvieron
+    let productivityTotal = 0;
+    const productivityMaxScore =
+      (coworkersAnswers.length + sprintAnswers.length + finalAnswers.length) *
+      10;
 
-  coworkersAnswers.forEach((answer) => {
-    productivityTotal += answer.answer || 0;
-    productivityMaxScore += 10;
-  });
-  sprintAnswers.forEach((answer) => {
-    productivityTotal += answer.answer || 0;
-    productivityMaxScore += 10;
-  });
-  finalAnswers.forEach((answer) => {
-    productivityTotal += answer.answer || 0;
-    productivityMaxScore += 10;
-  });
-  const productivityScore = Math.round(
-    (productivityTotal / productivityMaxScore) * 100,
-  );
+    // Calculamos el promedio de las respuestas
+    coworkersAnswers.forEach((answer) => {
+      productivityTotal += answer.answer || 0;
+    });
+    sprintAnswers.forEach((answer) => {
+      productivityTotal += answer.answer || 0;
+    });
+    finalAnswers.forEach((answer) => {
+      productivityTotal += answer.answer || 0;
+    });
+    const productivityScore = Math.round(
+      (productivityTotal / productivityMaxScore) * 100,
+    );
 
-  return productivityScore;
+    return productivityScore;
+  }
+
+  // Si no hay respuesta regresa 0
+  return 0;
 }
 
 export async function getPCPStatus(userId: string) {
@@ -340,7 +341,9 @@ export async function getPCPStatus(userId: string) {
     })
     .from(pipTask)
     .where(eq(pipTask.userId, userId));
+
   const totalTasks = pcpTasks.length;
+
   let completedTasks = 0;
   pcpTasks.forEach((task) => {
     if (task.status === "IN_PROGRESS") {
@@ -369,17 +372,15 @@ export async function getSelfPerceptionScore(userId: string) {
     .select({
       userId: sprintSurveyAnswerCoworkers.coworkerId,
       answer: sprintSurveyAnswerCoworkers.answer,
-      skillId: skill.id,
-      skill: skill.positiveSkill,
+      skillId: questionSkill.skillId,
     })
     .from(sprintSurveyAnswerCoworkers)
     .leftJoin(question, eq(sprintSurveyAnswerCoworkers.questionId, question.id))
     .leftJoin(questionSkill, eq(question.id, questionSkill.questionId))
-    .leftJoin(skill, eq(questionSkill.skillId, skill.id))
     .where(
       and(
         eq(sprintSurveyAnswerCoworkers.coworkerId, userId),
-        or(eq(skill.id, 43)),
+        eq(questionSkill.skillId, 43),
       ),
     );
 
@@ -387,14 +388,14 @@ export async function getSelfPerceptionScore(userId: string) {
     .select({
       userId: finalSurveyAnswer.userId,
       answer: finalSurveyAnswer.answer,
-      skillId: skill.id,
-      skill: skill.positiveSkill,
+      skillId: questionSkill.skillId,
     })
     .from(finalSurveyAnswer)
     .leftJoin(question, eq(finalSurveyAnswer.questionId, question.id))
     .leftJoin(questionSkill, eq(question.id, questionSkill.questionId))
-    .leftJoin(skill, eq(questionSkill.skillId, skill.id))
-    .where(and(eq(finalSurveyAnswer.userId, userId), or(eq(skill.id, 43))));
+    .where(
+      and(eq(finalSurveyAnswer.userId, userId), eq(questionSkill.skillId, 43)),
+    );
 
   const questionsMaxScore =
     (coworkersAnswers.length + finalAnswers.length) * 10;
@@ -419,23 +420,28 @@ export async function getSelfPerceptionScore(userId: string) {
     .leftJoin(rulerEmotion, eq(rulerSurveyAnswers.emotionId, rulerEmotion.id))
     .where(eq(rulerSurveyAnswers.userId, userId));
 
-  const totalEmotions = emotions.length * 10;
-  let goodSelfPerceptionScore = 0;
+  if (coworkersAnswers.length > 0 && finalAnswers.length > 0) {
+    // Se calcula el total de respuestas que se obtuvieron
 
-  emotions.forEach((answer) => {
-    if (answer.emotionPleasantness == null) {
-      goodSelfPerceptionScore = goodSelfPerceptionScore;
-    } else if (answer.emotionPleasantness > 0) {
-      goodSelfPerceptionScore += 10;
-    }
-  });
+    const totalEmotions = emotions.length * 10;
+    let goodSelfPerceptionScore = 0;
 
-  const totalSelfPerceptionScore = Math.round(
-    ((questionsTotal + goodSelfPerceptionScore) * 100) /
-      (questionsMaxScore + totalEmotions),
-  );
+    // Calculamos el promedio de las respuestas
+    emotions.forEach((answer) => {
+      if (answer.emotionPleasantness == null) {
+        goodSelfPerceptionScore = goodSelfPerceptionScore;
+      } else if (answer.emotionPleasantness > 0) {
+        goodSelfPerceptionScore += 10;
+      }
+    });
+    const totalSelfPerceptionScore = Math.round(
+      ((questionsTotal + goodSelfPerceptionScore) * 100) /
+        (questionsMaxScore + totalEmotions),
+    );
 
-  return totalSelfPerceptionScore;
+    return totalSelfPerceptionScore;
+  }
+  return 0;
 }
 
 // Function to calculate stress score based on energy and pleasantness
@@ -465,20 +471,23 @@ export async function getStressScore(userId: string) {
     .leftJoin(rulerEmotion, eq(rulerSurveyAnswers.emotionId, rulerEmotion.id))
     .where(eq(rulerSurveyAnswers.userId, userId));
 
-  const totalStressScore = emotions.reduce((sum, emotion) => {
-    const { emotionEnergy, emotionPleasantness } = emotion;
-    if (emotionEnergy == null || emotionPleasantness == null) {
-      return sum;
-    }
-    const stressScore = calculateStressScore(
-      emotionEnergy,
-      emotionPleasantness,
-    );
-    return sum + stressScore;
-  }, 0);
+  if (emotions.length > 0) {
+    const totalStressScore = emotions.reduce((sum, emotion) => {
+      const { emotionEnergy, emotionPleasantness } = emotion;
+      if (emotionEnergy == null || emotionPleasantness == null) {
+        return sum;
+      }
+      const stressScore = calculateStressScore(
+        emotionEnergy,
+        emotionPleasantness,
+      );
+      return sum + stressScore;
+    }, 0);
 
-  const averageStressScore = totalStressScore / emotions.length;
-  return Math.round(averageStressScore);
+    const averageStressScore = totalStressScore / emotions.length;
+    return Math.round(averageStressScore);
+  }
+  return 0;
 }
 
 export async function getCalendarInfo(userId: string) {

@@ -2,12 +2,14 @@
 
 import { Notification } from "@/types/types";
 import { parseDate } from "@/utils/utils";
+import PartyIcon from "./icons/PartyIcon";
 
 interface NotificationCardProps {
-  notification: Notification;
+  notification?: Notification;
+  empty?: boolean;
 }
 
-const NotificationCard = ({ notification }: NotificationCardProps) => {
+const NotificationCard = ({ notification, empty }: NotificationCardProps) => {
   const getTitle = (type: string) => {
     switch (type) {
       case "RULER":
@@ -21,6 +23,32 @@ const NotificationCard = ({ notification }: NotificationCardProps) => {
     }
   };
 
+  if (empty)
+    return (
+      <div
+        data-testid="empty-notification"
+        className={`flex w-full items-center rounded-t-md p-2`}
+      >
+        <PartyIcon color="text-primary" size="h-8 w-8" />
+        <div className="ms-4 flex w-full flex-col justify-start">
+          <p className="text-md text-start font-bold text-primary">
+            CONGRATULATIONS!
+          </p>
+          <p className="test-start text-xs">
+            You have <strong>no pending surveys</strong> , take a rest and enjoy
+            the rest of your day!
+          </p>
+          {/*           <p className="text-start text-xs">
+          You have a pending survery.
+          <strong> Click here </strong>
+          and answer your
+          <strong> {notification.type} </strong>
+          survey{" "}
+        </p> */}
+        </div>
+      </div>
+    );
+  if (!notification) return <></>;
   return (
     <div
       data-testid={`${getTitle(notification.type)}`}

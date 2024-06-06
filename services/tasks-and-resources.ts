@@ -81,6 +81,8 @@ export async function getUserTasksHistory(projectId: number) {
       and(
         // sprint surveys that belong to that project
         eq(sprintSurvey.projectId, projectId),
+        // tasks that belong to that user
+        eq(pipTask.userId, userId),
         // sprint surveys of sprints that have been already scheduled (i.e. the surveys have already been launched)
         lte(sprintSurvey.scheduledAt, new Date()),
       ),

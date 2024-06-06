@@ -4,12 +4,14 @@ import { auth } from "@/auth";
 import db from "@/db/drizzle";
 import {
   finalSurvey,
+  finalSurveyAnswer,
   project,
   projectMember,
   rulerSurveyAnswers,
   sprintSurvey,
+  sprintSurveyAnswerProject,
 } from "@/db/schema";
-import { eq, and, sql, gte } from "drizzle-orm";
+import { eq, and, sql, gte, isNull } from "drizzle-orm";
 import { Notification } from "@/types/types";
 
 export async function getNotifications() {
@@ -18,6 +20,16 @@ export async function getNotifications() {
   if (!userId) throw new Error("You must be signed in");
 
   const notifications = [];
+
+  // const currentTimestamp = new Date(
+  //   new Date().toLocaleString("es-MX", { timeZone: "America/Monterrey" }),
+  // );
+
+  // const currentDateString = currentTimestamp.toISOString().split("T")[0];
+  // const currentDateTimeString = currentTimestamp
+  //   .toISOString()
+  //   .replace("T", " ")
+  //   .split(".")[0];
 
   // Get the notifications of the sprint surveys
   const sprintSurveys = await db
@@ -29,9 +41,17 @@ export async function getNotifications() {
     .from(sprintSurvey)
     .innerJoin(project, eq(project.id, sprintSurvey.projectId))
     .innerJoin(projectMember, eq(projectMember.projectId, project.id))
+    .leftJoin(
+      sprintSurveyAnswerProject,
+      and(
+        eq(sprintSurvey.id, sprintSurveyAnswerProject.sprintSurveyId),
+        eq(sprintSurveyAnswerProject.userId, projectMember.userId),
+      ),
+    )
     .where(
       and(
         eq(projectMember.userId, userId), // the surveys belong to a user's project
+        isNull(sprintSurveyAnswerProject.sprintSurveyId),
         eq(sprintSurvey.processed, false), // the surveys aren't processed
         gte(sql`CURRENT_TIMESTAMP`, sprintSurvey.scheduledAt), // the survey itself is active (i.e. has been scheduled)
       ),
@@ -45,7 +65,6 @@ export async function getNotifications() {
       });
     }
   }
-
   // Get the notifications of the final surveys
   const finalSurveys = await db
     .select({
@@ -56,9 +75,17 @@ export async function getNotifications() {
     .from(finalSurvey)
     .innerJoin(project, eq(project.id, finalSurvey.projectId))
     .innerJoin(projectMember, eq(projectMember.projectId, project.id))
+    .leftJoin(
+      finalSurveyAnswer,
+      and(
+        eq(finalSurvey.id, finalSurveyAnswer.finalSurveyId),
+        eq(finalSurveyAnswer.userId, projectMember.userId),
+      ),
+    )
     .where(
       and(
         eq(projectMember.userId, userId), // the surveys belong to a user's project
+        isNull(finalSurveyAnswer.finalSurveyId),
         eq(finalSurvey.processed, false), // the surveys aren't processed
         gte(sql`CURRENT_TIMESTAMP`, finalSurvey.scheduledAt), // the survey itself is active (i.e. has been scheduled)
       ),

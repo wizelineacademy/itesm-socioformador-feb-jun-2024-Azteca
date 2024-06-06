@@ -26,7 +26,7 @@ const ProfileTraits: React.FC<TraitsProps> = ({
     <div
       className={
         traits.length === 0
-          ? "mb-6 mt-3 flex flex-wrap items-center justify-center gap-5 rounded-lg bg-slate-300/20 py-4"
+          ? "mb-4 mt-2 flex flex-wrap items-center justify-center gap-5 rounded-lg bg-slate-300/20 py-4"
           : "mb-10 mt-5 flex flex-wrap gap-5"
       }
     >

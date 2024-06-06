@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import { RadarChart, AreaChart } from "@mantine/charts";
 import GaugeChart from "@/components/GaugeChart";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { Survey } from "@/services/project";
 import {
   deleteProjectById,
   getUpdateFeedbackHistory,
@@ -19,22 +20,35 @@ import {
 } from "@/services/sprintSurvey";
 
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon";
-import NoDataCard from "@/components/NoDataCard";
 import Loader from "@/components/Loader";
+import InfoToolTip from "@/components/InfoToolTip";
+import Spinner from "@/components/icons/Spinner";
+import Reload from "@/components/icons/Reload";
 
 const Project = ({ params }: { params: { projectId: string } }) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const projectId = parseInt(params.projectId);
 
   const [isUpdateFeedbackPopupOpen, setIsUpdateFeedbackPopupOpen] =
     useState(false);
 
-  const { mutate } = useMutation({
+  const deleteProjectMutation = useMutation({
     mutationFn: deleteProjectById,
     onSuccess: () => {
       router.replace("/projects");
       router.refresh();
     },
+  });
+
+  const {
+    data: feedbackHistoryData,
+    isLoading: isLoadingFeedbackHistoryData,
+    isRefetching: isRefetchingFeedbackHistoryData,
+  } = useQuery({
+    queryKey: ["update-feedback-history"],
+    queryFn: () => getUpdateFeedbackHistory({ projectId }),
+    retry: false,
   });
 
   const userRoleQuery = useQuery({
@@ -126,6 +140,8 @@ const Project = ({ params }: { params: { projectId: string } }) => {
   const progressBarPercentage = 74;
 
   if (
+    isLoadingFeedbackHistoryData ||
+    !feedbackHistoryData ||
     isLoadingStatistics ||
     isLoadingDetailedStatistics ||
     isLoadingProjectData ||
@@ -137,7 +153,21 @@ const Project = ({ params }: { params: { projectId: string } }) => {
       </div>
     );
   }
-  console.log(gaugeData);
+
+  const getTooltipDescription = (title: string) => {
+    switch (title) {
+      case "Resources Satisfaction":
+        return "Indicates the level of satisfaction with the available resources.<br />Higher values suggest greater satisfaction with the resources provided.";
+      case "Listening Feeling":
+        return "Represents how well individuals feel they are being listened to.<br />Higher percentages indicate a stronger sense of being heard.";
+      case "Recognition Feeling":
+        return "Shows how individuals perceive recognition for their efforts.<br />Higher values reflect a greater feeling of being recognized.";
+      case "Respect and Trust Environment":
+        return "Indicates the current perception of respect and trust within the environment.<br />Higher percentages suggest a more respectful and trusting atmosphere.";
+      default:
+        return `Indicates the current ${title}`;
+    }
+  };
 
   return (
     <div className="mt-2">
@@ -151,7 +181,12 @@ const Project = ({ params }: { params: { projectId: string } }) => {
               <div className="relative z-10 flex items-center gap-1">
                 {/* popup */}
                 {isUpdateFeedbackPopupOpen && (
-                  <UpdateFeedbackHistoryPopup projectId={projectId} />
+                  <UpdateFeedbackHistoryPopup
+                    feedbackHistoryData={feedbackHistoryData}
+                    isRefetchingFeedbackHistoryData={
+                      isRefetchingFeedbackHistoryData
+                    }
+                  />
                 )}
 
                 {/* open-popup-button */}
@@ -166,9 +201,16 @@ const Project = ({ params }: { params: { projectId: string } }) => {
                 </button>
                 {/* update-button */}
                 <button
-                  className="rounded-lg bg-primary px-3 py-2 text-white"
+                  disabled={
+                    feedbackHistoryData.filter((s) => s.status === "PROCESSING")
+                      .length > 0
+                  }
+                  className="rounded-lg bg-primary px-3 py-2 text-white disabled:bg-gray-400"
                   onClick={async () => {
                     await updateFeedback(parseInt(params.projectId));
+                    await queryClient.invalidateQueries({
+                      queryKey: ["update-feedback-history"],
+                    });
                   }}
                 >
                   Update Feedback
@@ -177,8 +219,10 @@ const Project = ({ params }: { params: { projectId: string } }) => {
               {/* Delete button */}
               <button
                 className="rounded-lg bg-red-800 px-3 py-2 text-white"
-                onClick={() => {
-                  mutate(parseInt(params.projectId));
+                onClick={async () => {
+                  await deleteProjectMutation.mutateAsync(
+                    parseInt(params.projectId),
+                  );
                 }}
               >
                 Delete
@@ -193,6 +237,10 @@ const Project = ({ params }: { params: { projectId: string } }) => {
             key={index}
             className="flex w-fit flex-col rounded-xl bg-white px-10 py-5 drop-shadow-lg"
           >
+            <InfoToolTip
+              description={getTooltipDescription(gauge.title)}
+              size="sm"
+            />
             <GaugeChart
               percentage={Number(gauge.percentage)}
               type={gauge.type}
@@ -204,10 +252,14 @@ const Project = ({ params }: { params: { projectId: string } }) => {
           </div>
         ))}
       </div>
-      <div className="mt-4 flex justify-between">
+      <div className="mt-4 flex justify-between gap-12">
         {/* Radar Chart */}
         <div className="flex h-fit w-fit flex-col items-center rounded-xl bg-white px-4 pt-4 drop-shadow-lg">
           <h4 className="text-xl font-medium">Overall Statistics</h4>
+          <InfoToolTip
+            description="Provides a comprehensive view of various performance metrics.<br />Higher values indicate better performance in each area."
+            size="lg"
+          />
           <RadarChart
             h={380}
             w={460}
@@ -224,20 +276,28 @@ const Project = ({ params }: { params: { projectId: string } }) => {
             }}
           />
         </div>
-        <div className="grid gap-7">
+        <div className="grid w-full gap-7">
           {/* Progress Bar */}
-          <div className="flex h-fit w-fit flex-col rounded-xl bg-white p-4 drop-shadow-lg">
+          <div className="flex h-fit w-full flex-col rounded-xl bg-white p-4 drop-shadow-lg">
             <div className="flex justify-between">
               <div>
                 <p className="pb-2 text-lg font-medium">Employee Overload</p>
                 <p className="pb-2 text-5xl font-semibold">{`${progressBarPercentage}%`}</p>
               </div>
               <div>
-                <p className="text-md text-red-600">+ 3.1%</p>
-                <p className="text-sm text-grayText">to last week</p>
+                <div>
+                  <p className="text-md text-red-600">+ 3.1%</p>
+                  <p className="text-sm text-grayText">to last week</p>
+                </div>
               </div>
             </div>
-            <div className="w-[780px] rounded-full bg-gray-200 p-1">
+            <div className="absolute right-[-6px] top-[-6px]">
+              <InfoToolTip
+                description="Indicates the current level of employee overload.<br />A higher percentage reflects a greater degree of overload."
+                size="lg"
+              />
+            </div>
+            <div className="w-full rounded-full bg-gray-200 p-1">
               <div
                 className="h-6 rounded-full bg-gradient-to-r from-green-400 via-yellow-400 to-orange-500"
                 style={{ width: `70%` }}
@@ -245,10 +305,16 @@ const Project = ({ params }: { params: { projectId: string } }) => {
             </div>
           </div>
           {/* Area Chart */}
-          <div className="flex h-fit w-fit flex-col items-center rounded-xl bg-white px-4 pb-4 pt-6 drop-shadow-lg">
+          <div className="flex h-fit w-full flex-col items-center rounded-xl bg-white px-4 pb-4 pt-6 drop-shadow-lg">
+            <div className="absolute right-[-6px] top-[2px] z-50">
+              <InfoToolTip
+                description="Represents the level of support for growth and the the availability of growth opportunities  over time.<br />A steady increase indicates consistent growth support or increasing opportunities."
+                size="lg"
+              />
+            </div>
             <AreaChart
               h={200}
-              w={780}
+              // w={780}
               data={areaData}
               dataKey="month"
               series={[
@@ -272,6 +338,11 @@ const Project = ({ params }: { params: { projectId: string } }) => {
               tooltipAnimationDuration={200}
               strokeWidth={3}
               fillOpacity={0.25}
+              styles={{
+                legendItem: {
+                  margin: "0 20px 0 0",
+                },
+              }}
             />
           </div>
         </div>
@@ -280,12 +351,14 @@ const Project = ({ params }: { params: { projectId: string } }) => {
   );
 };
 
-const UpdateFeedbackHistoryPopup = ({ projectId }: { projectId: number }) => {
-  const updateFeedbackHistoryQuery = useQuery({
-    queryKey: ["update-feedback-history"],
-    queryFn: () => getUpdateFeedbackHistory({ projectId }),
-    retry: false,
-  });
+const UpdateFeedbackHistoryPopup = ({
+  feedbackHistoryData,
+  isRefetchingFeedbackHistoryData,
+}: {
+  feedbackHistoryData: Survey[];
+  isRefetchingFeedbackHistoryData: boolean;
+}) => {
+  const queryClient = useQueryClient();
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleString("default", {
@@ -295,21 +368,26 @@ const UpdateFeedbackHistoryPopup = ({ projectId }: { projectId: number }) => {
     });
   };
 
-  if (updateFeedbackHistoryQuery.isError) {
-    return <NoDataCard text={updateFeedbackHistoryQuery.error.message} />;
-  }
-
-  if (
-    updateFeedbackHistoryQuery.isLoading ||
-    !updateFeedbackHistoryQuery.data
-  ) {
-    return <p>Loading...</p>;
-  }
-
   return (
     <div className="absolute right-full top-full z-0 text-nowrap rounded-xl bg-white p-4 drop-shadow-lg">
-      <h2 className="mb-4 text-xl font-medium">Update History</h2>
-      {updateFeedbackHistoryQuery.data.map((survey, idx) => (
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-xl font-medium">Update History</h2>
+        <button
+          className="rounded-lg bg-primary p-1 text-white disabled:bg-gray-400"
+          disabled={isRefetchingFeedbackHistoryData}
+          onClick={async () => {
+            await queryClient.invalidateQueries({
+              queryKey: ["update-feedback-history"],
+            });
+          }}
+        >
+          <span className="sr-only">reload</span>
+          <div className="h-6 w-6">
+            <Reload />
+          </div>
+        </button>
+      </div>
+      {feedbackHistoryData?.map((survey, idx) => (
         <div key={idx} className="flex justify-between gap-20">
           <p>
             {survey.type === "SPRINT"
@@ -324,10 +402,17 @@ const UpdateFeedbackHistoryPopup = ({ projectId }: { projectId: number }) => {
           </p>
           {survey.status === "COMPLETED" ? (
             <p className="text-green-600">Completed</p>
+          ) : survey.status === "PROCESSING" ? (
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 fill-cyan-600 text-gray-200">
+                <Spinner />
+              </div>
+              <p className="text-cyan-600">Processing...</p>
+            </div>
           ) : survey.status === "PENDING" ? (
             <p className="text-red-600">Pending</p>
           ) : survey.status === "NOT_AVAILABLE" ? (
-            <p className="text-gray-600">Pending</p>
+            <p className="text-gray-600">Not Available</p>
           ) : null}
         </div>
       ))}

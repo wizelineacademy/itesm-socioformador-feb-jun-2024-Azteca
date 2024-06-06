@@ -4,15 +4,16 @@ import NoDataCard from "@/components/NoDataCard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getProjects } from "@/services/project";
 import {
+  getCurrentSprintSurvey,
   getUserResourcesForCurrentSprint,
   getUserResourcesHistory,
   getUserTasksForCurrentSprintByProjectId,
   getUserTasksHistory,
   updateTask,
 } from "@/services/tasks-and-resources";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import DialogComponent from "@/components/DialogComponent";
-import { Menu } from "@headlessui/react";
+import { Listbox, Menu, Transition } from "@headlessui/react";
 import { SelectPipResource, SelectPipTask } from "@/db/schema";
 import InfoIcon from "@/components/icons/InfoIcon";
 import VideoIcon from "@/components/icons/VideoIcon";
@@ -42,6 +43,18 @@ const PCP = () => {
     setProjectId(projectsQuery.data[0].id);
   }, [projectsQuery.data]);
 
+  const sprintSurveyQuery = useQuery({
+    queryKey: ["sprintSurvey", projectId],
+    queryFn: () => getCurrentSprintSurvey(projectId || 0),
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const scheduledAt = sprintSurveyQuery.data?.scheduledAt;
+  const formattedDate = scheduledAt
+    ? new Date(scheduledAt).toLocaleDateString("es-ES")
+    : "";
+
   const progressPercentage = 100;
 
   if (
@@ -63,26 +76,86 @@ const PCP = () => {
         <div className="flex items-center justify-between">
           <p className=" mb-2 text-3xl font-semibold">Personal Career Plan</p>
           <p className=" mb-2 text-xl font-medium text-graySubtitle">
-            Sprint 28/05/2024
+            {`Sprint ${formattedDate}`}
           </p>
         </div>
         <ProgressBar width={progressPercentage} height={6} />
       </section>
 
-      <section id="pip-selectproject">
-        <select
-          onChange={(e) => {
-            console.log(e.target.value);
-            setProjectId(parseInt(e.target.value));
-          }}
-        >
-          {projectsQuery.data &&
-            projectsQuery.data.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.name}
-              </option>
-            ))}
-        </select>
+      <section id="pip-selectproject" className="pt-4">
+        <div className="relative inline-block w-full">
+          <Listbox value={projectId} onChange={setProjectId}>
+            <div className="relative mt-1">
+              <Listbox.Button className="relative flex w-1/4 cursor-default items-center justify-between rounded-lg bg-white py-2 pl-3 pr-4 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                <p className="truncate">
+                  {projectsQuery.data &&
+                    projectsQuery.data.find((p) => p.id === projectId)?.name}
+                </p>
+                <svg
+                  className="h-4 w-4 fill-current text-gray-700"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M5.516 7.548a.75.75 0 011.06.025L10 10.704l3.424-3.13a.75.75 0 011.06-.024.75.75 0 01.024 1.06l-4 3.5a.75.75 0 01-1.084 0l-4-3.5a.75.75 0 01.024-1.06z" />
+                </svg>
+              </Listbox.Button>
+              <Transition
+                as={Fragment}
+                leave="transition ease-in duration-100"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <Listbox.Options className="absolute mt-1 max-h-56 w-1/4 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                  <Listbox.Option
+                    key={0}
+                    value={0}
+                    className={({ active }) =>
+                      `relative my-1 cursor-default select-none rounded-xl  ${
+                        active ? "bg-gray-200 text-black" : "text-gray-900"
+                      }`
+                    }
+                  >
+                    {({ selected }) => (
+                      <span
+                        className={`block truncate rounded-xl py-2 pl-10 pr-4 ${
+                          selected
+                            ? "bg-primary font-medium text-white"
+                            : "font-normal"
+                        }`}
+                      >
+                        Personal Improvement
+                      </span>
+                    )}
+                  </Listbox.Option>
+                  {projectsQuery.data &&
+                    projectsQuery.data.map((project) => (
+                      <Listbox.Option
+                        key={project.id}
+                        className={({ active }) =>
+                          `relative my-1 cursor-default select-none rounded-xl  ${
+                            active ? "bg-gray-200 text-black" : "text-gray-900"
+                          }`
+                        }
+                        value={project.id}
+                      >
+                        {({ selected }) => (
+                          <span
+                            className={`block truncate rounded-xl py-2 pl-10 pr-4 ${
+                              selected
+                                ? "bg-primary font-medium text-white"
+                                : "font-normal"
+                            }`}
+                          >
+                            {project.name}
+                          </span>
+                        )}
+                      </Listbox.Option>
+                    ))}
+                </Listbox.Options>
+              </Transition>
+            </div>
+          </Listbox>
+        </div>
       </section>
 
       {projectId && (
@@ -112,7 +185,7 @@ const PCPTasks = ({ projectId }: { projectId: number }) => {
   });
 
   return (
-    <section id="pip-tasks" className="mt-9 w-full">
+    <section id="pip-tasks" className="mt-5 w-full">
       <div className="mb-6">
         <div className="mx-auto flex justify-between">
           <h3 className="text-3xl font-medium text-black">Tasks</h3>
@@ -131,7 +204,7 @@ const PCPTasks = ({ projectId }: { projectId: number }) => {
         ) : (
           tasksQuery.data && (
             <div className="mt-2">
-              <div className="mb-10 mt-2 flex w-full flex-row flex-wrap gap-12 overflow-x-auto pb-3">
+              <div className="mb-10 mt-2 flex flex-row gap-12 overflow-x-auto whitespace-nowrap pb-3">
                 {tasksQuery.data.map((task) => (
                   <PCPTask key={task.id} task={task} projectId={projectId} />
                 ))}
@@ -209,8 +282,8 @@ const PCPTasksDialogContent = ({ projectId }: { projectId: number }) => {
                           <InfoIcon color="text-black" size="h-6 w-6" />
                         </Menu.Button>
                       </div>
-                      <Menu.Items className="absolute right-0 z-50 mt-2 w-fit origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        <div className="px-4 py-1 text-sm text-gray-700">
+                      <Menu.Items className="absolute right-0 z-50 mt-2 w-64 origin-top-right rounded-md bg-white ring-1 ring-black ring-opacity-5 drop-shadow-lg focus:outline-none">
+                        <div className="px-4 py-1 text-justify text-sm text-gray-700">
                           {task.description}
                         </div>
                       </Menu.Items>
@@ -225,7 +298,7 @@ const PCPTasksDialogContent = ({ projectId }: { projectId: number }) => {
                           <span className="sr-only">Change status</span>
                         </Menu.Button>
                       </div>
-                      <Menu.Items className="absolute right-0 z-50 mt-2 w-44 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <Menu.Items className="absolute right-0 z-50 mt-2 w-44 origin-top-right rounded-md bg-white ring-1 ring-black ring-opacity-5 drop-shadow-lg focus:outline-none">
                         <div className="py-1">
                           {statusOptions.map((option) => (
                             <Menu.Item key={option.value}>
@@ -363,7 +436,7 @@ const PCPResources = ({ projectId }: { projectId: number }) => {
   });
 
   return (
-    <section id="pip-tasks" className="mt-9 w-full">
+    <section id="pip-tasks" className="mt-5 w-full">
       <div className="mb-6">
         <div className="mx-auto flex justify-between">
           <h3 className="text-3xl font-medium text-black">Resources</h3>
@@ -382,7 +455,7 @@ const PCPResources = ({ projectId }: { projectId: number }) => {
         ) : (
           resourcesQuery.data && (
             <div className="mt-2">
-              <div className="mb-10 mt-2 flex w-full flex-row flex-wrap gap-12 overflow-x-auto pb-3">
+              <div className="mb-10 mt-2 flex flex-row gap-12 overflow-x-auto whitespace-nowrap pb-3">
                 {resourcesQuery.data.map((resource) => (
                   <PCPResource key={resource.id} resource={resource} />
                 ))}
@@ -497,7 +570,7 @@ const PCPResourcesDialogContent = ({ projectId }: { projectId: number }) => {
                         <InfoIcon color="text-black" size="h-6 w-6" />
                       </Menu.Button>
                     </div>
-                    <Menu.Items className="absolute right-0 z-50 mt-2 w-fit origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <Menu.Items className="absolute right-0 z-50 mt-2 w-80 origin-top-right rounded-md bg-white ring-1 ring-black ring-opacity-5 drop-shadow-lg focus:outline-none">
                       <div className="px-4 py-1 text-sm text-gray-700">
                         {resource.description}
                       </div>

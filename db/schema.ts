@@ -1,4 +1,3 @@
-import { sql } from "drizzle-orm";
 import {
   boolean,
   date,
@@ -62,25 +61,19 @@ export const projectMember = pgTable(
   // composite primary key on (userId, projectId)
 );
 
-export const traitKindEnum = pgEnum("trait_kind", [
+export const skillKindEnum = pgEnum("trait_kind", [
   "STRENGTH",
   "AREA_OF_OPPORTUNITY",
 ]);
 
-export const trait = pgTable("trait", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 64 }),
-  description: varchar("description", { length: 1024 }),
-  kind: traitKindEnum("kind"),
-});
-
-export const userTrait = pgTable(
-  "user_trait",
+export const userSkill = pgTable(
+  "user_skill",
   {
     userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
-    traitId: integer("trait_id").references(() => trait.id, {
+    skillId: integer("skill_id").references(() => skill.id, {
       onDelete: "cascade",
     }),
+    kind: skillKindEnum("kind"),
   },
   // composite primary key on (userId, traitId)
 );
@@ -93,7 +86,11 @@ export const taskStatusEnum = pgEnum("status", [
 
 export const pipTask = pgTable("pip_task", {
   id: serial("id").primaryKey(),
+  rulerSurveyId: integer("ruler_survey_id").references(
+    () => rulerSurveyAnswers.id,
+  ),
   sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
+  finalSurveyId: integer("final_survey_id").references(() => finalSurvey.id),
   userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 64 }),
   description: varchar("description", { length: 256 }),
@@ -125,9 +122,13 @@ export const userResource = pgTable(
     resourceId: serial("resource_id").references(() => pipResource.id, {
       onDelete: "cascade",
     }),
+    rulerSurveyId: integer("ruler_survey_id").references(
+      () => rulerSurveyAnswers.id,
+    ),
     sprintSurveyId: integer("sprint_survey_id").references(
       () => sprintSurvey.id,
     ),
+    finalSurveyId: integer("final_survey_id").references(() => finalSurvey.id),
   },
   // composite primary key on (userId, resourceId)
 );
@@ -145,12 +146,12 @@ export const rulerEmotion = pgTable("ruler_emotion", {
 export const rulerSurveyAnswers = pgTable(
   "ruler_survey_answers",
   {
+    id: serial("id").primaryKey(),
     userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
     emotionId: integer("emotion_id").references(() => rulerEmotion.id),
-    answeredAt: date("answered_at", { mode: "date" }).default(
-      sql`CURRENT_TIMESTAMP::date`,
-    ),
+    answeredAt: date("answered_at", { mode: "date" }),
     comment: text("comment"),
+    processed: boolean("processed").default(false),
   },
   // composite primary key on (userId, rulerSurveyId)
 );
@@ -173,6 +174,8 @@ export const skill = pgTable("skill", {
   id: serial("skill_id").primaryKey(),
   positiveSkill: varchar("positive_skill", { length: 30 }),
   negativeSkill: varchar("negative_skill", { length: 30 }),
+  positiveDescription: varchar("positive_description", { length: 1024 }),
+  negativeDescription: varchar("negative_description", { length: 1024 }),
 });
 
 export const questionSkill = pgTable("question_skill", {
@@ -197,6 +200,7 @@ export const sprintSurvey = pgTable("sprint_survey", {
   }),
   scheduledAt: date("scheduled_at", { mode: "date" }),
   processed: boolean("processed").default(false),
+  isProcessing: boolean("is_processing").default(false).notNull(),
 });
 
 export type SelectSprintSurvey = typeof sprintSurvey.$inferSelect;
@@ -240,6 +244,7 @@ export const finalSurvey = pgTable("final_survey", {
     onDelete: "cascade",
   }),
   processed: boolean("processed").default(false),
+  isProcessing: boolean("is_processing").default(false).notNull(),
 });
 
 export const finalSurveyAnswer = pgTable(
@@ -251,9 +256,7 @@ export const finalSurveyAnswer = pgTable(
     }),
     questionId: integer("question_id").references(() => question.id),
     answer: integer("answer"),
-    answeredAt: date("answered_at", { mode: "date" }).default(
-      sql`CURRENT_TIMESTAMP::date`,
-    ), // Nueva columna
+    answeredAt: date("answered_at", { mode: "date" }),
     comment: text("comment"),
   },
   // composite primary key on (userId, finalSurveyId)
