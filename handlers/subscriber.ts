@@ -21,6 +21,7 @@ interface EventType {
 }
 
 export const handler = async (event: EventType) => {
+  console.log("WORKING ?");
   const messageBody = JSON.parse(event.Records[0].body) as {
     sprintSurveyId: number;
   };
@@ -35,6 +36,13 @@ export const handler = async (event: EventType) => {
   }
   // TODO: maybe a finally ? block
 
+  await db
+    .update(sprintSurvey)
+    .set({
+      isProcessing: false,
+    })
+    .where(eq(sprintSurvey.id, messageBody.sprintSurveyId));
+
   const client = new SQSClient();
   const response = await client.send(
     new DeleteMessageCommand({
@@ -44,13 +52,6 @@ export const handler = async (event: EventType) => {
   );
 
   console.log("del response", response);
-
-  await db
-    .update(sprintSurvey)
-    .set({
-      isProcessing: false,
-    })
-    .where(eq(sprintSurvey.id, messageBody.sprintSurveyId));
 
   return "ok";
 };

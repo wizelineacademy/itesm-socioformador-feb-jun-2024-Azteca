@@ -273,10 +273,12 @@ export async function updateFeedback(projectId: number) {
     })
     .where(inArray(sprintSurvey.id, finalSurveyIds));
 
+  const messageGroupId = crypto.randomUUID();
+
   const entries: SendMessageBatchRequestEntry[] = sprintSurveyIds.map(
     (sprintSurveyId) => ({
       Id: crypto.randomUUID(),
-      MessageGroupId: "UPDATE_FEEDBACK",
+      MessageGroupId: messageGroupId,
       MessageDeduplicationId: crypto.randomUUID(),
       MessageBody: JSON.stringify({
         sprintSurveyId,
