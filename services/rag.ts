@@ -189,6 +189,10 @@ async function processCoworkersOpenFeedback(
     joinedFeedbackComments = joinedFeedbackComments.replaceAll("sesgado:", "");
     joinedFeedbackComments = joinedFeedbackComments.replaceAll("  ", " ");
 
+    console.log("===========================================");
+    console.log("COMMENTS PROCESSING");
+    console.log("===========================================");
+
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_KEY,
     });
@@ -250,6 +254,10 @@ async function processCoworkersOpenFeedback(
         commentClassifications.biased = sentiment.substring(8);
       }
     }
+
+    console.log("Positive comments: ", commentClassifications.positive);
+    console.log("Negative comments: ", commentClassifications.negative);
+    console.log("Biased comments: ", commentClassifications.biased);
 
     // ==================== RAG AND WEAKNESSES ANALYSIS ====================
 
@@ -637,6 +645,9 @@ async function getFeedbackClassifications(
         }
       } else {
         // add the negative skills of the question
+        console.log("Feedback: ", feedback[0]);
+        console.log("question Skills: ", questionsSkills[feedback[0]]);
+        console.log("questions: ", questionsSkills);
         const questionNegativeSkills = questionsSkills[feedback[0]].map(
           (skillId) => skillId as number,
         );
@@ -669,10 +680,14 @@ async function getQuestionsSkills(
   type: string,
 ): Promise<QuestionSkills> {
   const questionsSkills: QuestionSkills = {};
-  const questions: any[] = [];
+  type Question = {
+    questionId: number | null;
+  };
+
+  let questions: Question[] = [];
 
   if (type === "COWORKER_QUESTION") {
-    const questions = await db
+    questions = await db
       .select({
         questionId: sprintSurveyQuestion.questionId,
       })
@@ -685,7 +700,7 @@ async function getQuestionsSkills(
         ),
       );
   } else if (type === "FINAL_PROJECT_QUESTION") {
-    const questions = await db
+    questions = await db
       .select({
         questionId: sprintSurveyQuestion.questionId,
       })
@@ -951,6 +966,10 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
 
   // analyze survey only if it has not been processed
   if (notProcessedSurvey) {
+    console.log("=========================================");
+    console.log("START OF SPRINT ANALYSIS");
+    console.log("=========================================");
+
     const uniqueProjectUsers = await db
       .selectDistinct({
         userId: projectMember.userId,
@@ -972,8 +991,11 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
       "COWORKER_QUESTION",
     );
 
+    console.log("=====================, questionSkills: ", questionsSkills);
+
     // iterate through each unique user of the project and read the feedback received
     for (const userId of Object.keys(orderedFeedback)) {
+      console.log(userId);
       const userTasksCount = await db
         .select({ count: count() })
         .from(pipTask)
@@ -1016,6 +1038,9 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
       .set({ processed: true })
       .where(eq(sprintSurvey.id, sprintSurveyId));
   }
+  console.log("=========================================");
+  console.log("END OF SPRINT ANALYSIS");
+  console.log("=========================================");
 }
 
 export async function projectAnalysis(finalSurveyId: number) {
