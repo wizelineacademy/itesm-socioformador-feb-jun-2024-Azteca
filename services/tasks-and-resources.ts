@@ -27,7 +27,7 @@ export async function getCurrentSprintSurvey(projectId: number) {
     .orderBy(desc(sprintSurvey.scheduledAt))
     .limit(1);
 
-  if (!res[0]) throw new Error("No sprint survey was found");
+  if (!res[0]) return "No sprint survey was found";
   return res[0];
 }
 
@@ -36,18 +36,18 @@ export async function getUserTasksForCurrentSprintByProjectId(
 ) {
   const session = await auth();
   const userId = session?.user?.id;
-  if (!userId) throw new Error("You must be signed in");
+  if (!userId) return "You must be signed in";
 
   const currentSprintSurvey = await getCurrentSprintSurvey(projectId);
-
+  if (typeof currentSprintSurvey === "string") {
+    return currentSprintSurvey;
+  }
   // check if the sprint is not processed to throw an error
   // check if there's no sprint survey results throw an error
   // check if all the surveys were answered, so the only one left is the project one
 
   if (!currentSprintSurvey.processed) {
-    throw new Error(
-      "Curreny sprint survey was found, but it is not processed yet",
-    );
+    return "Curreny sprint survey was found, but it is not processed yet";
   }
 
   const tasks = await db
@@ -62,7 +62,7 @@ export async function getUserTasksForCurrentSprintByProjectId(
     .orderBy(asc(pipTask.title));
 
   if (tasks.length === 0) {
-    throw new Error("No tasks available. Ask your manager for an update.");
+    return "No tasks available. Ask your manager for an update.";
   }
 
   return tasks;
@@ -71,7 +71,7 @@ export async function getUserTasksForCurrentSprintByProjectId(
 export async function getUserTasksHistory(projectId: number) {
   const session = await auth();
   const userId = session?.user?.id;
-  if (!userId) throw new Error("You must be signed in");
+  if (!userId) return "You must be signed in";
 
   const sprintSurveys = await db
     .select({ sprintSurvey: sprintSurvey, task: pipTask })
@@ -110,7 +110,7 @@ export async function getUserTasksHistory(projectId: number) {
   // TODO: inform the frontend when the survey is pending for processing
 
   if (sprintSurveysWithTasks.length === 0) {
-    throw new Error("No task history available");
+    return "No task history available";
   }
 
   return sprintSurveysWithTasks;
@@ -119,18 +119,19 @@ export async function getUserTasksHistory(projectId: number) {
 export async function getUserResourcesForCurrentSprint(projectId: number) {
   const session = await auth();
   const userId = session?.user?.id;
-  if (!userId) throw new Error("You must be signed in");
+  if (!userId) return "You must be signed in";
 
   const currentSprintSurvey = await getCurrentSprintSurvey(projectId);
+  if (typeof currentSprintSurvey === "string") {
+    return currentSprintSurvey;
+  }
 
   // check if the sprint is not processed to throw an error
   // check if there's no sprint survey results throw an error
   // check if all the surveys were answered, so the only one left is the project one
 
   if (!currentSprintSurvey.processed) {
-    throw new Error(
-      "Curreny sprint survey was found, but it is not processed yet",
-    );
+    return "Curreny sprint survey was found, but it is not processed yet";
   }
 
   const res = await db
@@ -150,7 +151,7 @@ export async function getUserResourcesForCurrentSprint(projectId: number) {
   const resources = res.map((e) => ({ ...e.resource }));
 
   if (resources.length === 0) {
-    throw new Error("No resources available. Ask your manager for an update.");
+    return "No resources available. Ask your manager for an update.";
   }
 
   return resources;
@@ -159,7 +160,7 @@ export async function getUserResourcesForCurrentSprint(projectId: number) {
 export async function getUserResourcesHistory(projectId: number) {
   const session = await auth();
   const userId = session?.user?.id;
-  if (!userId) throw new Error("You must be signed in");
+  if (!userId) return "You must be signed in";
 
   const sprintSurveys = await db
     .select({
@@ -202,7 +203,7 @@ export async function getUserResourcesHistory(projectId: number) {
   // TODO: inform the frontend when the survey is pending for processing
 
   if (sprintSurveysWithResources.length === 0) {
-    throw new Error("No resource history available");
+    return "No resource history available";
   }
 
   return sprintSurveysWithResources;

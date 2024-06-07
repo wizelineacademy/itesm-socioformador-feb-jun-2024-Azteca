@@ -220,7 +220,9 @@ const CreateProject = () => {
                 </label>
                 <MultiSelect
                   // TODO: make this handle duplicate users
-                  data={employeesQuery.data?.map((member) => member.name)}
+                  data={Array.from(
+                    new Set(employeesQuery.data?.map((member) => member.name)),
+                  )}
                   renderOption={renderMultiSelectOption}
                   maxDropdownHeight={180}
                   // label="Employees of the month"
