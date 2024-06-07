@@ -21,6 +21,7 @@ import {
 import toast from "react-hot-toast";
 import { getUserId } from "@/services/user";
 import Loader from "../Loader";
+import { useRouter } from "next/navigation";
 
 interface SprintSurveyProps {
   showModal: boolean;
@@ -48,6 +49,8 @@ const SprintSurvey = ({
     queryKey: ["sprintQuestions"],
     queryFn: async () => await getSprintSurveyQuestions(),
   });
+
+  const router = useRouter();
 
   const sprintQuestions: Questions[] | undefined = useMemo(() => {
     return allSprintQuestions?.filter(
@@ -163,6 +166,7 @@ const SprintSurvey = ({
   const submitSurveyAnswers = useMutation({
     mutationFn: () => submitSprintSurveyAnswers(sprintAnswer),
     onSuccess: () => {
+      router.refresh();
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
       toast.success("Encuesta enviada exitosamente!");
     },

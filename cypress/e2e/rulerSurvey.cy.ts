@@ -8,6 +8,8 @@ describe("Testing different surveys", () => {
     cy.get("label").contains("Email").click().type("cypress@gmail.com");
     cy.get("label").contains("Password").click().type("cypress");
     cy.get("button").contains("Log in").click();
+    cy.wait(3000);
+    cy.url().should("include", "/dashboard");
     cy.get('[data-testid="notification-button"]').click();
     cy.get('[data-testid="Daily Ruler Survey"]').click();
     cy.get('[data-testid="ruler-survey"]').should("exist");

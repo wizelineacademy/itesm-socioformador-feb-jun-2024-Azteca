@@ -24,7 +24,7 @@ const Register = () => {
 
   return (
     <div className="flex h-dvh items-center justify-center bg-gradient-to-r from-primary to-primary-light">
-      <section className="flex h-fit w-[33%] flex-col justify-center rounded-[20px] bg-bone px-10 py-8 drop-shadow-md ">
+      <section className="flex h-fit w-fit flex-col justify-center rounded-[20px] bg-bone px-8 py-8 drop-shadow-md md:px-14 lg:px-16 ">
         <p className="mt-6 text-center text-3xl font-semibold leading-normal text-black">
           Sign Up
         </p>
