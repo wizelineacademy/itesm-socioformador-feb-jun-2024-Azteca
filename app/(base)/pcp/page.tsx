@@ -50,10 +50,13 @@ const PCP = () => {
     refetchOnWindowFocus: false,
   });
 
-  const scheduledAt = sprintSurveyQuery.data?.scheduledAt;
-  const formattedDate = scheduledAt
-    ? new Date(scheduledAt).toLocaleDateString("es-ES")
-    : "";
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleString("default", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   const progressPercentage = 100;
 
@@ -76,7 +79,12 @@ const PCP = () => {
         <div className="flex items-center justify-between">
           <p className=" mb-2 text-3xl font-semibold">Personal Career Plan</p>
           <p className=" mb-2 text-xl font-medium text-graySubtitle">
-            {`Sprint ${formattedDate}`}
+            {sprintSurveyQuery.data &&
+            typeof sprintSurveyQuery.data === "string"
+              ? sprintSurveyQuery.data
+              : sprintSurveyQuery.isLoading || !sprintSurveyQuery.data
+                ? "loading..."
+                : `Sprint ${formatDate(sprintSurveyQuery.data.scheduledAt as Date)}`}
           </p>
         </div>
         <ProgressBar width={progressPercentage} height={6} />
@@ -88,8 +96,9 @@ const PCP = () => {
             <div className="relative mt-1">
               <Listbox.Button className="relative flex w-1/4 cursor-default items-center justify-between rounded-lg bg-white py-2 pl-3 pr-4 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
                 <p className="truncate">
-                  {projectsQuery.data &&
-                    projectsQuery.data.find((p) => p.id === projectId)?.name}
+                  {(projectsQuery.data &&
+                    projectsQuery.data.find((p) => p.id === projectId)?.name) ??
+                    "Personal Improvement"}
                 </p>
                 <svg
                   className="h-4 w-4 fill-current text-gray-700"
@@ -107,8 +116,8 @@ const PCP = () => {
               >
                 <Listbox.Options className="absolute mt-1 max-h-56 w-1/4 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
                   <Listbox.Option
-                    key={0}
-                    value={0}
+                    key={-1}
+                    value={-1}
                     className={({ active }) =>
                       `relative my-1 cursor-default select-none rounded-xl  ${
                         active ? "bg-gray-200 text-black" : "text-gray-900"
@@ -197,10 +206,10 @@ const PCPTasks = ({ projectId }: { projectId: number }) => {
           </button>
         </div>
 
-        {tasksQuery.isLoading ? (
+        {tasksQuery.isLoading || !tasksQuery.data ? (
           <p>loading...</p>
-        ) : tasksQuery.isError ? (
-          <NoDataCard text={tasksQuery.error.message} />
+        ) : tasksQuery.data && typeof tasksQuery.data === "string" ? (
+          <NoDataCard text={tasksQuery.data} />
         ) : (
           tasksQuery.data && (
             <div className="mt-2">
@@ -239,8 +248,8 @@ const PCPTasksDialogContent = ({ projectId }: { projectId: number }) => {
     mutationFn: updateTask,
   });
 
-  if (tasksHistoryQuery.isError) {
-    return <NoDataCard text={tasksHistoryQuery.error.message} />;
+  if (tasksHistoryQuery.data && typeof tasksHistoryQuery.data === "string") {
+    return <NoDataCard text={tasksHistoryQuery.data} />;
   }
 
   if (tasksHistoryQuery.isLoading || !tasksHistoryQuery.data) {
@@ -448,10 +457,10 @@ const PCPResources = ({ projectId }: { projectId: number }) => {
           </button>
         </div>
 
-        {resourcesQuery.isLoading ? (
+        {resourcesQuery.isLoading || !resourcesQuery.data ? (
           <p>loading...</p>
-        ) : resourcesQuery.isError ? (
-          <NoDataCard text={resourcesQuery.error.message} />
+        ) : resourcesQuery.data && typeof resourcesQuery.data === "string" ? (
+          <NoDataCard text={resourcesQuery.data} />
         ) : (
           resourcesQuery.data && (
             <div className="mt-2">
@@ -532,8 +541,11 @@ const PCPResourcesDialogContent = ({ projectId }: { projectId: number }) => {
     refetchOnWindowFocus: false,
   });
 
-  if (resourcesHistoryQuery.isError) {
-    return <NoDataCard text={resourcesHistoryQuery.error.message} />;
+  if (
+    resourcesHistoryQuery.data &&
+    typeof resourcesHistoryQuery.data === "string"
+  ) {
+    return <NoDataCard text={resourcesHistoryQuery.data} />;
   }
 
   if (resourcesHistoryQuery.isLoading || !resourcesHistoryQuery.data) {
