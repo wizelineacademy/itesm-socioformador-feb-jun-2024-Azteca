@@ -11,7 +11,6 @@ on:
 jobs:
   cypress-test:
     runs-on: ubuntu-latest
-    needs: build
 
     steps:
       - name: Git checkout

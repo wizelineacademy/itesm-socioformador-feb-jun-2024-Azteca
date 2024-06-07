@@ -727,7 +727,7 @@ async function getQuestionsSkills(
   return questionsSkills;
 }
 
-async function rulerAnalysis(
+export async function rulerAnalysis(
   userId: string,
   userComment: string,
   emotionId: number,

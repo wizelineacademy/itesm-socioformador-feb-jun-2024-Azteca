@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import db from "@/db/drizzle";
 import { finalSurvey, finalSurveyAnswer, question } from "@/db/schema";
-import { eq, sql, or } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import { ProjectAnswer } from "@/types/types";
 
 export async function getProjectQuestions() {
