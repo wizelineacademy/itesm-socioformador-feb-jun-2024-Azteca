@@ -8,6 +8,7 @@ import { getUserId } from "@/services/user";
 import { submitRulerSurveyAnswer } from "@/services/rulerSurvey";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 interface RulerSurveyProps {
   showModal: boolean;
@@ -16,6 +17,7 @@ interface RulerSurveyProps {
 
 const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const [step, setStep] = useState<number>(1);
   const { data: userId } = useQuery({
     queryKey: ["userId"],
@@ -54,6 +56,7 @@ const RulerSurvey = ({ showModal, onClose }: RulerSurveyProps) => {
     mutationFn: () => submitRulerSurveyAnswer(rulerSurveyAnswer),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      router.refresh();
       toast.success("Encuesta enviada exitosamente!");
     },
     onError: () => {

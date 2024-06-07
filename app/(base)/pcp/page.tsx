@@ -75,7 +75,7 @@ const PCP = () => {
 
   return (
     <div>
-      <section id="pip-progressbar" className="mt-4">
+      <section id="pip-progressbar" className="mt-4 w-full">
         <div className="flex items-center justify-between">
           <p className=" mb-2 text-3xl font-semibold">Personal Career Plan</p>
           <p className=" mb-2 text-xl font-medium text-graySubtitle">
@@ -87,14 +87,11 @@ const PCP = () => {
                 : `Sprint ${formatDate(sprintSurveyQuery.data.scheduledAt as Date)}`}
           </p>
         </div>
-        <ProgressBar width={progressPercentage} height={6} />
-      </section>
-
-      <section id="pip-selectproject" className="pt-4">
-        <div className="relative inline-block w-full">
+        <div className="flex w-full flex-row items-center justify-between gap-4">
+          <ProgressBar width={progressPercentage} height={6} />
           <Listbox value={projectId} onChange={setProjectId}>
             <div className="relative mt-1">
-              <Listbox.Button className="relative flex w-1/4 cursor-default items-center justify-between rounded-lg bg-white py-2 pl-3 pr-4 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+              <Listbox.Button className="relative flex w-full cursor-default items-center justify-between rounded-lg bg-white py-2 pl-3 pr-4 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
                 <p className="truncate">
                   {(projectsQuery.data &&
                     projectsQuery.data.find((p) => p.id === projectId)?.name) ??
@@ -114,7 +111,7 @@ const PCP = () => {
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
               >
-                <Listbox.Options className="absolute mt-1 max-h-56 w-1/4 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                <Listbox.Options className="absolute z-50 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
                   <Listbox.Option
                     key={-1}
                     value={-1}
