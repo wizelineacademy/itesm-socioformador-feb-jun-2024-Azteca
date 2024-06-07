@@ -115,7 +115,7 @@ const Notifications = () => {
               {({ close }) => (
                 <div className="sticky top-0 z-50 flex flex-row items-center justify-between bg-white pt-3">
                   <div className="flex flex-row gap-1">
-                    <p className="text-md font-bold text-black">
+                    <p className="text-md font-medium text-black">
                       Notifications
                     </p>
                     <p className="">({notificationsQuery.data.length})</p>
@@ -149,9 +149,7 @@ const Notifications = () => {
             {notificationsQuery.data.length === 0 && (
               <div className="flex h-5/6 w-full items-center justify-center py-1">
                 <Menu.Item>
-                  <p className="items-center py-2 text-sm">
-                    No tienes ninguna notificación
-                  </p>
+                  <NotificationCard empty={true} />
                 </Menu.Item>
               </div>
             )}

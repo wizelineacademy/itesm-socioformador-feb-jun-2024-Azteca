@@ -18,7 +18,7 @@ const Register = () => {
         toast.error("There was an error saving the data. Try again.");
     } else {
       toast.success("Account created successfully.");
-      router.push("/profile");
+      router.push("/dashboard");
     }
   };
 

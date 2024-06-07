@@ -11,9 +11,9 @@ import {
   getUserTasksHistory,
   updateTask,
 } from "@/services/tasks-and-resources";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import DialogComponent from "@/components/DialogComponent";
-import { Menu } from "@headlessui/react";
+import { Listbox, Menu, Transition } from "@headlessui/react";
 import { SelectPipResource, SelectPipTask } from "@/db/schema";
 import InfoIcon from "@/components/icons/InfoIcon";
 import VideoIcon from "@/components/icons/VideoIcon";
@@ -84,30 +84,77 @@ const PCP = () => {
 
       <section id="pip-selectproject" className="pt-4">
         <div className="relative inline-block w-full">
-          <select
-            onChange={(e) => {
-              console.log(e.target.value);
-              setProjectId(parseInt(e.target.value));
-            }}
-            className="focus:shadow-outline w-full appearance-none rounded border border-gray-400 bg-white p-2 font-medium leading-tight drop-shadow-lg hover:border-gray-500 focus:border-primary focus:outline-none"
-          >
-            <option>Personal Improvement</option>
-            {projectsQuery.data &&
-              projectsQuery.data.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.name}
-                </option>
-              ))}
-          </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-            <svg
-              className="h-4 w-4 fill-current"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-            >
-              <path d="M5.516 7.548a.75.75 0 011.06.025L10 10.704l3.424-3.13a.75.75 0 011.06-.024.75.75 0 01.024 1.06l-4 3.5a.75.75 0 01-1.084 0l-4-3.5a.75.75 0 01.024-1.06z" />
-            </svg>
-          </div>
+          <Listbox value={projectId} onChange={setProjectId}>
+            <div className="relative mt-1">
+              <Listbox.Button className="relative flex w-1/4 cursor-default items-center justify-between rounded-lg bg-white py-2 pl-3 pr-4 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                <p className="truncate">
+                  {projectsQuery.data &&
+                    projectsQuery.data.find((p) => p.id === projectId)?.name}
+                </p>
+                <svg
+                  className="h-4 w-4 fill-current text-gray-700"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M5.516 7.548a.75.75 0 011.06.025L10 10.704l3.424-3.13a.75.75 0 011.06-.024.75.75 0 01.024 1.06l-4 3.5a.75.75 0 01-1.084 0l-4-3.5a.75.75 0 01.024-1.06z" />
+                </svg>
+              </Listbox.Button>
+              <Transition
+                as={Fragment}
+                leave="transition ease-in duration-100"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <Listbox.Options className="absolute mt-1 max-h-56 w-1/4 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                  <Listbox.Option
+                    key={0}
+                    value={0}
+                    className={({ active }) =>
+                      `relative my-1 cursor-default select-none rounded-xl  ${
+                        active ? "bg-gray-200 text-black" : "text-gray-900"
+                      }`
+                    }
+                  >
+                    {({ selected }) => (
+                      <span
+                        className={`block truncate rounded-xl py-2 pl-10 pr-4 ${
+                          selected
+                            ? "bg-primary font-medium text-white"
+                            : "font-normal"
+                        }`}
+                      >
+                        Personal Improvement
+                      </span>
+                    )}
+                  </Listbox.Option>
+                  {projectsQuery.data &&
+                    projectsQuery.data.map((project) => (
+                      <Listbox.Option
+                        key={project.id}
+                        className={({ active }) =>
+                          `relative my-1 cursor-default select-none rounded-xl  ${
+                            active ? "bg-gray-200 text-black" : "text-gray-900"
+                          }`
+                        }
+                        value={project.id}
+                      >
+                        {({ selected }) => (
+                          <span
+                            className={`block truncate rounded-xl py-2 pl-10 pr-4 ${
+                              selected
+                                ? "bg-primary font-medium text-white"
+                                : "font-normal"
+                            }`}
+                          >
+                            {project.name}
+                          </span>
+                        )}
+                      </Listbox.Option>
+                    ))}
+                </Listbox.Options>
+              </Transition>
+            </div>
+          </Listbox>
         </div>
       </section>
 

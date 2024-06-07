@@ -1,10 +1,7 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
 import UserProfileButton from "@/components/UserProfileButton";
 import ChevronRightIcon from "./icons/ChevronRightIcon";
-import { useQuery } from "@tanstack/react-query";
 import { getEmployeesInProjectById } from "@/services/project";
 
 interface ProjectProps {
@@ -14,20 +11,13 @@ interface ProjectProps {
   description?: string;
 }
 
-export default function ProjectCard({
+export default async function ProjectCard({
   id,
   name,
   date,
   description,
 }: ProjectProps) {
-  const coworkersQuery = useQuery({
-    queryKey: ["coworkers-in-project", id],
-    queryFn: () => getEmployeesInProjectById(id),
-  });
-
-  if (!coworkersQuery.data) {
-    return <div>loading...</div>;
-  }
+  const coworkersQuery = await getEmployeesInProjectById(id);
 
   return (
     <div className="flex h-full min-h-40 w-fit items-center gap-4 rounded-lg bg-white p-4">
@@ -40,7 +30,7 @@ export default function ProjectCard({
         <p className="pb-4 text-sm text-graySubtitle">In progress</p>
         <div className="ml-[6px] mt-auto">
           <ul className="flex">
-            {coworkersQuery.data.map((coworker, index) => (
+            {coworkersQuery.map((coworker, index) => (
               <li key={index}>
                 <UserProfileButton
                   size="xs"
