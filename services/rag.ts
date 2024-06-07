@@ -807,11 +807,6 @@ async function setUserPCP(
   type: string,
 ) {
   // ================== CLOSED FEEDBACK SUMMARIZED ==================
-
-  console.log("====================================================");
-  console.log("CLOSED FEEDBACK SUMMARIZED");
-  console.log("====================================================");
-
   let uniqueResources: Set<number> = new Set<number>();
   let strengthsIds: Set<number> = new Set();
   let weaknessesIds: Set<number> = new Set();
@@ -901,8 +896,6 @@ async function setUserPCP(
     const tasks = await createTasks(stringWeaknesses);
 
     if (type === "SPRINT_SURVEY") {
-      console.log("====================================================");
-      console.log("INSERTING TASKS");
       for (const task of tasks) {
         const [title, description] = task.split(":");
         let newTitle = title;
@@ -913,9 +906,6 @@ async function setUserPCP(
         if (description.length > 256) {
           newDescription = await reduceTask(description, 256);
         }
-
-        console.log(newDescription);
-
         await db.insert(pipTask).values({
           userId: userId,
           title: newTitle,
@@ -923,10 +913,6 @@ async function setUserPCP(
           sprintSurveyId: surveyId,
         });
       }
-      console.log("====================================================");
-      console.log("====================================================");
-
-      console.log("INSERTING RESOURCES");
 
       for (const resourceId of Array.from(uniqueResources)) {
         await db.insert(userResource).values({
@@ -934,12 +920,8 @@ async function setUserPCP(
           resourceId: resourceId,
           sprintSurveyId: surveyId,
         });
-        console.log(resourceId);
       }
-      console.log("====================================================");
     } else if (type === "FINAL_PROJECT_SURVEY") {
-      console.log("====================================================");
-      console.log("INSERTING TASKS");
       for (const task of tasks) {
         const [title, description] = task.split(":");
         let newTitle = title;
@@ -957,9 +939,6 @@ async function setUserPCP(
           finalSurveyId: surveyId,
         });
       }
-      console.log("====================================================");
-      console.log("====================================================");
-      console.log("INSERTING RESOURCES");
 
       for (const resourceId of Array.from(uniqueResources)) {
         await db.insert(userResource).values({
@@ -967,9 +946,7 @@ async function setUserPCP(
           resourceId: resourceId,
           finalSurveyId: surveyId,
         });
-        console.log(resourceId);
       }
-      console.log("====================================================");
     }
   }
 
@@ -1076,10 +1053,6 @@ export async function projectAnalysis(finalSurveyId: number) {
 
   // analyze survey only if it has not been processed
   if (notProcessedFinalSurvey) {
-    console.log("==========================================================");
-    console.log("START OF FINAL PROJECT ANALYSIS");
-    console.log("==========================================================");
-
     const manager = await db
       .select({ managerId: project.managerId })
       .from(finalSurvey)
