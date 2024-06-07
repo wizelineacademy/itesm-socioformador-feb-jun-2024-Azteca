@@ -25,7 +25,6 @@ const ProjectSurvey = ({
   projectSurveyId,
 }: ProjectSurveyProps) => {
   const router = useRouter();
-
   const { mutate } = useMutation({
     mutationFn: submitProjectAnswer,
     onSuccess: () => {

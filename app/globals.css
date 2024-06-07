@@ -3,7 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* *>* {
+/* * > * > * {
   outline: red solid 1px;
 } */
 
@@ -95,4 +95,12 @@
   grid-template-rows: repeat(13, minmax(0, 1fr));
   gap: 1rem;
   grid-auto-flow: row;
+}
+
+.emotion-circle:hover {
+  transform: scale(1.2);
+}
+
+.emotion-box:has(.emotion-circle:hover) .emotion-circle:not(:hover) {
+  transform: scale(0.9);
 }
