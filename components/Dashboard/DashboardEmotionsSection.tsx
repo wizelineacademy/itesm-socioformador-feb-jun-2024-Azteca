@@ -24,11 +24,11 @@ const DashboardEmotionsSection: React.FC<EmotionsSectionProps> = ({
         Emotions Summary
       </p>
     </div>
-    <div className="m-auto grid grid-cols-2 gap-10">
+    <div className="emotion-box m-auto grid grid-cols-2 gap-10">
       {emotionsData.map((circle, index) => (
         <div
           key={index}
-          className="flex items-center justify-center drop-shadow-lg transition-transform duration-300 ease-in-out hover:scale-125"
+          className="emotion-circle flex items-center justify-center drop-shadow-lg transition-transform duration-300 ease-in-out"
         >
           <Tooltip.Floating label={circle.title} color={circle.gradient.end}>
             <div>
