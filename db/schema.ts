@@ -115,7 +115,7 @@ export const pipResource = pgTable("pip_resource", {
   title: varchar("title", { length: 64 }),
   typeResource: typeResource("type_resource"),
   description: varchar("description", { length: 1024 }),
-  embedding: json("embedding"),
+  embedding: json("embedding").$type<number[]>(),
 });
 
 export const rulerEmotion = pgTable("ruler_emotion", {
