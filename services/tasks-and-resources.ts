@@ -9,7 +9,7 @@ import {
   SelectPipResource,
 } from "@/db/schema";
 import db from "@/db/drizzle";
-import { eq, lte, and, desc, asc } from "drizzle-orm";
+import { eq, lte, and, desc, asc, isNotNull } from "drizzle-orm";
 import { auth } from "@/auth";
 
 export async function getCurrentSprintSurvey(projectId: number) {
@@ -221,4 +221,36 @@ export async function updateTask({
     .where(eq(pipTask.id, taskId));
 
   console.log("pipTask", taskId, newStatus);
+}
+
+export async function rulerResources() {
+  const session = await auth();
+  const userId = session?.user?.id as string;
+
+  const resources = db
+    .select()
+    .from(userResource)
+    .leftJoin(pipResource, eq(userResource.resourceId, pipResource.id))
+    .where(
+      and(
+        eq(userResource.userId, userId),
+        isNotNull(userResource.rulerSurveyId),
+      ),
+    )
+    .orderBy(userResource.rulerSurveyId);
+
+  return resources;
+}
+
+export async function rulerTask() {
+  const session = await auth();
+  const userId = session?.user?.id as string;
+
+  const tasks = db
+    .select()
+    .from(pipTask)
+    .where(and(eq(pipTask.userId, userId), isNotNull(pipTask.rulerSurveyId)))
+    .orderBy(userResource.rulerSurveyId);
+
+  return tasks;
 }
