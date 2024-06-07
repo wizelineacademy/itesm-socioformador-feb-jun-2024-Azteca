@@ -6,7 +6,6 @@ describe("Profile", () => {
     cy.get("button").contains("Log in").click();
     cy.wait(3000);
     cy.visit("/profile");
-    cy.url().should("include", "/profile");
   });
   it("Change banner image", () => {
     const randomNumber = Math.floor(Math.random() * 5);

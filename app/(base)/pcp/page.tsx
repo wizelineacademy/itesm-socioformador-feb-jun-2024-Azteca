@@ -90,7 +90,7 @@ const PCP = () => {
         <div className="flex w-full flex-row items-center justify-between gap-4">
           <ProgressBar width={progressPercentage} height={6} />
           <Listbox value={projectId} onChange={setProjectId}>
-            <div className="relative mt-1">
+            <div className="relative mt-1 w-1/4">
               <Listbox.Button className="relative flex w-full cursor-default items-center justify-between rounded-lg bg-white py-2 pl-3 pr-4 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
                 <p className="truncate">
                   {(projectsQuery.data &&
