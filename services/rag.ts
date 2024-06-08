@@ -446,12 +446,12 @@ async function orderCoworkersFeedback(
     )
     .innerJoin(
       question,
-      eq(question.questionId, sprintSurveyAnswerCoworkers.questionId),
+      eq(question.id, sprintSurveyAnswerCoworkers.questionId),
     )
     .where(
       and(
         eq(question.type, "COWORKER_COMMENT"),
-        eq(sprintSurvey.sprintSurveyId, sprintSurveyId),
+        eq(sprintSurvey.id, sprintSurveyId),
       ),
     );
 
@@ -469,12 +469,12 @@ async function orderCoworkersFeedback(
     )
     .innerJoin(
       question,
-      eq(question.questionId, sprintSurveyAnswerCoworkers.questionId),
+      eq(question.id, sprintSurveyAnswerCoworkers.questionId),
     )
     .where(
       and(
         eq(question.type, "COWORKER_QUESTION"),
-        eq(sprintSurvey.sprintSurveyId, sprintSurveyId),
+        eq(sprintSurvey.id, sprintSurveyId),
       ),
     );
 
@@ -546,7 +546,7 @@ async function orderProjectFeedback(
     .where(
       and(
         eq(question.type, "FINAL_PROJECT_QUESTION"),
-        eq(finalSurvey.finalSurveyId, finalSurveyId),
+        eq(finalSurvey.id, finalSurveyId),
       ),
     );
 
@@ -560,7 +560,7 @@ async function orderProjectFeedback(
     .where(
       and(
         eq(question.type, "FINAL_PROJECT_COMMENT"),
-        eq(finalSurvey.finalSurveyId, finalSurveyId),
+        eq(finalSurvey.id, finalSurveyId),
       ),
     );
 
@@ -692,10 +692,7 @@ async function getQuestionsSkills(
         questionId: sprintSurveyQuestion.questionId,
       })
       .from(sprintSurveyQuestion)
-      .innerJoin(
-        question,
-        eq(question.questionId, sprintSurveyQuestion.questionId),
-      )
+      .innerJoin(question, eq(question.id, sprintSurveyQuestion.questionId))
       .where(
         and(
           eq(sprintSurveyQuestion.sprintSurveyId, surveyId),
@@ -708,10 +705,7 @@ async function getQuestionsSkills(
         questionId: sprintSurveyQuestion.questionId,
       })
       .from(sprintSurveyQuestion)
-      .innerJoin(
-        question,
-        eq(question.questionId, sprintSurveyQuestion.questionId),
-      )
+      .innerJoin(question, eq(question.id, sprintSurveyQuestion.questionId))
       .where(
         and(
           eq(sprintSurveyQuestion.sprintSurveyId, surveyId),
@@ -890,7 +884,7 @@ async function setUserPCP(
     const weaknessesRecords = await db
       .select({ negativeSkill: skill.negativeSkill })
       .from(skill)
-      .where(inArray(skill.skillId, Array.from(weaknessesIds)));
+      .where(inArray(skill.id, Array.from(weaknessesIds)));
 
     const weaknessesNames: string[] = weaknessesRecords.map(
       (skill) => skill.negativeSkill as string,
@@ -966,7 +960,7 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
   const processedSurvey = await db
     .select({ processed: sprintSurvey.processed })
     .from(sprintSurvey)
-    .where(eq(sprintSurvey.sprintSurveyId, sprintSurveyId));
+    .where(eq(sprintSurvey.id, sprintSurveyId));
 
   const notProcessedSurvey = !processedSurvey[0].processed;
 
@@ -983,7 +977,7 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
       .from(sprintSurvey)
       .innerJoin(project, eq(project.id, sprintSurvey.projectId))
       .innerJoin(projectMember, eq(projectMember.projectId, project.id))
-      .where(eq(sprintSurvey.sprintSurveyId, sprintSurveyId));
+      .where(eq(sprintSurvey.id, sprintSurveyId));
 
     const ids: string[] = uniqueProjectUsers.map(
       (user) => user.userId as string,
@@ -1042,7 +1036,7 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
     await db
       .update(sprintSurvey)
       .set({ processed: true })
-      .where(eq(sprintSurvey.sprintSurveyId, sprintSurveyId));
+      .where(eq(sprintSurvey.id, sprintSurveyId));
   }
   console.log("=========================================");
   console.log("END OF SPRINT ANALYSIS");
@@ -1053,7 +1047,7 @@ export async function projectAnalysis(finalSurveyId: number) {
   const processedFinalSurvey = await db
     .select({ processed: finalSurvey.processed })
     .from(finalSurvey)
-    .where(eq(finalSurvey.finalSurveyId, finalSurveyId));
+    .where(eq(finalSurvey.id, finalSurveyId));
 
   const notProcessedFinalSurvey = !processedFinalSurvey[0].processed;
 
@@ -1063,7 +1057,7 @@ export async function projectAnalysis(finalSurveyId: number) {
       .select({ managerId: project.managerId })
       .from(finalSurvey)
       .innerJoin(project, eq(project.id, finalSurvey.projectId))
-      .where(eq(finalSurvey.finalSurveyId, finalSurveyId));
+      .where(eq(finalSurvey.id, finalSurveyId));
 
     const managerId: string = manager[0].managerId;
 
@@ -1074,7 +1068,7 @@ export async function projectAnalysis(finalSurveyId: number) {
       .from(finalSurvey)
       .innerJoin(project, eq(project.id, finalSurvey.projectId))
       .innerJoin(projectMember, eq(projectMember.projectId, project.id))
-      .where(eq(finalSurvey.finalSurveyId, finalSurveyId));
+      .where(eq(finalSurvey.id, finalSurveyId));
 
     const uniqueWorkersIds = uniqueProjectUsers.map(
       (worker) => worker.userId,
@@ -1107,6 +1101,6 @@ export async function projectAnalysis(finalSurveyId: number) {
     await db
       .update(finalSurvey)
       .set({ processed: true })
-      .where(eq(finalSurvey.finalSurveyId, finalSurveyId));
+      .where(eq(finalSurvey.id, finalSurveyId));
   }
 }
