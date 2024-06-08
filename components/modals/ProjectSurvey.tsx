@@ -3,7 +3,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import Slider from "../Slider";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   submitProjectAnswer,
   getProjectQuestions,
@@ -25,7 +25,6 @@ const ProjectSurvey = ({
   projectSurveyId,
 }: ProjectSurveyProps) => {
   const router = useRouter();
-
   const { mutate } = useMutation({
     mutationFn: submitProjectAnswer,
     onSuccess: () => {
@@ -49,6 +48,8 @@ const ProjectSurvey = ({
     queryFn: async () => await getProjectQuestions(),
   });
 
+  const queryClient = useQueryClient();
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!userId || !questions.data) return;
@@ -69,20 +70,33 @@ const ProjectSurvey = ({
     const finalAnswers = formsAnswers.filter(
       (answerObj) => !isNaN(answerObj.answer),
     );
-    mutate({
-      userId: userId,
-      finalSurveyId: projectSurveyId,
-      answers: finalAnswers,
-      comment: {
-        questionKey: commentId,
-        text:
-          (
-            formData.get(
-              `Question ${questions.data[questions.data.length - 1].id}`,
-            ) || "None"
-          ).toString() || "None",
+    mutate(
+      {
+        userId: userId,
+        finalSurveyId: projectSurveyId,
+        answers: finalAnswers,
+        comment: {
+          questionKey: commentId,
+          text:
+            (
+              formData.get(
+                `Question ${questions.data[questions.data.length - 1].id}`,
+              ) || "None"
+            ).toString() || "None",
+        },
       },
-    });
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["notifications"] });
+          toast.success("Encuesta enviada exitosamente!");
+          onClose();
+        },
+        onError: () => {
+          toast.error("Error al enviar la encuesta");
+          onClose();
+        },
+      },
+    );
   };
 
   return (

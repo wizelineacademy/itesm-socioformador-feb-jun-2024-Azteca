@@ -11,9 +11,9 @@ import {
   getUserTasksHistory,
   updateTask,
 } from "@/services/tasks-and-resources";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import DialogComponent from "@/components/DialogComponent";
-import { Menu } from "@headlessui/react";
+import { Listbox, Menu, Transition } from "@headlessui/react";
 import { SelectPipResource, SelectPipTask } from "@/db/schema";
 import InfoIcon from "@/components/icons/InfoIcon";
 import VideoIcon from "@/components/icons/VideoIcon";
@@ -60,7 +60,7 @@ const PCP = () => {
   });
 
   useEffect(() => {
-    if (tasksData) {
+    if (Array.isArray(tasksData)) {
       const doneTasks = tasksData.filter(
         (task) => task.status === "DONE",
       ).length;
@@ -78,10 +78,13 @@ const PCP = () => {
     }
   }, [projectId, queryClient]);
 
-  const scheduledAt = sprintSurveyQuery.data?.scheduledAt;
-  const formattedDate = scheduledAt
-    ? new Date(scheduledAt).toLocaleDateString("es-ES")
-    : "";
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleString("default", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   if (
     projectsQuery.isError ||
@@ -98,42 +101,92 @@ const PCP = () => {
 
   return (
     <div>
-      <section id="pip-progressbar" className="mt-4">
+      <section id="pip-progressbar" className="mt-4 w-full">
         <div className="flex items-center justify-between">
           <p className=" mb-2 text-3xl font-semibold">Personal Career Plan</p>
           <p className=" mb-2 text-xl font-medium text-graySubtitle">
-            {`Sprint ${formattedDate}`}
+            {sprintSurveyQuery.data &&
+            typeof sprintSurveyQuery.data === "string"
+              ? sprintSurveyQuery.data
+              : sprintSurveyQuery.isLoading || !sprintSurveyQuery.data
+                ? "loading..."
+                : `Sprint ${formatDate(sprintSurveyQuery.data.scheduledAt as Date)}`}
           </p>
         </div>
-        <ProgressBar width={progressPercentage} height={6} />
-      </section>
-
-      <section id="pip-selectproject" className="pt-4">
-        <div className="relative inline-block w-full">
-          <select
-            onChange={(e) => {
-              console.log(e.target.value);
-              setProjectId(parseInt(e.target.value));
-            }}
-            className="focus:shadow-outline w-full appearance-none rounded border border-gray-400 bg-white p-2 font-medium leading-tight drop-shadow-lg hover:border-gray-500 focus:border-primary focus:outline-none"
-          >
-            <option>Personal Improvement</option>
-            {projectsQuery.data &&
-              projectsQuery.data.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.name}
-                </option>
-              ))}
-          </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-            <svg
-              className="h-4 w-4 fill-current"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-            >
-              <path d="M5.516 7.548a.75.75 0 011.06.025L10 10.704l3.424-3.13a.75.75 0 011.06-.024.75.75 0 01.024 1.06l-4 3.5a.75.75 0 01-1.084 0l-4-3.5a.75.75 0 01.024-1.06z" />
-            </svg>
-          </div>
+        <div className="flex w-full flex-row items-center justify-between gap-4">
+          <ProgressBar width={progressPercentage} height={6} />
+          <Listbox value={projectId} onChange={setProjectId}>
+            <div className="relative mt-1 w-1/4">
+              <Listbox.Button className="relative flex w-full cursor-default items-center justify-between rounded-lg bg-white py-2 pl-3 pr-4 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                <p className="truncate">
+                  {(projectsQuery.data &&
+                    projectsQuery.data.find((p) => p.id === projectId)?.name) ??
+                    "Personal Improvement"}
+                </p>
+                <svg
+                  className="h-4 w-4 fill-current text-gray-700"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M5.516 7.548a.75.75 0 011.06.025L10 10.704l3.424-3.13a.75.75 0 011.06-.024.75.75 0 01.024 1.06l-4 3.5a.75.75 0 01-1.084 0l-4-3.5a.75.75 0 01.024-1.06z" />
+                </svg>
+              </Listbox.Button>
+              <Transition
+                as={Fragment}
+                leave="transition ease-in duration-100"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <Listbox.Options className="absolute z-50 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                  <Listbox.Option
+                    key={-1}
+                    value={-1}
+                    className={({ active }) =>
+                      `relative my-1 cursor-default select-none rounded-xl  ${
+                        active ? "bg-gray-200 text-black" : "text-gray-900"
+                      }`
+                    }
+                  >
+                    {({ selected }) => (
+                      <span
+                        className={`block truncate rounded-xl py-2 pl-10 pr-4 ${
+                          selected
+                            ? "bg-primary font-medium text-white"
+                            : "font-normal"
+                        }`}
+                      >
+                        Personal Improvement
+                      </span>
+                    )}
+                  </Listbox.Option>
+                  {projectsQuery.data &&
+                    projectsQuery.data.map((project) => (
+                      <Listbox.Option
+                        key={project.id}
+                        className={({ active }) =>
+                          `relative my-1 cursor-default select-none rounded-xl  ${
+                            active ? "bg-gray-200 text-black" : "text-gray-900"
+                          }`
+                        }
+                        value={project.id}
+                      >
+                        {({ selected }) => (
+                          <span
+                            className={`block truncate rounded-xl py-2 pl-10 pr-4 ${
+                              selected
+                                ? "bg-primary font-medium text-white"
+                                : "font-normal"
+                            }`}
+                          >
+                            {project.name}
+                          </span>
+                        )}
+                      </Listbox.Option>
+                    ))}
+                </Listbox.Options>
+              </Transition>
+            </div>
+          </Listbox>
         </div>
       </section>
 
@@ -178,7 +231,7 @@ const PCPTasks = ({
   });
 
   useEffect(() => {
-    if (tasksData) {
+    if (Array.isArray(tasksData)) {
       const doneTasks = tasksData.filter(
         (task) => task.status === "DONE",
       ).length;
@@ -191,9 +244,9 @@ const PCPTasks = ({
 
   const mutation = useMutation({
     mutationFn: updateTask,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
-      await queryClient.invalidateQueries({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
+      queryClient.invalidateQueries({
         queryKey: ["tasks-history", projectId],
       });
 
@@ -227,7 +280,8 @@ const PCPTasks = ({
         ) : tasksError ? (
           <NoDataCard text={tasksError.message} />
         ) : (
-          tasksData && (
+          tasksData &&
+          Array.isArray(tasksData) && (
             <div className="mt-2">
               <div className="mb-10 mt-2 flex flex-row gap-12 overflow-x-auto whitespace-nowrap pb-3">
                 {tasksData.map((task) => (
@@ -269,8 +323,8 @@ const PCPTasksDialogContent = ({ projectId }: { projectId: number }) => {
     mutationFn: updateTask,
   });
 
-  if (tasksHistoryQuery.isError) {
-    return <NoDataCard text={tasksHistoryQuery.error.message} />;
+  if (tasksHistoryQuery.data && typeof tasksHistoryQuery.data === "string") {
+    return <NoDataCard text={tasksHistoryQuery.data} />;
   }
 
   if (tasksHistoryQuery.isLoading || !tasksHistoryQuery.data) {
@@ -478,10 +532,10 @@ const PCPResources = ({ projectId }: { projectId: number }) => {
           </button>
         </div>
 
-        {resourcesQuery.isLoading ? (
+        {resourcesQuery.isLoading || !resourcesQuery.data ? (
           <p>loading...</p>
-        ) : resourcesQuery.isError ? (
-          <NoDataCard text={resourcesQuery.error.message} />
+        ) : resourcesQuery.data && typeof resourcesQuery.data === "string" ? (
+          <NoDataCard text={resourcesQuery.data} />
         ) : (
           resourcesQuery.data && (
             <div className="mt-2">
@@ -562,8 +616,11 @@ const PCPResourcesDialogContent = ({ projectId }: { projectId: number }) => {
     refetchOnWindowFocus: false,
   });
 
-  if (resourcesHistoryQuery.isError) {
-    return <NoDataCard text={resourcesHistoryQuery.error.message} />;
+  if (
+    resourcesHistoryQuery.data &&
+    typeof resourcesHistoryQuery.data === "string"
+  ) {
+    return <NoDataCard text={resourcesHistoryQuery.data} />;
   }
 
   if (resourcesHistoryQuery.isLoading || !resourcesHistoryQuery.data) {

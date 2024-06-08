@@ -13,7 +13,7 @@ const ProfileBanner: React.FC<ProfileBannerProps> = async ({ user }) => {
   const isManagedBy = await getUserManagedBy(activeUserId, user.id);
 
   return (
-    <section className="w-100 mx-auto mb-24 mt-6 flex h-52 rounded-xl bg-primary">
+    <section className="w-100 mx-auto mb-20 mt-6 flex h-52 rounded-xl bg-primary">
       <UserProfileButton
         photoUrl={user.photoUrl || ""}
         size="lg"

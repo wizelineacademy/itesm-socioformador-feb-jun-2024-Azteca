@@ -1,5 +1,8 @@
+import db from "@/db/drizzle";
+import { sprintSurvey } from "@/db/schema";
 import { feedbackAnalysis } from "@/services/rag";
 import { DeleteMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
+import { eq } from "drizzle-orm";
 import { Resource } from "sst";
 
 // TODO: this stuff should come from either @sst/sqs or @aws/sqs
@@ -18,6 +21,7 @@ interface EventType {
 }
 
 export const handler = async (event: EventType) => {
+  console.log("WORKING ?");
   const messageBody = JSON.parse(event.Records[0].body) as {
     sprintSurveyId: number;
   };
@@ -30,6 +34,14 @@ export const handler = async (event: EventType) => {
   } catch (error) {
     console.log("ERROR:", error);
   }
+  // TODO: maybe a finally ? block
+
+  await db
+    .update(sprintSurvey)
+    .set({
+      isProcessing: false,
+    })
+    .where(eq(sprintSurvey.id, messageBody.sprintSurveyId));
 
   const client = new SQSClient();
   const response = await client.send(

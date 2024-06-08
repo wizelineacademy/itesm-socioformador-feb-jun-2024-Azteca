@@ -8,10 +8,14 @@ on:
     branches:
       - dev
 
+env:
+  AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+  POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+  OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+
 jobs:
   cypress-test:
     runs-on: ubuntu-latest
-    needs: build
 
     steps:
       - name: Git checkout
@@ -48,7 +52,7 @@ jobs:
           headless: true
         env:
           CYPRESS_CACHE_FOLDER: ~/.cache/Cypress
-  build:
+  unit-test:
     runs-on: ubuntu-latest
 
     steps:
