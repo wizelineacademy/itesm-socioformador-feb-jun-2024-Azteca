@@ -1,7 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-let gradientIdCounter = 0; // Contador estático fuera del componente
+let gradientIdCounter = 0;
 
 interface GradientColor {
   start: string;
@@ -16,6 +16,11 @@ interface GaugeChartProps {
 
 const GaugeChart = ({ percentage, type, gradient }: GaugeChartProps) => {
   const [gradientId] = useState(`gradient${gradientIdCounter++}`);
+  const [animatedPercentage, setAnimatedPercentage] = useState(0);
+
+  useEffect(() => {
+    setAnimatedPercentage(percentage);
+  }, [percentage]);
 
   const radius = 85;
   const strokeWidth = 20;
@@ -25,7 +30,7 @@ const GaugeChart = ({ percentage, type, gradient }: GaugeChartProps) => {
   const halfCircumference = Math.PI * radius;
   const strokeDasharray = type === "full" ? circumference : halfCircumference;
   const strokeDashoffset =
-    strokeDasharray - (strokeDasharray * percentage) / 100;
+    strokeDasharray - (strokeDasharray * animatedPercentage) / 100;
 
   return (
     <div className="relative">
@@ -39,8 +44,8 @@ const GaugeChart = ({ percentage, type, gradient }: GaugeChartProps) => {
             id={gradientId}
             gradientTransform={type === "full" ? "rotate(90)" : ""}
           >
-            <stop offset="0%" stop-color={gradient.start} />
-            <stop offset="100%" stop-color={gradient.end} />
+            <stop offset="0%" stopColor={gradient.start} />
+            <stop offset="100%" stopColor={gradient.end} />
           </linearGradient>
         </defs>
         {type === "half" && (
@@ -75,15 +80,16 @@ const GaugeChart = ({ percentage, type, gradient }: GaugeChartProps) => {
           strokeLinecap="round"
           strokeDasharray={strokeDasharray}
           strokeDashoffset={strokeDashoffset}
+          style={{ transition: "stroke-dashoffset 1s ease-in-out" }}
         />
         <text
-          x="100" // Centered in X axis
-          y={type === "full" ? "110" : "90"} // Adjust y position depending on type
-          text-anchor="middle" // Align text in the center horizontally
-          fill={`url(#${gradientId})`} // Apply gradient using dynamic ID
-          font-size="32"
-          font-weight="bold"
-          font-family="inherit"
+          x="100"
+          y={type === "full" ? "110" : "90"}
+          textAnchor="middle"
+          fill={`url(#${gradientId})`}
+          fontSize="32"
+          fontWeight="bold"
+          fontFamily="inherit"
         >
           {percentage}%
         </text>

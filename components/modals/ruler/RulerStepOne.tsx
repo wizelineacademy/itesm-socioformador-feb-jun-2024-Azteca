@@ -186,6 +186,7 @@ const RulerStepOne = ({
                   data-testid={`emotion-${rowIndex}-${colIndex}`}
                   id={`${rowIndex}-${colIndex}`}
                   key={colIndex}
+                  title={`emotion-${emotion.energy}-${emotion.pleasantness}`}
                   onMouseEnter={() => expandSize(rowIndex, colIndex)}
                   onMouseLeave={() => removeSize()}
                   onClick={() => handleClick(emotion)}

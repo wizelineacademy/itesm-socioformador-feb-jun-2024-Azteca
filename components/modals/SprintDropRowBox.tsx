@@ -19,7 +19,7 @@ const SprintDropRowBox = ({
   coworkers,
 }: SprintDropRowBoxProps) => {
   const [showExpandedUsers, setShowExpandedUsers] = useState<boolean>(false);
-  const MINIMUM_USERS = 3;
+  const MINIMUM_USERS = 4;
 
   const handleSetExpandedPosition = () => {
     setShowExpandedUsers((prev) => !prev);
