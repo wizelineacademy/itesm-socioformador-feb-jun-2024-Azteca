@@ -11,7 +11,10 @@ const NavigationBar = async () => {
   const userRoleQuery = await getUserRole();
 
   return (
-    <nav className="flex items-center justify-between bg-bone">
+    <nav
+      className="flex items-center justify-between bg-bone"
+      data-testid="navigation-bar"
+    >
       <h1 className="text-3xl font-bold text-primary">FEEDBACK FLOW</h1>
       <div className="flex flex-row gap-5 p-1">
         {userRoleQuery === "ADMIN" && (
