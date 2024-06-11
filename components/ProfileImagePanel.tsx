@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Image } from "@mantine/core";
-import { Dropzone, IMAGE_MIME_TYPE, FileWithPath } from "@mantine/dropzone";
+import { Dropzone, FileWithPath, MIME_TYPES } from "@mantine/dropzone";
 import { changeProfileImage, getPreSignedURL } from "@/services/images";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
@@ -60,7 +60,7 @@ const ProfileImagePanel = ({ closeModal }: { closeModal: () => void }) => {
           onReject={(file) => console.log("rejected files", file)}
           maxSize={5 * 1024 ** 2}
           maxFiles={1}
-          accept={IMAGE_MIME_TYPE}
+          accept={[MIME_TYPES.png, MIME_TYPES.jpeg, MIME_TYPES.gif]}
         >
           <div className="pointer-events-none flex min-h-56 flex-col items-center justify-center  text-center">
             <p className=" text-xl">Drag image here or click to select file</p>
