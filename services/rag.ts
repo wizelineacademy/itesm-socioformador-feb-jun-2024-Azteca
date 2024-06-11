@@ -543,10 +543,11 @@ async function orderProjectFeedback(
       answer: finalSurveyAnswer.answer,
     })
     .from(finalSurveyAnswer)
+    .innerJoin(question, eq(question.id, finalSurveyAnswer.questionId))
     .where(
       and(
         eq(question.type, "FINAL_PROJECT_QUESTION"),
-        eq(finalSurvey.id, finalSurveyId),
+        eq(finalSurveyAnswer.finalSurveyId, finalSurveyId),
       ),
     );
 
@@ -557,10 +558,11 @@ async function orderProjectFeedback(
       comment: finalSurveyAnswer.comment,
     })
     .from(finalSurveyAnswer)
+    .innerJoin(question, eq(question.id, finalSurveyAnswer.questionId))
     .where(
       and(
         eq(question.type, "FINAL_PROJECT_COMMENT"),
-        eq(finalSurvey.id, finalSurveyId),
+        eq(finalSurveyAnswer.finalSurveyId, finalSurveyId),
       ),
     );
 
