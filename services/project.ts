@@ -10,11 +10,7 @@ import {
   user,
 } from "@/db/schema";
 import { and, asc, eq, inArray, ne, or } from "drizzle-orm";
-import {
-  SQSClient,
-  SendMessageBatchCommand,
-  SendMessageBatchRequestEntry,
-} from "@aws-sdk/client-sqs";
+import { SQSClient, SendMessageBatchCommand } from "@aws-sdk/client-sqs";
 import { Resource } from "sst";
 
 export async function getProjects() {
@@ -245,53 +241,80 @@ export async function getUpdateFeedbackHistory({
   return surveys;
 }
 
+export interface SQSMessageBody {
+  id: number;
+  type: "RULER" | "SPRINT" | "FINAL";
+}
+
 export async function updateFeedback(projectId: number) {
-  console.log("UPDATE_FEEDBACK", projectId);
   const client = new SQSClient();
+  const messageGroupId = crypto.randomUUID(); // we want all of these to be part of the same message group
 
   const feedbackHistory = await getUpdateFeedbackHistory({ projectId });
 
+  // Get pending sprint surveys ids
   const sprintSurveyIds = feedbackHistory
     .filter((s) => s.status === "PENDING" && s.type === "SPRINT")
     .map((s) => s.id);
-  console.log("SPRINT_SURVEY_IDS", sprintSurveyIds);
-  await db
-    .update(sprintSurvey)
-    .set({
-      isProcessing: true,
-    })
-    .where(inArray(sprintSurvey.id, sprintSurveyIds));
 
+  // If there are pending sprint surveys
+  if (sprintSurveyIds.length > 0) {
+    // Put sprint surveys in processing state
+    await db
+      .update(sprintSurvey)
+      .set({
+        isProcessing: true,
+      })
+      .where(inArray(sprintSurvey.id, sprintSurveyIds));
+
+    // Send sprint survey ids to the queue
+    const response = await client.send(
+      new SendMessageBatchCommand({
+        QueueUrl: Resource.FeedbackFlowQueueV3.url,
+        Entries: sprintSurveyIds.map((sprintSurveyId) => ({
+          Id: crypto.randomUUID(),
+          MessageGroupId: messageGroupId,
+          MessageDeduplicationId: crypto.randomUUID(),
+          MessageBody: JSON.stringify({
+            id: sprintSurveyId,
+            type: "SPRINT",
+          } as SQSMessageBody),
+        })),
+      }),
+    );
+    console.log("response sprint surveys", response);
+  }
+
+  // Get pending final surveys ids
   const finalSurveyIds = feedbackHistory
     .filter((s) => s.status === "PENDING" && s.type === "FINAL")
     .map((s) => s.id);
-  console.log("FINAL_SURVEY_IDS", finalSurveyIds);
-  await db
-    .update(sprintSurvey)
-    .set({
-      isProcessing: true,
-    })
-    .where(inArray(sprintSurvey.id, finalSurveyIds));
 
-  const messageGroupId = crypto.randomUUID();
+  // If there are pending final surveys
+  if (finalSurveyIds.length > 0) {
+    // Put final surveys in processing state
+    await db
+      .update(finalSurvey)
+      .set({
+        isProcessing: true,
+      })
+      .where(inArray(finalSurvey.id, finalSurveyIds));
 
-  const entries: SendMessageBatchRequestEntry[] = sprintSurveyIds.map(
-    (sprintSurveyId) => ({
-      Id: crypto.randomUUID(),
-      MessageGroupId: messageGroupId,
-      MessageDeduplicationId: crypto.randomUUID(),
-      MessageBody: JSON.stringify({
-        sprintSurveyId,
+    // Send final survey ids to the queue
+    const response1 = await client.send(
+      new SendMessageBatchCommand({
+        QueueUrl: Resource.FeedbackFlowQueueV3.url,
+        Entries: finalSurveyIds.map((finalSurveyId) => ({
+          Id: crypto.randomUUID(),
+          MessageGroupId: messageGroupId,
+          MessageDeduplicationId: crypto.randomUUID(),
+          MessageBody: JSON.stringify({
+            id: finalSurveyId,
+            type: "FINAL",
+          } as SQSMessageBody),
+        })),
       }),
-    }),
-  );
-
-  const response = await client.send(
-    new SendMessageBatchCommand({
-      QueueUrl: Resource.FeedbackFlowQueueV3.url,
-      Entries: entries,
-    }),
-  );
-
-  console.log("response", response);
+    );
+    console.log("response final surveys", response1);
+  }
 }
