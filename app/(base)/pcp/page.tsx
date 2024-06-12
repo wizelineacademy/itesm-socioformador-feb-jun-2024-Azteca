@@ -219,11 +219,7 @@ const PCPTasks = ({
   };
   const queryClient = useQueryClient();
 
-  const {
-    data: tasksData,
-    error: tasksError,
-    isLoading: tasksLoading,
-  } = useQuery({
+  const { data: tasksData, isLoading: tasksLoading } = useQuery({
     queryKey: ["tasks", projectId],
     queryFn: () => getUserTasksForCurrentSprintByProjectId(projectId),
     retry: false,
@@ -277,8 +273,8 @@ const PCPTasks = ({
 
         {tasksLoading ? (
           <p>loading...</p>
-        ) : tasksError ? (
-          <NoDataCard text={tasksError.message} />
+        ) : tasksData && typeof tasksData === "string" ? (
+          <NoDataCard text={tasksData} />
         ) : (
           tasksData &&
           Array.isArray(tasksData) && (
