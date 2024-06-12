@@ -17,6 +17,11 @@ import {
   SurveyStepTwoAnswer,
 } from "@/types/types";
 
+type GrowthDataResult = {
+  month: number;
+  averageAnswer: number;
+};
+
 export async function getSprintSurveyQuestions(): Promise<Questions[]> {
   const res = await db
     .select()
@@ -325,6 +330,12 @@ export async function getDetailedProjectStatistics(projectId: number) {
   };
 }
 
+// Define un tipo para los resultados de la consulta
+type GrowthDataResult = {
+  month: number;
+  averageAnswer: number;
+};
+
 export const getGrowthData = async (projectId: number) => {
   const growthSupportQuestions = [27, 37, 38]; // Preguntas relacionadas con soporte de crecimiento
   const growthOpportunitiesQuestions = [37, 38]; // Preguntas relacionadas con oportunidades de crecimiento
@@ -349,7 +360,7 @@ export const getGrowthData = async (projectId: number) => {
       ),
     )
     .groupBy(sql`EXTRACT(MONTH FROM ${finalSurveyAnswer.answeredAt})`)
-    .execute();
+    .execute() as GrowthDataResult[]; // Asignar el tipo explícitamente
 
   const growthSupportData = growthSupportDataResults.map((result) => ({
     month: result.month,
@@ -376,7 +387,7 @@ export const getGrowthData = async (projectId: number) => {
       ),
     )
     .groupBy(sql`EXTRACT(MONTH FROM ${finalSurveyAnswer.answeredAt})`)
-    .execute();
+    .execute() as GrowthDataResult[]; // Asignar el tipo explícitamente
 
   const growthOpportunitiesData = growthOpportunitiesDataResults.map(
     (result) => ({
