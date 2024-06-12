@@ -874,73 +874,46 @@ async function setUserPCP(
   // set the strengths and weaknesses of the user
 }
 
-export async function rulerAnalysis(
-  userId: string,
-  userComment: string,
-  emotionId: number,
-  sprintSurveyId: number,
-) {
-  const emotionInfo = await db
-    .select({
-      name: rulerEmotion.name,
-      description: rulerEmotion.description,
-      embedding: rulerEmotion.embedding,
-      pleasentess: rulerEmotion.pleasantness,
-      energy: rulerEmotion.energy,
-    })
-    .from(rulerEmotion)
-    .where(eq(rulerEmotion.id, emotionId));
+export async function rulerAnalysis(userId: string) {
+  // llamar todas las respuestas de ruler sin contestar
+  // Si hay al menos 5 respuestas sin analizar procesar todo
+  // Sacar todas las emociones y scores de las respuestas
+  // Obtener un promedio de scores
+  // Si el promedio es menor a 0 recomendar recursos y tareas
 
-  // recommend tasks and resources only if the emotion is negative
-  const pleasentess = emotionInfo[0].pleasentess as number;
-  if (pleasentess < -3) {
-    const allResources = await db
-      .select({ id: pipResource.id, embedding: pipResource.embedding })
-      .from(pipResource);
+  const recommendedResourcesIds: number[] = await cosineSimilarity(
+    baseMessage,
+    allResources,
+  );
 
-    let baseMessage: string = "Este es el estado de ánimo del usuario:\n";
-    baseMessage += ((emotionInfo[0].name as string) +
-      ": " +
-      emotionInfo[0].description) as string;
+  recommendedResourcesIds.splice(5);
 
-    if (userComment !== "") {
-      baseMessage += "\n\n" + "Y estos son sus pensamientos:\n" + userComment;
+  const tasks: string[] = await createTasks(baseMessage);
+
+  for (const task of tasks) {
+    const [title, description] = task.split(":");
+    let newTitle = title;
+    let newDescription = description;
+    if (title.length > 64) {
+      newTitle = await reduceTask(title, 64);
     }
-
-    const recommendedResourcesIds: number[] = await cosineSimilarity(
-      baseMessage,
-      allResources,
-    );
-
-    recommendedResourcesIds.splice(5);
-
-    const tasks: string[] = await createTasks(baseMessage);
-
-    for (const task of tasks) {
-      const [title, description] = task.split(":");
-      let newTitle = title;
-      let newDescription = description;
-      if (title.length > 64) {
-        newTitle = await reduceTask(title, 64);
-      }
-      if (description.length > 256) {
-        newDescription = await reduceTask(description, 256);
-      }
-      await db.insert(pipTask).values({
-        userId: userId,
-        title: newTitle,
-        description: newDescription,
-        sprintSurveyId: sprintSurveyId,
-      });
+    if (description.length > 256) {
+      newDescription = await reduceTask(description, 256);
     }
+    await db.insert(pipTask).values({
+      userId: userId,
+      title: newTitle,
+      description: newDescription,
+      rulerSurveyId: rulerSurveyId,
+    });
+  }
 
-    for (const resourceId of recommendedResourcesIds) {
-      await db.insert(userResource).values({
-        userId: userId,
-        resourceId: resourceId,
-        sprintSurveyId: sprintSurveyId,
-      });
-    }
+  for (const resourceId of recommendedResourcesIds) {
+    await db.insert(userResource).values({
+      userId: userId,
+      resourceId: resourceId,
+      rulerSurveyId: rulerSurveyId,
+    });
   }
 }
 
