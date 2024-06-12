@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import db from "@/db/drizzle";
-import { and, count, eq, inArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray } from "drizzle-orm";
 import similarity from "compute-cosine-similarity";
 
 import {
@@ -19,6 +19,7 @@ import {
   sprintSurveyAnswerCoworkers,
   sprintSurveyQuestion,
   userResource,
+  rulerSurveyAnswers,
 } from "@/db/schema";
 
 // =============== FEEDBACK INTERFACES ===============
@@ -875,45 +876,95 @@ async function setUserPCP(
 }
 
 export async function rulerAnalysis(userId: string) {
-  // llamar todas las respuestas de ruler sin contestar
-  // Si hay al menos 5 respuestas sin analizar procesar todo
-  // Sacar todas las emociones y scores de las respuestas
-  // Obtener un promedio de scores
-  // Si el promedio es menor a 0 recomendar recursos y tareas
+  // construir el nuevo mensaje con las emociones negativas
+  // marcar todas las respuestas como procesadas
 
-  const recommendedResourcesIds: number[] = await cosineSimilarity(
-    baseMessage,
-    allResources,
-  );
+  const rulerAnswers = await db
+    .select({
+      rulerSurveyId: rulerSurveyAnswers.id,
+      userId: rulerSurveyAnswers.userId,
+      emotionId: rulerSurveyAnswers.emotionId,
+      userComment: rulerSurveyAnswers.comment,
+      emotionName: rulerEmotion.name,
+      emotionDescription: rulerEmotion.description,
+      emotionPleasantness: rulerEmotion.pleasantness,
+    })
+    .from(rulerSurveyAnswers)
+    .innerJoin(rulerEmotion, eq(rulerEmotion.id, rulerSurveyAnswers.emotionId))
+    .where(
+      and(
+        eq(rulerSurveyAnswers.userId, userId),
+        eq(rulerSurveyAnswers.processed, false),
+      ),
+    )
+    .orderBy(desc(rulerSurveyAnswers.answeredAt));
 
-  recommendedResourcesIds.splice(5);
+  // enough answers to recommend resources and tasks
+  if (rulerAnswers.length >= 5) {
+    const uniqueEmotions = new Set<number>();
+    let scoresMean: number = 0;
+    let baseMessage = "";
+    let message = "";
 
-  const tasks: string[] = await createTasks(baseMessage);
-
-  for (const task of tasks) {
-    const [title, description] = task.split(":");
-    let newTitle = title;
-    let newDescription = description;
-    if (title.length > 64) {
-      newTitle = await reduceTask(title, 64);
-    }
-    if (description.length > 256) {
-      newDescription = await reduceTask(description, 256);
-    }
-    await db.insert(pipTask).values({
-      userId: userId,
-      title: newTitle,
-      description: newDescription,
-      rulerSurveyId: rulerSurveyId,
+    rulerAnswers.forEach((answer) => {
+      // check if the emotionId is already in the set to create the message with unique emotions
+      if (!uniqueEmotions.has(answer.emotionId as number)) {
+        uniqueEmotions.add(answer.emotionId as number);
+        message =
+          answer.emotionName +
+          ": " +
+          answer.emotionDescription +
+          "\n" +
+          answer.userComment +
+          "\n\n";
+        baseMessage += message;
+      }
+      scoresMean += answer.emotionId as number;
     });
-  }
 
-  for (const resourceId of recommendedResourcesIds) {
-    await db.insert(userResource).values({
-      userId: userId,
-      resourceId: resourceId,
-      rulerSurveyId: rulerSurveyId,
-    });
+    scoresMean /= rulerAnswers.length;
+
+    // the user has a negative emotional state
+    if (scoresMean < 0) {
+      const allResources = await db
+        .select({ id: pipResource.id, embedding: pipResource.embedding })
+        .from(pipResource);
+
+      const recommendedResourcesIds: number[] = await cosineSimilarity(
+        baseMessage,
+        allResources,
+      );
+
+      recommendedResourcesIds.splice(5);
+
+      const tasks: string[] = await createTasks(baseMessage);
+
+      for (const task of tasks) {
+        const [title, description] = task.split(":");
+        let newTitle = title;
+        let newDescription = description;
+        if (title.length > 64) {
+          newTitle = await reduceTask(title, 64);
+        }
+        if (description.length > 256) {
+          newDescription = await reduceTask(description, 256);
+        }
+        await db.insert(pipTask).values({
+          userId: userId,
+          title: newTitle,
+          description: newDescription,
+          rulerSurveyId: rulerSurveyId,
+        });
+      }
+
+      for (const resourceId of recommendedResourcesIds) {
+        await db.insert(userResource).values({
+          userId: userId,
+          resourceId: resourceId,
+          rulerSurveyId: rulerSurveyId,
+        });
+      }
+    }
   }
 }
 
