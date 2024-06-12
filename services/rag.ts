@@ -189,10 +189,6 @@ async function processCoworkersOpenFeedback(
     joinedFeedbackComments = joinedFeedbackComments.replaceAll("sesgado:", "");
     joinedFeedbackComments = joinedFeedbackComments.replaceAll("  ", " ");
 
-    console.log("===========================================");
-    console.log("COMMENTS PROCESSING");
-    console.log("===========================================");
-
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_KEY,
     });
@@ -254,10 +250,6 @@ async function processCoworkersOpenFeedback(
         commentClassifications.biased = sentiment.substring(8);
       }
     }
-
-    console.log("Positive comments: ", commentClassifications.positive);
-    console.log("Negative comments: ", commentClassifications.negative);
-    console.log("Biased comments: ", commentClassifications.biased);
 
     // ==================== RAG AND WEAKNESSES ANALYSIS ====================
 
@@ -543,10 +535,11 @@ async function orderProjectFeedback(
       answer: finalSurveyAnswer.answer,
     })
     .from(finalSurveyAnswer)
+    .innerJoin(question, eq(question.id, finalSurveyAnswer.questionId))
     .where(
       and(
         eq(question.type, "FINAL_PROJECT_QUESTION"),
-        eq(finalSurvey.id, finalSurveyId),
+        eq(finalSurveyAnswer.finalSurveyId, finalSurveyId),
       ),
     );
 
@@ -557,10 +550,11 @@ async function orderProjectFeedback(
       comment: finalSurveyAnswer.comment,
     })
     .from(finalSurveyAnswer)
+    .innerJoin(question, eq(question.id, finalSurveyAnswer.questionId))
     .where(
       and(
         eq(question.type, "FINAL_PROJECT_COMMENT"),
-        eq(finalSurvey.id, finalSurveyId),
+        eq(finalSurveyAnswer.finalSurveyId, finalSurveyId),
       ),
     );
 
@@ -645,9 +639,6 @@ async function getFeedbackClassifications(
         }
       } else {
         // add the negative skills of the question
-        console.log("Feedback: ", feedback[0]);
-        console.log("question Skills: ", questionsSkills[feedback[0]]);
-        console.log("questions: ", questionsSkills);
         const questionNegativeSkills = questionsSkills[feedback[0]].map(
           (skillId) => skillId as number,
         );
@@ -702,27 +693,22 @@ async function getQuestionsSkills(
   } else if (type === "FINAL_PROJECT_QUESTION") {
     questions = await db
       .select({
-        questionId: sprintSurveyQuestion.questionId,
+        questionId: finalSurveyAnswer.questionId,
       })
-      .from(sprintSurveyQuestion)
-      .innerJoin(question, eq(question.id, sprintSurveyQuestion.questionId))
-      .where(
-        and(
-          eq(sprintSurveyQuestion.sprintSurveyId, surveyId),
-          eq(question.type, "COWORKER_QUESTION"),
-        ),
-      );
+      .from(finalSurveyAnswer)
+      .innerJoin(question, eq(question.id, finalSurveyAnswer.questionId))
+      .where(eq(finalSurveyAnswer.finalSurveyId, surveyId));
   }
 
-  questions.forEach(async (question) => {
+  for (const question of questions) {
     const associatedSkills = await db
       .select({ skillId: questionSkill.skillId })
       .from(questionSkill)
       .where(eq(questionSkill.questionId, question.questionId as number));
     questionsSkills[question.questionId as number] = associatedSkills.map(
-      (element) => element.skillId as number,
+      (questionSkill) => questionSkill.skillId as number,
     );
-  });
+  }
 
   return questionsSkills;
 }
@@ -955,8 +941,6 @@ async function setUserPCP(
 
 // Main function
 export async function feedbackAnalysis(sprintSurveyId: number) {
-  console.log(`*** PROCESSING SPRINTSURVEYID ${sprintSurveyId} ***`);
-
   const processedSurvey = await db
     .select({ processed: sprintSurvey.processed })
     .from(sprintSurvey)
@@ -967,7 +951,9 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
   // analyze survey only if it has not been processed
   if (notProcessedSurvey) {
     console.log("=========================================");
-    console.log("START OF SPRINT ANALYSIS");
+    console.log("=========================================");
+    console.log("START OF SPRINT ANALYSIS: ", sprintSurveyId);
+    console.log("=========================================");
     console.log("=========================================");
 
     const uniqueProjectUsers = await db
@@ -991,11 +977,8 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
       "COWORKER_QUESTION",
     );
 
-    console.log("=====================, questionSkills: ", questionsSkills);
-
     // iterate through each unique user of the project and read the feedback received
     for (const userId of Object.keys(orderedFeedback)) {
-      console.log(userId);
       const userTasksCount = await db
         .select({ count: count() })
         .from(pipTask)
@@ -1039,7 +1022,9 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
       .where(eq(sprintSurvey.id, sprintSurveyId));
   }
   console.log("=========================================");
+  console.log("=========================================");
   console.log("END OF SPRINT ANALYSIS");
+  console.log("=========================================");
   console.log("=========================================");
 }
 
@@ -1053,6 +1038,12 @@ export async function projectAnalysis(finalSurveyId: number) {
 
   // analyze survey only if it has not been processed
   if (notProcessedFinalSurvey) {
+    console.log("=========================================");
+    console.log("=========================================");
+    console.log("START OF FINAL PROJECT ANALYSIS: ", finalSurveyId);
+    console.log("=========================================");
+    console.log("=========================================");
+
     const manager = await db
       .select({ managerId: project.managerId })
       .from(finalSurvey)
@@ -1103,4 +1094,9 @@ export async function projectAnalysis(finalSurveyId: number) {
       .set({ processed: true })
       .where(eq(finalSurvey.id, finalSurveyId));
   }
+  console.log("=========================================");
+  console.log("=========================================");
+  console.log("END OF FINAL PROJECT ANALYSIS");
+  console.log("=========================================");
+  console.log("=========================================");
 }
