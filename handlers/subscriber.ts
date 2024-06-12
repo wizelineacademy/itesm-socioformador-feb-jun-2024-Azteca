@@ -14,6 +14,7 @@ export const handler: SQSHandler = async (event) => {
   switch (messageBody.type) {
     case "RULER":
       try {
+        console.log("ruler msg bdy", messageBody);
         //TODO: lalo implements this
       } catch (error) {
         console.log("ERROR:", error);

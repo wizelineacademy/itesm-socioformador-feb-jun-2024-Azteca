@@ -257,58 +257,64 @@ export async function updateFeedback(projectId: number) {
     .filter((s) => s.status === "PENDING" && s.type === "SPRINT")
     .map((s) => s.id);
 
-  // Put sprint surveys in processing state
-  await db
-    .update(sprintSurvey)
-    .set({
-      isProcessing: true,
-    })
-    .where(inArray(sprintSurvey.id, sprintSurveyIds));
+  // If there are pending sprint surveys
+  if (sprintSurveyIds.length > 0) {
+    // Put sprint surveys in processing state
+    await db
+      .update(sprintSurvey)
+      .set({
+        isProcessing: true,
+      })
+      .where(inArray(sprintSurvey.id, sprintSurveyIds));
 
-  // Send sprint survey ids to the queue
-  const response = await client.send(
-    new SendMessageBatchCommand({
-      QueueUrl: Resource.FeedbackFlowQueueV3.url,
-      Entries: sprintSurveyIds.map((sprintSurveyId) => ({
-        Id: crypto.randomUUID(),
-        MessageGroupId: messageGroupId,
-        MessageDeduplicationId: crypto.randomUUID(),
-        MessageBody: JSON.stringify({
-          id: sprintSurveyId,
-          type: "SPRINT",
-        } as SQSMessageBody),
-      })),
-    }),
-  );
-  console.log("response sprint surveys", response);
+    // Send sprint survey ids to the queue
+    const response = await client.send(
+      new SendMessageBatchCommand({
+        QueueUrl: Resource.FeedbackFlowQueueV3.url,
+        Entries: sprintSurveyIds.map((sprintSurveyId) => ({
+          Id: crypto.randomUUID(),
+          MessageGroupId: messageGroupId,
+          MessageDeduplicationId: crypto.randomUUID(),
+          MessageBody: JSON.stringify({
+            id: sprintSurveyId,
+            type: "SPRINT",
+          } as SQSMessageBody),
+        })),
+      }),
+    );
+    console.log("response sprint surveys", response);
+  }
 
   // Get pending final surveys ids
   const finalSurveyIds = feedbackHistory
     .filter((s) => s.status === "PENDING" && s.type === "FINAL")
     .map((s) => s.id);
 
-  // Put sprint surveys in processing state
-  await db
-    .update(finalSurvey)
-    .set({
-      isProcessing: true,
-    })
-    .where(inArray(finalSurvey.id, finalSurveyIds));
+  // If there are pending final surveys
+  if (finalSurveyIds.length > 0) {
+    // Put final surveys in processing state
+    await db
+      .update(finalSurvey)
+      .set({
+        isProcessing: true,
+      })
+      .where(inArray(finalSurvey.id, finalSurveyIds));
 
-  // Send sprint survey ids to the queue
-  const response1 = await client.send(
-    new SendMessageBatchCommand({
-      QueueUrl: Resource.FeedbackFlowQueueV3.url,
-      Entries: finalSurveyIds.map((finalSurveyId) => ({
-        Id: crypto.randomUUID(),
-        MessageGroupId: messageGroupId,
-        MessageDeduplicationId: crypto.randomUUID(),
-        MessageBody: JSON.stringify({
-          id: finalSurveyId,
-          type: "FINAL",
-        } as SQSMessageBody),
-      })),
-    }),
-  );
-  console.log("response final surveys", response1);
+    // Send final survey ids to the queue
+    const response1 = await client.send(
+      new SendMessageBatchCommand({
+        QueueUrl: Resource.FeedbackFlowQueueV3.url,
+        Entries: finalSurveyIds.map((finalSurveyId) => ({
+          Id: crypto.randomUUID(),
+          MessageGroupId: messageGroupId,
+          MessageDeduplicationId: crypto.randomUUID(),
+          MessageBody: JSON.stringify({
+            id: finalSurveyId,
+            type: "FINAL",
+          } as SQSMessageBody),
+        })),
+      }),
+    );
+    console.log("response final surveys", response1);
+  }
 }
