@@ -755,7 +755,7 @@ export async function rulerAnalysis(
 
     const tasks: string[] = await createTasks(baseMessage);
 
-    tasks.forEach(async (task) => {
+    for (let task of tasks) {
       const [title, description] = task.split(":");
       let newTitle = title;
       let newDescription = description;
@@ -771,15 +771,15 @@ export async function rulerAnalysis(
         description: newDescription,
         sprintSurveyId: sprintSurveyId,
       });
-    });
+    }
 
-    recommendedResourcesIds.forEach(async (resourceId) => {
+    for (let resourceId of recommendedResourcesIds) {
       await db.insert(userResource).values({
         userId: userId,
         resourceId: resourceId,
         sprintSurveyId: sprintSurveyId,
       });
-    });
+    }
   }
 }
 
@@ -882,6 +882,11 @@ async function setUserPCP(
     const tasks = await createTasks(stringWeaknesses);
 
     if (type === "SPRINT_SURVEY") {
+      console.log("=========================================");
+      console.log("=========================================");
+      console.log("INSERTING TASKS AND RESOURCES OF SPRINT SURVEY ", surveyId);
+      console.log("=========================================");
+      console.log("=========================================");
       for (const task of tasks) {
         const [title, description] = task.split(":");
         let newTitle = title;
@@ -1023,7 +1028,7 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
   }
   console.log("=========================================");
   console.log("=========================================");
-  console.log("END OF SPRINT ANALYSIS");
+  console.log("END OF SPRINT ANALYSIS: ", sprintSurveyId);
   console.log("=========================================");
   console.log("=========================================");
 }
@@ -1096,7 +1101,7 @@ export async function projectAnalysis(finalSurveyId: number) {
   }
   console.log("=========================================");
   console.log("=========================================");
-  console.log("END OF FINAL PROJECT ANALYSIS");
+  console.log("END OF FINAL PROJECT ANALYSIS: ", finalSurveyId);
   console.log("=========================================");
   console.log("=========================================");
 }
