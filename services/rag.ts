@@ -1011,7 +1011,7 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
             questionsSkills,
           );
 
-        setUserPCP(
+        await setUserPCP(
           userId,
           orderedFeedback[userId],
           sprintSurveyId,
@@ -1086,7 +1086,7 @@ export async function projectAnalysis(finalSurveyId: number) {
         questionsSkills,
       );
 
-    setUserPCP(
+    await setUserPCP(
       managerId,
       orderedFeedback[managerId],
       finalSurveyId,
