@@ -76,6 +76,15 @@ const Project = ({ params }: { params: { projectId: string } }) => {
     queryKey: ["project-growth-data", projectId],
     queryFn: () => getGrowthData(projectId), // Consumir el nuevo servicio
   });
+
+  const monthNames = [
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+  ];
+
+  const getMonthName = (monthNumber: number) => {
+    return monthNames[monthNumber - 1];
+  };
   const radarData = statistics
     ? [
         {
@@ -102,13 +111,12 @@ const Project = ({ params }: { params: { projectId: string } }) => {
     : [];
   const areaData = growthData
     ? growthData.growthSupportData.map((item, index) => ({
-        month: item.month,
+        month: getMonthName(item.month),
         growthSupport: item.averageAnswer,
         growthOportunities:
           growthData.growthOpportunitiesData[index]?.averageAnswer || 0,
       }))
     : [];
-
   const gaugeData = detailedStatistics
     ? [
         {
