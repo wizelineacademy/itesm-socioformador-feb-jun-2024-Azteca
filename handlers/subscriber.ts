@@ -1,48 +1,61 @@
 import db from "@/db/drizzle";
-import { sprintSurvey } from "@/db/schema";
-import { feedbackAnalysis } from "@/services/rag";
+import { finalSurvey, sprintSurvey } from "@/db/schema";
+import { feedbackAnalysis, projectAnalysis } from "@/services/rag";
 import { DeleteMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
 import { eq } from "drizzle-orm";
 import { Resource } from "sst";
+import type { SQSHandler } from "aws-lambda";
+import type { SQSMessageBody } from "@/services/project";
 
-// TODO: this stuff should come from either @sst/sqs or @aws/sqs
-interface Record {
-  messageId: string;
-  receiptHandle: string;
-  body: string;
-  md5OfBody: string;
-  eventSource: string;
-  eventSourceARN: string;
-  awsRegion: string;
-}
-
-interface EventType {
-  Records: Record[];
-}
-
-export const handler = async (event: EventType) => {
-  console.log("WORKING ?");
-  const messageBody = JSON.parse(event.Records[0].body) as {
-    sprintSurveyId: number;
-  };
-  console.log("HANDLER", messageBody.sprintSurveyId);
-  console.log("RECORDS", event.Records);
+export const handler: SQSHandler = async (event) => {
+  const messageBody = JSON.parse(event.Records[0].body) as SQSMessageBody;
 
   // Note: we should wrap everything inside a try-catch block to avoid putting SQS messages in retention state
-  try {
-    await feedbackAnalysis(messageBody.sprintSurveyId);
-  } catch (error) {
-    console.log("ERROR:", error);
+  switch (messageBody.type) {
+    case "RULER":
+      try {
+        //TODO: lalo implements this
+      } catch (error) {
+        console.log("ERROR:", error);
+      }
+      break;
+    case "SPRINT":
+      // Process sprint survey
+      try {
+        await feedbackAnalysis(messageBody.id);
+      } catch (error) {
+        console.log("ERROR:", error);
+      }
+
+      // Set the isProcessing state to false
+      await db
+        .update(sprintSurvey)
+        .set({
+          isProcessing: false,
+        })
+        .where(eq(sprintSurvey.id, messageBody.id));
+      break;
+    case "FINAL":
+      // Process final survey
+      try {
+        await projectAnalysis(messageBody.id);
+      } catch (error) {
+        console.log("ERROR:", error);
+      }
+
+      // Set the isProcessing state to false
+      await db
+        .update(finalSurvey)
+        .set({
+          isProcessing: false,
+        })
+        .where(eq(finalSurvey.id, messageBody.id));
+      break;
+    default:
+      console.log("UNREACHABLE");
   }
-  // TODO: maybe a finally ? block
 
-  await db
-    .update(sprintSurvey)
-    .set({
-      isProcessing: false,
-    })
-    .where(eq(sprintSurvey.id, messageBody.sprintSurveyId));
-
+  // Deletes the message from the queue
   const client = new SQSClient();
   const response = await client.send(
     new DeleteMessageCommand({
@@ -50,8 +63,5 @@ export const handler = async (event: EventType) => {
       ReceiptHandle: event.Records[0].receiptHandle,
     }),
   );
-
   console.log("del response", response);
-
-  return "ok";
 };
