@@ -713,76 +713,6 @@ async function getQuestionsSkills(
   return questionsSkills;
 }
 
-export async function rulerAnalysis(
-  userId: string,
-  userComment: string,
-  emotionId: number,
-  sprintSurveyId: number,
-) {
-  const emotionInfo = await db
-    .select({
-      name: rulerEmotion.name,
-      description: rulerEmotion.description,
-      embedding: rulerEmotion.embedding,
-      pleasentess: rulerEmotion.pleasantness,
-      energy: rulerEmotion.energy,
-    })
-    .from(rulerEmotion)
-    .where(eq(rulerEmotion.id, emotionId));
-
-  // recommend tasks and resources only if the emotion is negative
-  const pleasentess = emotionInfo[0].pleasentess as number;
-  if (pleasentess < -3) {
-    const allResources = await db
-      .select({ id: pipResource.id, embedding: pipResource.embedding })
-      .from(pipResource);
-
-    let baseMessage: string = "Este es el estado de ánimo del usuario:\n";
-    baseMessage += ((emotionInfo[0].name as string) +
-      ": " +
-      emotionInfo[0].description) as string;
-
-    if (userComment !== "") {
-      baseMessage += "\n\n" + "Y estos son sus pensamientos:\n" + userComment;
-    }
-
-    const recommendedResourcesIds: number[] = await cosineSimilarity(
-      baseMessage,
-      allResources,
-    );
-
-    recommendedResourcesIds.splice(5);
-
-    const tasks: string[] = await createTasks(baseMessage);
-
-    for (let task of tasks) {
-      const [title, description] = task.split(":");
-      let newTitle = title;
-      let newDescription = description;
-      if (title.length > 64) {
-        newTitle = await reduceTask(title, 64);
-      }
-      if (description.length > 256) {
-        newDescription = await reduceTask(description, 256);
-      }
-      await db.insert(pipTask).values({
-        userId: userId,
-        title: newTitle,
-        description: newDescription,
-        sprintSurveyId: sprintSurveyId,
-      });
-    }
-
-    for (let resourceId of recommendedResourcesIds) {
-      await db.insert(userResource).values({
-        userId: userId,
-        resourceId: resourceId,
-        sprintSurveyId: sprintSurveyId,
-      });
-    }
-  }
-}
-
 async function setUserPCP(
   userId: string,
   userFeedback: {
@@ -944,7 +874,76 @@ async function setUserPCP(
   // set the strengths and weaknesses of the user
 }
 
-// Main function
+export async function rulerAnalysis(
+  userId: string,
+  userComment: string,
+  emotionId: number,
+  sprintSurveyId: number,
+) {
+  const emotionInfo = await db
+    .select({
+      name: rulerEmotion.name,
+      description: rulerEmotion.description,
+      embedding: rulerEmotion.embedding,
+      pleasentess: rulerEmotion.pleasantness,
+      energy: rulerEmotion.energy,
+    })
+    .from(rulerEmotion)
+    .where(eq(rulerEmotion.id, emotionId));
+
+  // recommend tasks and resources only if the emotion is negative
+  const pleasentess = emotionInfo[0].pleasentess as number;
+  if (pleasentess < -3) {
+    const allResources = await db
+      .select({ id: pipResource.id, embedding: pipResource.embedding })
+      .from(pipResource);
+
+    let baseMessage: string = "Este es el estado de ánimo del usuario:\n";
+    baseMessage += ((emotionInfo[0].name as string) +
+      ": " +
+      emotionInfo[0].description) as string;
+
+    if (userComment !== "") {
+      baseMessage += "\n\n" + "Y estos son sus pensamientos:\n" + userComment;
+    }
+
+    const recommendedResourcesIds: number[] = await cosineSimilarity(
+      baseMessage,
+      allResources,
+    );
+
+    recommendedResourcesIds.splice(5);
+
+    const tasks: string[] = await createTasks(baseMessage);
+
+    for (const task of tasks) {
+      const [title, description] = task.split(":");
+      let newTitle = title;
+      let newDescription = description;
+      if (title.length > 64) {
+        newTitle = await reduceTask(title, 64);
+      }
+      if (description.length > 256) {
+        newDescription = await reduceTask(description, 256);
+      }
+      await db.insert(pipTask).values({
+        userId: userId,
+        title: newTitle,
+        description: newDescription,
+        sprintSurveyId: sprintSurveyId,
+      });
+    }
+
+    for (const resourceId of recommendedResourcesIds) {
+      await db.insert(userResource).values({
+        userId: userId,
+        resourceId: resourceId,
+        sprintSurveyId: sprintSurveyId,
+      });
+    }
+  }
+}
+
 export async function feedbackAnalysis(sprintSurveyId: number) {
   const processedSurvey = await db
     .select({ processed: sprintSurvey.processed })
