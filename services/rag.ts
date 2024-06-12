@@ -388,6 +388,10 @@ async function processProjectOpenFeedback(
         }
       }
 
+      console.log("Positive comments: ", commentClassifications.positive);
+      console.log("Negative comments: ", commentClassifications.negative);
+      console.log("Biased comments: ", commentClassifications.biased);
+
       // ==================== RAG AND WEAKNESSES ANALYSIS ====================
 
       // add the recommended resources of the user
@@ -647,9 +651,6 @@ async function getFeedbackClassifications(
         }
       } else {
         // add the negative skills of the question
-        console.log("Feedback: ", feedback[0]);
-        console.log("question Skills: ", questionsSkills[feedback[0]]);
-        console.log("questions: ", questionsSkills);
         const questionNegativeSkills = questionsSkills[feedback[0]].map(
           (skillId) => skillId as number,
         );
@@ -701,35 +702,42 @@ async function getQuestionsSkills(
           eq(question.type, "COWORKER_QUESTION"),
         ),
       );
+
+    console.log("===========================================");
+    console.log("===========================================");
+    console.log("QUESTIONS: ", questions);
+    console.log("===========================================");
+    console.log("===========================================");
   } else if (type === "FINAL_PROJECT_QUESTION") {
     questions = await db
       .select({
-        questionId: sprintSurveyQuestion.questionId,
+        questionId: finalSurveyAnswer.questionId,
       })
-      .from(sprintSurveyQuestion)
-      .innerJoin(question, eq(question.id, sprintSurveyQuestion.questionId))
-      .where(
-        and(
-          eq(sprintSurveyQuestion.sprintSurveyId, surveyId),
-          eq(question.type, "COWORKER_QUESTION"),
-        ),
-      );
+      .from(finalSurveyAnswer)
+      .innerJoin(question, eq(question.id, finalSurveyAnswer.questionId))
+      .where(eq(finalSurveyAnswer.finalSurveyId, surveyId));
   }
 
-  questions.forEach(async (question) => {
+  for (const question of questions) {
     const associatedSkills = await db
       .select({ skillId: questionSkill.skillId })
       .from(questionSkill)
       .where(eq(questionSkill.questionId, question.questionId as number));
     questionsSkills[question.questionId as number] = associatedSkills.map(
-      (element) => element.skillId as number,
+      (questionSkill) => questionSkill.skillId as number,
     );
-  });
+  }
+
+  console.log("===========================================");
+  console.log("===========================================");
+  console.log("QUESTIONS SKILLS: ", questionsSkills);
+  console.log("===========================================");
+  console.log("===========================================");
 
   return questionsSkills;
 }
 
-async function rulerAnalysis(
+export async function rulerAnalysis(
   userId: string,
   userComment: string,
   emotionId: number,
@@ -993,8 +1001,6 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
       "COWORKER_QUESTION",
     );
 
-    console.log("=====================, questionSkills: ", questionsSkills);
-
     // iterate through each unique user of the project and read the feedback received
     for (const userId of Object.keys(orderedFeedback)) {
       console.log(userId);
@@ -1026,22 +1032,28 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
             questionsSkills,
           );
 
+        /*
         setUserPCP(
           userId,
           orderedFeedback[userId],
           sprintSurveyId,
           "SPRINT_SURVEY",
         );
+        */
       }
     }
 
+    /*
     await db
       .update(sprintSurvey)
       .set({ processed: true })
       .where(eq(sprintSurvey.id, sprintSurveyId));
+    */
   }
   console.log("=========================================");
+  console.log("=========================================");
   console.log("END OF SPRINT ANALYSIS");
+  console.log("=========================================");
   console.log("=========================================");
 }
 
@@ -1105,4 +1117,9 @@ export async function projectAnalysis(finalSurveyId: number) {
       .set({ processed: true })
       .where(eq(finalSurvey.id, finalSurveyId));
   }
+  console.log("=========================================");
+  console.log("=========================================");
+  console.log("END OF FINAL PROJECT ANALYSIS");
+  console.log("=========================================");
+  console.log("=========================================");
 }
