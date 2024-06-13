@@ -1,6 +1,10 @@
 import db from "@/db/drizzle";
 import { finalSurvey, sprintSurvey } from "@/db/schema";
-import { feedbackAnalysis, projectAnalysis } from "@/services/rag";
+import {
+  feedbackAnalysis,
+  projectAnalysis,
+  rulerAnalysis,
+} from "@/services/rag";
 import { DeleteMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
 import { eq } from "drizzle-orm";
 import { Resource } from "sst";
@@ -14,8 +18,7 @@ export const handler: SQSHandler = async (event) => {
   switch (messageBody.type) {
     case "RULER":
       try {
-        console.log("ruler msg bdy", messageBody);
-        //TODO: lalo implements this
+        await rulerAnalysis(messageBody.id);
       } catch (error) {
         console.log("ERROR:", error);
       }

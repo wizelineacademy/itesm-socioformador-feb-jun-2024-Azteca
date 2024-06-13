@@ -242,7 +242,8 @@ export async function getUpdateFeedbackHistory({
 }
 
 export interface SQSMessageBody {
-  id: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  id: any;
   type: "RULER" | "SPRINT" | "FINAL";
 }
 
