@@ -6,13 +6,9 @@ import CoWorkersCarousel from "@/components/CoWorkersCarousel";
 import ProjectsCarousel from "@/components/ProjectsCarousel";
 import ProfileTraits from "@/components/Profile/ProfileTraits";
 
-import { rulerAnalysis } from "@/services/rag";
-
 const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
   const user = await getUserInfoById(params.id);
   const traits = await getUserSkillsById(params.id);
-
-  await rulerAnalysis("b6a6b46b-0ca6-4ae4-b045-dd71df76f0a0");
 
   return (
     <main>
