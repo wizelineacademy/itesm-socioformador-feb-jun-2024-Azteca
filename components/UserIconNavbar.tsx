@@ -27,13 +27,16 @@ const UserIconNavbar = ({ path }: UserIconInterface) => {
 
   useEffect(() => {
     const onClickOutsideButton = (e: MouseEvent) => {
-      if (!(e.target as HTMLElement).closest(".group")) {
-        setIsClicked(false);
-      }
+      const clickOnIcon =
+        (e.target as HTMLElement) ===
+        document.getElementById("user-profile-photo");
+      if (!clickOnIcon) setIsClicked(false);
+      else if (clickOnIcon && isClicked) setIsClicked(true);
+      else setIsClicked(false);
     };
     document.addEventListener("click", onClickOutsideButton);
     return () => document.removeEventListener("click", onClickOutsideButton);
-  }, []);
+  }, [isClicked]);
 
   return (
     <>
@@ -46,7 +49,6 @@ const UserIconNavbar = ({ path }: UserIconInterface) => {
       <Menu as="div" className="relative inline-block text-left">
         <Menu.Button
           data-testid="user-icon-navbar"
-          as="div"
           onClick={() => setIsClicked(!isClicked)}
           className={`${onSite || isClicked ? "bg-primary" : "bg-white transition-all delay-0 hover:scale-[1.175]"} flex rounded-full drop-shadow-lg`}
         >

@@ -21,6 +21,7 @@ import BookIcon from "@/components/icons/BookIcon";
 import ArticleIcon from "@/components/icons/ArticleIcon";
 import Link from "next/link";
 import ChevronRightIcon from "@/components/icons/ChevronRightIcon";
+import Loader from "@/components/Loader";
 
 const statusOptions = [
   { label: "Pending", color: "bg-red-500", value: "PENDING" },
@@ -96,7 +97,11 @@ const PCP = () => {
   }
 
   if (projectsQuery.isLoading) {
-    return <p>loading...</p>;
+    return (
+      <section className="mt-4 h-[80dvh] w-full">
+        <Loader />
+      </section>
+    );
   }
 
   return (
