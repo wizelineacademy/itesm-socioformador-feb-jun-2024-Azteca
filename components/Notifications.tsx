@@ -1,7 +1,7 @@
 "use client";
 
 import { Menu, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import CloseIcon from "./icons/CloseIcon";
 import NotificationIcon from "./icons/NotificationIcon";
 import NotificationCard from "./NotificationCard";
@@ -18,6 +18,19 @@ const Notifications = () => {
   const [showSprintModal, setShowSprintModal] = useState<boolean>(false);
   const [showRulerModal, setShowRulerModal] = useState<boolean>(false);
   const [notificationId, setNotificationId] = useState<number>(0);
+
+  useEffect(() => {
+    const onClickOutsideButton = (e: MouseEvent) => {
+      const clickOnIcon =
+        (e.target as HTMLElement) ===
+        document.getElementById("user-profile-photo");
+      if (!clickOnIcon) setIsActive(false);
+      else if (clickOnIcon && isActive) setIsActive(true);
+      else setIsActive(false);
+    };
+    document.addEventListener("click", onClickOutsideButton);
+    return () => document.removeEventListener("click", onClickOutsideButton);
+  }, [isActive]);
 
   const notificationsQuery = useQuery({
     queryKey: ["notifications"],
