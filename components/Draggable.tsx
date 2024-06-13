@@ -40,6 +40,7 @@ const Draggable = ({
       {...attributes}
       {...listeners}
       className={className}
+      data-testid={`draggable-${data.userId}`}
     >
       {children}
     </div>

@@ -3,6 +3,7 @@ export type Coworker = {
   photoUrl?: string | null;
   userId: string;
   color?: string;
+  id?: string;
 };
 
 export interface User {

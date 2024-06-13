@@ -7,7 +7,6 @@ interface FormTextInputProps {
 
 const FormTextInput = ({ name, type, label }: FormTextInputProps) => {
   const toggleInput = () => {
-    if (type !== "password") return;
     const input = document.getElementById("password");
     const newType =
       input?.getAttribute("type") === "text" ? "password" : "text";

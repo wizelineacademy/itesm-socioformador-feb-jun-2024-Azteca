@@ -35,7 +35,10 @@ const SprintStepOne = ({
   };
 
   return (
-    <div className="mt-9 grid grid-flow-row grid-cols-2 gap-x-20 gap-y-16">
+    <div
+      data-testid="sprint-step-one"
+      className="mt-9 grid grid-flow-row grid-cols-2 gap-x-20 gap-y-16"
+    >
       {questions &&
         questions.map((question, index) => (
           <Slider

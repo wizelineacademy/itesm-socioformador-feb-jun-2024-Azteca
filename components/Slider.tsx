@@ -7,12 +7,16 @@ interface SliderProps {
 }
 const Slider = ({ label, className, onChange, name, value }: SliderProps) => {
   return (
-    <div className={`flex h-full w-full flex-col justify-between ${className}`}>
+    <div
+      data-testid={`slider-${name}`}
+      className={`flex h-full w-full flex-col justify-between ${className}`}
+    >
       <label className="mb-2 mt-4 block text-sm font-light text-black">
         {label}
       </label>
       <div className="flex flex-col">
         <input
+          data-testid="input-slider"
           type="range"
           step={1}
           min={1}

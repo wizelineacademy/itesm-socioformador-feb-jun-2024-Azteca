@@ -17,6 +17,7 @@ import { Notification } from "@/types/types";
 export async function getNotifications() {
   const session = await auth();
   const userId = session?.user?.id;
+  console.log(userId);
   if (!userId) throw new Error("You must be signed in");
 
   const notifications = [];

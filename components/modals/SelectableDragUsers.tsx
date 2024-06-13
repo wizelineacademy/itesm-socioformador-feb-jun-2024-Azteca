@@ -8,7 +8,10 @@ interface SelectableDragUsersProps {
 
 const SelectableDragUsers = ({ users }: SelectableDragUsersProps) => {
   return (
-    <div className={`flex flex-row items-center justify-around`}>
+    <div
+      data-testid="selectable-drag-users"
+      className={`flex flex-row items-center justify-around`}
+    >
       {users.map(
         (user, index) =>
           user.times > 0 && (
