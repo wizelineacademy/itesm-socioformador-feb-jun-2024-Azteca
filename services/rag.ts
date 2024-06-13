@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import db from "@/db/drizzle";
-import { and, count, eq, inArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray } from "drizzle-orm";
 import similarity from "compute-cosine-similarity";
 
 import {
@@ -19,6 +19,7 @@ import {
   sprintSurveyAnswerCoworkers,
   sprintSurveyQuestion,
   userResource,
+  rulerSurveyAnswers,
 } from "@/db/schema";
 
 // =============== FEEDBACK INTERFACES ===============
@@ -874,73 +875,118 @@ async function setUserPCP(
   // set the strengths and weaknesses of the user
 }
 
-export async function rulerAnalysis(
-  userId: string,
-  userComment: string,
-  emotionId: number,
-  sprintSurveyId: number,
-) {
-  const emotionInfo = await db
+export async function rulerAnalysis(userId: string) {
+  const rulerAnswers = await db
     .select({
-      name: rulerEmotion.name,
-      description: rulerEmotion.description,
-      embedding: rulerEmotion.embedding,
-      pleasentess: rulerEmotion.pleasantness,
-      energy: rulerEmotion.energy,
+      rulerSurveyId: rulerSurveyAnswers.id,
+      userId: rulerSurveyAnswers.userId,
+      emotionId: rulerSurveyAnswers.emotionId,
+      userComment: rulerSurveyAnswers.comment,
+      emotionName: rulerEmotion.name,
+      emotionDescription: rulerEmotion.description,
+      emotionPleasantness: rulerEmotion.pleasantness,
     })
-    .from(rulerEmotion)
-    .where(eq(rulerEmotion.id, emotionId));
+    .from(rulerSurveyAnswers)
+    .innerJoin(rulerEmotion, eq(rulerEmotion.id, rulerSurveyAnswers.emotionId))
+    .where(
+      and(
+        eq(rulerSurveyAnswers.userId, userId),
+        eq(rulerSurveyAnswers.processed, false),
+      ),
+    )
+    .orderBy(desc(rulerSurveyAnswers.answeredAt));
 
-  // recommend tasks and resources only if the emotion is negative
-  const pleasentess = emotionInfo[0].pleasentess as number;
-  if (pleasentess < -3) {
-    const allResources = await db
-      .select({ id: pipResource.id, embedding: pipResource.embedding })
-      .from(pipResource);
+  // enough answers to recommend resources and tasks
+  if (rulerAnswers.length >= 5) {
+    console.log("=========================================");
+    console.log("=========================================");
+    console.log("START OF RULER ANALYSIS");
+    console.log("=========================================");
+    console.log("=========================================");
+    const rulerSurveyIds: number[] = [];
+    const lastRulerSurveyId: number = rulerAnswers[0].rulerSurveyId as number;
+    const uniqueEmotions = new Set<number>();
+    let scoresMean: number = 0;
+    let baseMessage = "";
+    let message = "";
 
-    let baseMessage: string = "Este es el estado de ánimo del usuario:\n";
-    baseMessage += ((emotionInfo[0].name as string) +
-      ": " +
-      emotionInfo[0].description) as string;
-
-    if (userComment !== "") {
-      baseMessage += "\n\n" + "Y estos son sus pensamientos:\n" + userComment;
-    }
-
-    const recommendedResourcesIds: number[] = await cosineSimilarity(
-      baseMessage,
-      allResources,
-    );
-
-    recommendedResourcesIds.splice(5);
-
-    const tasks: string[] = await createTasks(baseMessage);
-
-    for (const task of tasks) {
-      const [title, description] = task.split(":");
-      let newTitle = title;
-      let newDescription = description;
-      if (title.length > 64) {
-        newTitle = await reduceTask(title, 64);
+    rulerAnswers.forEach((answer) => {
+      // check if the emotionId is already in the set to create the message with unique emotions
+      if (!uniqueEmotions.has(answer.emotionId as number)) {
+        uniqueEmotions.add(answer.emotionId as number);
+        message =
+          answer.emotionName +
+          ": " +
+          answer.emotionDescription +
+          "\n" +
+          answer.userComment +
+          "\n\n";
+        baseMessage += message;
       }
-      if (description.length > 256) {
-        newDescription = await reduceTask(description, 256);
-      }
-      await db.insert(pipTask).values({
-        userId: userId,
-        title: newTitle,
-        description: newDescription,
-        sprintSurveyId: sprintSurveyId,
-      });
-    }
+      rulerSurveyIds.push(answer.rulerSurveyId as number);
+      scoresMean += answer.emotionPleasantness as number;
+    });
 
-    for (const resourceId of recommendedResourcesIds) {
-      await db.insert(userResource).values({
+    scoresMean /= rulerAnswers.length;
+
+    console.log("User score: ", scoresMean);
+
+    // the user has a negative emotional state
+    if (scoresMean < 0) {
+      const allResources = await db
+        .select({ id: pipResource.id, embedding: pipResource.embedding })
+        .from(pipResource);
+
+      const recommendedResourcesIds: number[] = await cosineSimilarity(
+        baseMessage,
+        allResources,
+      );
+
+      recommendedResourcesIds.splice(5);
+
+      console.log("=========================================");
+      console.log("INSERTING TASKS AND RESOURCES OF RULER ANALYSIS");
+      console.log("=========================================");
+
+      const tasks: string[] = await createTasks(baseMessage);
+
+      for (const task of tasks) {
+        const [title, description] = task.split(":");
+        let newTitle = title;
+        let newDescription = description;
+        if (title.length > 64) {
+          newTitle = await reduceTask(title, 64);
+        }
+        if (description.length > 256) {
+          newDescription = await reduceTask(description, 256);
+        }
+        await db.insert(pipTask).values({
+          userId: userId,
+          title: newTitle,
+          description: newDescription,
+          rulerSurveyId: lastRulerSurveyId,
+        });
+      }
+
+      const resourcesToInsert = recommendedResourcesIds.map((resourceId) => ({
         userId: userId,
         resourceId: resourceId,
-        sprintSurveyId: sprintSurveyId,
-      });
+        rulerSurveyId: lastRulerSurveyId,
+      }));
+
+      await db.insert(userResource).values(resourcesToInsert);
     }
+
+    console.log("=========================================");
+    console.log("=========================================");
+    console.log("END OF RULER ANALYSIS");
+    console.log("=========================================");
+    console.log("=========================================");
+
+    await db
+      .update(rulerSurveyAnswers)
+      .set({ processed: true })
+      .where(inArray(rulerSurveyAnswers.id, rulerSurveyIds));
   }
 }
 
