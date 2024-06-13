@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import db from "@/db/drizzle";
-import { and, count, eq, inArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray } from "drizzle-orm";
 import similarity from "compute-cosine-similarity";
 
 import {
@@ -19,6 +19,7 @@ import {
   sprintSurveyAnswerCoworkers,
   sprintSurveyQuestion,
   userResource,
+  rulerSurveyAnswers,
 } from "@/db/schema";
 
 // =============== FEEDBACK INTERFACES ===============
@@ -713,76 +714,6 @@ async function getQuestionsSkills(
   return questionsSkills;
 }
 
-export async function rulerAnalysis(
-  userId: string,
-  userComment: string,
-  emotionId: number,
-  sprintSurveyId: number,
-) {
-  const emotionInfo = await db
-    .select({
-      name: rulerEmotion.name,
-      description: rulerEmotion.description,
-      embedding: rulerEmotion.embedding,
-      pleasentess: rulerEmotion.pleasantness,
-      energy: rulerEmotion.energy,
-    })
-    .from(rulerEmotion)
-    .where(eq(rulerEmotion.id, emotionId));
-
-  // recommend tasks and resources only if the emotion is negative
-  const pleasentess = emotionInfo[0].pleasentess as number;
-  if (pleasentess < -3) {
-    const allResources = await db
-      .select({ id: pipResource.id, embedding: pipResource.embedding })
-      .from(pipResource);
-
-    let baseMessage: string = "Este es el estado de ánimo del usuario:\n";
-    baseMessage += ((emotionInfo[0].name as string) +
-      ": " +
-      emotionInfo[0].description) as string;
-
-    if (userComment !== "") {
-      baseMessage += "\n\n" + "Y estos son sus pensamientos:\n" + userComment;
-    }
-
-    const recommendedResourcesIds: number[] = await cosineSimilarity(
-      baseMessage,
-      allResources,
-    );
-
-    recommendedResourcesIds.splice(5);
-
-    const tasks: string[] = await createTasks(baseMessage);
-
-    tasks.forEach(async (task) => {
-      const [title, description] = task.split(":");
-      let newTitle = title;
-      let newDescription = description;
-      if (title.length > 64) {
-        newTitle = await reduceTask(title, 64);
-      }
-      if (description.length > 256) {
-        newDescription = await reduceTask(description, 256);
-      }
-      await db.insert(pipTask).values({
-        userId: userId,
-        title: newTitle,
-        description: newDescription,
-        sprintSurveyId: sprintSurveyId,
-      });
-    });
-
-    recommendedResourcesIds.forEach(async (resourceId) => {
-      await db.insert(userResource).values({
-        userId: userId,
-        resourceId: resourceId,
-        sprintSurveyId: sprintSurveyId,
-      });
-    });
-  }
-}
-
 async function setUserPCP(
   userId: string,
   userFeedback: {
@@ -882,6 +813,11 @@ async function setUserPCP(
     const tasks = await createTasks(stringWeaknesses);
 
     if (type === "SPRINT_SURVEY") {
+      console.log("=========================================");
+      console.log("=========================================");
+      console.log("INSERTING TASKS AND RESOURCES OF SPRINT SURVEY ", surveyId);
+      console.log("=========================================");
+      console.log("=========================================");
       for (const task of tasks) {
         const [title, description] = task.split(":");
         let newTitle = title;
@@ -939,7 +875,121 @@ async function setUserPCP(
   // set the strengths and weaknesses of the user
 }
 
-// Main function
+export async function rulerAnalysis(userId: string) {
+  const rulerAnswers = await db
+    .select({
+      rulerSurveyId: rulerSurveyAnswers.id,
+      userId: rulerSurveyAnswers.userId,
+      emotionId: rulerSurveyAnswers.emotionId,
+      userComment: rulerSurveyAnswers.comment,
+      emotionName: rulerEmotion.name,
+      emotionDescription: rulerEmotion.description,
+      emotionPleasantness: rulerEmotion.pleasantness,
+    })
+    .from(rulerSurveyAnswers)
+    .innerJoin(rulerEmotion, eq(rulerEmotion.id, rulerSurveyAnswers.emotionId))
+    .where(
+      and(
+        eq(rulerSurveyAnswers.userId, userId),
+        eq(rulerSurveyAnswers.processed, false),
+      ),
+    )
+    .orderBy(desc(rulerSurveyAnswers.answeredAt));
+
+  // enough answers to recommend resources and tasks
+  if (rulerAnswers.length >= 5) {
+    console.log("=========================================");
+    console.log("=========================================");
+    console.log("START OF RULER ANALYSIS");
+    console.log("=========================================");
+    console.log("=========================================");
+    const rulerSurveyIds: number[] = [];
+    const lastRulerSurveyId: number = rulerAnswers[0].rulerSurveyId as number;
+    const uniqueEmotions = new Set<number>();
+    let scoresMean: number = 0;
+    let baseMessage = "";
+    let message = "";
+
+    rulerAnswers.forEach((answer) => {
+      // check if the emotionId is already in the set to create the message with unique emotions
+      if (!uniqueEmotions.has(answer.emotionId as number)) {
+        uniqueEmotions.add(answer.emotionId as number);
+        message =
+          answer.emotionName +
+          ": " +
+          answer.emotionDescription +
+          "\n" +
+          answer.userComment +
+          "\n\n";
+        baseMessage += message;
+      }
+      rulerSurveyIds.push(answer.rulerSurveyId as number);
+      scoresMean += answer.emotionPleasantness as number;
+    });
+
+    scoresMean /= rulerAnswers.length;
+
+    console.log("User score: ", scoresMean);
+
+    // the user has a negative emotional state
+    if (scoresMean < 0) {
+      const allResources = await db
+        .select({ id: pipResource.id, embedding: pipResource.embedding })
+        .from(pipResource);
+
+      const recommendedResourcesIds: number[] = await cosineSimilarity(
+        baseMessage,
+        allResources,
+      );
+
+      recommendedResourcesIds.splice(5);
+
+      console.log("=========================================");
+      console.log("INSERTING TASKS AND RESOURCES OF RULER ANALYSIS");
+      console.log("=========================================");
+
+      const tasks: string[] = await createTasks(baseMessage);
+
+      for (const task of tasks) {
+        const [title, description] = task.split(":");
+        let newTitle = title;
+        let newDescription = description;
+        if (title.length > 64) {
+          newTitle = await reduceTask(title, 64);
+        }
+        if (description.length > 256) {
+          newDescription = await reduceTask(description, 256);
+        }
+        await db.insert(pipTask).values({
+          userId: userId,
+          title: newTitle,
+          description: newDescription,
+          rulerSurveyId: lastRulerSurveyId,
+        });
+      }
+
+      const resourcesToInsert = recommendedResourcesIds.map((resourceId) => ({
+        userId: userId,
+        resourceId: resourceId,
+        rulerSurveyId: lastRulerSurveyId,
+      }));
+
+      await db.insert(userResource).values(resourcesToInsert);
+    }
+
+    console.log("=========================================");
+    console.log("=========================================");
+    console.log("END OF RULER ANALYSIS");
+    console.log("=========================================");
+    console.log("=========================================");
+
+    await db
+      .update(rulerSurveyAnswers)
+      .set({ processed: true })
+      .where(inArray(rulerSurveyAnswers.id, rulerSurveyIds));
+  }
+}
+
 export async function feedbackAnalysis(sprintSurveyId: number) {
   const processedSurvey = await db
     .select({ processed: sprintSurvey.processed })
@@ -1007,7 +1057,7 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
             questionsSkills,
           );
 
-        setUserPCP(
+        await setUserPCP(
           userId,
           orderedFeedback[userId],
           sprintSurveyId,
@@ -1023,7 +1073,7 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
   }
   console.log("=========================================");
   console.log("=========================================");
-  console.log("END OF SPRINT ANALYSIS");
+  console.log("END OF SPRINT ANALYSIS: ", sprintSurveyId);
   console.log("=========================================");
   console.log("=========================================");
 }
@@ -1082,7 +1132,7 @@ export async function projectAnalysis(finalSurveyId: number) {
         questionsSkills,
       );
 
-    setUserPCP(
+    await setUserPCP(
       managerId,
       orderedFeedback[managerId],
       finalSurveyId,
@@ -1096,7 +1146,7 @@ export async function projectAnalysis(finalSurveyId: number) {
   }
   console.log("=========================================");
   console.log("=========================================");
-  console.log("END OF FINAL PROJECT ANALYSIS");
+  console.log("END OF FINAL PROJECT ANALYSIS: ", finalSurveyId);
   console.log("=========================================");
   console.log("=========================================");
 }
