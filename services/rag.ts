@@ -876,9 +876,6 @@ async function setUserPCP(
 }
 
 export async function rulerAnalysis(userId: string) {
-  // construir el nuevo mensaje con las emociones negativas
-  // marcar todas las respuestas como procesadas
-
   const rulerAnswers = await db
     .select({
       rulerSurveyId: rulerSurveyAnswers.id,
@@ -901,6 +898,13 @@ export async function rulerAnalysis(userId: string) {
 
   // enough answers to recommend resources and tasks
   if (rulerAnswers.length >= 5) {
+    console.log("=========================================");
+    console.log("=========================================");
+    console.log("START OF RULER ANALYSIS");
+    console.log("=========================================");
+    console.log("=========================================");
+    const rulerSurveyIds: number[] = [];
+    const lastRulerSurveyId: number = rulerAnswers[0].rulerSurveyId as number;
     const uniqueEmotions = new Set<number>();
     let scoresMean: number = 0;
     let baseMessage = "";
@@ -919,10 +923,13 @@ export async function rulerAnalysis(userId: string) {
           "\n\n";
         baseMessage += message;
       }
-      scoresMean += answer.emotionId as number;
+      rulerSurveyIds.push(answer.rulerSurveyId as number);
+      scoresMean += answer.emotionPleasantness as number;
     });
 
     scoresMean /= rulerAnswers.length;
+
+    console.log("User score: ", scoresMean);
 
     // the user has a negative emotional state
     if (scoresMean < 0) {
@@ -936,6 +943,10 @@ export async function rulerAnalysis(userId: string) {
       );
 
       recommendedResourcesIds.splice(5);
+
+      console.log("=========================================");
+      console.log("INSERTING TASKS AND RESOURCES OF RULER ANALYSIS");
+      console.log("=========================================");
 
       const tasks: string[] = await createTasks(baseMessage);
 
@@ -953,18 +964,29 @@ export async function rulerAnalysis(userId: string) {
           userId: userId,
           title: newTitle,
           description: newDescription,
-          rulerSurveyId: rulerSurveyId,
+          rulerSurveyId: lastRulerSurveyId,
         });
       }
 
-      for (const resourceId of recommendedResourcesIds) {
-        await db.insert(userResource).values({
-          userId: userId,
-          resourceId: resourceId,
-          rulerSurveyId: rulerSurveyId,
-        });
-      }
+      const resourcesToInsert = recommendedResourcesIds.map((resourceId) => ({
+        userId: userId,
+        resourceId: resourceId,
+        rulerSurveyId: lastRulerSurveyId,
+      }));
+
+      await db.insert(userResource).values(resourcesToInsert);
     }
+
+    console.log("=========================================");
+    console.log("=========================================");
+    console.log("END OF RULER ANALYSIS");
+    console.log("=========================================");
+    console.log("=========================================");
+
+    await db
+      .update(rulerSurveyAnswers)
+      .set({ processed: true })
+      .where(inArray(rulerSurveyAnswers.id, rulerSurveyIds));
   }
 }
 
