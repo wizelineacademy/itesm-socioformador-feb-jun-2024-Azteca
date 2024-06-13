@@ -19,23 +19,25 @@ const SprintDropRow = ({
   people,
 }: SprintDropRowProps) => {
   return (
-    <div className={`${className} flex min-h-20 w-full flex-row`}>
+    <div
+      data-testid={`droppable-row-${name}`}
+      className={`${className} flex min-h-20 w-full flex-row`}
+    >
       <div
+        data-testid={`title-${title}`}
         className={`w-1/4 rounded-l-lg ${colors[0]} ${titlePadding} flex text-end text-sm`}
       >
         <p className="my-auto me-2 text-black">{title}</p>
       </div>
-      {colors.map((color, index) => {
-        return (
-          <SprintDropRowBox
-            key={index}
-            index={index}
-            color={color}
-            name={name}
-            coworkers={people}
-          />
-        );
-      })}
+      {colors.map((color, index) => (
+        <SprintDropRowBox
+          key={index}
+          index={index}
+          color={color}
+          name={name}
+          coworkers={people}
+        />
+      ))}
     </div>
   );
 };

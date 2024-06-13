@@ -1,3 +1,4 @@
+//José Carlos Sánchez Gómez - A01174050
 describe("Register", () => {
   beforeEach(() => {
     cy.visit("/register");
