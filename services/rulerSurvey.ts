@@ -38,7 +38,7 @@ export async function submitRulerSurveyAnswer(surveyAnswer: RulerSurveyAnswer) {
       MessageGroupId: messageGroupId,
       MessageDeduplicationId: crypto.randomUUID(),
       MessageBody: JSON.stringify({
-        id: 1,
+        id: surveyAnswer.userId,
         type: "RULER",
       } as SQSMessageBody),
     }),
