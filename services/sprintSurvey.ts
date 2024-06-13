@@ -17,6 +17,10 @@ import {
   SurveyStepTwoAnswer,
 } from "@/types/types";
 
+type GrowthDataResult = {
+  month: number;
+  averageAnswer: number;
+};
 export async function getSprintSurveyQuestions(): Promise<Questions[]> {
   const res = await db
     .select()
