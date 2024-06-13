@@ -10,6 +10,7 @@ import {
   getUpdateFeedbackHistory,
   getProjectById,
   updateFeedback,
+  calculateEmployeeOverload,
 } from "@/services/project";
 import { useRouter } from "next/navigation";
 import { getUserRole } from "@/services/user";
@@ -76,6 +77,11 @@ const Project = ({ params }: { params: { projectId: string } }) => {
     queryKey: ["project-growth-data", projectId],
     queryFn: () => getGrowthData(projectId), // Consumir el nuevo servicio
   });
+  const { data: employeeOverload, isLoading: isLoadingEmployeeOverload } =
+    useQuery({
+      queryKey: ["employee-overload", projectId],
+      queryFn: () => calculateEmployeeOverload(projectId),
+    });
 
   const monthNames = [
     "Enero",
@@ -155,7 +161,6 @@ const Project = ({ params }: { params: { projectId: string } }) => {
         },
       ]
     : [];
-  const progressBarPercentage = 74;
 
   if (
     isLoadingFeedbackHistoryData ||
@@ -163,7 +168,8 @@ const Project = ({ params }: { params: { projectId: string } }) => {
     isLoadingStatistics ||
     isLoadingDetailedStatistics ||
     isLoadingProjectData ||
-    isLoadingGrowthData // Agregar el estado de carga de los datos de crecimiento
+    isLoadingGrowthData ||
+    isLoadingEmployeeOverload // Agregar el estado de carga de los datos de crecimiento
   ) {
     return (
       <div className="h-[80dvh]">
@@ -300,7 +306,7 @@ const Project = ({ params }: { params: { projectId: string } }) => {
             <div className="flex justify-between">
               <div>
                 <p className="pb-2 text-lg font-medium">Employee Overload</p>
-                <p className="pb-2 text-5xl font-semibold">{`${progressBarPercentage}%`}</p>
+                <p className="pb-2 text-5xl font-semibold">{`${employeeOverload}%`}</p>
               </div>
               <div>
                 <div>
@@ -318,7 +324,7 @@ const Project = ({ params }: { params: { projectId: string } }) => {
             <div className="w-full rounded-full bg-gray-200 p-1">
               <div
                 className="h-6 rounded-full bg-gradient-to-r from-green-400 via-yellow-400 to-orange-500"
-                style={{ width: `70%` }}
+                style={{ width: `${employeeOverload}%`}}
               ></div>
             </div>
           </div>

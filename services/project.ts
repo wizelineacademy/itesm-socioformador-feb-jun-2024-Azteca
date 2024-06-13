@@ -8,6 +8,9 @@ import {
   projectMember,
   sprintSurvey,
   user,
+  sprintSurveyAnswerProject,
+  rulerSurveyAnswers,
+  rulerEmotion,
 } from "@/db/schema";
 import { and, asc, eq, inArray, ne, or } from "drizzle-orm";
 import { SQSClient, SendMessageBatchCommand } from "@aws-sdk/client-sqs";
@@ -318,4 +321,69 @@ export async function updateFeedback(projectId: number) {
     );
     console.log("response final surveys", response1);
   }
+}
+async function getSprintSurveyAnswers(projectId: number) {
+  return db
+    .select({
+      answer: sprintSurveyAnswerProject.answer,
+    })
+    .from(sprintSurveyAnswerProject)
+    .innerJoin(
+      sprintSurvey,
+      eq(sprintSurveyAnswerProject.sprintSurveyId, sprintSurvey.id),
+    )
+    .where(
+      and(
+        eq(sprintSurvey.projectId, projectId),
+        inArray(sprintSurveyAnswerProject.questionId, [26, 27, 28, 29]),
+      ),
+    );
+}
+
+// Obtener los userIds de los miembros del proyecto
+async function getProjectMemberIds(projectId: number) {
+  const projectMembers = await db
+    .select({
+      userId: projectMember.userId,
+    })
+    .from(projectMember)
+    .where(eq(projectMember.projectId, projectId));
+
+  return projectMembers.map((member) => member.userId);
+}
+
+// Obtener respuestas de las encuestas RULER
+async function getRulerSurveyAnswers(userIds: string[]) {
+  return db
+    .select({
+      pleasantness: rulerEmotion.pleasantness,
+      energy: rulerEmotion.energy,
+    })
+    .from(rulerSurveyAnswers)
+    .innerJoin(rulerEmotion, eq(rulerSurveyAnswers.emotionId, rulerEmotion.id))
+    .where(inArray(rulerSurveyAnswers.userId, userIds));
+}
+
+export async function calculateEmployeeOverload(projectId: number) {
+  const sprintAnswers = await getSprintSurveyAnswers(projectId);
+  const userIds = await getProjectMemberIds(projectId);
+  const rulerAnswers = await getRulerSurveyAnswers(userIds as string[]);
+
+  const calculateAverage = (values: number[]) => {
+    const total = values.reduce((acc, value) => acc + value, 0);
+    return total / values.length;
+  };
+
+  const sprintScores = sprintAnswers.map((answer) => answer.answer);
+  const avgSprintScore = calculateAverage(sprintScores as number[]);
+
+  const emotionScores = rulerAnswers.map(
+    (answer) => (answer.pleasantness as number) + (answer.energy as number),
+  );
+  const avgEmotionScore = calculateAverage(emotionScores);
+
+  const employeeOverload = (avgSprintScore + avgEmotionScore) / 2;
+  const normalizedOverload = Math.round(((employeeOverload + 6) / 12) * 100);
+
+  return normalizedOverload || 0;
 }
