@@ -330,18 +330,12 @@ export async function getDetailedProjectStatistics(projectId: number) {
   };
 }
 
-// Define un tipo para los resultados de la consulta
-type GrowthDataResult = {
-  month: number;
-  averageAnswer: number;
-};
-
 export const getGrowthData = async (projectId: number) => {
   const growthSupportQuestions = [27, 37, 38]; // Preguntas relacionadas con soporte de crecimiento
   const growthOpportunitiesQuestions = [37, 38]; // Preguntas relacionadas con oportunidades de crecimiento
 
   // Obtener los datos de soporte de crecimiento
-  const growthSupportDataResults = await db
+  const growthSupportDataResults = (await db
     .select({
       month: sql`EXTRACT(MONTH FROM ${finalSurveyAnswer.answeredAt})`.as(
         "month",
@@ -360,7 +354,7 @@ export const getGrowthData = async (projectId: number) => {
       ),
     )
     .groupBy(sql`EXTRACT(MONTH FROM ${finalSurveyAnswer.answeredAt})`)
-    .execute() as GrowthDataResult[]; // Asignar el tipo explícitamente
+    .execute()) as GrowthDataResult[]; // Asignar el tipo explícitamente
 
   const growthSupportData = growthSupportDataResults.map((result) => ({
     month: result.month,
@@ -368,7 +362,7 @@ export const getGrowthData = async (projectId: number) => {
   }));
 
   // Obtener los datos de oportunidades de crecimiento
-  const growthOpportunitiesDataResults = await db
+  const growthOpportunitiesDataResults = (await db
     .select({
       month: sql`EXTRACT(MONTH FROM ${finalSurveyAnswer.answeredAt})`.as(
         "month",
@@ -387,7 +381,7 @@ export const getGrowthData = async (projectId: number) => {
       ),
     )
     .groupBy(sql`EXTRACT(MONTH FROM ${finalSurveyAnswer.answeredAt})`)
-    .execute() as GrowthDataResult[]; // Asignar el tipo explícitamente
+    .execute()) as GrowthDataResult[]; // Asignar el tipo explícitamente
 
   const growthOpportunitiesData = growthOpportunitiesDataResults.map(
     (result) => ({
