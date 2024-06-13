@@ -30,6 +30,8 @@ const statusOptions = [
 
 const PCP = () => {
   const [projectId, setProjectId] = useState<number>();
+  const queryClient = useQueryClient();
+  const [progressPercentage, setProgressPercentage] = useState<number>(0);
 
   const projectsQuery = useQuery({
     queryKey: ["projects"],
@@ -49,6 +51,32 @@ const PCP = () => {
     retry: false,
     refetchOnWindowFocus: false,
   });
+  const { data: tasksData } = useQuery({
+    queryKey: ["tasks", projectId],
+    queryFn: () => getUserTasksForCurrentSprintByProjectId(projectId || 0),
+    retry: false,
+    refetchOnWindowFocus: false,
+    enabled: !!projectId,
+  });
+
+  useEffect(() => {
+    if (Array.isArray(tasksData)) {
+      const doneTasks = tasksData.filter(
+        (task) => task.status === "DONE",
+      ).length;
+      const totalTasks = tasksData.length;
+      setProgressPercentage((doneTasks / totalTasks) * 100);
+    } else {
+      setProgressPercentage(0);
+    }
+  }, [tasksData]);
+
+  useEffect(() => {
+    if (projectId) {
+      queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["sprintSurvey", projectId] });
+    }
+  }, [projectId, queryClient]);
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleString("default", {
@@ -57,8 +85,6 @@ const PCP = () => {
       year: "numeric",
     });
   };
-
-  const progressPercentage = 100;
 
   if (
     projectsQuery.isError ||
@@ -166,7 +192,10 @@ const PCP = () => {
 
       {projectId && (
         <>
-          <PCPTasks projectId={projectId} />
+          <PCPTasks
+            projectId={projectId}
+            setProgressPercentage={setProgressPercentage}
+          />
           <PCPResources projectId={projectId} />
         </>
       )}
@@ -174,7 +203,13 @@ const PCP = () => {
   );
 };
 
-const PCPTasks = ({ projectId }: { projectId: number }) => {
+const PCPTasks = ({
+  projectId,
+  setProgressPercentage,
+}: {
+  projectId: number;
+  setProgressPercentage: (percentage: number) => void;
+}) => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const openDialog = () => {
     setIsDialogOpen(true);
@@ -182,12 +217,45 @@ const PCPTasks = ({ projectId }: { projectId: number }) => {
   const closeDialog = () => {
     setIsDialogOpen(false);
   };
+  const queryClient = useQueryClient();
 
-  const tasksQuery = useQuery({
+  const { data: tasksData, isLoading: tasksLoading } = useQuery({
     queryKey: ["tasks", projectId],
     queryFn: () => getUserTasksForCurrentSprintByProjectId(projectId),
     retry: false,
     refetchOnWindowFocus: false,
+  });
+
+  useEffect(() => {
+    if (Array.isArray(tasksData)) {
+      const doneTasks = tasksData.filter(
+        (task) => task.status === "DONE",
+      ).length;
+      const totalTasks = tasksData.length;
+      setProgressPercentage((doneTasks / totalTasks) * 100);
+    } else {
+      setProgressPercentage(0);
+    }
+  }, [tasksData, setProgressPercentage]);
+
+  const mutation = useMutation({
+    mutationFn: updateTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
+      queryClient.invalidateQueries({
+        queryKey: ["tasks-history", projectId],
+      });
+
+      const tasks = queryClient.getQueryData<SelectPipTask[]>([
+        "tasks",
+        projectId,
+      ]);
+      if (tasks) {
+        const doneTasks = tasks.filter((task) => task.status === "DONE").length;
+        const totalTasks = tasks.length;
+        setProgressPercentage((doneTasks / totalTasks) * 100);
+      }
+    },
   });
 
   return (
@@ -203,16 +271,22 @@ const PCPTasks = ({ projectId }: { projectId: number }) => {
           </button>
         </div>
 
-        {tasksQuery.isLoading || !tasksQuery.data ? (
+        {tasksLoading ? (
           <p>loading...</p>
-        ) : tasksQuery.data && typeof tasksQuery.data === "string" ? (
-          <NoDataCard text={tasksQuery.data} />
+        ) : tasksData && typeof tasksData === "string" ? (
+          <NoDataCard text={tasksData} />
         ) : (
-          tasksQuery.data && (
+          tasksData &&
+          Array.isArray(tasksData) && (
             <div className="mt-2">
               <div className="mb-10 mt-2 flex flex-row gap-12 overflow-x-auto whitespace-nowrap pb-3">
-                {tasksQuery.data.map((task) => (
-                  <PCPTask key={task.id} task={task} projectId={projectId} />
+                {tasksData.map((task) => (
+                  <PCPTask
+                    key={task.id}
+                    task={task}
+                    projectId={projectId}
+                    mutateAsync={mutation.mutateAsync}
+                  />
                 ))}
               </div>
             </div>
@@ -356,19 +430,19 @@ const PCPTasksDialogContent = ({ projectId }: { projectId: number }) => {
 const PCPTask = ({
   task,
   projectId,
+  mutateAsync,
 }: {
   task: SelectPipTask;
   projectId: number;
+  mutateAsync: (data: {
+    taskId: number;
+    newStatus: "PENDING" | "IN_PROGRESS" | "DONE";
+  }) => Promise<void>;
 }) => {
-  const queryClient = useQueryClient();
-
-  const { mutateAsync } = useMutation({
-    mutationFn: updateTask,
-  });
-
-  const selectedStatus =
+  const selectedStatus: { label: string; color: string; value: string } =
     statusOptions.find((option) => option.value === task.status) ||
     statusOptions[0];
+  const queryClient = useQueryClient(); // Asegúrate de obtener queryClient aquí
 
   return (
     <div className="box-border h-48 w-52 shrink-0 rounded-xl bg-white p-4 shadow-lg">

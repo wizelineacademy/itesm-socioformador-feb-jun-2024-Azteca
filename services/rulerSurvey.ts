@@ -5,6 +5,9 @@ import { sql } from "drizzle-orm";
 
 import { RulerSurveyAnswer } from "@/types/types";
 import { auth } from "@/auth";
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+import { Resource } from "sst";
+import type { SQSMessageBody } from "./project";
 
 export async function submitRulerSurveyAnswer(surveyAnswer: RulerSurveyAnswer) {
   if (!surveyAnswer.userId || surveyAnswer.userId === undefined) {
@@ -25,4 +28,20 @@ export async function submitRulerSurveyAnswer(surveyAnswer: RulerSurveyAnswer) {
     answeredAt: sql`CURRENT_TIMESTAMP`,
     comment: surveyAnswer.comment,
   });
+
+  // Sends ruler survey to the queue
+  const client = new SQSClient();
+  const messageGroupId = crypto.randomUUID();
+  const response = await client.send(
+    new SendMessageCommand({
+      QueueUrl: Resource.FeedbackFlowQueueV3.url,
+      MessageGroupId: messageGroupId,
+      MessageDeduplicationId: crypto.randomUUID(),
+      MessageBody: JSON.stringify({
+        id: surveyAnswer.userId,
+        type: "RULER",
+      } as SQSMessageBody),
+    }),
+  );
+  console.log("response ruler survey", response);
 }

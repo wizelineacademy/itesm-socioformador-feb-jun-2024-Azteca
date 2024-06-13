@@ -14,7 +14,7 @@ env:
   OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
 
 jobs:
-  cypress-test:
+  e2e-test:
     runs-on: ubuntu-latest
 
     steps:

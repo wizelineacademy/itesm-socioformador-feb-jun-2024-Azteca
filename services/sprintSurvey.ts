@@ -17,6 +17,10 @@ import {
   SurveyStepTwoAnswer,
 } from "@/types/types";
 
+type GrowthDataResult = {
+  month: number;
+  averageAnswer: number;
+};
 export async function getSprintSurveyQuestions(): Promise<Questions[]> {
   const res = await db
     .select()
@@ -330,7 +334,7 @@ export const getGrowthData = async (projectId: number) => {
   const growthOpportunitiesQuestions = [37, 38]; // Preguntas relacionadas con oportunidades de crecimiento
 
   // Obtener los datos de soporte de crecimiento
-  const growthSupportDataResults = await db
+  const growthSupportDataResults = (await db
     .select({
       month: sql`EXTRACT(MONTH FROM ${finalSurveyAnswer.answeredAt})`.as(
         "month",
@@ -349,7 +353,7 @@ export const getGrowthData = async (projectId: number) => {
       ),
     )
     .groupBy(sql`EXTRACT(MONTH FROM ${finalSurveyAnswer.answeredAt})`)
-    .execute();
+    .execute()) as GrowthDataResult[]; // Asignar el tipo explícitamente
 
   const growthSupportData = growthSupportDataResults.map((result) => ({
     month: result.month,
@@ -357,7 +361,7 @@ export const getGrowthData = async (projectId: number) => {
   }));
 
   // Obtener los datos de oportunidades de crecimiento
-  const growthOpportunitiesDataResults = await db
+  const growthOpportunitiesDataResults = (await db
     .select({
       month: sql`EXTRACT(MONTH FROM ${finalSurveyAnswer.answeredAt})`.as(
         "month",
@@ -376,7 +380,7 @@ export const getGrowthData = async (projectId: number) => {
       ),
     )
     .groupBy(sql`EXTRACT(MONTH FROM ${finalSurveyAnswer.answeredAt})`)
-    .execute();
+    .execute()) as GrowthDataResult[]; // Asignar el tipo explícitamente
 
   const growthOpportunitiesData = growthOpportunitiesDataResults.map(
     (result) => ({

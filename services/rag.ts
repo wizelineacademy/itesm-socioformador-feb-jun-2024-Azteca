@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import db from "@/db/drizzle";
-import { and, count, eq, inArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray } from "drizzle-orm";
 import similarity from "compute-cosine-similarity";
 
 import {
@@ -19,6 +19,7 @@ import {
   sprintSurveyAnswerCoworkers,
   sprintSurveyQuestion,
   userResource,
+  rulerSurveyAnswers,
 } from "@/db/schema";
 
 // =============== FEEDBACK INTERFACES ===============
@@ -189,10 +190,6 @@ async function processCoworkersOpenFeedback(
     joinedFeedbackComments = joinedFeedbackComments.replaceAll("sesgado:", "");
     joinedFeedbackComments = joinedFeedbackComments.replaceAll("  ", " ");
 
-    console.log("===========================================");
-    console.log("COMMENTS PROCESSING");
-    console.log("===========================================");
-
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_KEY,
     });
@@ -254,10 +251,6 @@ async function processCoworkersOpenFeedback(
         commentClassifications.biased = sentiment.substring(8);
       }
     }
-
-    console.log("Positive comments: ", commentClassifications.positive);
-    console.log("Negative comments: ", commentClassifications.negative);
-    console.log("Biased comments: ", commentClassifications.biased);
 
     // ==================== RAG AND WEAKNESSES ANALYSIS ====================
 
@@ -543,10 +536,11 @@ async function orderProjectFeedback(
       answer: finalSurveyAnswer.answer,
     })
     .from(finalSurveyAnswer)
+    .innerJoin(question, eq(question.id, finalSurveyAnswer.questionId))
     .where(
       and(
         eq(question.type, "FINAL_PROJECT_QUESTION"),
-        eq(finalSurvey.id, finalSurveyId),
+        eq(finalSurveyAnswer.finalSurveyId, finalSurveyId),
       ),
     );
 
@@ -557,10 +551,11 @@ async function orderProjectFeedback(
       comment: finalSurveyAnswer.comment,
     })
     .from(finalSurveyAnswer)
+    .innerJoin(question, eq(question.id, finalSurveyAnswer.questionId))
     .where(
       and(
         eq(question.type, "FINAL_PROJECT_COMMENT"),
-        eq(finalSurvey.id, finalSurveyId),
+        eq(finalSurveyAnswer.finalSurveyId, finalSurveyId),
       ),
     );
 
@@ -645,9 +640,6 @@ async function getFeedbackClassifications(
         }
       } else {
         // add the negative skills of the question
-        console.log("Feedback: ", feedback[0]);
-        console.log("question Skills: ", questionsSkills[feedback[0]]);
-        console.log("questions: ", questionsSkills);
         const questionNegativeSkills = questionsSkills[feedback[0]].map(
           (skillId) => skillId as number,
         );
@@ -702,99 +694,24 @@ async function getQuestionsSkills(
   } else if (type === "FINAL_PROJECT_QUESTION") {
     questions = await db
       .select({
-        questionId: sprintSurveyQuestion.questionId,
+        questionId: finalSurveyAnswer.questionId,
       })
-      .from(sprintSurveyQuestion)
-      .innerJoin(question, eq(question.id, sprintSurveyQuestion.questionId))
-      .where(
-        and(
-          eq(sprintSurveyQuestion.sprintSurveyId, surveyId),
-          eq(question.type, "COWORKER_QUESTION"),
-        ),
-      );
+      .from(finalSurveyAnswer)
+      .innerJoin(question, eq(question.id, finalSurveyAnswer.questionId))
+      .where(eq(finalSurveyAnswer.finalSurveyId, surveyId));
   }
 
-  questions.forEach(async (question) => {
+  for (const question of questions) {
     const associatedSkills = await db
       .select({ skillId: questionSkill.skillId })
       .from(questionSkill)
       .where(eq(questionSkill.questionId, question.questionId as number));
     questionsSkills[question.questionId as number] = associatedSkills.map(
-      (element) => element.skillId as number,
+      (questionSkill) => questionSkill.skillId as number,
     );
-  });
+  }
 
   return questionsSkills;
-}
-
-export async function rulerAnalysis(
-  userId: string,
-  userComment: string,
-  emotionId: number,
-  sprintSurveyId: number,
-) {
-  const emotionInfo = await db
-    .select({
-      name: rulerEmotion.name,
-      description: rulerEmotion.description,
-      embedding: rulerEmotion.embedding,
-      pleasentess: rulerEmotion.pleasantness,
-      energy: rulerEmotion.energy,
-    })
-    .from(rulerEmotion)
-    .where(eq(rulerEmotion.id, emotionId));
-
-  // recommend tasks and resources only if the emotion is negative
-  const pleasentess = emotionInfo[0].pleasentess as number;
-  if (pleasentess < -3) {
-    const allResources = await db
-      .select({ id: pipResource.id, embedding: pipResource.embedding })
-      .from(pipResource);
-
-    let baseMessage: string = "Este es el estado de ánimo del usuario:\n";
-    baseMessage += ((emotionInfo[0].name as string) +
-      ": " +
-      emotionInfo[0].description) as string;
-
-    if (userComment !== "") {
-      baseMessage += "\n\n" + "Y estos son sus pensamientos:\n" + userComment;
-    }
-
-    const recommendedResourcesIds: number[] = await cosineSimilarity(
-      baseMessage,
-      allResources,
-    );
-
-    recommendedResourcesIds.splice(5);
-
-    const tasks: string[] = await createTasks(baseMessage);
-
-    tasks.forEach(async (task) => {
-      const [title, description] = task.split(":");
-      let newTitle = title;
-      let newDescription = description;
-      if (title.length > 64) {
-        newTitle = await reduceTask(title, 64);
-      }
-      if (description.length > 256) {
-        newDescription = await reduceTask(description, 256);
-      }
-      await db.insert(pipTask).values({
-        userId: userId,
-        title: newTitle,
-        description: newDescription,
-        sprintSurveyId: sprintSurveyId,
-      });
-    });
-
-    recommendedResourcesIds.forEach(async (resourceId) => {
-      await db.insert(userResource).values({
-        userId: userId,
-        resourceId: resourceId,
-        sprintSurveyId: sprintSurveyId,
-      });
-    });
-  }
 }
 
 async function setUserPCP(
@@ -896,6 +813,11 @@ async function setUserPCP(
     const tasks = await createTasks(stringWeaknesses);
 
     if (type === "SPRINT_SURVEY") {
+      console.log("=========================================");
+      console.log("=========================================");
+      console.log("INSERTING TASKS AND RESOURCES OF SPRINT SURVEY ", surveyId);
+      console.log("=========================================");
+      console.log("=========================================");
       for (const task of tasks) {
         const [title, description] = task.split(":");
         let newTitle = title;
@@ -953,10 +875,122 @@ async function setUserPCP(
   // set the strengths and weaknesses of the user
 }
 
-// Main function
-export async function feedbackAnalysis(sprintSurveyId: number) {
-  console.log(`*** PROCESSING SPRINTSURVEYID ${sprintSurveyId} ***`);
+export async function rulerAnalysis(userId: string) {
+  const rulerAnswers = await db
+    .select({
+      rulerSurveyId: rulerSurveyAnswers.id,
+      userId: rulerSurveyAnswers.userId,
+      emotionId: rulerSurveyAnswers.emotionId,
+      userComment: rulerSurveyAnswers.comment,
+      emotionName: rulerEmotion.name,
+      emotionDescription: rulerEmotion.description,
+      emotionPleasantness: rulerEmotion.pleasantness,
+    })
+    .from(rulerSurveyAnswers)
+    .innerJoin(rulerEmotion, eq(rulerEmotion.id, rulerSurveyAnswers.emotionId))
+    .where(
+      and(
+        eq(rulerSurveyAnswers.userId, userId),
+        eq(rulerSurveyAnswers.processed, false),
+      ),
+    )
+    .orderBy(desc(rulerSurveyAnswers.answeredAt));
 
+  // enough answers to recommend resources and tasks
+  if (rulerAnswers.length >= 5) {
+    console.log("=========================================");
+    console.log("=========================================");
+    console.log("START OF RULER ANALYSIS");
+    console.log("=========================================");
+    console.log("=========================================");
+    const rulerSurveyIds: number[] = [];
+    const lastRulerSurveyId: number = rulerAnswers[0].rulerSurveyId as number;
+    const uniqueEmotions = new Set<number>();
+    let scoresMean: number = 0;
+    let baseMessage = "";
+    let message = "";
+
+    rulerAnswers.forEach((answer) => {
+      // check if the emotionId is already in the set to create the message with unique emotions
+      if (!uniqueEmotions.has(answer.emotionId as number)) {
+        uniqueEmotions.add(answer.emotionId as number);
+        message =
+          answer.emotionName +
+          ": " +
+          answer.emotionDescription +
+          "\n" +
+          answer.userComment +
+          "\n\n";
+        baseMessage += message;
+      }
+      rulerSurveyIds.push(answer.rulerSurveyId as number);
+      scoresMean += answer.emotionPleasantness as number;
+    });
+
+    scoresMean /= rulerAnswers.length;
+
+    console.log("User score: ", scoresMean);
+
+    // the user has a negative emotional state
+    if (scoresMean < 0) {
+      const allResources = await db
+        .select({ id: pipResource.id, embedding: pipResource.embedding })
+        .from(pipResource);
+
+      const recommendedResourcesIds: number[] = await cosineSimilarity(
+        baseMessage,
+        allResources,
+      );
+
+      recommendedResourcesIds.splice(5);
+
+      console.log("=========================================");
+      console.log("INSERTING TASKS AND RESOURCES OF RULER ANALYSIS");
+      console.log("=========================================");
+
+      const tasks: string[] = await createTasks(baseMessage);
+
+      for (const task of tasks) {
+        const [title, description] = task.split(":");
+        let newTitle = title;
+        let newDescription = description;
+        if (title.length > 64) {
+          newTitle = await reduceTask(title, 64);
+        }
+        if (description.length > 256) {
+          newDescription = await reduceTask(description, 256);
+        }
+        await db.insert(pipTask).values({
+          userId: userId,
+          title: newTitle,
+          description: newDescription,
+          rulerSurveyId: lastRulerSurveyId,
+        });
+      }
+
+      const resourcesToInsert = recommendedResourcesIds.map((resourceId) => ({
+        userId: userId,
+        resourceId: resourceId,
+        rulerSurveyId: lastRulerSurveyId,
+      }));
+
+      await db.insert(userResource).values(resourcesToInsert);
+    }
+
+    console.log("=========================================");
+    console.log("=========================================");
+    console.log("END OF RULER ANALYSIS");
+    console.log("=========================================");
+    console.log("=========================================");
+
+    await db
+      .update(rulerSurveyAnswers)
+      .set({ processed: true })
+      .where(inArray(rulerSurveyAnswers.id, rulerSurveyIds));
+  }
+}
+
+export async function feedbackAnalysis(sprintSurveyId: number) {
   const processedSurvey = await db
     .select({ processed: sprintSurvey.processed })
     .from(sprintSurvey)
@@ -967,7 +1001,9 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
   // analyze survey only if it has not been processed
   if (notProcessedSurvey) {
     console.log("=========================================");
-    console.log("START OF SPRINT ANALYSIS");
+    console.log("=========================================");
+    console.log("START OF SPRINT ANALYSIS: ", sprintSurveyId);
+    console.log("=========================================");
     console.log("=========================================");
 
     const uniqueProjectUsers = await db
@@ -991,11 +1027,8 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
       "COWORKER_QUESTION",
     );
 
-    console.log("=====================, questionSkills: ", questionsSkills);
-
     // iterate through each unique user of the project and read the feedback received
     for (const userId of Object.keys(orderedFeedback)) {
-      console.log(userId);
       const userTasksCount = await db
         .select({ count: count() })
         .from(pipTask)
@@ -1024,7 +1057,7 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
             questionsSkills,
           );
 
-        setUserPCP(
+        await setUserPCP(
           userId,
           orderedFeedback[userId],
           sprintSurveyId,
@@ -1039,7 +1072,9 @@ export async function feedbackAnalysis(sprintSurveyId: number) {
       .where(eq(sprintSurvey.id, sprintSurveyId));
   }
   console.log("=========================================");
-  console.log("END OF SPRINT ANALYSIS");
+  console.log("=========================================");
+  console.log("END OF SPRINT ANALYSIS: ", sprintSurveyId);
+  console.log("=========================================");
   console.log("=========================================");
 }
 
@@ -1053,6 +1088,12 @@ export async function projectAnalysis(finalSurveyId: number) {
 
   // analyze survey only if it has not been processed
   if (notProcessedFinalSurvey) {
+    console.log("=========================================");
+    console.log("=========================================");
+    console.log("START OF FINAL PROJECT ANALYSIS: ", finalSurveyId);
+    console.log("=========================================");
+    console.log("=========================================");
+
     const manager = await db
       .select({ managerId: project.managerId })
       .from(finalSurvey)
@@ -1091,7 +1132,7 @@ export async function projectAnalysis(finalSurveyId: number) {
         questionsSkills,
       );
 
-    setUserPCP(
+    await setUserPCP(
       managerId,
       orderedFeedback[managerId],
       finalSurveyId,
@@ -1103,4 +1144,9 @@ export async function projectAnalysis(finalSurveyId: number) {
       .set({ processed: true })
       .where(eq(finalSurvey.id, finalSurveyId));
   }
+  console.log("=========================================");
+  console.log("=========================================");
+  console.log("END OF FINAL PROJECT ANALYSIS: ", finalSurveyId);
+  console.log("=========================================");
+  console.log("=========================================");
 }
