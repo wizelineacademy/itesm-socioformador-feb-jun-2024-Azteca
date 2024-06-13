@@ -324,7 +324,7 @@ const Project = ({ params }: { params: { projectId: string } }) => {
             <div className="w-full rounded-full bg-gray-200 p-1">
               <div
                 className="h-6 rounded-full bg-gradient-to-r from-green-400 via-yellow-400 to-orange-500"
-                style={{ width: `${employeeOverload}%`}}
+                style={{ width: `${employeeOverload}%` }}
               ></div>
             </div>
           </div>
