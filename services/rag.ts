@@ -428,8 +428,8 @@ async function orderCoworkersFeedback(
 
   const coworkersOpenFeedback = await db
     .select({
-      userId: sprintSurveyAnswerCoworkers.userId,
-      coworkerId: sprintSurveyAnswerCoworkers.coworkerId,
+      userId: sprintSurveyAnswerCoworkers.coworkerId,
+      coworkerId: sprintSurveyAnswerCoworkers.userId,
       questionId: sprintSurveyAnswerCoworkers.questionId,
       comment: sprintSurveyAnswerCoworkers.comment,
     })
@@ -451,8 +451,8 @@ async function orderCoworkersFeedback(
 
   const coworkersClosedFeedback = await db
     .select({
-      userId: sprintSurveyAnswerCoworkers.userId,
-      coworkerId: sprintSurveyAnswerCoworkers.coworkerId,
+      userId: sprintSurveyAnswerCoworkers.coworkerId,
+      coworkerId: sprintSurveyAnswerCoworkers.userId,
       questionId: sprintSurveyAnswerCoworkers.questionId,
       answer: sprintSurveyAnswerCoworkers.answer,
     })

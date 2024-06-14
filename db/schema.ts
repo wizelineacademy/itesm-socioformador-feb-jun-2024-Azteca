@@ -88,9 +88,15 @@ export const pipTask = pgTable("pip_task", {
   id: serial("id").primaryKey(),
   rulerSurveyId: integer("ruler_survey_id").references(
     () => rulerSurveyAnswers.id,
+    { onDelete: "cascade" },
   ),
-  sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
-  finalSurveyId: integer("final_survey_id").references(() => finalSurvey.id),
+  sprintSurveyId: integer("sprint_survey_id").references(
+    () => sprintSurvey.id,
+    { onDelete: "cascade" },
+  ),
+  finalSurveyId: integer("final_survey_id").references(() => finalSurvey.id, {
+    onDelete: "cascade",
+  }),
   userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 64 }),
   description: varchar("description", { length: 256 }),
@@ -124,11 +130,15 @@ export const userResource = pgTable(
     }),
     rulerSurveyId: integer("ruler_survey_id").references(
       () => rulerSurveyAnswers.id,
+      { onDelete: "cascade" },
     ),
     sprintSurveyId: integer("sprint_survey_id").references(
       () => sprintSurvey.id,
+      { onDelete: "cascade" },
     ),
-    finalSurveyId: integer("final_survey_id").references(() => finalSurvey.id),
+    finalSurveyId: integer("final_survey_id").references(() => finalSurvey.id, {
+      onDelete: "cascade",
+    }),
   },
   // composite primary key on (userId, resourceId)
 );
@@ -189,7 +199,10 @@ export const pipResourceSkill = pgTable("pip_resource_skill", {
 });
 
 export const sprintSurveyQuestion = pgTable("sprint_survey_question", {
-  sprintSurveyId: integer("sprint_survey_id").references(() => sprintSurvey.id),
+  sprintSurveyId: integer("sprint_survey_id").references(
+    () => sprintSurvey.id,
+    { onDelete: "cascade" },
+  ),
   questionId: integer("question_id").references(() => question.id),
 });
 
