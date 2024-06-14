@@ -27,17 +27,20 @@ interface SprintSurveyProps {
   showModal: boolean;
   onClose: () => void;
   sprintSurveyId: number;
+  projectId: number;
 }
 
 const SprintSurvey = ({
   showModal,
   onClose,
   sprintSurveyId,
+  projectId,
 }: SprintSurveyProps) => {
   const [step, setStep] = useState<number>(1);
   const { data: users, isError } = useQuery({
-    queryKey: ["coworkers", 34],
-    queryFn: () => getCoworkersInProject(34),
+    queryKey: ["coworkers", sprintSurveyId],
+    queryFn: () => getCoworkersInProject(sprintSurveyId),
+    enabled: !!projectId,
   });
 
   const { data: userId } = useQuery({
