@@ -876,9 +876,14 @@ async function setUserPCP(
     const oldWeaknesses: Set<number> = new Set();
 
     const oldWeaknessesArray = await db
-      .select({ skillId: skill.id })
+      .select({ skillId: userSkill.skillId })
       .from(userSkill)
-      .where(eq(userSkill.userId, userId));
+      .where(
+        and(
+          eq(userSkill.userId, userId),
+          eq(userSkill.kind, "AREA_OF_OPPORTUNITY"),
+        ),
+      );
 
     oldWeaknessesArray.forEach((userWeakness) => {
       oldWeaknesses.add(userWeakness.skillId as number);
@@ -906,9 +911,9 @@ async function setUserPCP(
   const oldStrengths: Set<number> = new Set();
 
   const oldStrengthsArray = await db
-    .select({ skillId: skill.id })
+    .select({ skillId: userSkill.skillId })
     .from(userSkill)
-    .where(eq(userSkill.userId, userId));
+    .where(and(eq(userSkill.userId, userId), eq(userSkill.kind, "STRENGTH")));
 
   oldStrengthsArray.forEach((userStrength) => {
     oldStrengths.add(userStrength.skillId as number);
