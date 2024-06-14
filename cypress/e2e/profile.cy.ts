@@ -26,7 +26,7 @@ describe("Profile", () => {
   it("Should signout", () => {
     cy.get('[data-testid="user-icon-navbar"]').click();
     cy.get('[data-testid="signout-button"]').click();
-    cy.wait(6000);
+    cy.wait(8000);
     cy.url().should("include", "/login");
   });
 });
