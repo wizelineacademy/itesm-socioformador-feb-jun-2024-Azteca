@@ -196,21 +196,22 @@ export async function getUserSkillsById(id: string) {
       and(eq(userSkill.userId, id), eq(userSkill.kind, "AREA_OF_OPPORTUNITY")),
     );
 
-  const strengthsSet = strengths.filter((s) => {
-    const set = new Set();
-    if (set.has(s.name)) return false;
-    set.add(s.name);
+  const strengthsSet = new Set();
+  const uniqueStrengths = strengths.filter((s) => {
+    if (strengthsSet.has(s.name)) return false;
+    strengthsSet.add(s.name);
     return true;
   });
-  const areasOppSet = areasOfOportunity.filter((s) => {
-    const set = new Set();
-    if (set.has(s.name)) return false;
-    set.add(s.name);
+
+  const areasOppSet = new Set();
+  const uniqueAreasOfOpportunity = areasOfOportunity.filter((s) => {
+    if (areasOppSet.has(s.name)) return false;
+    areasOppSet.add(s.name);
     return true;
   });
   const traits = {
-    strengths: strengthsSet,
-    areasOfOportunity: areasOppSet,
+    strengths: uniqueStrengths,
+    areasOfOportunity: uniqueAreasOfOpportunity,
   };
   return traits;
 }
