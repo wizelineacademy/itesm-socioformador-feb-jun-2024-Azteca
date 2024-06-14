@@ -49,6 +49,8 @@ const BannerImagePanel = ({ closeModal }: { closeModal: () => void }) => {
               src={src}
               alt={`Banner ${index + 1}`}
               className="cursor-pointer"
+              width={200}
+              height={200}
             />
           </button>
         ))}

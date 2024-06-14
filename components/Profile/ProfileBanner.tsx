@@ -41,6 +41,8 @@ const ProfileBanner: React.FC<ProfileBannerProps> = async ({ user }) => {
           src={`/${user.bannerId}` || "/Banner1.svg"}
           alt="Banner"
           className="hidden h-auto w-56 md:block"
+          width={100}
+          height={100}
         />
       </div>
     </section>

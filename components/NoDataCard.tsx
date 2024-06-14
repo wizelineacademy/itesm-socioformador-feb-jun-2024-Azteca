@@ -7,7 +7,13 @@ interface NoDataCardProps {
 const NoDataCard = ({ text }: NoDataCardProps) => {
   return (
     <div className="flex flex-col items-center justify-center">
-      <img src={"/NoData.svg"} alt="NoDataSVG" className="hidden md:block" />
+      <img
+        src={"/NoData.svg"}
+        alt="NoDataSVG"
+        className="hidden md:block"
+        height={70}
+        width={100}
+      />
       <p className="text-center text-sm font-medium text-grayText">{text}</p>
     </div>
   );
