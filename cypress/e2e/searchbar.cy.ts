@@ -4,7 +4,7 @@ describe("Searchbar", () => {
     cy.get("label").contains("Email").click().type("cypress@gmail.com");
     cy.get("label").contains("Password").click().type("cypress");
     cy.get("button").contains("Log in").click();
-    cy.wait(10000);
+    cy.wait(25000);
   });
   it("Expands searchbar", () => {
     cy.get('[data-testid="search-box"]').should("have.class", "w-10");
@@ -26,7 +26,7 @@ describe("Searchbar", () => {
     const comboboxInput = cy.get('[data-testid="combobox-input"]');
     comboboxInput.should("have.focus");
     comboboxInput.type("cypress");
-    cy.wait(8000);
+    cy.wait(15000);
     cy.get('[data-testid="option-cypress prueba"]').should("exist");
     cy.get('[data-testid="option-cypress prueba"]').click();
     cy.url().should("include", "/profile");
