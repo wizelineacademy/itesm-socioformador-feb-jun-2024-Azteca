@@ -31,6 +31,7 @@ const SprintDropRow = ({
       </div>
       {colors.map((color, index) => (
         <SprintDropRowBox
+          data-testid={`droppable-box-${index}`}
           key={index}
           index={index}
           color={color}

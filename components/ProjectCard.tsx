@@ -66,7 +66,7 @@ export default async function ProjectCard({
       <Link
         data-testid={`project-${id}-link`}
         href={`/projects/${id}`}
-        className="flex h-9 w-9 items-center justify-center rounded-full bg-primary"
+        className="flex h-9 w-9 items-center justify-center rounded-full bg-primary hover:bg-primary-dark"
       >
         <ChevronRightIcon size="h-6 w-6" color="white" />
       </Link>

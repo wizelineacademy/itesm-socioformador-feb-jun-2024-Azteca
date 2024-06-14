@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { searchUsers } from "@/services/user";
 import SearchBar from "./SearchBar";
 import UserProfileButton from "./UserProfileButton";
+import Spinner from "./Spinner";
 
 interface Person {
   id: number;
@@ -60,8 +61,8 @@ const ComboBoxSearch = () => {
             className="absolute z-10 mt-1 max-h-52 w-full overflow-auto rounded-md border border-gray-300 bg-white p-2 shadow-lg empty:hidden"
           >
             {isLoading ? (
-              <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
-                Loading...
+              <div className="flex w-full py-2">
+                <Spinner />
               </div>
             ) : people.length === 0 && query !== "" ? (
               <div className="relative cursor-default select-none px-4 py-2 text-gray-700">

@@ -24,6 +24,7 @@ import ArticleIcon from "@/components/icons/ArticleIcon";
 import Link from "next/link";
 import ChevronRightIcon from "@/components/icons/ChevronRightIcon";
 import Loader from "@/components/Loader";
+import toast from "react-hot-toast";
 import { RulerTask, RulerResource } from "@/types/types";
 
 const statusOptions = [
@@ -258,6 +259,7 @@ const PCPTasks = ({
       queryClient.invalidateQueries({
         queryKey: ["tasks-history", projectId],
       });
+      toast.success("Task status updated successfully");
 
       const tasks = queryClient.getQueryData<SelectPipTask[]>([
         "tasks",
@@ -269,6 +271,9 @@ const PCPTasks = ({
         setProgressPercentage((doneTasks / totalTasks) * 100);
       }
     },
+    onError: () => {
+      toast.error("Error updating task status");
+    },
   });
 
   return (
@@ -277,6 +282,7 @@ const PCPTasks = ({
         <div className="mx-auto flex justify-between">
           <h3 className="text-3xl font-medium text-black">Tasks</h3>
           <button
+            data-testid="show-task-history"
             className="cursor-pointer self-center text-sm text-graySubtitle"
             onClick={openDialog}
           >
@@ -330,6 +336,17 @@ const PCPTasksDialogContent = ({ projectId }: { projectId: number }) => {
 
   const { mutateAsync } = useMutation({
     mutationFn: updateTask,
+    onSuccess: () => {
+      console.log("success");
+      queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
+      queryClient.invalidateQueries({
+        queryKey: ["tasks-history", projectId],
+      });
+      toast.success("Task status updated successfully");
+    },
+    onError: () => {
+      toast.error("Error updating task status");
+    },
   });
 
   if (tasksHistoryQuery.data && typeof tasksHistoryQuery.data === "string") {
@@ -349,7 +366,7 @@ const PCPTasksDialogContent = ({ projectId }: { projectId: number }) => {
   };
 
   return (
-    <div>
+    <div data-testid="pcp-task-history">
       {tasksHistoryQuery.data.map((sprint) => (
         <div key={sprint.id}>
           {sprint.scheduledAt && (
@@ -386,6 +403,7 @@ const PCPTasksDialogContent = ({ projectId }: { projectId: number }) => {
                     <Menu as="div" className="relative inline-block text-left">
                       <div className="flex items-center">
                         <Menu.Button
+                          data-testid={``}
                           className={`h-6 w-6 transform cursor-pointer rounded-full border ${currentStatusOption.color} outline-${currentStatusOption.color} transition-all duration-200 ease-in-out hover:scale-110`}
                         >
                           <span className="sr-only">Change status</span>
@@ -405,12 +423,6 @@ const PCPTasksDialogContent = ({ projectId }: { projectId: number }) => {
                                       taskId: task.id,
                                       newStatus:
                                         option.value as typeof task.status,
-                                    });
-                                    await queryClient.invalidateQueries({
-                                      queryKey: ["tasks", projectId],
-                                    });
-                                    await queryClient.invalidateQueries({
-                                      queryKey: ["tasks-history", projectId],
                                     });
                                   }}
                                 >
@@ -465,17 +477,22 @@ const PCPTask = ({
           <Menu as="div" className="relative inline-block text-left">
             <div>
               <Menu.Button
+                data-testid="task-status-button"
                 className={`h-6 w-6 transform cursor-pointer rounded-full border ${selectedStatus.color} outline-${selectedStatus.color} transition-all duration-200 ease-in-out hover:scale-110`}
               >
                 <span className="sr-only">Change status</span>
               </Menu.Button>
             </div>
-            <Menu.Items className="absolute right-0 mt-2 w-44 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <Menu.Items
+              data-testid="task-status-options"
+              className="absolute right-0 mt-2 w-44 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+            >
               <div className="py-1">
                 {statusOptions.map((option) => (
                   <Menu.Item key={option.value}>
                     {({ active }) => (
                       <button
+                        data-testid={option.value}
                         className={`${
                           active ? "bg-gray-100" : ""
                         } group flex w-full items-center px-4 py-2 text-sm text-gray-700`}
@@ -607,6 +624,7 @@ const PCPResource = ({ resource }: { resource: SelectPipResource }) => {
       </p>
       <button className="mx-auto w-fit rounded-full bg-primary px-7 py-1 text-xs font-medium text-white">
         <Link
+          data-testid="resource-link"
           target="_blank"
           href={`https://www.google.com/search?q=${resource.title}`}
         >
@@ -645,7 +663,7 @@ const PCPResourcesDialogContent = ({ projectId }: { projectId: number }) => {
   };
 
   return (
-    <div>
+    <div data-testid="pcp-resource-history">
       {resourcesHistoryQuery.data.map((sprint) => (
         <div key={sprint.id}>
           {sprint.scheduledAt && (
