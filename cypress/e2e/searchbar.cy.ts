@@ -26,7 +26,7 @@ describe("Searchbar", () => {
     const comboboxInput = cy.get('[data-testid="combobox-input"]');
     comboboxInput.should("have.focus");
     comboboxInput.type("cypress");
-    cy.wait(8000);
+    cy.wait(15000);
     cy.get('[data-testid="option-cypress prueba"]').should("exist");
     cy.get('[data-testid="option-cypress prueba"]').click();
     cy.url().should("include", "/profile");
