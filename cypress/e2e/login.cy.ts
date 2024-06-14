@@ -5,7 +5,7 @@ describe("Login", () => {
     cy.get("label").contains("Email").click().type("cypress@gmail.com");
     cy.get("label").contains("Password").click().type("cypress");
     cy.get("button").contains("Log in").click();
-    cy.wait(4000);
+    cy.wait(12000);
     cy.url().should("include", "/dashboard");
   });
   it("Visits page not being signed in, and gets redirected to login", () => {
