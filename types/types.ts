@@ -74,6 +74,7 @@ export type Notification = {
   id: number;
   projectName: string;
   date: Date;
+  projectId: number;
   type: "RULER" | "SPRINT" | "FINAL" | "UNKNOWN";
 };
 

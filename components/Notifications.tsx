@@ -18,6 +18,7 @@ const Notifications = () => {
   const [showSprintModal, setShowSprintModal] = useState<boolean>(false);
   const [showRulerModal, setShowRulerModal] = useState<boolean>(false);
   const [notificationId, setNotificationId] = useState<number>(0);
+  const [projectId, setProjectId] = useState<number>(0);
 
   useEffect(() => {
     const onClickOutsideButton = (e: MouseEvent) => {
@@ -61,6 +62,7 @@ const Notifications = () => {
     notification: Notification,
   ): void => {
     setNotificationId(notification.id);
+    setProjectId(notification.projectId);
     onNotificationClick(notification.type);
     setIsActive(false);
   };
@@ -90,6 +92,7 @@ const Notifications = () => {
           showModal={showSprintModal}
           onClose={() => setShowSprintModal(false)}
           sprintSurveyId={notificationId}
+          projectId={projectId}
         />
       )}
 
