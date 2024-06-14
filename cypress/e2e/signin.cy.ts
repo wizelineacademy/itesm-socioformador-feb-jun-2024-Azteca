@@ -22,7 +22,7 @@ describe("Register", () => {
   });
 
   it("Visits Register page, and signs up with an existing email", () => {
-    cy.get("label").contains("Name").click().type("Cypress prueba");
+    cy.get("label").contains("Name").click().type("prueba");
     cy.get("label").contains("Email").click().type("cypress2@gmail.com");
     cy.get("label").contains("Password").click().type("cypress");
     cy.get("label").contains("Job Title").click().type("Cypress");
