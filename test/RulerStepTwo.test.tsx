@@ -23,7 +23,12 @@ describe("RulerSurvey Component Test", () => {
     mockSetComment = vi.fn();
   });
 
-  // Pedro Alonso Moreno Salcedo A01741437 - Test #6/10
+  /* 
+    Pedro Alonso Moreno Salcedo A01741437 - Test #6/10
+
+    This test verifies that the Ruler Survey comment
+    (the step two of that survey) is rendered correctly
+  */
   it("Should render step two", () => {
     render(
       <RulerStepTwo
@@ -36,7 +41,13 @@ describe("RulerSurvey Component Test", () => {
     expect(screen.getByTestId("ruler-step-two")).toBeInTheDocument();
   });
 
-  // Pedro Alonso Moreno Salcedo A01741437 - Test #7/10
+  /* 
+    Pedro Alonso Moreno Salcedo A01741437 - Test #7/10
+
+    This test verifies that the Ruler Survey comment
+    (the step two of that survey) calls the setComment
+    function once the user types on the input
+  */
   it("Should set a comment", () => {
     render(
       <RulerStepTwo
@@ -53,7 +64,13 @@ describe("RulerSurvey Component Test", () => {
     expect(mockSetComment).toHaveBeenCalledTimes(1);
   });
 
-  // Pedro Alonso Moreno Salcedo A01741437 - Test #8/10
+  /* 
+    Pedro Alonso Moreno Salcedo A01741437 - Test #8/10
+
+    This test verifies that the Ruler Survey comment
+    (the step two of that survey) goes back when the
+    back-button is pressed
+  */
   it("Should go back", () => {
     render(
       <RulerStepTwo

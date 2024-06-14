@@ -29,14 +29,27 @@ vi.mock("react", () => {
 });
 
 describe("Should render SprintSurveyStepTwo", () => {
-  // Pedro Alonso Moreno Salcedo A01741437 - Test #9/10
+  /* 
+    Pedro Alonso Moreno Salcedo A01741437 - Test #9/10
+
+    This test verifies that the DraggableUser component
+    that is used in the Drag & Drop gamification of the 
+    Sprint Survey is rendered correctly
+  */
   it("Should render dragUser", () => {
     customDndProvider(<DraggableUser user={users[0]} times={2} />, vi.fn());
     const draggableUser = screen.getByTestId("draggable-1");
     expect(draggableUser).toBeInTheDocument();
   });
 
-  // Pedro Alonso Moreno Salcedo A01741437 - Test #10/10
+  /* 
+    Pedro Alonso Moreno Salcedo A01741437 - Test #10/10
+    
+    This test verifies that the DraggableUser component
+    that is used in the Drag & Drop gamification of the 
+    Sprint Survey is not rendered when the 'times' prop 
+    is empty (meaning there's zero users left)
+  */
   it("Should not render dragUser", () => {
     customDndProvider(<DraggableUser user={users[0]} />, vi.fn());
     const draggableUser = screen.getByTestId(`draggable-${users[0].userId}`);
