@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -7,10 +6,8 @@ export default function Forbbiden() {
   const pathName = usePathname();
   return (
     <main className="w-dvh flex h-dvh flex-col items-center justify-center">
-      <Image
+      <img
         src={"/FeedbackFlowLogo.png"}
-        width={350}
-        height={350}
         alt="Logo Feedback Flow"
         className="absolute -bottom-0 -right-0 hidden opacity-60 md:block"
       />

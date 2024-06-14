@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { updateBannerId } from "@/services/user";
-import Image from "next/image";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
@@ -46,13 +45,10 @@ const BannerImagePanel = ({ closeModal }: { closeModal: () => void }) => {
             className={`rounded border-2 ${selectedImage === index ? "border-primary" : "border-transparent"}`}
             onClick={() => handleImageClick(index)}
           >
-            <Image
+            <img
               src={src}
               alt={`Banner ${index + 1}`}
               className="cursor-pointer"
-              width={200}
-              height={200}
-              layout="responsive"
             />
           </button>
         ))}

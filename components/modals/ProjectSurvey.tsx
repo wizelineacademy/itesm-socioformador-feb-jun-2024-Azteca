@@ -27,15 +27,6 @@ const ProjectSurvey = ({
   const router = useRouter();
   const { mutate } = useMutation({
     mutationFn: submitProjectAnswer,
-    onSuccess: () => {
-      router.refresh();
-      toast.success("Encuesta enviada exitosamente!");
-      onClose();
-    },
-    onError: () => {
-      toast.error("Error al enviar la encuesta");
-      onClose();
-    },
   });
 
   const { data: userId } = useQuery({
@@ -88,6 +79,7 @@ const ProjectSurvey = ({
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["notifications"] });
+          router.refresh();
           toast.success("Encuesta enviada exitosamente!");
           onClose();
         },

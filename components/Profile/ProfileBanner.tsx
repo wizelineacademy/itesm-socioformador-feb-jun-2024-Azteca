@@ -1,6 +1,5 @@
 import React from "react";
 import UserProfileButton from "@/components/UserProfileButton";
-import Image from "next/image";
 import Link from "next/link";
 import { User } from "@/types/types";
 import { getUserId, getUserManagedBy } from "@/services/user";
@@ -37,14 +36,11 @@ const ProfileBanner: React.FC<ProfileBannerProps> = async ({ user }) => {
             </Link>
           )}
         </div>
-        <Image
+        <img
           data-testid={user.bannerId}
           src={`/${user.bannerId}` || "/Banner1.svg"}
-          alt="Banner Image"
-          width={100}
-          height={100}
+          alt="Banner"
           className="hidden h-auto w-56 md:block"
-          priority
         />
       </div>
     </section>

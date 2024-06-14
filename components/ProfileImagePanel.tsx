@@ -41,7 +41,7 @@ const ProfileImagePanel = ({ closeModal }: { closeModal: () => void }) => {
       <Image
         key={index}
         src={imageUrl}
-        alt="Image Preview"
+        alt="Uploading"
         onLoad={() => URL.revokeObjectURL(imageUrl)}
         style={{
           width: "200px",
