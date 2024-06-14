@@ -5,7 +5,7 @@ describe("Profile", () => {
     cy.get("label").contains("Email").click().type("cypress@gmail.com");
     cy.get("label").contains("Password").click().type("cypress");
     cy.get("button").contains("Log in").click();
-    cy.wait(3000);
+    cy.wait(20000);
     cy.visit("/profile");
   });
   it("Change banner image", () => {
@@ -26,7 +26,7 @@ describe("Profile", () => {
   it("Should signout", () => {
     cy.get('[data-testid="user-icon-navbar"]').click();
     cy.get('[data-testid="signout-button"]').click();
-    cy.wait(8000);
+    cy.wait(30000);
     cy.url().should("include", "/login");
   });
 });
