@@ -74,7 +74,7 @@ export type Notification = {
   id: number;
   projectName: string;
   date: Date;
-  type: "RULER" | "SPRINT" | "FINAL";
+  type: "RULER" | "SPRINT" | "FINAL" | "UNKNOWN";
 };
 
 export type Emotion = {

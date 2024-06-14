@@ -9,4 +9,13 @@ describe("PCP", () => {
     cy.visit("/pcp");
     cy.wait(8000);
   });
+
+  it("Should change the status of the task", () => {
+    const statusButton = cy.get('[data-testid="task-status-button"]');
+    statusButton.should("exist");
+    statusButton.click();
+    cy.get('[data-testid="IN_PROGRESS"]').click();
+
+    cy.get("div").contains("Task status updated successfully").should("exist");
+  });
 });
