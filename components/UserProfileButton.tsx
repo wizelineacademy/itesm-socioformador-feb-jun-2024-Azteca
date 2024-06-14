@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 interface UserProfileButtonProps {
   active?: boolean;
   photoUrl?: string | null | undefined;
@@ -27,13 +25,11 @@ const UserProfileButton = ({
       className={`${className} ${active ? "bg-primary" : "bg-white"} group h-fit w-fit rounded-full p-1 drop-shadow-lg focus-within:outline-primary focus:outline-primary`}
     >
       {photoUrl ? (
-        <Image
+        <img
           id="user-profile-photo"
           src={photoUrl}
-          alt={"User profile photo"}
+          alt={"User"}
           className={`rounded-full ${sizes[size]}`}
-          width={300}
-          height={300}
         />
       ) : (
         <svg
