@@ -156,7 +156,6 @@ export async function getCoworkersInProject(sprintSurveyId: number) {
       ),
     );
 
-  console.log(coworkers);
   return coworkers;
 }
 
