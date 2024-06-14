@@ -30,6 +30,7 @@ const GrowthCircle = ({
 
   return (
     <svg
+      data-testid="growth-circle-svg"
       width={size}
       height={size}
       viewBox={`0 0 ${size} ${size}`}
@@ -41,7 +42,13 @@ const GrowthCircle = ({
           <stop offset="100%" stopColor={gradient.end} />
         </linearGradient>
       </defs>
-      <circle cx={radius} cy={radius} r={radius} fill={`url(#${gradientId})`} />
+      <circle
+        data-testid="growth-circle"
+        cx={radius}
+        cy={radius}
+        r={radius}
+        fill={`url(#${gradientId})`}
+      />
       <text
         x="50%"
         y="50%"

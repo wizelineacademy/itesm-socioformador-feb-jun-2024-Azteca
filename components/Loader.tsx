@@ -2,15 +2,23 @@ import "@/public/Loader.css";
 
 const Loader = () => {
   return (
-    <section className="m-auto flex h-full w-full flex-col items-center justify-center">
-      <div className="container">
-        <div className="box" />
-        <div className="box" />
-        <div className="box" />
-        <div className="box" />
-        <div className="box" />
+    <section
+      data-testid="loader-section"
+      className="m-auto flex h-full w-full flex-col items-center justify-center"
+    >
+      <div className="container" data-testid="loader-container">
+        <div className="box" data-testid="loader-box" />
+        <div className="box" data-testid="loader-box" />
+        <div className="box" data-testid="loader-box" />
+        <div className="box" data-testid="loader-box" />
+        <div className="box" data-testid="loader-box" />
       </div>
-      <p className="mt-4 text-xl font-medium text-primary">Cargando...</p>
+      <p
+        data-testid="loader-text"
+        className="mt-4 text-xl font-medium text-primary"
+      >
+        Cargando...
+      </p>
     </section>
   );
 };
