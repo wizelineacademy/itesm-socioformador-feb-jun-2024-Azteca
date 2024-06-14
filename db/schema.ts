@@ -247,6 +247,9 @@ export const finalSurvey = pgTable("final_survey", {
   isProcessing: boolean("is_processing").default(false).notNull(),
 });
 
+export type SelectFinalSurvey = typeof finalSurvey.$inferSelect;
+export type InsertFinalSurvey = typeof finalSurvey.$inferInsert;
+
 export const finalSurveyAnswer = pgTable(
   "final_survey_answer",
   {

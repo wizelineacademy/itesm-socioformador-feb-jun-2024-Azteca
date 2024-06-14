@@ -353,7 +353,7 @@ const PCPTasksDialogContent = ({ projectId }: { projectId: number }) => {
       {tasksHistoryQuery.data.map((sprint) => (
         <div key={sprint.id}>
           {sprint.scheduledAt && (
-            <p className="py-1 text-lg font-medium">{`Sprint ${formatDate(sprint.scheduledAt)}`}</p>
+            <p className="py-1 text-lg font-medium">{`${sprint.type === "SPRINT" ? "Sprint" : "Final"} Survey ${formatDate(sprint.scheduledAt)}`}</p>
           )}
           {sprint.processed ? (
             sprint.tasks.map((task) => {
@@ -649,7 +649,7 @@ const PCPResourcesDialogContent = ({ projectId }: { projectId: number }) => {
       {resourcesHistoryQuery.data.map((sprint) => (
         <div key={sprint.id}>
           {sprint.scheduledAt && (
-            <p className="py-1 text-lg font-medium">{`Sprint ${formatDate(sprint.scheduledAt)}`}</p>
+            <p className="py-1 text-lg font-medium">{`${sprint.type === "SPRINT" ? "Sprint" : "Final"} Survey ${formatDate(sprint.scheduledAt)}`}</p>
           )}
           {sprint.processed ? (
             sprint.resources.map((resource) => (
