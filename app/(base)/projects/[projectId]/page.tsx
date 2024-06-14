@@ -101,30 +101,28 @@ const Project = ({ params }: { params: { projectId: string } }) => {
   const getMonthName = (monthNumber: number) => {
     return monthNames[monthNumber - 1];
   };
-  const radarData = statistics
-    ? [
-        {
-          statistic: "Communication",
-          punctuation: statistics.communication,
-        },
-        {
-          statistic: "Motivation",
-          punctuation: statistics.motivation,
-        },
-        {
-          statistic: "Coworker Support",
-          punctuation: statistics.coworkerSupport,
-        },
-        {
-          statistic: "Manager Support",
-          punctuation: statistics.managerSupport,
-        },
-        {
-          statistic: "Punctuality",
-          punctuation: statistics.punctuality,
-        },
-      ]
-    : [];
+  const radarData = [
+    {
+      statistic: "Communication",
+      punctuation: statistics ? statistics.communication : 0,
+    },
+    {
+      statistic: "Motivation",
+      punctuation: statistics ? statistics.motivation : 0,
+    },
+    {
+      statistic: "Coworker Support",
+      punctuation: statistics ? statistics.coworkerSupport : 0,
+    },
+    {
+      statistic: "Manager Support",
+      punctuation: statistics ? statistics.managerSupport : 0,
+    },
+    {
+      statistic: "Punctuality",
+      punctuation: statistics ? statistics.punctuality : 0,
+    },
+  ];
   const areaData = growthData
     ? growthData.growthSupportData.map((item, index) => ({
         month: getMonthName(item.month),
@@ -308,12 +306,12 @@ const Project = ({ params }: { params: { projectId: string } }) => {
                 <p className="pb-2 text-lg font-medium">Employee Overload</p>
                 <p className="pb-2 text-5xl font-semibold">{`${employeeOverload}%`}</p>
               </div>
-              <div>
+              {/* <div>
                 <div>
                   <p className="text-md text-red-600">+ 3.1%</p>
                   <p className="text-sm text-grayText">to last week</p>
                 </div>
-              </div>
+              </div> */}
             </div>
             <div className="absolute right-[-6px] top-[-6px]">
               <InfoToolTip

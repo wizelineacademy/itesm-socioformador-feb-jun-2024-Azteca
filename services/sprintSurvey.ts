@@ -6,8 +6,8 @@ import {
   sprintSurvey,
   sprintSurveyAnswerCoworkers,
   sprintSurveyAnswerProject,
-  projectMember,
   finalSurveyAnswer,
+  finalSurvey,
 } from "@/db/schema";
 import { eq, or, sql, and, inArray } from "drizzle-orm";
 
@@ -124,13 +124,13 @@ export async function getOverallStatistics(projectId: number) {
       ),
     })
     .from(sprintSurveyAnswerCoworkers)
-    .innerJoin(
-      projectMember,
-      eq(sprintSurveyAnswerCoworkers.coworkerId, projectMember.userId),
+    .leftJoin(
+      sprintSurvey,
+      eq(sprintSurvey.id, sprintSurveyAnswerCoworkers.sprintSurveyId),
     )
     .where(
       and(
-        eq(projectMember.projectId, projectId),
+        eq(sprintSurvey.projectId, projectId),
         eq(sprintSurveyAnswerCoworkers.questionId, 31),
       ),
     );
@@ -145,17 +145,16 @@ export async function getOverallStatistics(projectId: number) {
       ),
     })
     .from(sprintSurveyAnswerCoworkers)
-    .innerJoin(
-      projectMember,
-      eq(sprintSurveyAnswerCoworkers.coworkerId, projectMember.userId),
+    .leftJoin(
+      sprintSurvey,
+      eq(sprintSurvey.id, sprintSurveyAnswerCoworkers.sprintSurveyId),
     )
     .where(
       and(
-        eq(projectMember.projectId, projectId),
+        eq(sprintSurvey.projectId, projectId),
         eq(sprintSurveyAnswerCoworkers.questionId, 33),
       ),
     );
-
   const motivation = motivationResult[0]?.motivation || 0;
 
   // Obtener el promedio de respuestas para Puntualidad
@@ -166,13 +165,13 @@ export async function getOverallStatistics(projectId: number) {
       ),
     })
     .from(sprintSurveyAnswerCoworkers)
-    .innerJoin(
-      projectMember,
-      eq(sprintSurveyAnswerCoworkers.coworkerId, projectMember.userId),
+    .leftJoin(
+      sprintSurvey,
+      eq(sprintSurvey.id, sprintSurveyAnswerCoworkers.sprintSurveyId),
     )
     .where(
       and(
-        eq(projectMember.projectId, projectId),
+        eq(sprintSurvey.projectId, projectId),
         eq(sprintSurveyAnswerCoworkers.questionId, 30),
       ),
     );
@@ -187,13 +186,13 @@ export async function getOverallStatistics(projectId: number) {
       ),
     })
     .from(sprintSurveyAnswerProject)
-    .innerJoin(
-      projectMember,
-      eq(sprintSurveyAnswerProject.userId, projectMember.userId),
+    .leftJoin(
+      sprintSurvey,
+      eq(sprintSurvey.id, sprintSurveyAnswerProject.sprintSurveyId),
     )
     .where(
       and(
-        eq(projectMember.projectId, projectId),
+        eq(sprintSurvey.projectId, projectId),
         eq(sprintSurveyAnswerProject.questionId, 27),
       ),
     );
@@ -208,13 +207,13 @@ export async function getOverallStatistics(projectId: number) {
       ),
     })
     .from(sprintSurveyAnswerCoworkers)
-    .innerJoin(
-      projectMember,
-      eq(sprintSurveyAnswerCoworkers.coworkerId, projectMember.userId),
+    .leftJoin(
+      sprintSurvey,
+      eq(sprintSurvey.id, sprintSurveyAnswerCoworkers.sprintSurveyId),
     )
     .where(
       and(
-        eq(projectMember.projectId, projectId),
+        eq(sprintSurvey.projectId, projectId),
         eq(sprintSurveyAnswerCoworkers.questionId, 32),
       ),
     );
@@ -240,13 +239,10 @@ export async function getDetailedProjectStatistics(projectId: number) {
       ),
     })
     .from(finalSurveyAnswer)
-    .innerJoin(
-      projectMember,
-      eq(finalSurveyAnswer.userId, projectMember.userId),
-    )
+    .innerJoin(finalSurvey, eq(finalSurveyAnswer.finalSurveyId, finalSurvey.id))
     .where(
       and(
-        eq(projectMember.projectId, projectId),
+        eq(finalSurvey.projectId, projectId),
         eq(finalSurveyAnswer.questionId, 36),
       ),
     );
@@ -263,13 +259,10 @@ export async function getDetailedProjectStatistics(projectId: number) {
       ),
     })
     .from(finalSurveyAnswer)
-    .innerJoin(
-      projectMember,
-      eq(finalSurveyAnswer.userId, projectMember.userId),
-    )
+    .innerJoin(finalSurvey, eq(finalSurveyAnswer.finalSurveyId, finalSurvey.id))
     .where(
       and(
-        eq(projectMember.projectId, projectId),
+        eq(finalSurvey.projectId, projectId),
         eq(finalSurveyAnswer.questionId, 35),
       ),
     );
@@ -286,13 +279,10 @@ export async function getDetailedProjectStatistics(projectId: number) {
       ),
     })
     .from(finalSurveyAnswer)
-    .innerJoin(
-      projectMember,
-      eq(finalSurveyAnswer.userId, projectMember.userId),
-    )
+    .innerJoin(finalSurvey, eq(finalSurveyAnswer.finalSurveyId, finalSurvey.id))
     .where(
       and(
-        eq(projectMember.projectId, projectId),
+        eq(finalSurvey.projectId, projectId),
         eq(finalSurveyAnswer.questionId, 39),
       ),
     );
@@ -308,12 +298,12 @@ export async function getDetailedProjectStatistics(projectId: number) {
     })
     .from(sprintSurveyAnswerProject)
     .innerJoin(
-      projectMember,
-      eq(sprintSurveyAnswerProject.userId, projectMember.userId),
+      sprintSurvey,
+      eq(sprintSurveyAnswerProject.sprintSurveyId, sprintSurvey.id),
     )
     .where(
       and(
-        eq(projectMember.projectId, projectId),
+        eq(sprintSurvey.projectId, projectId),
         eq(sprintSurveyAnswerProject.questionId, 26),
       ),
     );
@@ -342,13 +332,10 @@ export const getGrowthData = async (projectId: number) => {
       averageAnswer: sql`AVG(${finalSurveyAnswer.answer})`.as("averageAnswer"),
     })
     .from(finalSurveyAnswer)
-    .innerJoin(
-      projectMember,
-      eq(finalSurveyAnswer.userId, projectMember.userId),
-    )
+    .innerJoin(finalSurvey, eq(finalSurveyAnswer.finalSurveyId, finalSurvey.id))
     .where(
       and(
-        eq(projectMember.projectId, projectId),
+        eq(finalSurvey.projectId, projectId),
         inArray(finalSurveyAnswer.questionId, growthSupportQuestions),
       ),
     )
@@ -369,13 +356,10 @@ export const getGrowthData = async (projectId: number) => {
       averageAnswer: sql`AVG(${finalSurveyAnswer.answer})`.as("averageAnswer"),
     })
     .from(finalSurveyAnswer)
-    .innerJoin(
-      projectMember,
-      eq(finalSurveyAnswer.userId, projectMember.userId),
-    )
+    .innerJoin(finalSurvey, eq(finalSurveyAnswer.finalSurveyId, finalSurvey.id))
     .where(
       and(
-        eq(projectMember.projectId, projectId),
+        eq(finalSurvey.projectId, projectId),
         inArray(finalSurveyAnswer.questionId, growthOpportunitiesQuestions),
       ),
     )
