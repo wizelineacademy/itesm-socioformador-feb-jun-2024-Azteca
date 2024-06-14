@@ -45,6 +45,7 @@ describe("NotificationCard Component", () => {
       type: "RULER",
       projectName: "Project ABC",
       date: new Date("2023-06-15T00:00:00Z"),
+      projectId: 1,
     };
 
     render(<NotificationCard notification={notification} />);
@@ -65,6 +66,7 @@ describe("NotificationCard Component", () => {
       projectName: "",
       date: new Date("2023-06-15T00:00:00Z"),
       id: 0,
+      projectId: 0,
     };
 
     render(<NotificationCard notification={notification} />);
