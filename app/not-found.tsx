@@ -10,6 +10,8 @@ export default function NotFound() {
         src={"/FeedbackFlowLogo.png"}
         alt="Logo Feedback Flow"
         className="absolute -bottom-0 -right-0 hidden opacity-60 md:block"
+        width={350}
+        height={350}
       />
       <section className="relative flex w-full flex-col gap-4 from-primary to-primary-light px-10 py-20 text-center text-white after:absolute after:inset-0 after:-z-10 after:-skew-y-6 after:bg-gradient-to-r">
         <h2 className="text-3xl font-bold">404 -Ruta No Encontrada</h2>

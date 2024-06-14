@@ -30,6 +30,8 @@ const UserProfileButton = ({
           src={photoUrl}
           alt={"User"}
           className={`rounded-full ${sizes[size]}`}
+          width={300}
+          height={300}
         />
       ) : (
         <svg
