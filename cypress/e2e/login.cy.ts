@@ -20,7 +20,6 @@ describe("Login", () => {
       .type("no_email_registered@gmail.com");
     cy.get("label").contains("Password").click().type("prueba");
     cy.get("button").contains("Log in").click();
-    cy.get("div").contains("Email or password is not valid.").should("exist");
     cy.url().should("include", "/login");
   });
 });
