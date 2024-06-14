@@ -104,3 +104,23 @@
 .emotion-box:has(.emotion-circle:hover) .emotion-circle:not(:hover) {
   transform: scale(0.9);
 }
+
+.loader {
+  width: 25px;
+  height: 25px;
+  border: 3px solid #bdbdbd;
+  border-bottom-color: #6640d5;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

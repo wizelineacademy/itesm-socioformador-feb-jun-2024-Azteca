@@ -16,6 +16,7 @@ import {
 } from "@mantine/core";
 import { Employee } from "@/types/types";
 import toast from "react-hot-toast";
+import Loader from "@/components/Loader";
 
 const CreateProject = () => {
   const router = useRouter();
@@ -146,11 +147,17 @@ const CreateProject = () => {
     );
   };
 
-  if (employeesQuery.isLoading) return <div>Loading...</div>;
+  if (employeesQuery.isLoading)
+    return (
+      <div className="flex h-[80dvh] w-full">
+        <Loader />
+      </div>
+    );
   if (employeesQuery.isError) return <div>Error loading employees.</div>;
 
   return (
     <>
+      {isLoading && <p>Creando proyecto</p>}
       <div className="mx-28 my-6">
         <h3 className="text-4xl font-medium">Project Creation</h3>
         <form action={handleForm} className="mt-4">
