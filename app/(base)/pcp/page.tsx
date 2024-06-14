@@ -34,7 +34,7 @@ const statusOptions = [
 ];
 
 const PCP = () => {
-  const [projectId, setProjectId] = useState<number>();
+  const [projectId, setProjectId] = useState<number>(-1);
   const queryClient = useQueryClient();
   const [progressPercentage, setProgressPercentage] = useState<number>(0);
 
@@ -46,7 +46,12 @@ const PCP = () => {
   });
 
   useEffect(() => {
-    if (!projectsQuery.data) return;
+    if (
+      !projectsQuery.data ||
+      (projectsQuery.data && projectsQuery.data.length === 0)
+    ) {
+      return;
+    }
     setProjectId(projectsQuery.data[0].id);
   }, [projectsQuery.data]);
 
@@ -91,13 +96,12 @@ const PCP = () => {
     });
   };
 
-  if (
-    projectsQuery.isError ||
-    (projectsQuery.data && projectsQuery.data.length === 0)
-  ) {
-    return (
-      <NoDataCard text="You dont have projects or there was an error fetching the data" />
-    );
+  if (projectsQuery.isError) {
+    return <NoDataCard text="There was an error fetching the data" />;
+  }
+
+  if (projectsQuery.data && projectsQuery.data.length === 0) {
+    return <NoDataCard text="You dont have projects" />;
   }
 
   if (projectsQuery.isLoading) {
