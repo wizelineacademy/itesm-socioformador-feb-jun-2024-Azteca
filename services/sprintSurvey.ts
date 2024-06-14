@@ -247,8 +247,9 @@ export async function getDetailedProjectStatistics(projectId: number) {
       ),
     );
 
-  const listeningFeeling = Math.round(
-    Number(listeningFeelingResult[0]?.listeningFeeling ?? 0),
+  const listeningFeeling = Math.min(
+    100,
+    Math.round(Number(listeningFeelingResult[0]?.listeningFeeling ?? 0)),
   );
 
   // Obtener el promedio de respuestas para "Recognition Feeling"
@@ -267,8 +268,9 @@ export async function getDetailedProjectStatistics(projectId: number) {
       ),
     );
 
-  const recognitionFeeling = Math.round(
-    Number(recognitionFeelingResult[0]?.recognitionFeeling ?? 0),
+  const recognitionFeeling = Math.min(
+    100,
+    Math.round(Number(recognitionFeelingResult[0]?.recognitionFeeling ?? 0)),
   );
 
   // Obtener el promedio de respuestas para "Respect and Trust Environment"
@@ -286,9 +288,14 @@ export async function getDetailedProjectStatistics(projectId: number) {
         eq(finalSurveyAnswer.questionId, 39),
       ),
     );
-  const respectTrustEnvironment = Math.round(
-    Number(respectTrustEnvironmentResult[0]?.respectTrustEnvironment ?? 0),
+
+  const respectTrustEnvironment = Math.min(
+    100,
+    Math.round(
+      Number(respectTrustEnvironmentResult[0]?.respectTrustEnvironment ?? 0),
+    ),
   );
+
   const resourcesSatisfactionResult = await db
     .select({
       resourcesSatisfaction:
@@ -307,8 +314,12 @@ export async function getDetailedProjectStatistics(projectId: number) {
         eq(sprintSurveyAnswerProject.questionId, 26),
       ),
     );
-  const resourcesSatisfaction = Math.round(
-    Number(resourcesSatisfactionResult[0]?.resourcesSatisfaction ?? 0),
+
+  const resourcesSatisfaction = Math.min(
+    100,
+    Math.round(
+      Number(resourcesSatisfactionResult[0]?.resourcesSatisfaction ?? 0),
+    ),
   );
 
   return {
