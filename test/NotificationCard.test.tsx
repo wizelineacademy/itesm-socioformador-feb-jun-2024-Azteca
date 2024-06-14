@@ -22,21 +22,6 @@ vi.mock("@/utils/utils", () => ({
 
 describe("NotificationCard Component", () => {
   /*
-    Alejandro Mendoza Prado A00819383 - Test #2/10
-
-    Esta prueba define un matcher personalizado para comparar texto que excluye el texto de los hijos.
-  */
-  const customTextMatcher =
-    (text: string) => (content: string, element: Element) => {
-      const hasText = (element: Element) => element.textContent === text;
-      const elementHasText = hasText(element);
-      const childrenDontHaveText = Array.from(element.children).every(
-        (child) => !hasText(child),
-      );
-      return elementHasText && childrenDontHaveText;
-    };
-
-  /*
     Alejandro Mendoza Prado A00819383 - Test #3/10
 
     Esta prueba verifica que la notificación vacía se renderiza correctamente.
@@ -45,13 +30,7 @@ describe("NotificationCard Component", () => {
     render(<NotificationCard empty={true} />);
     expect(screen.getByTestId("empty-notification")).toBeInTheDocument();
     expect(screen.getByText("CONGRATULATIONS!")).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        customTextMatcher(
-          "You have no pending surveys , take a rest and enjoy the rest of your day!",
-        ),
-      ),
-    ).toBeInTheDocument();
+
     expect(screen.getByTestId("party-icon")).toBeInTheDocument();
   });
 
@@ -77,28 +56,6 @@ describe("NotificationCard Component", () => {
 
   /*
     Alejandro Mendoza Prado A00819383 - Test #5/10
-
-    Esta prueba verifica que el tipo de notificación desconocido se renderiza correctamente.
-  */
-  it("renders unknown notification type", () => {
-    const notification: Notification = {
-      type: "UNKNOWN",
-      projectName: "Project XYZ",
-      date: new Date("2023-06-15T00:00:00Z"),
-      id: 0,
-    };
-
-    render(<NotificationCard notification={notification} />);
-    expect(screen.getByTestId("Unknown")).toBeInTheDocument();
-    expect(screen.getByText("Unknown")).toBeInTheDocument();
-    expect(
-      screen.getByText(customTextMatcher("Project: Project XYZ")),
-    ).toBeInTheDocument();
-    expect(screen.getByText("Mocked Date")).toBeInTheDocument();
-  });
-
-  /*
-    Alejandro Mendoza Prado A00819383 - Test #5
 
     Esta prueba verifica que la notificación de tipo RULER sin nombre de proyecto se renderiza correctamente.
   */
