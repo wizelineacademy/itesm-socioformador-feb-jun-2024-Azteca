@@ -41,6 +41,8 @@ const UserProfileButton = ({
           strokeWidth={1.4}
           stroke="currentColor"
           className={`${color} ${sizes[size]}`}
+          role="img"
+          data-testid="user-profile-icon"
         >
           <path
             strokeLinecap="round"
