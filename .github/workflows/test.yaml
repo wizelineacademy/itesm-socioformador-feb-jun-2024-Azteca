@@ -53,13 +53,6 @@ jobs:
         env:
           CYPRESS_CACHE_FOLDER: ~/.cache/Cypress
 
-      - name: Upload screenshots
-              uses: actions/upload-artifact@v4
-              if: failure()
-              with:
-                name: cypress-screenshots
-                path: /home/runner/work/itesm-socioformador-feb-jun-2024-Croods/itesm-socioformador-feb-jun-2024-Azteca/knowx/cypress/screenshots
-
   unit-test:
     runs-on: ubuntu-latest
 
