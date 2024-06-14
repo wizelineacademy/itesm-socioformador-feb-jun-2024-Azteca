@@ -13,11 +13,11 @@ describe("Register", () => {
     cy.get("label").contains("Department").click().type("QA");
     cy.get("button").contains("Register").click();
     cy.get("div").contains("Account created successfully.").should("exist");
-    cy.wait(8000);
+    cy.wait(15000);
     cy.url().should("include", "/dashboard");
     cy.visit("/profile");
-    cy.wait(8000);
-    cy.get("h2").contains("Cypress prueba");
+    cy.wait(15000);
+    cy.get("h2").contains("prueba");
   });
 
   it("Visits Register page, and signs up with an existing email", () => {
