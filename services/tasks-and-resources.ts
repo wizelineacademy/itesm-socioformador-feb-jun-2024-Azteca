@@ -8,6 +8,8 @@ import {
   pipResource,
   SelectPipResource,
   rulerSurveyAnswers,
+  finalSurvey,
+  SelectFinalSurvey,
 } from "@/db/schema";
 import db from "@/db/drizzle";
 import { eq, lte, and, desc, asc, isNotNull } from "drizzle-orm";
@@ -46,9 +48,8 @@ export async function getUserTasksForCurrentSprintByProjectId(
   // check if the sprint is not processed to throw an error
   // check if there's no sprint survey results throw an error
   // check if all the surveys were answered, so the only one left is the project one
-
   if (!currentSprintSurvey.processed) {
-    return "Curreny sprint survey was found, but it is not processed yet";
+    return "Current sprint survey was found, but it is not processed yet";
   }
 
   const tasks = await db
@@ -61,7 +62,6 @@ export async function getUserTasksForCurrentSprintByProjectId(
       ),
     )
     .orderBy(asc(pipTask.title));
-
   if (tasks.length === 0) {
     return "No tasks available. Ask your manager for an update.";
   }
@@ -110,11 +110,73 @@ export async function getUserTasksHistory(projectId: number) {
 
   // TODO: inform the frontend when the survey is pending for processing
 
-  if (sprintSurveysWithTasks.length === 0) {
+  const finalSurveys = await db
+    .select({ finalSurvey: finalSurvey, task: pipTask })
+    .from(finalSurvey)
+    .innerJoin(pipTask, eq(finalSurvey.id, pipTask.finalSurveyId))
+    .where(
+      and(
+        // final surveys that belong to that project
+        eq(finalSurvey.projectId, projectId),
+        // tasks that belong to that user
+        eq(pipTask.userId, userId),
+        // final surveys  that have been already scheduled (i.e. the surveys have already been launched)
+        lte(finalSurvey.scheduledAt, new Date()),
+      ),
+    );
+
+  interface SelectFinalSurveyWithTasks extends SelectFinalSurvey {
+    tasks: SelectPipTask[];
+  }
+
+  const finalSurveysWithTasks = finalSurveys.reduce((acc, row) => {
+    const { finalSurvey, task } = row;
+    let survey = acc.find((s) => s.id === finalSurvey.id);
+
+    if (!survey) {
+      survey = { ...finalSurvey, tasks: [] };
+      acc.push(survey);
+    }
+
+    survey.tasks.push(task);
+
+    return acc;
+  }, [] as SelectFinalSurveyWithTasks[]);
+
+  interface SurveysWithTasks {
+    id: number;
+    type: "SPRINT" | "FINAL";
+    processed: boolean | null;
+    scheduledAt: Date | null;
+    tasks: SelectPipTask[];
+  }
+  const surveys = [] as SurveysWithTasks[];
+
+  for (const sprintSurveyWithTasks of sprintSurveysWithTasks) {
+    surveys.push({
+      id: sprintSurveyWithTasks.id,
+      type: "SPRINT",
+      processed: sprintSurveyWithTasks.processed,
+      scheduledAt: sprintSurveyWithTasks.scheduledAt,
+      tasks: sprintSurveyWithTasks.tasks,
+    });
+  }
+
+  for (const finalSurveyWithTasks of finalSurveysWithTasks) {
+    surveys.push({
+      id: finalSurveyWithTasks.id,
+      type: "FINAL",
+      processed: finalSurveyWithTasks.processed,
+      scheduledAt: finalSurveyWithTasks.scheduledAt,
+      tasks: finalSurveyWithTasks.tasks,
+    });
+  }
+
+  if (surveys.length === 0) {
     return "No task history available";
   }
 
-  return sprintSurveysWithTasks;
+  return surveys;
 }
 
 export async function getUserResourcesForCurrentSprint(projectId: number) {
@@ -201,13 +263,80 @@ export async function getUserResourcesHistory(projectId: number) {
     return acc;
   }, [] as SelectSprintSurveyWithResources[]);
 
-  // TODO: inform the frontend when the survey is pending for processing
+  const finalSurveys = await db
+    .select({
+      resource: pipResource,
+      finalSurvey: finalSurvey,
+    })
+    .from(finalSurvey)
+    .innerJoin(userResource, eq(finalSurvey.id, userResource.finalSurveyId))
+    .innerJoin(pipResource, eq(userResource.resourceId, pipResource.id))
+    .where(
+      and(
+        // final surveys that belong to that project
+        eq(finalSurvey.projectId, projectId),
+        // final surveys that have been already scheduled (i.e. the surveys have already been launched)
+        lte(finalSurvey.scheduledAt, new Date()),
+        // resources that belong to the user
+        eq(userResource.userId, userId),
+      ),
+    )
+    .orderBy(desc(finalSurvey.scheduledAt), asc(pipResource.title));
 
-  if (sprintSurveysWithResources.length === 0) {
-    return "No resource history available";
+  interface SelectFinalSurveyWithResources extends SelectFinalSurvey {
+    resources: SelectPipResource[];
   }
 
-  return sprintSurveysWithResources;
+  const finalSurveysWithResources = finalSurveys.reduce((acc, row) => {
+    const { finalSurvey, resource } = row;
+    let survey = acc.find((s) => s.id === finalSurvey.id);
+
+    if (!survey) {
+      survey = { ...finalSurvey, resources: [] };
+      acc.push(survey);
+    }
+
+    survey.resources.push(resource);
+
+    return acc;
+  }, [] as SelectFinalSurveyWithResources[]);
+
+  // TODO: inform the frontend when the survey is pending for processing
+
+  interface SurveysWithResources {
+    id: number;
+    type: "SPRINT" | "FINAL";
+    processed: boolean | null;
+    scheduledAt: Date | null;
+    resources: SelectPipResource[];
+  }
+  const surveys = [] as SurveysWithResources[];
+
+  for (const sprintSurveyWithResources of sprintSurveysWithResources) {
+    surveys.push({
+      id: sprintSurveyWithResources.id,
+      type: "SPRINT",
+      processed: sprintSurveyWithResources.processed,
+      scheduledAt: sprintSurveyWithResources.scheduledAt,
+      resources: sprintSurveyWithResources.resources,
+    });
+  }
+
+  for (const finalSurveyWithResources of finalSurveysWithResources) {
+    surveys.push({
+      id: finalSurveyWithResources.id,
+      type: "FINAL",
+      processed: finalSurveyWithResources.processed,
+      scheduledAt: finalSurveyWithResources.scheduledAt,
+      resources: finalSurveyWithResources.resources,
+    });
+  }
+
+  if (surveys.length === 0) {
+    return "No task history available";
+  }
+
+  return surveys;
 }
 
 export async function updateTask({
@@ -221,8 +350,6 @@ export async function updateTask({
     .update(pipTask)
     .set({ status: newStatus })
     .where(eq(pipTask.id, taskId));
-
-  console.log("pipTask", taskId, newStatus);
 }
 
 export async function rulerResources() {

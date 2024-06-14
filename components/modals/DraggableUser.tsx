@@ -17,6 +17,7 @@ const DraggableUser = ({ user, times = 0 }: DraggableUserProps) => {
     <Draggable
       id={`base-${user.userId}`}
       data={user}
+      data-testid="draggable-user"
       setIsDragging={setIsDragging}
     >
       {isDragging ? (
