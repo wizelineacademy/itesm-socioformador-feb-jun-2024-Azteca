@@ -38,8 +38,8 @@ const SprintSurvey = ({
 }: SprintSurveyProps) => {
   const [step, setStep] = useState<number>(1);
   const { data: users, isError } = useQuery({
-    queryKey: ["coworkers", projectId],
-    queryFn: () => getCoworkersInProject(projectId),
+    queryKey: ["coworkers", sprintSurveyId],
+    queryFn: () => getCoworkersInProject(sprintSurveyId),
     enabled: !!projectId,
   });
 
