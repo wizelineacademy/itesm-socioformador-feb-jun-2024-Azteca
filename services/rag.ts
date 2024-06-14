@@ -19,6 +19,7 @@ import {
   sprintSurveyAnswerCoworkers,
   sprintSurveyQuestion,
   userResource,
+  userSkill,
   rulerSurveyAnswers,
 } from "@/db/schema";
 
@@ -870,9 +871,29 @@ async function setUserPCP(
         });
       }
     }
+
+    // set weaknesses of the user
+    const weaknessesArray = Array.from(weaknessesIds);
+
+    // Insert all values into the userSkill table
+    for (const weaknessId of weaknessesArray) {
+      await db.insert(userSkill).values({
+        userId: userId,
+        skillId: weaknessId,
+        kind: "AREA_OF_OPPORTUNITY",
+      });
+    }
   }
 
-  // set the strengths and weaknesses of the user
+  // set the strengths of the user
+  const strengthsArray = Array.from(strengthsIds);
+  for (const strengthId of strengthsArray) {
+    await db.insert(userSkill).values({
+      userId: userId,
+      skillId: strengthId,
+      kind: "STRENGTH",
+    });
+  }
 }
 
 export async function rulerAnalysis(userId: string) {

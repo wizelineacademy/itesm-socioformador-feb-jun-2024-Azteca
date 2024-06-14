@@ -10,6 +10,8 @@ import {
   getUserTasksForCurrentSprintByProjectId,
   getUserTasksHistory,
   updateTask,
+  rulerResources,
+  rulerTask,
 } from "@/services/tasks-and-resources";
 import { Fragment, useEffect, useState } from "react";
 import DialogComponent from "@/components/DialogComponent";
@@ -23,6 +25,7 @@ import Link from "next/link";
 import ChevronRightIcon from "@/components/icons/ChevronRightIcon";
 import Loader from "@/components/Loader";
 import toast from "react-hot-toast";
+import { RulerTask, RulerResource } from "@/types/types";
 
 const statusOptions = [
   { label: "Pending", color: "bg-red-500", value: "PENDING" },
@@ -143,7 +146,7 @@ const PCP = () => {
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
               >
-                <Listbox.Options className="absolute z-50 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                <Listbox.Options className="absolute z-50 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white px-2 py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
                   <Listbox.Option
                     key={-1}
                     value={-1}
@@ -196,13 +199,18 @@ const PCP = () => {
         </div>
       </section>
 
-      {projectId && (
+      {projectId === -1 ? (
+        <>
+          <PCPRulerTasks setProgressPercentage={setProgressPercentage} />
+          <PCPRulerResources />
+        </>
+      ) : (
         <>
           <PCPTasks
-            projectId={projectId}
+            projectId={projectId || 0}
             setProgressPercentage={setProgressPercentage}
           />
-          <PCPResources projectId={projectId} />
+          <PCPResources projectId={projectId || 0} />
         </>
       )}
     </div>
@@ -362,7 +370,7 @@ const PCPTasksDialogContent = ({ projectId }: { projectId: number }) => {
       {tasksHistoryQuery.data.map((sprint) => (
         <div key={sprint.id}>
           {sprint.scheduledAt && (
-            <p className="py-1 text-lg font-medium">{`Sprint ${formatDate(sprint.scheduledAt)}`}</p>
+            <p className="py-1 text-lg font-medium">{`${sprint.type === "SPRINT" ? "Sprint" : "Final"} Survey ${formatDate(sprint.scheduledAt)}`}</p>
           )}
           {sprint.processed ? (
             sprint.tasks.map((task) => {
@@ -659,7 +667,7 @@ const PCPResourcesDialogContent = ({ projectId }: { projectId: number }) => {
       {resourcesHistoryQuery.data.map((sprint) => (
         <div key={sprint.id}>
           {sprint.scheduledAt && (
-            <p className="py-1 text-lg font-medium">{`Sprint ${formatDate(sprint.scheduledAt)}`}</p>
+            <p className="py-1 text-lg font-medium">{`${sprint.type === "SPRINT" ? "Sprint" : "Final"} Survey ${formatDate(sprint.scheduledAt)}`}</p>
           )}
           {sprint.processed ? (
             sprint.resources.map((resource) => (
@@ -697,6 +705,445 @@ const PCPResourcesDialogContent = ({ projectId }: { projectId: number }) => {
               <NoDataCard text="Survey not procesed yet, ask your manager to do it" />
             </div>
           )}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const PCPRulerTasks = ({
+  setProgressPercentage,
+}: {
+  setProgressPercentage: (percentage: number) => void;
+}) => {
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const openDialog = () => {
+    setIsDialogOpen(true);
+  };
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+  };
+  const queryClient = useQueryClient();
+
+  const { data: tasksRulerData, isLoading: tasksRulerLoading } = useQuery({
+    queryKey: ["rulerTask"],
+    queryFn: () => rulerTask(),
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
+  useEffect(() => {
+    if (Array.isArray(tasksRulerData)) {
+      const doneTasks = tasksRulerData.filter(
+        (task) => task.status === "DONE",
+      ).length;
+      const totalTasks = tasksRulerData.length;
+      setProgressPercentage((doneTasks / totalTasks) * 100);
+    } else {
+      setProgressPercentage(0);
+    }
+  }, [tasksRulerData, setProgressPercentage]);
+
+  const mutation = useMutation({
+    mutationFn: updateTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["rulerTask"] });
+      queryClient.invalidateQueries({
+        queryKey: ["tasks-ruler-history"],
+      });
+
+      const tasks = queryClient.getQueryData<SelectPipTask[]>(["rulerTask"]);
+      if (tasks) {
+        const doneTasks = tasks.filter((task) => task.status === "DONE").length;
+        const totalTasks = tasks.length;
+        setProgressPercentage((doneTasks / totalTasks) * 100);
+      }
+    },
+  });
+
+  return (
+    <section id="pip-tasks" className="mt-5 w-full">
+      <div className="mb-6">
+        <div className="mx-auto flex justify-between">
+          <h3 className="text-3xl font-medium text-black">Tasks</h3>
+          <button
+            className="cursor-pointer self-center text-sm text-graySubtitle"
+            onClick={openDialog}
+          >
+            Show History
+          </button>
+        </div>
+
+        {tasksRulerLoading ? (
+          <p>loading...</p>
+        ) : tasksRulerData && typeof tasksRulerData === "string" ? (
+          <NoDataCard text={tasksRulerData} />
+        ) : (
+          tasksRulerData &&
+          Array.isArray(tasksRulerData) &&
+          (() => {
+            // Obtener la fecha más reciente de los tasks
+            const recentDate = tasksRulerData.reduce((max, task) => {
+              const taskDate = task.date ? new Date(task.date) : null;
+              return taskDate && taskDate > max ? taskDate : max;
+            }, new Date(0));
+
+            // Filtrar los tasks que tienen la fecha más reciente
+            const recentTasks = tasksRulerData.filter((task) => {
+              const taskDate = task.date ? new Date(task.date) : null;
+              return taskDate && taskDate.getTime() === recentDate.getTime();
+            });
+
+            return (
+              <div className="mt-2">
+                <div className="mb-10 mt-2 flex flex-row gap-12 overflow-x-auto whitespace-nowrap pb-3">
+                  {recentTasks.map((task) => (
+                    <PCPRulerTask
+                      key={task.id}
+                      task={task}
+                      mutateAsync={mutation.mutateAsync}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })()
+        )}
+
+        <DialogComponent
+          isOpen={isDialogOpen}
+          onClose={closeDialog}
+          title="Tasks History"
+        >
+          {tasksRulerData && (
+            <PCPRulerTasksDialogContent tasks={tasksRulerData} />
+          )}
+        </DialogComponent>
+      </div>
+    </section>
+  );
+};
+
+const PCPRulerTasksDialogContent = ({ tasks }: { tasks: RulerTask[] }) => {
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleString("default", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+  const queryClient = useQueryClient();
+
+  const { mutateAsync } = useMutation({
+    mutationFn: updateTask,
+  });
+
+  const tasksByDate = tasks.reduce(
+    (acc: { [key: string]: RulerTask[] }, task: RulerTask) => {
+      const date = task.date ? formatDate(task.date) : null;
+      if (date) {
+        if (!acc[date]) {
+          acc[date] = [];
+        }
+        acc[date].push(task);
+      }
+      return acc;
+    },
+    {},
+  );
+
+  return (
+    <div>
+      {Object.entries(tasksByDate).map(([date, tasks]) => (
+        <div key={date}>
+          <p className="py-1 text-lg font-medium">{date}</p>
+          {tasks.map((task: RulerTask) => {
+            const currentStatusOption =
+              statusOptions.find((option) => option.value === task.status) ||
+              statusOptions[0];
+
+            return (
+              <div
+                key={task.id}
+                className="flex items-center justify-between py-1"
+              >
+                <p className="text-graySubtitle">{task.title}</p>
+                <div className="flex items-center space-x-4">
+                  {/* Description Dropdown */}
+                  <Menu as="div" className="relative inline-block text-left">
+                    <div>
+                      <Menu.Button className="flex items-center text-sm text-blue-500 underline">
+                        <InfoIcon color="text-black" size="h-6 w-6" />
+                      </Menu.Button>
+                    </div>
+                    <Menu.Items className="absolute right-0 z-50 mt-2 w-64 origin-top-right rounded-md bg-white ring-1 ring-black ring-opacity-5 drop-shadow-lg focus:outline-none">
+                      <div className="px-4 py-1 text-justify text-sm text-gray-700">
+                        {task.description}
+                      </div>
+                    </Menu.Items>
+                  </Menu>
+
+                  {/* Status Change Button */}
+                  <Menu as="div" className="relative inline-block text-left">
+                    <div className="flex items-center">
+                      <Menu.Button
+                        className={`h-6 w-6 transform cursor-pointer rounded-full border ${currentStatusOption.color} outline-${currentStatusOption.color} transition-all duration-200 ease-in-out hover:scale-110`}
+                      >
+                        <span className="sr-only">Change status</span>
+                      </Menu.Button>
+                    </div>
+                    <Menu.Items className="absolute right-0 z-50 mt-2 w-44 origin-top-right rounded-md bg-white ring-1 ring-black ring-opacity-5 drop-shadow-lg focus:outline-none">
+                      <div className="py-1">
+                        {statusOptions.map((option) => (
+                          <Menu.Item key={option.value}>
+                            {({ active }) => (
+                              <button
+                                className={`${active ? "bg-gray-100" : ""} group flex w-full items-center px-4 py-2 text-sm text-gray-700`}
+                                onClick={async () => {
+                                  await mutateAsync({
+                                    taskId: task.id,
+                                    newStatus:
+                                      option.value as typeof task.status,
+                                  });
+                                  await queryClient.invalidateQueries({
+                                    queryKey: ["rulerTask"],
+                                  });
+                                  await queryClient.invalidateQueries({
+                                    queryKey: ["tasks-ruler-history"],
+                                  });
+                                }}
+                              >
+                                <span
+                                  className={`mr-3 inline-block h-4 w-4 rounded-full ${option.color}`}
+                                ></span>
+                                {option.label}
+                              </button>
+                            )}
+                          </Menu.Item>
+                        ))}
+                      </div>
+                    </Menu.Items>
+                  </Menu>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const PCPRulerTask = ({
+  task,
+  mutateAsync,
+}: {
+  task: SelectPipTask;
+  mutateAsync: (data: {
+    taskId: number;
+    newStatus: "PENDING" | "IN_PROGRESS" | "DONE";
+  }) => Promise<void>;
+}) => {
+  const selectedStatus: { label: string; color: string; value: string } =
+    statusOptions.find((option) => option.value === task.status) ||
+    statusOptions[0];
+  const queryClient = useQueryClient(); // Asegúrate de obtener queryClient aquí
+
+  return (
+    <div className="box-border h-48 w-52 shrink-0 rounded-xl bg-white p-4 shadow-lg">
+      <header className="flex items-center">
+        <p className="text-md text-wrap font-semibold">{task.title}</p>
+        <div className="ml-auto inline-flex items-center">
+          <Menu as="div" className="relative inline-block text-left">
+            <div>
+              <Menu.Button
+                className={`h-6 w-6 transform cursor-pointer rounded-full border ${selectedStatus.color} outline-${selectedStatus.color} transition-all duration-200 ease-in-out hover:scale-110`}
+              >
+                <span className="sr-only">Change status</span>
+              </Menu.Button>
+            </div>
+            <Menu.Items className="absolute right-0 mt-2 w-44 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <div className="py-1">
+                {statusOptions.map((option) => (
+                  <Menu.Item key={option.value}>
+                    {({ active }) => (
+                      <button
+                        className={`${
+                          active ? "bg-gray-100" : ""
+                        } group flex w-full items-center px-4 py-2 text-sm text-gray-700`}
+                        onClick={async () => {
+                          await mutateAsync({
+                            taskId: task.id,
+                            newStatus: option.value as typeof task.status,
+                          });
+                          await queryClient.invalidateQueries({
+                            queryKey: ["rulerTask"],
+                          });
+                          await queryClient.invalidateQueries({
+                            queryKey: ["tasks-ruler-history"],
+                          });
+                        }}
+                      >
+                        <span
+                          className={`mr-3 inline-block h-4 w-4 rounded-full ${option.color}`}
+                        ></span>
+                        {option.label}
+                      </button>
+                    )}
+                  </Menu.Item>
+                ))}
+              </div>
+            </Menu.Items>
+          </Menu>
+        </div>
+      </header>
+      <p className="font-regular mt-2 text-ellipsis text-wrap text-xs text-[#9E9E9E]">
+        {task.description}
+      </p>
+    </div>
+  );
+};
+
+const PCPRulerResources = () => {
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const openDialog = () => {
+    setIsDialogOpen(true);
+  };
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+  };
+
+  const { data: resourcesRulerData, isLoading: resourcesRulerLoading } =
+    useQuery({
+      queryKey: ["rulerResources"],
+      queryFn: () => rulerResources(),
+      retry: false,
+      refetchOnWindowFocus: false,
+    });
+
+  return (
+    <section id="pip-tasks" className="mt-5 w-full">
+      <div className="mb-6">
+        <div className="mx-auto flex justify-between">
+          <h3 className="text-3xl font-medium text-black">Resources</h3>
+          <button
+            className="cursor-pointer self-center text-sm text-graySubtitle"
+            onClick={openDialog}
+          >
+            Show History
+          </button>
+        </div>
+
+        {resourcesRulerLoading || !resourcesRulerData ? (
+          <p>loading...</p>
+        ) : resourcesRulerData && typeof resourcesRulerData === "string" ? (
+          <NoDataCard text={resourcesRulerData} />
+        ) : (
+          resourcesRulerData && (
+            <>
+              <div className="mt-2">
+                <div className="mb-10 mt-2 flex flex-row gap-12 overflow-x-auto whitespace-nowrap pb-3">
+                  {resourcesRulerData
+                    .filter((resource) => {
+                      const latestDate = Math.max(
+                        ...resourcesRulerData.map((r) =>
+                          r.date ? new Date(r.date).getTime() : 0,
+                        ),
+                      );
+                      return resource.date?.getTime() === latestDate;
+                    })
+                    .map((resource) => (
+                      <PCPResource key={resource.id} resource={resource} />
+                    ))}
+                </div>
+              </div>
+            </>
+          )
+        )}
+        <DialogComponent
+          isOpen={isDialogOpen}
+          onClose={closeDialog}
+          title="Tasks History"
+        >
+          {resourcesRulerData && (
+            <PCPRulerResourcesDialogContent
+              resources={resourcesRulerData.map((resource) => ({
+                ...resource,
+                userId: "0", // Change the userId value to a string
+                url: "", // Add a default value for url
+              }))}
+            />
+          )}
+        </DialogComponent>
+      </div>
+    </section>
+  );
+};
+
+const PCPRulerResourcesDialogContent = ({
+  resources,
+}: {
+  resources: RulerResource[];
+}) => {
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleString("default", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const resourcesByDate = resources.reduce(
+    (acc: { [key: string]: RulerResource[] }, resource: RulerResource) => {
+      const date = resource.date ? formatDate(resource.date) : null;
+      if (date) {
+        if (!acc[date]) {
+          acc[date] = [];
+        }
+        acc[date].push(resource);
+      }
+      return acc;
+    },
+    {},
+  );
+
+  return (
+    <div>
+      {Object.entries(resourcesByDate).map(([date, resources]) => (
+        <div key={date}>
+          <p className="py-1 text-lg font-medium">{date}</p>
+          {resources.map((resource: RulerResource) => (
+            <div
+              key={resource.id}
+              className="flex items-center justify-between py-1"
+            >
+              <p className="text-graySubtitle">{resource.title}</p>
+              <div className="flex items-center space-x-4">
+                {/* Description Dropdown */}
+                <Menu as="div" className="relative inline-block text-left">
+                  <div>
+                    <Menu.Button className="flex items-center text-sm text-blue-500 underline">
+                      <InfoIcon color="text-black" size="h-6 w-6" />
+                    </Menu.Button>
+                  </div>
+                  <Menu.Items className="absolute right-0 z-50 mt-2 w-64 origin-top-right rounded-md bg-white ring-1 ring-black ring-opacity-5 drop-shadow-lg focus:outline-none">
+                    <div className="px-4 py-1 text-justify text-sm text-gray-700">
+                      {resource.description}
+                    </div>
+                  </Menu.Items>
+                </Menu>
+
+                {/* Link Button */}
+                <Link
+                  href={`https://www.google.com/search?q=${resource.title}`}
+                  target="_blank"
+                  className="flex h-6 w-6 items-center justify-center rounded-full bg-primary"
+                >
+                  <ChevronRightIcon size="h-3 w-3" color="white" />
+                </Link>
+              </div>
+            </div>
+          ))}
         </div>
       ))}
     </div>
