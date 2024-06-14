@@ -902,8 +902,27 @@ async function setUserPCP(
   }
 
   // set the strengths of the user
-  const strengthsArray = Array.from(newStrengthsIds);
-  for (const strengthId of strengthsArray) {
+
+  const oldStrengths: Set<number> = new Set();
+
+  const oldStrengthsArray = await db
+    .select({ skillId: skill.id })
+    .from(userSkill)
+    .where(eq(userSkill.userId, userId));
+
+  oldStrengthsArray.forEach((userStrength) => {
+    oldStrengths.add(userStrength.skillId as number);
+  });
+
+  const newStrengths = new Set<number>();
+
+  for (const id of Array.from(feedbackStrengthsIds)) {
+    if (!oldStrengths.has(id)) {
+      newStrengths.add(id);
+    }
+  }
+
+  for (const strengthId of Array.from(newStrengths)) {
     await db.insert(userSkill).values({
       userId: userId,
       skillId: strengthId,
