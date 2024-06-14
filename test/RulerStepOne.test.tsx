@@ -35,7 +35,13 @@ describe("RulerSurvey Component Test", () => {
     };
   });
 
-  // Pedro Alonso Moreno Salcedo A01741437 - Test #1/10
+  /* 
+    Pedro Alonso Moreno Salcedo A01741437 - Test #1/10
+
+    This test verifies that the Ruler Survey gamification
+    (the four-quadrant one) is rendered correctly in the
+    screen
+  */
   it("Should render step one", () => {
     render(
       <RulerStepOne
@@ -48,7 +54,14 @@ describe("RulerSurvey Component Test", () => {
     expect(screen.getByTestId("ruler-step-one")).toBeInTheDocument();
   });
 
-  // Pedro Alonso Moreno Salcedo A01741437 - Test #2/10
+  /* 
+    Pedro Alonso Moreno Salcedo A01741437 - Test #2/10
+
+    This test verifies that the Ruler Survey gamification
+    (the four-quadrant one) sets the emotion correctly
+    when its passed as a prop and is highlighted when
+    the mouse enters and leaves
+  */
   it("Should get an emotion", () => {
     render(
       <RulerStepOne
@@ -67,7 +80,13 @@ describe("RulerSurvey Component Test", () => {
     expect(emotion).not.toHaveClass("scale-150");
   });
 
-  // Pedro Alonso Moreno Salcedo A01741437 - Test #3/10
+  /* 
+    Pedro Alonso Moreno Salcedo A01741437 - Test #3/10
+
+    This test verifies that the Ruler Survey gamification
+    (the four-quadrant one) sets the emotion correctly
+    and the right color is assigned from the gradient
+  */
   it("Should have the right color", () => {
     render(
       <RulerStepOne
@@ -84,7 +103,13 @@ describe("RulerSurvey Component Test", () => {
     );
   });
 
-  // Pedro Alonso Moreno Salcedo A01741437 - Test #4/10
+  /* 
+    Pedro Alonso Moreno Salcedo A01741437 - Test #4/10
+
+    This test verifies that the Ruler Survey gamification
+    (the four-quadrant one) calls the setEmotion() callback
+    once when the user presses on the emotion button
+  */
   it("Should set an emotion", () => {
     render(
       <RulerStepOne
@@ -100,7 +125,13 @@ describe("RulerSurvey Component Test", () => {
     expect(setMockEmotion).toHaveBeenCalledTimes(1);
   });
 
-  // Pedro Alonso Moreno Salcedo A01741437 - Test #5/10
+  /* 
+    Pedro Alonso Moreno Salcedo A01741437 - Test #5/10
+
+    This test verifies that the Ruler Survey gamification
+    (the four-quadrant one) calls the nextStep function
+    after it clicks on the emotion
+  */
   it("Should go to the next step", async () => {
     render(
       <RulerStepOne

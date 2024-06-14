@@ -99,6 +99,18 @@ export type Task = {
   status: string | null;
 };
 
+export type RulerTask = {
+  id: number;
+  description: string | null;
+  userId: string | null;
+  rulerSurveyId: number | null;
+  sprintSurveyId: number | null;
+  finalSurveyId: number | null;
+  title: string | null;
+  status: "PENDING" | "IN_PROGRESS" | "DONE";
+  date: Date | null;
+};
+
 export type Resource = {
   id: number;
   userId: string | null;
@@ -106,4 +118,14 @@ export type Resource = {
   description: string | null;
   kind: string | null;
   url: string | null;
+};
+
+export type RulerResource = {
+  id: number;
+  userId: string | null;
+  title: string | null;
+  description: string | null;
+  kind: string | null;
+  url: string | null;
+  date: Date | null;
 };
