@@ -13,7 +13,6 @@ interface DraggableUserProps {
 
 const DraggableUser = ({ user, times = 0 }: DraggableUserProps) => {
   const [isDragging, setIsDragging] = useState(false);
-
   return (
     <Draggable
       id={`base-${user.userId}`}
@@ -37,7 +36,10 @@ const DraggableUser = ({ user, times = 0 }: DraggableUserProps) => {
       ) : (
         <Tooltip message={user.name}>
           {times > 1 && (
-            <span className="relative left-3 top-3 z-10 flex h-3 w-3 cursor-move items-center justify-center rounded-full bg-primary-light p-2 text-[0.6rem] font-medium text-white">
+            <span
+              data-testid={`user-${user.userId}-times`}
+              className="relative left-3 top-3 z-10 flex h-3 w-3 cursor-move items-center justify-center rounded-full bg-primary-light p-2 text-[0.6rem] font-medium text-white"
+            >
               x{times}
             </span>
           )}

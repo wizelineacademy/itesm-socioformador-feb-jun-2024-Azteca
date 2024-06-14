@@ -1,5 +1,9 @@
 import React from "react";
-import { getUserInfoById, getUserSkillsById } from "@/services/user";
+import {
+  getCoWorkers,
+  getUserInfoById,
+  getUserSkillsById,
+} from "@/services/user";
 import ProfileBanner from "@/components/Profile/ProfileBanner";
 import ProfileSection from "@/components/Profile/ProfileSection";
 import CoWorkersCarousel from "@/components/CoWorkersCarousel";
@@ -9,7 +13,8 @@ import ProfileTraits from "@/components/Profile/ProfileTraits";
 const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
   const user = await getUserInfoById(params.id);
   const traits = await getUserSkillsById(params.id);
-
+  const coworkers: { name: string; id: string; photoUrl: string | null }[] =
+    await getCoWorkers(params.id);
   return (
     <main>
       <ProfileBanner user={user} />
@@ -21,7 +26,7 @@ const Profile: React.FC<{ params: { id: string } }> = async ({ params }) => {
             userId={params.id}
             type="coworkers"
           >
-            <CoWorkersCarousel userId={params.id} />
+            <CoWorkersCarousel coworkers={coworkers} />
           </ProfileSection>
           <ProfileSection
             title="Projects"

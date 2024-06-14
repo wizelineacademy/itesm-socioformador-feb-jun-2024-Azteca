@@ -245,7 +245,10 @@ const SprintStepTwo = ({
     }
   };
   return (
-    <main className="flex h-full w-full flex-col items-center justify-center">
+    <main
+      data-testid="sprint-step-two"
+      className="flex h-full w-full flex-col items-center justify-center"
+    >
       <p className="mt-6 self-start text-sm">
         <strong>Drag and drop</strong> the profile picture of yonpmur{" "}
         <strong>co-worker</strong> to the box that{" "}

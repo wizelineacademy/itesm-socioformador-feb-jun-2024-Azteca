@@ -1,3 +1,4 @@
+//José Carlos Sánchez Gómez - A01174050
 describe("Profile", () => {
   beforeEach(() => {
     cy.visit("/profile");
@@ -19,5 +20,13 @@ describe("Profile", () => {
       "src",
       `/Banner${randomNumber}.svg`,
     );
+  });
+  // Felipe de Jesús González Acosta A01275536 - Test #1/1
+  // Test know if sign out works correctly
+  it("Should signout", () => {
+    cy.get('[data-testid="user-icon-navbar"]').click();
+    cy.get('[data-testid="signout-button"]').click();
+    cy.wait(6000);
+    cy.url().should("include", "/login");
   });
 });

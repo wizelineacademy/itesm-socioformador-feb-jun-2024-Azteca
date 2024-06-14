@@ -15,23 +15,19 @@ interface Person {
   photoUrl: string;
 }
 
-const fetchFilteredUsers = async (query: string) => {
-  const res = await searchUsers(query); // Llama directamente a la función del backend
-  return res;
-};
-
 const ComboBoxSearch = () => {
   const [query, setQuery] = useState("");
   const router = useRouter();
 
-  const useSearchUsers = (query: string) => {
-    return useQuery({
-      queryKey: ["search-users", query],
-      queryFn: () => fetchFilteredUsers(query),
-    });
+  const fetchFilteredUsers = async (query: string) => {
+    const res = await searchUsers(query); // Llama directamente a la función del backend
+    return res;
   };
 
-  const { data: people = [], isLoading } = useSearchUsers(query);
+  const { data: people = [], isLoading } = useQuery({
+    queryKey: ["search-users", query],
+    queryFn: () => fetchFilteredUsers(query),
+  });
 
   const handleSelect = (person: Person | null) => {
     if (person) {
@@ -59,7 +55,10 @@ const ComboBoxSearch = () => {
           className={`h-10 ${isExpanded ? "w-80" : "w-32"} rounded-full border border-gray-300 bg-white px-4 shadow-lg transition-all duration-300 focus:border-blue-500 focus:outline-none`}
         /> */}
         {query !== "" && (
-          <Combobox.Options className="absolute z-10 mt-1 max-h-52 w-full overflow-auto rounded-md border border-gray-300 bg-white p-2 shadow-lg empty:hidden">
+          <Combobox.Options
+            data-testid="combobox-results"
+            className="absolute z-10 mt-1 max-h-52 w-full overflow-auto rounded-md border border-gray-300 bg-white p-2 shadow-lg empty:hidden"
+          >
             {isLoading ? (
               <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
                 Loading...
@@ -72,6 +71,7 @@ const ComboBoxSearch = () => {
               people.map((person) => (
                 <Combobox.Option
                   key={person.id}
+                  data-testid={`option-${person.name.toLowerCase()}`}
                   value={person}
                   className={({ active }) =>
                     `flex cursor-default select-none items-center gap-2 rounded-xl px-2 py-1 text-sm text-gray-900 ${active && "bg-primary-light text-white"}`

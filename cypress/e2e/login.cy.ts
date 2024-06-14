@@ -1,3 +1,4 @@
+//José Carlos Sánchez Gómez - A01174050
 describe("Login", () => {
   it("Visits Login page, and signs in", () => {
     cy.visit("/");

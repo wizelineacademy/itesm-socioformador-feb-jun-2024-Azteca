@@ -2,6 +2,8 @@ const randomEmotion = {
   row: Math.floor(Math.random() * 12),
   col: Math.floor(Math.random() * 12),
 };
+
+//José Carlos Sánchez Gómez - A01174050
 describe("Testing different surveys", () => {
   beforeEach(() => {
     cy.visit("/");
