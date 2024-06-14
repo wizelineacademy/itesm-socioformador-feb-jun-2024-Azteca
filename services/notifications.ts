@@ -37,6 +37,7 @@ export async function getNotifications() {
       id: sprintSurvey.id,
       projectName: project.name,
       date: sprintSurvey.scheduledAt,
+      projectId: project.id,
     })
     .from(sprintSurvey)
     .innerJoin(project, eq(project.id, sprintSurvey.projectId))

@@ -139,7 +139,7 @@ export async function getCoworkersInProject(sprintSurveyId: number) {
   const session = await auth();
   const currentUserId = session?.user?.id;
   if (!currentUserId) throw new Error("You must be signed in");
-  return await db
+  const coworkers = db
     .select({
       userId: user.id,
       name: user.name,
@@ -155,6 +155,9 @@ export async function getCoworkersInProject(sprintSurveyId: number) {
         ne(user.id, currentUserId), // Exclude the current user from the results
       ),
     );
+
+  console.log(coworkers);
+  return coworkers;
 }
 
 export type SurveyStatus =
