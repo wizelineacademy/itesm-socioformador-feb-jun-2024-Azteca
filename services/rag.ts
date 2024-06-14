@@ -726,8 +726,8 @@ async function setUserPCP(
 ) {
   // ================== CLOSED FEEDBACK SUMMARIZED ==================
   let uniqueResources: Set<number> = new Set<number>();
-  let strengthsIds: Set<number> = new Set();
-  let weaknessesIds: Set<number> = new Set();
+  let feedbackStrengthsIds: Set<number> = new Set();
+  let feedbackWeaknessesIds: Set<number> = new Set();
   const userNegativeSkills: [number, number][] = []; // [coworkersCount, negativeSkillId]
 
   // get the detected negative skills
@@ -760,7 +760,7 @@ async function setUserPCP(
       uniqueResources.add(resource.resourceId as number),
     );
 
-    weaknessesIds = new Set(negativeSkillsIds);
+    feedbackWeaknessesIds = new Set(negativeSkillsIds);
   }
 
   const positiveSkillsIds: number[] = [];
@@ -772,37 +772,37 @@ async function setUserPCP(
     },
   );
 
-  strengthsIds = new Set(positiveSkillsIds);
+  feedbackStrengthsIds = new Set(positiveSkillsIds);
 
   // ================== ANALYSIS OF COMMENTS ==================
 
   if (type === "SPRINT_SURVEY") {
-    [uniqueResources, strengthsIds, weaknessesIds] =
+    [uniqueResources, feedbackStrengthsIds, feedbackWeaknessesIds] =
       await processCoworkersOpenFeedback(
         userFeedback,
         uniqueResources,
-        strengthsIds,
-        weaknessesIds,
+        feedbackStrengthsIds,
+        feedbackWeaknessesIds,
       );
   } else if (type === "FINAL_PROJECT_SURVEY") {
-    [uniqueResources, strengthsIds, weaknessesIds] =
+    [uniqueResources, feedbackStrengthsIds, feedbackWeaknessesIds] =
       await processProjectOpenFeedback(
         userFeedback,
         uniqueResources,
-        strengthsIds,
-        weaknessesIds,
+        feedbackStrengthsIds,
+        feedbackWeaknessesIds,
       );
   }
 
   // =========== STORE SELECTED TASKS AND RESOURCES ===========
 
-  if (weaknessesIds.size > 0) {
+  if (feedbackWeaknessesIds.size > 0) {
     // get the name of the weaknesses
 
     const weaknessesRecords = await db
       .select({ negativeSkill: skill.negativeSkill })
       .from(skill)
-      .where(inArray(skill.id, Array.from(weaknessesIds)));
+      .where(inArray(skill.id, Array.from(feedbackWeaknessesIds)));
 
     const weaknessesNames: string[] = weaknessesRecords.map(
       (skill) => skill.negativeSkill as string,
@@ -873,10 +873,26 @@ async function setUserPCP(
     }
 
     // set weaknesses of the user
-    const weaknessesArray = Array.from(weaknessesIds);
+    const oldWeaknesses: Set<number> = new Set();
 
-    // Insert all values into the userSkill table
-    for (const weaknessId of weaknessesArray) {
+    const oldWeaknessesArray = await db
+      .select({ skillId: skill.id })
+      .from(userSkill)
+      .where(eq(userSkill.userId, userId));
+
+    oldWeaknessesArray.forEach((userWeakness) => {
+      oldWeaknesses.add(userWeakness.skillId as number);
+    });
+
+    const newWeaknesses = new Set<number>();
+
+    for (const id of Array.from(feedbackWeaknessesIds)) {
+      if (!oldWeaknesses.has(id)) {
+        newWeaknesses.add(id);
+      }
+    }
+
+    for (const weaknessId of Array.from(newWeaknesses)) {
       await db.insert(userSkill).values({
         userId: userId,
         skillId: weaknessId,
@@ -886,7 +902,7 @@ async function setUserPCP(
   }
 
   // set the strengths of the user
-  const strengthsArray = Array.from(strengthsIds);
+  const strengthsArray = Array.from(newStrengthsIds);
   for (const strengthId of strengthsArray) {
     await db.insert(userSkill).values({
       userId: userId,
