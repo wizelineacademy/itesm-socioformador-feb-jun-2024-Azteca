@@ -45,9 +45,8 @@ export async function getUserTasksForCurrentSprintByProjectId(
   // check if the sprint is not processed to throw an error
   // check if there's no sprint survey results throw an error
   // check if all the surveys were answered, so the only one left is the project one
-
   if (!currentSprintSurvey.processed) {
-    return "Curreny sprint survey was found, but it is not processed yet";
+    return "Current sprint survey was found, but it is not processed yet";
   }
 
   const tasks = await db
@@ -60,7 +59,6 @@ export async function getUserTasksForCurrentSprintByProjectId(
       ),
     )
     .orderBy(asc(pipTask.title));
-
   if (tasks.length === 0) {
     return "No tasks available. Ask your manager for an update.";
   }

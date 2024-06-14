@@ -168,10 +168,10 @@ const SprintSurvey = ({
     onSuccess: () => {
       router.refresh();
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      toast.success("Encuesta enviada exitosamente!");
+      toast.success("Survey submitted!");
     },
     onError: () => {
-      toast.error("Error al enviar la encuesta");
+      toast.error("Error submitting the survey.");
     },
   });
 
@@ -210,6 +210,7 @@ const SprintSurvey = ({
               leaveTo="opacity-0"
             >
               <Dialog.Panel
+                data-testid="sprint-survey"
                 className={`sprint-survey flex h-auto transform flex-col rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all duration-500 ${modalWidth}`}
               >
                 <Dialog.Title
