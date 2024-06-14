@@ -38,7 +38,7 @@ jobs:
         run: npm ci
 
       - name: Start the server
-        run: npm run dev &
+        run: npm run build && npm run start &
         env:
           CYPRESS_CACHE_FOLDER: ~/.cache/Cypress
 
@@ -52,6 +52,7 @@ jobs:
           headless: true
         env:
           CYPRESS_CACHE_FOLDER: ~/.cache/Cypress
+
   unit-test:
     runs-on: ubuntu-latest
 
