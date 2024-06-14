@@ -13,9 +13,10 @@ describe("Register", () => {
     cy.get("label").contains("Department").click().type("QA");
     cy.get("button").contains("Register").click();
     cy.get("div").contains("Account created successfully.").should("exist");
-    cy.wait(12000);
+    cy.wait(8000);
     cy.url().should("include", "/dashboard");
     cy.visit("/profile");
+    cy.wait(8000);
     cy.get("h2").contains("Cypress prueba");
   });
 
