@@ -11,6 +11,7 @@ import {
   sprintSurveyAnswerProject,
   rulerSurveyAnswers,
   rulerEmotion,
+  sprintSurveyQuestion,
 } from "@/db/schema";
 import { and, asc, eq, inArray, ne, or } from "drizzle-orm";
 import { SQSClient, SendMessageBatchCommand } from "@aws-sdk/client-sqs";
@@ -97,11 +98,23 @@ export async function createProject({
     );
   };
 
+  const sprintSurveyQuestionsIds: number[] = [30, 31, 32, 33, 34, 41];
+
   jumpToNextSprint();
   while (currentDate <= newProject.endDate) {
-    await db
+    const [insertedSurvey] = await db
       .insert(sprintSurvey)
-      .values({ projectId, scheduledAt: currentDate });
+      .values({ projectId, scheduledAt: currentDate })
+      .returning({ id: sprintSurvey.id });
+
+    // insertedSurvey.id
+
+    await db.insert(sprintSurveyQuestion).values(
+      sprintSurveyQuestionsIds.map((questionId) => ({
+        sprintSurveyId: insertedSurvey.id,
+        questionId: questionId,
+      })),
+    );
 
     jumpToNextSprint();
   }
