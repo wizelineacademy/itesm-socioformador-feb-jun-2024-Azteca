@@ -7,6 +7,7 @@ import {
   userResource,
   pipResource,
   SelectPipResource,
+  rulerSurveyAnswers,
 } from "@/db/schema";
 import db from "@/db/drizzle";
 import { eq, lte, and, desc, asc, isNotNull } from "drizzle-orm";
@@ -227,19 +228,28 @@ export async function updateTask({
 export async function rulerResources() {
   const session = await auth();
   const userId = session?.user?.id as string;
-
   const resources = db
-    .select()
+    .select({
+      id: userResource.resourceId,
+      description: pipResource.description,
+      embedding: pipResource.embedding,
+      title: pipResource.title,
+      kind: pipResource.kind,
+      date: rulerSurveyAnswers.answeredAt,
+    })
     .from(userResource)
     .leftJoin(pipResource, eq(userResource.resourceId, pipResource.id))
+    .leftJoin(
+      rulerSurveyAnswers,
+      eq(rulerSurveyAnswers.id, userResource.rulerSurveyId),
+    )
     .where(
       and(
         eq(userResource.userId, userId),
         isNotNull(userResource.rulerSurveyId),
       ),
     )
-    .orderBy(userResource.rulerSurveyId);
-
+    .orderBy(desc(rulerSurveyAnswers.answeredAt));
   return resources;
 }
 
@@ -248,10 +258,24 @@ export async function rulerTask() {
   const userId = session?.user?.id as string;
 
   const tasks = db
-    .select()
+    .select({
+      id: pipTask.id,
+      userId: pipTask.userId,
+      description: pipTask.description,
+      rulerSurveyId: pipTask.rulerSurveyId,
+      sprintSurveyId: pipTask.sprintSurveyId,
+      finalSurveyId: pipTask.finalSurveyId,
+      title: pipTask.title,
+      status: pipTask.status,
+      date: rulerSurveyAnswers.answeredAt,
+    })
     .from(pipTask)
+    .leftJoin(
+      rulerSurveyAnswers,
+      eq(rulerSurveyAnswers.id, pipTask.rulerSurveyId),
+    )
     .where(and(eq(pipTask.userId, userId), isNotNull(pipTask.rulerSurveyId)))
-    .orderBy(userResource.rulerSurveyId);
+    .orderBy(desc(rulerSurveyAnswers.answeredAt));
 
   return tasks;
 }
