@@ -20,7 +20,7 @@ describe("NoDataCard Component", () => {
   it("renders image on medium and larger screens", () => {
     render(<NoDataCard text="No data available" />);
 
-    const imageElement = screen.getByAltText("No Data Image");
+    const imageElement = screen.getByAltText("NoDataSVG");
     expect(imageElement).toBeInTheDocument();
     expect(imageElement).toHaveClass("hidden md:block");
   });
