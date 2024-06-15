@@ -295,7 +295,7 @@ const PCPTasks = ({
         </div>
 
         {tasksLoading ? (
-          <p>loading...</p>
+          <p>loading..</p>
         ) : tasksData && typeof tasksData === "string" ? (
           <NoDataCard text={tasksData} />
         ) : (
