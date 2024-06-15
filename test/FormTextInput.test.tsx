@@ -1,6 +1,59 @@
+import React from "react";
 import FormTextInput from "@/components/FormTextInput";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+
+describe("FormTextInput Component", () => {
+  //  José Eduardo de Valle Lara A01734957 - Test #1/5
+  it("renders correctly with provided props", () => {
+    render(<FormTextInput name="email" type="email" label="Email Address" />);
+
+    const input = screen.getByTestId("email");
+    expect(input).toBeInTheDocument();
+    expect(input).toHaveAttribute("type", "email");
+    expect(screen.getByLabelText("Email Address")).toBeInTheDocument();
+  });
+
+  // Jose Eduardo De Valle Lara A01734957 - Test #2/5
+  it("toggles password visibility when show button is clicked", () => {
+    render(<FormTextInput name="password" type="password" label="Password" />);
+
+    const input = screen.getByTestId("password");
+    const toggleButton = screen.getByRole("button", { name: /show/i });
+
+    expect(input).toHaveAttribute("type", "password");
+
+    fireEvent.click(toggleButton);
+    expect(input).toHaveAttribute("type", "text");
+
+    fireEvent.click(toggleButton);
+    expect(input).toHaveAttribute("type", "password");
+  });
+
+  // Jose Eduardo De Valle Lara A01734957 - Test #3/5
+  it("sets autocomplete attribute based on type and name", () => {
+    render(<FormTextInput name="name" type="text" label="Full Name" />);
+
+    const input = screen.getByTestId("name");
+    expect(input).toHaveAttribute("autocomplete", "on");
+  });
+
+  // Jose Eduardo De Valle Lara A01734957 - Test #4/5
+  it("sets autocomplete attribute for email", () => {
+    render(<FormTextInput name="email" type="email" label="Email Address" />);
+
+    const input = screen.getByTestId("email");
+    expect(input).toHaveAttribute("autocomplete", "on");
+  });
+
+  // Jose Eduardo De Valle Lara A01734957 - Test #5/5
+  it("sets autocomplete attribute off for other fields", () => {
+    render(<FormTextInput name="username" type="text" label="Username" />);
+
+    const input = screen.getByTestId("username");
+    expect(input).toHaveAttribute("autocomplete", "off");
+  });
+});
 
 describe("FormTextInput Component Test", () => {
   // José Carlos Sánchez Gómez A01745810 - Test #1/10
