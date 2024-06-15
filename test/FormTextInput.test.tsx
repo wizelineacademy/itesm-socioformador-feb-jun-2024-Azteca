@@ -14,7 +14,7 @@ describe("FormTextInput Component", () => {
     expect(screen.getByLabelText("Email Address")).toBeInTheDocument();
   });
 
-  // Jose Eduardo De Valle Lara A01734957 - Test #2/5
+  // José Eduardo de Valle Lara A01734957 - Test #2/5
   it("toggles password visibility when show button is clicked", () => {
     render(<FormTextInput name="password" type="password" label="Password" />);
 
@@ -30,7 +30,7 @@ describe("FormTextInput Component", () => {
     expect(input).toHaveAttribute("type", "password");
   });
 
-  // Jose Eduardo De Valle Lara A01734957 - Test #3/5
+  // José Eduardo de Valle Lara A01734957 - Test #3/5
   it("sets autocomplete attribute based on type and name", () => {
     render(<FormTextInput name="name" type="text" label="Full Name" />);
 
@@ -38,7 +38,7 @@ describe("FormTextInput Component", () => {
     expect(input).toHaveAttribute("autocomplete", "on");
   });
 
-  // Jose Eduardo De Valle Lara A01734957 - Test #4/5
+  // José Eduardo de Valle Lara A01734957 - Test #4/5
   it("sets autocomplete attribute for email", () => {
     render(<FormTextInput name="email" type="email" label="Email Address" />);
 
@@ -46,7 +46,7 @@ describe("FormTextInput Component", () => {
     expect(input).toHaveAttribute("autocomplete", "on");
   });
 
-  // Jose Eduardo De Valle Lara A01734957 - Test #5/5
+  // José Eduardo de Valle Lara A01734957 - Test #5/5
   it("sets autocomplete attribute off for other fields", () => {
     render(<FormTextInput name="username" type="text" label="Username" />);
 
