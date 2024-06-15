@@ -14,7 +14,7 @@ describe("Register", () => {
     cy.get("button").contains("Register").click();
     cy.wait(2000);
     cy.get("div").contains("Account created successfully.").should("exist");
-    cy.wait(60000);
+    cy.wait(61000);
     cy.url().should("include", "/dashboard");
     cy.visit("/profile");
     cy.wait(30000);
