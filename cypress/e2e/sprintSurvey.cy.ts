@@ -10,4 +10,15 @@ describe("Sprint Survey", () => {
     cy.get('[data-testid="Sprint Survey"]').click();
     cy.get('[data-testid="sprint-survey"]').should("exist");
   });
+
+  // José Eduardo de Valle Lara A01734957
+  it("Not allow to move forward if not done with step two", () => {
+    cy.get("button").contains("Next").click();
+    cy.get('[data-testid="sprint-step-two"]').should("exist");
+    cy.wait(3000);
+    cy.get("button").contains("Submit").click();
+    cy.get("div")
+      .contains("Please fill all the fields before submitting the survey")
+      .should("exist");
+  });
 });
