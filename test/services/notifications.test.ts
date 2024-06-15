@@ -56,7 +56,7 @@ vi.mock("drizzle-orm", () => ({
   isNull: vi.fn(),
 }));
 
-// José Carlos Sánchez Gómez A01745810 - Test #6/10
+// José Carlos Sánchez Gómez A01174050 - Test #6/10
 describe("getNotifications", () => {
   it("should return notifications", async () => {
     const notifications = await getNotifications();

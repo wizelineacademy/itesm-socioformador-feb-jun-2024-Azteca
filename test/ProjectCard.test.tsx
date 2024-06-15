@@ -26,7 +26,7 @@ vi.mock("@/services/project", () => {
 });
 
 describe("ProjectCard Component Test", () => {
-  // José Carlos Sánchez Gómez A01745810 - Test #7/10
+  // José Carlos Sánchez Gómez A01174050 - Test #7/10
   it("Should render the project card", async () => {
     const component = await ProjectCard({
       id: 1,
@@ -40,7 +40,7 @@ describe("ProjectCard Component Test", () => {
     expect(projectCard).toBeInTheDocument();
   });
 
-  // José Carlos Sánchez Gómez A01745810 - Test #8/10
+  // José Carlos Sánchez Gómez A01174050 - Test #8/10
   it("Should render all the coworkers", async () => {
     const component = await ProjectCard({
       id: 1,
@@ -56,7 +56,7 @@ describe("ProjectCard Component Test", () => {
     });
   });
 
-  // José Carlos Sánchez Gómez A01745810 - Test #9/10
+  // José Carlos Sánchez Gómez A01174050 - Test #9/10
   it("Should render all the properties", async () => {
     const component = await ProjectCard({
       id: 1,
